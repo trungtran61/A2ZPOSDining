@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Employee } from "~/app/models/employees";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail } from "~/app/models/products";
+import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, ChoiceOption, ForcedModifier } from "~/app/models/products";
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
@@ -11,6 +11,7 @@ var Sqlite = require("nativescript-sqlite");
 
 @Injectable()
 export class SQLiteService {
+
     private static database: any;
     public categories: Array<any>;
     public products: Array<any>;
@@ -29,11 +30,11 @@ export class SQLiteService {
         */
         if (!SQLiteService.isInstantiated) {
             (new Sqlite("FullServiceDining.db")).then(db => {
-
+                SQLiteService.database = db;
+                SQLiteService.isInstantiated = true;
                 console.log("FullServiceDining DB opened.");
+
                 db.execSQL("CREATE TABLE IF NOT EXISTS Employees (EmployeeID TEXT PRIMARY KEY, FirstName TEXT);").then(id => {
-                    SQLiteService.database = db;
-                    SQLiteService.isInstantiated = true;
                     console.log("Employees table created");
                     this.getRecordCount('Employees');
                 }, error => {
@@ -41,7 +42,6 @@ export class SQLiteService {
                 });
 
                 db.execSQL("CREATE TABLE IF NOT EXISTS CategoryCodes (PriKey INTEGER PRIMARY KEY, CategoryCode1 TEXT, Description TEXT, PrintGroup INTEGER);").then(id => {
-                    SQLiteService.database = db;
                     console.log("categorycodes table created");
                     this.getRecordCount('CategoryCodes');
                 }, error => {
@@ -49,7 +49,6 @@ export class SQLiteService {
                 });
 
                 db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER,ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier TEXT,UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
-                    SQLiteService.database = db;
                     console.log("Products table created");
                     this.getRecordCount('Products');
                 }, error => {
@@ -57,17 +56,13 @@ export class SQLiteService {
                 });
 
                 db.execSQL("CREATE TABLE IF NOT EXISTS ProductCategories (PriKey INTEGER PRIMARY KEY, ProductFilter INTEGER, Category INTEGER, SubCategory INTEGER, Position INTEGER, ButtonColor TEXT, ButtonForeColor TEXT);").then(id => {
-                    SQLiteService.database = db;
                     console.log("ProductCategories table created");
                     this.getRecordCount('ProductCategories');
                 }, error => {
                     console.log("CREATE TABLE CategoryCodes ERROR", error);
                 });
 
-                //this.getRecordCount('Areas');
-                //this.getAreas();
                 db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
-                    SQLiteService.database = db;
                     console.log("Table Areas created");
                     this.getRecordCount('Areas');
                 }, error => {
@@ -75,14 +70,12 @@ export class SQLiteService {
                 });
 
                 db.execSQL("CREATE TABLE IF NOT EXISTS Tables (AreaID INTEGER, Name TEXT, Height INTEGER, Width INTEGER, PosX INTEGER, PosY INTEGER, TableType INTEGER);").then(id => {
-                    SQLiteService.database = db;
                     this.getRecordCount('Tables');
                 }, error => {
                     console.log("CREATE TABLE Tables ERROR", error);
                 });
 
                 db.execSQL("CREATE TABLE IF NOT EXISTS MenuCategories (CategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-                    SQLiteService.database = db;
                     console.log("Tables MenuCategories created");
                     this.getRecordCount('MenuCategories');
                 }, error => {
@@ -90,7 +83,6 @@ export class SQLiteService {
                 });
 
                 db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubCategories (CategoryID INTEGER, SubCategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-                    SQLiteService.database = db;
                     console.log("Tables MenuSubCategories created");
                     this.getRecordCount('MenuSubCategories');
                 }, error => {
@@ -98,11 +90,24 @@ export class SQLiteService {
                 });
 
                 db.execSQL("CREATE TABLE IF NOT EXISTS MenuProducts (CategoryID INTEGER, SubCategoryID INTEGER,ProductID INTEGER,Name TEXT,Position INTEGER,ProductCode INTEGER,ButtonColor INTEGER,ButtonColorHex TEXT,ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-                    SQLiteService.database = db;
                     console.log("Tables Products created");
                     this.getRecordCount('MenuProducts');
                 }, error => {
                     console.log("CREATE TABLE Products ERROR", error);
+                });
+
+                db.execSQL("CREATE TABLE IF NOT EXISTS ForcedModifiers (ProductCode INTEGER, OptionCode INTEGER, Charge REAL, Layer INTEGER, Position INTEGER,ForcedOption INTEGER,OptionFilter INTEGER, ChoiceName TEXT,ReportProductMix INTEGER);").then(id => {
+                    console.log("Table ForcedModifier screated");
+                    this.getRecordCount('ForcedModifiers');
+                }, error => {
+                    console.log("CREATE TABLE ForcedModifier ERROR", error);
+                });
+
+                db.execSQL("CREATE TABLE IF NOT EXISTS ChoiceOptions (PriKey INTEGER, Name TEXT, Price REAL, PrintName TEXT, CategoryCode INTEGER);").then(id => {
+                    console.log("Table ChoiceOptions created");
+                    this.getRecordCount('ChoiceOptions');
+                }, error => {
+                    console.log("CREATE TABLE ChoiceOptions ERROR", error);
                 });
 
             }, error => {
@@ -236,7 +241,6 @@ export class SQLiteService {
     public loadMenuProducts(MenuProducts: any[]) {
         let that = this;
         MenuProducts.forEach(function (menuProduct: MenuProduct) {
-
             SQLiteService.database.execSQL("INSERT INTO MenuProducts (CategoryID, SubCategoryID, ProductID, Name, Position, ProductCode, ButtonColor, ButtonColorHex, ButtonForeColor, ButtonForeColorHex) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 [menuProduct.CategoryID, menuProduct.SubCategoryID, menuProduct.ProductID, menuProduct.Name, menuProduct.ProductCode, menuProduct.Position,
                 menuProduct.ButtonColor, that.padZeroes(parseInt(menuProduct.ButtonColor.toString()).toString(16), 6),
@@ -269,6 +273,57 @@ export class SQLiteService {
                 }
                 return (menuProducts);
             });
+    }
+
+    public getChoiceOptions() {
+        let headers = this.createRequestHeader();
+        this.http.get(this.apiUrl + 'GetOption', { headers: headers })
+            .subscribe(
+                data => {
+                    console.log('got Options from API: ' + data);
+                    this.loadChoiceOptions(<ChoiceOption[]>data);
+                },
+                err => {
+                    console.log("Error occured while retrieving Options from API.");
+                    console.log(err);
+                }
+            );
+
+    }
+
+    public loadChoiceOptions(choiceOptions: any[]) {
+        let that = this;
+        choiceOptions.forEach(function (choiceOption: ChoiceOption) {
+            SQLiteService.database.execSQL("INSERT INTO ChoiceOptions (PriKey, Name,Price,PrintName,CategoryCode) VALUES (?, ?, ?, ?, ?)",
+                [choiceOption.PriKey, choiceOption.Name,choiceOption.Price,choiceOption.PrintName,choiceOption.CategoryCode]);
+        }
+        );
+    }
+
+    public getForcedModifiers() {
+        let headers = this.createRequestHeader();
+        this.http.get(this.apiUrl + 'GetOption', { headers: headers })
+            .subscribe(
+                data => {
+                    console.log('got Options from API: ' + data);
+                    this.loadForcedModifiers(<ForcedModifier[]>data);
+                },
+                err => {
+                    console.log("Error occured while retrieving Options from API.");
+                    console.log(err);
+                }
+            );
+
+    }
+
+    public loadForcedModifiers(forcedModifiers: any[]) {
+        let that = this;
+        forcedModifiers.forEach(function (forcedModifier: ForcedModifier) {
+            SQLiteService.database.execSQL("INSERT INTO ForcedModifiers (Charge, ChoiceName,ForcedOption,Layer,OptionCode, OptionFilter, Position,ProductCode,ReportProductMix) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )",
+                [forcedModifier.Charge, forcedModifier.ChoiceName,forcedModifier.ForcedOption,forcedModifier.Layer,forcedModifier.OptionCode,
+                 forcedModifier.OptionFilter, forcedModifier.Position,forcedModifier.ProductCode,forcedModifier.ReportProductMix]);
+        }
+        );
     }
 
     public getEmployees() {
@@ -515,7 +570,7 @@ export class SQLiteService {
     }
 
     public logoff(): Observable<any> {
-        let headers = this.createRequestHeader();        
+        let headers = this.createRequestHeader();
         return this.http.get(this.apiUrl + 'logoff?EmployeeID=' + this.loggedInUser.PriKey,
             { headers: headers }).pipe(map(res => res));
     }
@@ -597,6 +652,16 @@ export class SQLiteService {
                         case 'MenuProducts':
                             {
                                 that.getMenuProducts();
+                                break;
+                            }
+                        case 'ForcedModifiers':
+                            {
+                                that.getForcedModifiers();
+                                break;
+                            }
+                        case 'ChoiceOptions':
+                            {
+                                that.getChoiceOptions();
                                 break;
                             }
                     }
