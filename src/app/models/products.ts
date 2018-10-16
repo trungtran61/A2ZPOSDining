@@ -188,7 +188,7 @@ export interface TableDetail {
     Width: number;
 }
 
-export interface ChoiceOption {
+export interface Option {
     PriKey: number;
     Name: string;
     Price: number;
@@ -208,3 +208,7 @@ export interface ForcedModifier {
     ReportProductMix: boolean;
 }
 
+export interface OptionCategory {
+    PriKey: number;
+    Name: string;
+}

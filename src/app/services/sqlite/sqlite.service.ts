@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Employee } from "~/app/models/employees";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, ChoiceOption, ForcedModifier } from "~/app/models/products";
+import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, ForcedModifier, OptionCategory } from "~/app/models/products";
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
@@ -103,11 +103,18 @@ export class SQLiteService {
                     console.log("CREATE TABLE ForcedModifier ERROR", error);
                 });
 
-                db.execSQL("CREATE TABLE IF NOT EXISTS ChoiceOptions (PriKey INTEGER, Name TEXT, Price REAL, PrintName TEXT, CategoryCode INTEGER);").then(id => {
-                    console.log("Table ChoiceOptions created");
-                    this.getRecordCount('ChoiceOptions');
+                db.execSQL("CREATE TABLE IF NOT EXISTS Options (PriKey INTEGER, Name TEXT, Price REAL, PrintName TEXT, CategoryCode INTEGER);").then(id => {
+                    console.log("Table Options created");
+                    this.getRecordCount('Options');
                 }, error => {
-                    console.log("CREATE TABLE ChoiceOptions ERROR", error);
+                    console.log("CREATE TABLE Options ERROR", error);
+                });
+
+                db.execSQL("CREATE TABLE IF NOT EXISTS OptionCategories (PriKey INTEGER, Name TEXT);").then(id => {
+                    console.log("Table OptionCategories created");
+                    this.getRecordCount('OptionCategories');
+                }, error => {
+                    console.log("CREATE TABLE OptionCategories ERROR", error);
                 });
 
             }, error => {
@@ -275,13 +282,38 @@ export class SQLiteService {
             });
     }
 
-    public getChoiceOptions() {
+    public getOptionCategories() {
+        let headers = this.createRequestHeader();
+        this.http.get(this.apiUrl + 'GetOption', { headers: headers })
+            .subscribe(
+                data => {
+                    console.log('got OptionCategories from API: ' + data);
+                    this.loadOptionCategories(<OptionCategory[]>data);
+                },
+                err => {
+                    console.log("Error occured while retrieving OptionCategories from API.");
+                    console.log(err);
+                }
+            );
+
+    }
+
+    public loadOptionCategories(optionCategories: any[]) {
+        let that = this;
+        optionCategories.forEach(function (optionCategory: OptionCategory) {
+            SQLiteService.database.execSQL("INSERT INTO OptionCategories (PriKey, Name) VALUES (?, ?)",
+                [optionCategory.PriKey, optionCategory.Name]);
+        }
+        );
+    }
+
+    public getOptions() {
         let headers = this.createRequestHeader();
         this.http.get(this.apiUrl + 'GetOption', { headers: headers })
             .subscribe(
                 data => {
                     console.log('got Options from API: ' + data);
-                    this.loadChoiceOptions(<ChoiceOption[]>data);
+                    this.loadOptions(<Option[]>data);
                 },
                 err => {
                     console.log("Error occured while retrieving Options from API.");
@@ -291,11 +323,11 @@ export class SQLiteService {
 
     }
 
-    public loadChoiceOptions(choiceOptions: any[]) {
+    public loadOptions(Options: any[]) {
         let that = this;
-        choiceOptions.forEach(function (choiceOption: ChoiceOption) {
-            SQLiteService.database.execSQL("INSERT INTO ChoiceOptions (PriKey, Name,Price,PrintName,CategoryCode) VALUES (?, ?, ?, ?, ?)",
-                [choiceOption.PriKey, choiceOption.Name,choiceOption.Price,choiceOption.PrintName,choiceOption.CategoryCode]);
+        Options.forEach(function (Option: Option) {
+            SQLiteService.database.execSQL("INSERT INTO Options (PriKey, Name,Price,PrintName,CategoryCode) VALUES (?, ?, ?, ?, ?)",
+                [Option.PriKey, Option.Name,Option.Price,Option.PrintName,Option.CategoryCode]);
         }
         );
     }
@@ -659,11 +691,16 @@ export class SQLiteService {
                                 that.getForcedModifiers();
                                 break;
                             }
-                        case 'ChoiceOptions':
+                        case 'Options':
                             {
-                                that.getChoiceOptions();
+                                that.getOptions();
                                 break;
                             }
+                        case 'OptionCategories':
+                        {
+                            that.getOptionCategories();
+                            break;                            
+                        }
                     }
             });
     }
