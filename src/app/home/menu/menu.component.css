@@ -1,0 +1,19 @@
+.table-check
+{
+    background-color: antiquewhite;
+}
+
+.check-label
+{
+    width: 300px;  margin-left: 5;
+}
+
+.check-amount
+{
+    text-align: right;    width: 200px;      margin-right: 5;
+}
+
+.bgImage
+{
+background: url('https://www.nativescript.org/images/default-source/Blogs/ns-logo_share_600x315.png');
+}

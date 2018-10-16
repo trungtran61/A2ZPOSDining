@@ -1,0 +1,68 @@
+<StackLayout style="background-color: rgb(54, 52, 52); border-color: black; border-width: 3px;">
+    <GridLayout class="m-5" rows="100,*,*" columns="*,100">
+        <GridLayout rows="*" columns="*,*,*,*" row="0" col="0" *ngIf='isNormalChoice'>
+            <StackLayout orientation="horizontal" colSpan="4" class="panel">
+                <Button text="Modify" class="glass" style="margin-left: 21px;width: 250px;height: 100px;color: orange;background-image: linear-gradient(#0a4e3d, lightgreen);"
+                    (tap)="modifyItem()"></Button>
+                <Button text="Delete" class="glass" style="margin-left: 21px;width: 250px;height: 100px;background-image: linear-gradient(darkred,red);"
+                    (tap)="deleteItem()"></Button>
+                <Button text="Repeat" class="glass" style="margin-left: 21px;width: 250px;height: 100px;color: gold; background-image: linear-gradient(brown,orange);"
+                    (tap)="repeatItem()"></Button>
+            </StackLayout>
+        </GridLayout>
+        <GridLayout rows="*,*" columns="*,*" row="0" col="0" *ngIf='!isNormalChoice' class="panel">
+            <Label text="Quantity" row="0" col="0" colSpan="2"></Label>
+            <Label [text]="enterQty" row="1" col="0"></Label>
+            <Button text="Back" class="glass" (tap)="backSpace()" row="1" col="1"></Button>
+        </GridLayout>
+        <GridLayout rows="*,*,*,*" columns="*,*,*" row="1" col="0" *ngIf='isNormalChoice' class="panel">
+            <Button text="1" class="glass" (tap)="setChoice(1)" row="0" col="0"></Button>
+            <Button text="2" class="glass" (tap)="setChoice(2)" row="0" col="1"></Button>
+            <Button text="3" class="glass" (tap)="setChoice(3)" row="0" col="2"></Button>
+            <Button text="4" class="glass" (tap)="setChoice(4)" row="1" col="0"></Button>
+            <Button text="5" class="glass" (tap)="setChoice(5)" row="1" col="1"></Button>
+            <Button text="6" class="glass" (tap)="setChoice(6)" row="1" col="2"></Button>
+            <Button text="7" class="glass" (tap)="setChoice(7)" row="2" col="0"></Button>
+            <Button text="8" class="glass" (tap)="setChoice(8)" row="2" col="1"></Button>
+            <Button text="9" class="glass" (tap)="setChoice(9)" row="2" col="2"></Button>
+            <Button text="0" class="glass" (tap)="setChoice(0)" row="3" col="0" *ngIf='isTenPlus'></Button>
+            <Button text="10+" class="glass" (tap)="setChoice(10)" row="3" col="1"></Button>
+            <Button [text]="otherText" class="glass" style="font-size: 16px;" (tap)="otherChoice()" row="3" col="2"></Button>
+        </GridLayout>
+        <GridLayout rows="*,*,*,*" columns="*,*,*" row="1" col="0" *ngIf='!isNormalChoice' class="panel">
+            <Button text="1" class="glass" (tap)="setEnterQty('1')" row="0" col="0"></Button>
+            <Button text="2" class="glass" (tap)="setEnterQty('2')" row="0" col="1"></Button>
+            <Button text="3" class="glass" (tap)="setEnterQty('3')" row="0" col="2"></Button>
+            <Button text="4" class="glass" (tap)="setEnterQty('4')" row="1" col="0"></Button>
+            <Button text="5" class="glass" (tap)="setEnterQty('5')" row="1" col="1"></Button>
+            <Button text="6" class="glass" (tap)="setEnterQty('6')" row="1" col="2"></Button>
+            <Button text="7" class="glass" (tap)="setEnterQty('7')" row="2" col="0"></Button>
+            <Button text="8" class="glass" (tap)="setEnterQty('8')" row="2" col="1"></Button>
+            <Button text="9" class="glass" (tap)="setEnterQty('9')" row="2" col="2"></Button>
+            <Button text="0" class="glass" (tap)="setEnterQty('0')" row="3" col="0"></Button>
+            <Button text="." class="glass" (tap)="setEnterQty('.')" row="3" col="1" *ngIf="changeType == 'quantity'"></Button>
+            <Label text="" row="3" col="1" *ngIf="changeType == 'seat'"></Label>
+            <Button text="Enter" class="glass" (tap)="setOtherChoice()" row="3" col="2"></Button>
+        </GridLayout>
+        <GridLayout rows="*,*,*,*" columns="*" row="1" col="1">
+            <Button text="Qty" class="glass" (tap)="setChangeType('quantity')" row="0" [style]="qtyTypeStyle"></Button>
+            <Button text="Seat" class="glass" (tap)="setChangeType('seat')" row="1" [style]="seatTypeStyle"></Button>
+            <Label text="" row="2"></Label>
+            <Button text="Hide" class="glass" style="background-image: linear-gradient(darkred,red);" (tap)="hide()" row="3"></Button>
+        </GridLayout>
+        <GridLayout rows="*,*" columns="*,*,*,*,*,*" row="2" colSpan="2">
+            <Button class="glass" [text]="seat1" row="0" col="0"></Button>
+            <Button class="glass" [text]="seat2" row="0" col="1"></Button>
+            <Button class="glass" [text]="seat3" row="0" col="2"></Button>
+            <Button class="glass" [text]="seat4" row="0" col="3"></Button>
+            <Button class="glass" [text]="seat5" row="0" col="4"></Button>
+            <Button class="glass" [text]="seat1+5" row="1" col="0"></Button>
+            <Button class="glass" [text]="seat2+5" row="1" col="1"></Button>
+            <Button class="glass" [text]="seat3+5" row="1" col="2"></Button>
+            <Button class="glass" [text]="seat4+5" row="1" col="3"></Button>
+            <Button class="glass" [text]="seat5+5" row="1" col="4"></Button>
+            <Button class="glass" text="next" row="0" col="5"></Button>
+            <Button class="glass" text="prev" row="1" col="5"></Button>
+        </GridLayout>
+    </GridLayout>
+</StackLayout>

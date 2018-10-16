@@ -1,0 +1,27 @@
+<ActionBar class="action-bar">
+  <Label class="action-bar-title" [text]="tableGuestsTitle"></Label>
+</ActionBar>
+
+<GridLayout class="m-10" rows="100,*,100" columns="*,*">  
+  <GridLayout class="m-20" rows="*,*,*,*,*,*" columns="*,*" row="1" col="0">
+    <Button text="10" class="glass" (tap)="setGuests(10)" row="0" col="0" [style]="styles[0]"></Button>
+    <Button text="20" class="glass" (tap)="setGuests(20)" row="0" col="1" [style]="styles[1]"></Button>
+    <Button text="30" class="glass" (tap)="setGuests(30)" row="1" col="0" [style]="styles[2]"></Button>
+    <Button text="40" class="glass" (tap)="setGuests(40)" row="1" col="1" [style]="styles[3]"></Button>
+    <Button text="50" class="glass" (tap)="setGuests(50)" row="2" col="0" [style]="styles[4]"></Button>
+    <Button text="60" class="glass" (tap)="setGuests(60)" row="2" col="1" [style]="styles[5]"></Button>
+    <TextField text="{{ 'Currently ' + numberOfGuests + '+' }}" row="3" col="0" colspan="2" class="glass" style="text-align: right" ></TextField>
+  </GridLayout>
+  <GridLayout rows="*,*,*,*,*,*" columns="*,*,*" row="1" col="1">
+    <Button text="1" class="glass" (tap)="setGuests(1)" row="0" col="0"></Button>
+    <Button text="2" class="glass" (tap)="setGuests(2)" row="0" col="1"></Button>
+    <Button text="3" class="glass" (tap)="setGuests(3)" row="0" col="2"></Button>
+    <Button text="4" class="glass" (tap)="setGuests(4)" row="1" col="0"></Button>
+    <Button text="5" class="glass" (tap)="setGuests(5)" row="1" col="1"></Button>
+    <Button text="6" class="glass" (tap)="setGuests(6)" row="1" col="2"></Button>
+    <Button text="7" class="glass" (tap)="setGuests(7)" row="2" col="0"></Button>
+    <Button text="8" class="glass" (tap)="setGuests(8)" row="2" col="1"></Button>
+    <Button text="9" class="glass" (tap)="setGuests(9)" row="2" col="2"></Button>
+    <Button text="Done" class="glass" (tap)="router.navigate(['/home/menu'])" row="3" colSpan="3"></Button>
+  </GridLayout>
+</GridLayout>

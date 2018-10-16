@@ -1,0 +1,25 @@
+<ActionBar class="action-bar">
+    <Label class="action-bar-title" text="Login"></Label>
+</ActionBar>
+
+<GridLayout class="m-20" rows="100,*,100" columns="200,*,200" style="background-image: url('res://images/TigerTouch'); background-repeat: no-repeat;">            
+<GridLayout class="m-20" rows="*,*,*,*,*,*" columns="*,*,*" row="1" col="1">    
+    <TextField [text]="employeeId" row="0" col="0" colspan="3" class="glass" secure="true"  ></TextField>
+        <Button text="1" class="glass" (tap)="addDigit('1')" row="1" col="0" ></Button>
+        <Button text="2" class="glass" (tap)="addDigit('2')" row="1" col="1" ></Button>
+        <Button text="3" class="glass" (tap)="addDigit('3')" row="1" col="2" ></Button>
+        <Button text="4" class="glass" (tap)="addDigit('4')" row="2" col="0" ></Button>
+        <Button text="5" class="glass" (tap)="addDigit('5')" row="2" col="1" ></Button>
+        <Button text="6" class="glass" (tap)="addDigit('6')" row="2" col="2" ></Button>
+        <Button text="7" class="glass" (tap)="addDigit('7')" row="3" col="0" ></Button>
+        <Button text="8" class="glass" (tap)="addDigit('8')" row="3" col="1" ></Button>
+        <Button text="9" class="glass" (tap)="addDigit('9')" row="3" col="2" ></Button>
+        <Button text="0" class="glass" (tap)="addDigit('0')" row="4" col="0" ></Button>
+        <Button text="Clear" class="glass" row="4" col="1" colSpan="2" (tap)="clearInput()" ></Button>        
+        <Button text="Dine In" class="glass" (tap)="logIn()" row="5" col="0" colSpan="3" ></Button>        
+</GridLayout>
+<WrapLayout row="2" col="0" colSpan="3">    
+        <Button text="Shut Down" class="glass" (tap)="shutdown()"></Button>
+        <Button text="Manager Functions" class="glass" (tap)="shutdown()"></Button>        
+    </WrapLayout>   
+</GridLayout>

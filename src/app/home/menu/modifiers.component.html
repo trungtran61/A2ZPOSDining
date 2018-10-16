@@ -1,0 +1,26 @@
+<StackLayout class="p-10">	
+	<GridLayout columns="*1,*1" rows="*4, *1">	
+	<StackLayout col="0" row="0">
+		<Label text="Choose options"></Label>
+		<StackLayout orientation="horizontal">
+		<Button class="btn btn-primary btn-rounded-sm" [text]="modifyButton" [class.clicked]="clickedButton == i" *ngFor="let modifyButton of modifyButtonsList let i=index" attr.data-index="{{ modifyButton.index }}"
+		 (tap)="clickedButton = i; onButtonTap(modifyButton)"></Button>
+		</StackLayout>
+		<WrapLayout orientation="horizontal">
+		<Button class="btn option btn-rounded-sm" [text]="option" *ngFor="let option of options let i=index"
+		 (tap)="addOptionToCartItem(option)"></Button>
+		</WrapLayout>
+	</StackLayout>	
+	<StackLayout col="1">
+	<Label class="h2 text-center" text="Selected options" textWrap="true"></Label>
+	<ListView [items]="currentOptions" separatorColor="white" class="m-5" height="80%">
+		<ng-template let-item="item" let-i="index">
+			<StackLayout class="m-b-5">
+				<Button class="btn btn-primary btn-rounded-sm" [text]='item' (swipe)="removeOption(index)"></Button>
+			</StackLayout>
+		</ng-template>
+	</ListView>
+	</StackLayout>
+	<Button height="40" class="btn btn-primary btn-rounded-sm" text="&lt;&lt;Back" (tap)="close()" row="1" colSpan="2"></Button>
+	</GridLayout>	
+</StackLayout>

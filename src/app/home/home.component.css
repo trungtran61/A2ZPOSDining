@@ -1,0 +1,10 @@
+.a2zLabelWithBorders
+{
+ border: solid gray 1px;
+}
+
+.loginBG {
+    background-image: url("res://images/TigerTouch"); 
+    background-repeat: no-repeat;
+    background-position: center top; /* instead set ypos to top to avoid scroll-up */
+}
