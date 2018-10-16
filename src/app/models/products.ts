@@ -187,3 +187,24 @@ export interface TableDetail {
     TableColor: string;
     Width: number;
 }
+
+export interface ChoiceOption {
+    PriKey: number;
+    Name: string;
+    Price: number;
+    PrintName: string;
+    CategoryCode: number;
+}
+
+export interface ForcedModifier {
+    ProductCode: number;
+    OptionCode: number;
+    Charge: number;
+    Layer: number;
+    Position: number;
+    ForcedOption: boolean;
+    OptionFilter: number;
+    ChoiceName: string;
+    ReportProductMix: boolean;
+}
+

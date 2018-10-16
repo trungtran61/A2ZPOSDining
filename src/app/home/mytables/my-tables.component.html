@@ -7,15 +7,15 @@
           <button class="glass" left="0" top="650" text='Log Out' (tap)='logOut()'></button>          
           <button class="glass" left="300" top="650" text='Start Over' (tap)='startOver()'></button>     
           <StackLayout  *ngIf='displayTableActions' left="850" top="0" >
-            <button class="glass actionButton" text='Open Table' textWrap="true" (tap)='openTable()' style="background-image: url('res://seat')"></button>
-            <button class="glass actionButton" text='Close' textWrap="true" (tap)='openTable()' style="background-image: url('res://seat')"></button>
-            <button class="glass actionButton" text='Add Check' textWrap="true" (tap)='openTable()' style="background-image: url('res://seat')"></button>
-            <button class="glass actionButton" text='Split' (tap)='openTable()' style="background-image: url('res://seat')"></button>
-            <button class="glass actionButton" text='Combine' (tap)='openTable()' style="background-image: url('res://seat')"></button>
-            <button class="glass actionButton" text='Void' (tap)='openTable()' style="background-image: url('res://seat')"></button>
-            <button class="glass actionButton" text='Transfer' (tap)='openTable()' style="background-image: url('res://seat')"></button>
-            <button class="glass actionButton" text='Kitchen' textWrap="true" (tap)='openTable()' style="background-image: url('res://seat')"></button>
-            <button class="glass actionButton" text='Receipt' textWrap="true" (tap)='openTable()' style="background-image: url('res://seat');"></button>
+            <Image src='res://images/TableLayout/Open' (tap)='openTable()' height="82" ></Image>
+            <Image src='res://images/TableLayout/Close' (tap)='closeTable()' height="82" ></Image>
+            <Image src='res://images/TableLayout/AddNew' (tap)='closeTable()' height="64" ></Image>
+            <Image src='res://images/TableLayout/Split' (tap)='closeTable()' height="64" ></Image>
+            <Image src='res://images/TableLayout/Combine' (tap)='closeTable()' height="64" ></Image>
+            <Image src='res://images/TableLayout/Void' (tap)='closeTable()' height="64" ></Image>
+            <Image src='res://images/TableLayout/Transfer' (tap)='closeTable()' height="64" ></Image>
+            <Image src='res://images/TableLayout/PrintKitchen' (tap)='closeTable()' height="64" ></Image>
+            <Image src='res://images/TableLayout/PrintReceipt' (tap)='closeTable()' height="64" ></Image>            
           </StackLayout>
         </AbsoluteLayout>
       
