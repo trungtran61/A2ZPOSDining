@@ -115,17 +115,6 @@ export interface Choice {
     SelectedNumber: string;    
 }
 
-export interface MenuChoice {
-    Charge: number;
-    ChoiceID: number;
-    ChoiceName: string;
-    ForcedChoice: boolean;
-    Name: string;
-    Position: number;
-    ProductCode: number;
-    ReportProductMix: boolean;
-}
-
 export interface MenuOption {
     ApplyCharge: boolean;
     Charge: number;
@@ -138,7 +127,7 @@ export interface MenuOption {
 export interface MenuSubOption {
     ApplyCharge: boolean;
     Charge: number;
-    ChoiceID: number;
+    ChoiceID?: number;
     Layer: number;
     Name: string;
     Position: number;
@@ -196,19 +185,38 @@ export interface Option {
     CategoryCode: number;
 }
 
-export interface ForcedModifier {
-    ProductCode: number;
-    OptionCode: number;
-    Charge: number;
-    Layer: number;
-    Position: number;
-    ForcedOption: boolean;
-    OptionFilter: number;
-    ChoiceName: string;
-    ReportProductMix: boolean;
+export interface MenuChoice {
+    Charge?: number;
+    ChoiceID?: number;
+    ChoiceName?: string;
+    ForcedChoice?: boolean;
+    Layer?: number;
+    Name?: string;
+    Position?: number;
+    ProductCode?: number;
+    ReportProductMix?: boolean;
 }
 
 export interface OptionCategory {
     PriKey: number;
     Name: string;
+}
+
+export interface MenuSubOption {
+    ApplyCharge: boolean;
+    Charge: number;
+    ChoiceID?: number;
+    Layer: number;
+    Name: string;
+    Position: number;
+    ReportProductMix: boolean;
+}
+
+export interface CurrentChoice
+{
+    Charge: number;
+    ChoiceID?: number;
+    ChoiceName: string;
+    Layer: number;
+    Name: string;    
 }

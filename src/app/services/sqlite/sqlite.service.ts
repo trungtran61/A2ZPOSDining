@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Employee } from "~/app/models/employees";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, ForcedModifier, OptionCategory } from "~/app/models/products";
+import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption } from "~/app/models/products";
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
@@ -48,7 +48,7 @@ export class SQLiteService {
                     console.log("CREATE TABLE CategoryCodes ERROR", error);
                 });
 
-                db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER,ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier TEXT,UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER,ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,MenuChoice TEXT,UseMenuChoice INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
                     console.log("Products table created");
                     this.getRecordCount('Products');
                 }, error => {
@@ -96,11 +96,11 @@ export class SQLiteService {
                     console.log("CREATE TABLE Products ERROR", error);
                 });
 
-                db.execSQL("CREATE TABLE IF NOT EXISTS ForcedModifiers (ProductCode INTEGER, OptionCode INTEGER, Charge REAL, Layer INTEGER, Position INTEGER,ForcedOption INTEGER,OptionFilter INTEGER, ChoiceName TEXT,ReportProductMix INTEGER);").then(id => {
-                    console.log("Table ForcedModifier screated");
-                    this.getRecordCount('ForcedModifiers');
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuChoices (Charge REAL, ChoiceID INTEGER, ChoiceName TEXT, ForcedChoice INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
+                    console.log("Table MenuChoices screated");
+                    this.getRecordCount('MenuChoices');
                 }, error => {
-                    console.log("CREATE TABLE ForcedModifier ERROR", error);
+                    console.log("CREATE TABLE MenuChoices ERROR", error);
                 });
 
                 db.execSQL("CREATE TABLE IF NOT EXISTS Options (PriKey INTEGER, Name TEXT, Price REAL, PrintName TEXT, CategoryCode INTEGER);").then(id => {
@@ -116,6 +116,13 @@ export class SQLiteService {
                 }, error => {
                     console.log("CREATE TABLE OptionCategories ERROR", error);
                 });
+                
+               db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ReportProductMix INTEGER);").then(id => {
+                console.log("Table MenuSubOptions created");
+                this.getRecordCount('MenuSubOptions');
+            }, error => {
+                console.log("CREATE TABLE MenuSubOptions ERROR", error);
+            });
 
             }, error => {
                 console.log("OPEN DB ERROR", error);
@@ -258,8 +265,6 @@ export class SQLiteService {
 
     public getLocalMenuProducts(categoryID: number, subCategoryID: number): Promise<MenuProduct[]> {
 
-        let that = this;
-
         return SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex, mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice FROM MenuProducts AS mp INNER JOIN Products AS p ON mp.ProductId=p.ProductFilter WHERE mp.CategoryID=? AND mp.SubCategoryID=? ORDER BY mp.Position", [categoryID, subCategoryID])
             .then(function (rows) {
                 let menuProducts: MenuProduct[] = [];
@@ -298,11 +303,35 @@ export class SQLiteService {
 
     }
 
-    public loadOptionCategories(optionCategories: any[]) {
-        let that = this;
+    public loadOptionCategories(optionCategories: any[]) {        
         optionCategories.forEach(function (optionCategory: OptionCategory) {
             SQLiteService.database.execSQL("INSERT INTO OptionCategories (PriKey, Name) VALUES (?, ?)",
                 [optionCategory.PriKey, optionCategory.Name]);
+        }
+        );
+    }
+
+    public getMenuSubOptions() {
+        let headers = this.createRequestHeader();
+        this.http.get(this.apiUrl + 'GetMenuSubOption', { headers: headers })
+            .subscribe(
+                data => {
+                    console.log('got MenuSubOptions from API: ' + data);
+                    this.loadMenuSubOptions(<OptionCategory[]>data);
+                },
+                err => {
+                    console.log("Error occured while retrieving MenuSubOptions from API.");
+                    console.log(err);
+                }
+            );
+
+    }
+
+    public loadMenuSubOptions(menuSubOptions: any[]) {        
+        menuSubOptions.forEach(function (menuSubOption: MenuSubOption) {
+            SQLiteService.database.execSQL("INSERT INTO MenuSubOptions (ApplyCharge, Charge, ChoiceID, Layer, Name, Position, ReportProductMix) VALUES (?,?,?,?,?,?,?)",
+                [menuSubOption.ApplyCharge, menuSubOption.Charge, menuSubOption.ChoiceID, menuSubOption.Layer,
+                    menuSubOption.Name, menuSubOption.Position, menuSubOption.ReportProductMix]);
         }
         );
     }
@@ -332,13 +361,13 @@ export class SQLiteService {
         );
     }
 
-    public getForcedModifiers() {
+    public getMenuChoices() {
         let headers = this.createRequestHeader();
         this.http.get(this.apiUrl + 'GetOption', { headers: headers })
             .subscribe(
                 data => {
                     console.log('got Options from API: ' + data);
-                    this.loadForcedModifiers(<ForcedModifier[]>data);
+                    this.loadMenuChoices(<MenuChoice[]>data);
                 },
                 err => {
                     console.log("Error occured while retrieving Options from API.");
@@ -348,14 +377,43 @@ export class SQLiteService {
 
     }
 
-    public loadForcedModifiers(forcedModifiers: any[]) {
+    public loadMenuChoices(MenuChoices: any[]) {
         let that = this;
-        forcedModifiers.forEach(function (forcedModifier: ForcedModifier) {
-            SQLiteService.database.execSQL("INSERT INTO ForcedModifiers (Charge, ChoiceName,ForcedOption,Layer,OptionCode, OptionFilter, Position,ProductCode,ReportProductMix) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )",
-                [forcedModifier.Charge, forcedModifier.ChoiceName,forcedModifier.ForcedOption,forcedModifier.Layer,forcedModifier.OptionCode,
-                 forcedModifier.OptionFilter, forcedModifier.Position,forcedModifier.ProductCode,forcedModifier.ReportProductMix]);
+        MenuChoices.forEach(function (menuChoice: MenuChoice) {
+            SQLiteService.database.execSQL("INSERT INTO MenuChoices (Charge, ChoiceID, ChoiceName, ForcedChoice, Layer, Name, Position, ProductCode, ReportProductMix) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )",
+                [menuChoice.Charge, menuChoice.ChoiceID,menuChoice.ChoiceName,menuChoice.ForcedChoice, menuChoice.Layer,
+                menuChoice.Name,menuChoice.Position,menuChoice.ProductCode,menuChoice.ReportProductMix]);
         }
         );
+    }
+
+    public getLocalMenuChoices(productCode: number, layer: number) {
+        return SQLiteService.database.all("SELECT DISTINCT ChoiceName FROM MenuChoices WHERE ProductCode=? AND Layer=?", [productCode, layer])
+        .then(function (rows) {
+            let choices: string[] = [];
+            for (var row in rows) {
+                choices.push(
+                    rows[row][0]
+                );
+            }
+            return (choices);
+        });
+    }
+
+    public getLocalMenuChoiceItems(productCode: number, choiceName: string) {
+        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position FROM MenuChoices WHERE ProductCode=? AND ChoiceName=?", [productCode, choiceName])
+        .then(function (rows) {
+            let items: MenuChoice[] = [];
+            for (var row in rows) {
+                items.push({
+                    ChoiceID: rows[row][0],
+                    Charge: rows[row][1],
+                    Name: rows[row][2],
+                    Position: rows[row][3]
+                });
+            }
+            return (items);
+        });
     }
 
     public getEmployees() {
@@ -424,7 +482,7 @@ export class SQLiteService {
 
     public loadProducts(products: any[]) {
         products.forEach(function (product: Product) {
-            SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode,ProductGroup,PrintCode1,CouponCode,GeneralCode,Description,AutoOption,PrintName,ForcedModifier,UseForcedModifier,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings,Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode,ProductGroup,PrintCode1,CouponCode,GeneralCode,Description,AutoOption,PrintName,MenuChoice,UseMenuChoice,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings,Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 [product.ProductName,
                 product.ProductFilter,
                 product.UnitPrice,
@@ -550,19 +608,6 @@ export class SQLiteService {
             });
     }
 
-    /*
-        private loadTablesDetails(tables) : TableDetail[]
-        {
-            let tablesDetails: TableDetail[] = [];
-    
-            tables.forEach(function (tableDetail: TableDetail) {
-                
-            });
-    
-            return (tablesDetails);
-          
-        }
-    */
     public getProductCategories() {
         let headers = this.createRequestHeader();
         this.http.get(this.apiUrl + 'GetProductCategories', { headers: headers })
@@ -686,9 +731,9 @@ export class SQLiteService {
                                 that.getMenuProducts();
                                 break;
                             }
-                        case 'ForcedModifiers':
+                        case 'MenuChoices':
                             {
-                                that.getForcedModifiers();
+                                that.getMenuChoices();
                                 break;
                             }
                         case 'Options':
@@ -696,9 +741,9 @@ export class SQLiteService {
                                 that.getOptions();
                                 break;
                             }
-                        case 'OptionCategories':
+                        case 'MenuSubOptions':
                         {
-                            that.getOptionCategories();
+                            that.getMenuSubOptions();
                             break;                            
                         }
                     }

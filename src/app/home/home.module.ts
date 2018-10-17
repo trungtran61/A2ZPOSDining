@@ -10,6 +10,7 @@ import { TableGuestsComponent } from "~/app/home/tableguests/table-guests.compon
 import { MenuComponent } from "~/app/home/menu/menu.component";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
 import { ModifiersComponent } from "~/app/home/menu/modifiers.component";
+import { ChoicesComponent } from "~/app/home/menu/choices/choices.component";
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 
 @NgModule({
@@ -24,7 +25,8 @@ import { ModifiersComponent } from "~/app/home/menu/modifiers.component";
         TableGuestsComponent,
         MenuComponent,
         ModifyCheckItemComponent,
-        ModifiersComponent
+        ModifiersComponent,
+        ChoicesComponent
     ],
     schemas: [
         NO_ERRORS_SCHEMA
