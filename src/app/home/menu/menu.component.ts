@@ -7,6 +7,7 @@ import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
+import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 
 @Component({
     selector: "Menu",
@@ -123,20 +124,7 @@ let that = this;
                 this.menuSubCategoriesEven = menuSubCategories.filter(function (menuSubCategory:MenuSubCategory) {
                     return (menuSubCategory.Position % 2 === 0);
                 });
-/*
-                this.menuSubCategoriesOdd.forEach(function (menuSubCategory: MenuSubCategory) {
-                    let darkColor: string =  menuSubCategory.ButtonColorHex;
-                    let lightColor: string =  darkColor //that.lightenDarkenColor(darkColor, 50);
-                    let style: string = "color: #" + menuSubCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";                     
-                    that.menuSubCategoryOddStyles.push(style);
-                });
-                this.menuSubCategoriesEven.forEach(function (menuSubCategory: MenuSubCategory) {
-                    let darkColor: string =  menuSubCategory.ButtonColorHex;
-                    let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-                    let style: string = "color: #" + menuSubCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";                     
-                    that.menuSubCategoryEvenStyles.push(style);
-                });
-*/
+
                 this.loadMenuCategoryStyles(this.menuSubCategoriesOdd, this.menuSubCategoryOddStyles);
                 this.loadMenuCategoryStyles(this.menuSubCategoriesEven, this.menuSubCategoryEvenStyles);
                 this.menuSubCategorySelected(menuSubCategories[0].SubCategoryID);
@@ -177,7 +165,6 @@ let that = this;
                 this.menuProducts3 = menuProducts.filter(function (menuProduct:MenuProduct) {
                     return (menuProduct.Position % 3 === 0);
                 });
-                console.log(this.menuProducts1.length); 
                 this.loadMenuProductStyles(this.menuProducts1, that.menuProduct1Styles);
                 this.loadMenuProductStyles(this.menuProducts2, that.menuProduct2Styles);
                 this.loadMenuProductStyles(this.menuProducts3, that.menuProduct3Styles);                     
@@ -213,7 +200,7 @@ let that = this;
     }
 
     categorySelected(categoryCodeKey: number) {
-        console.log(categoryCodeKey);
+        
         this.DBService.getLocalProducts(categoryCodeKey).then((products) => {
             if (products.length == 0) {
                 dialogs.alert("Products not loaded for categoryCode: " + categoryCodeKey).then(() => {
@@ -226,22 +213,32 @@ let that = this;
         });
     }
 
-    menuProductSelected(product: MenuProduct) {
+    menuProductSelected(product: MenuProduct, checkItemIndex:number) {
         this.currentSeatNumber++;
         this.checkItems.push({
             "ProductName": product.Name, "UnitPrice": product.UnitPrice,
             "Modifiers": [], "Qty": 1, "SeatNumber": 1, "Price": product.UnitPrice
         });
-        this.totalPrice();
+        this.totalPrice();    
+
+        if (product.UseForcedModifier)
+        {
+            this.showForcedModifierDialog(product, checkItemIndex);
+        }
     }
 
-    productSelected(product: Product) {
-        this.currentSeatNumber++;
-        this.checkItems.push({
-            "ProductName": product.ProductName, "UnitPrice": product.UnitPrice,
-            "Modifiers": [], "Qty": 1, "SeatNumber": 1, "Price": product.UnitPrice
-        });
-        this.totalPrice();
+    showForcedModifierDialog(product: MenuProduct, checkItemIndex:number)
+    {
+        const modalOptions: ModalDialogOptions = {
+            viewContainerRef: this.viewContainerRef,
+            fullscreen: true,
+            context: { productCode: product.ProductCode, currentChoices: this.checkItems[checkItemIndex].ForcedModifiers}
+        };
+
+        this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
+            (selectedChoices) => {
+                this.checkItems[checkItemIndex].ForcedModifiers = selectedChoices;                
+            });
     }
 
     showModifyDialog(checkItemIndex: number) {

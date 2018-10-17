@@ -265,7 +265,8 @@ export class SQLiteService {
 
     public getLocalMenuProducts(categoryID: number, subCategoryID: number): Promise<MenuProduct[]> {
 
-        return SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex, mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice FROM MenuProducts AS mp INNER JOIN Products AS p ON mp.ProductId=p.ProductFilter WHERE mp.CategoryID=? AND mp.SubCategoryID=? ORDER BY mp.Position", [categoryID, subCategoryID])
+        return SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex, mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice, p.UseModifier, p.UseForcedModier " + 
+            "  FROM MenuProducts AS mp INNER JOIN Products AS p ON mp.ProductId=p.ProductFilter WHERE mp.CategoryID=? AND mp.SubCategoryID=? ORDER BY mp.Position", [categoryID, subCategoryID])
             .then(function (rows) {
                 let menuProducts: MenuProduct[] = [];
                 for (var row in rows) {
@@ -280,7 +281,9 @@ export class SQLiteService {
                         ButtonColorHex: rows[row][7],
                         ButtonForeColor: rows[row][8],
                         ButtonForeColorHex: rows[row][9],
-                        UnitPrice: rows[row][10]
+                        UnitPrice: rows[row][10],
+                        UseModifier: rows[row][11],
+                        UseForcedModifier: rows[row][12]
                     });
                 }
                 return (menuProducts);
@@ -667,13 +670,15 @@ export class SQLiteService {
     }
 
     public getLocalProducts(categoryCodeKey: number): Promise<Product[]> {
-        return SQLiteService.database.all("SELECT ProductName, UnitPrice FROM Products WHERE CategoryCode =?", [categoryCodeKey])
+        return SQLiteService.database.all("SELECT ProductName, UnitPrice, Product, UseForcedModifier FROM Products WHERE CategoryCode =?", [categoryCodeKey])
             .then(function (rows) {
                 let products: Product[] = [];
                 for (var row in rows) {
                     products.push({
                         ProductName: rows[row][0],
-                        UnitPrice: rows[row][1]
+                        UnitPrice: rows[row][1],
+                        ProductCode: rows[row][2],
+                        UseForcedModifier: rows[row][3],                        
                     });
                 }
                 return (products);

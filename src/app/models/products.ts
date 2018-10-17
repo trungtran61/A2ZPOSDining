@@ -31,6 +31,8 @@ export interface MenuProduct {
     ButtonForeColor: number; 
     ButtonForeColorHex?: string; 
     UnitPrice?: number;
+    UseModifier?: boolean;
+    UseForcedModifier?: boolean;
 }
 
 export interface CategoryCode {
@@ -41,7 +43,7 @@ export interface CategoryCode {
 }
 
 export interface Product {
-    Product?: number;
+    ProductCode?: number;
     ProductFilter?: number;
     ProductName?: string;
     UnitPrice?: number;
@@ -102,7 +104,8 @@ export interface CheckItem {
     Qty?: number;
     SeatNumber?: number;
     Price?: number;
-    Modifiers: Modifier[]
+    ForcedModifiers?: ForcedModifier[]
+    Modifiers?: Modifier[]
 }
 
 export interface Modifier {
@@ -212,7 +215,7 @@ export interface MenuSubOption {
     ReportProductMix: boolean;
 }
 
-export interface CurrentChoice
+export interface ForcedModifier
 {
     Charge: number;
     ChoiceID?: number;

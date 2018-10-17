@@ -63,17 +63,17 @@
   </StackLayout>
   <StackLayout row="0" col="4" *ngIf="!isMainCategories">
     <Button class="glass" [text]="item.Name" *ngFor="let item of menuProducts1 let i=index" 
-      (tap)="menuProductSelected(item)" 
+      (tap)="menuProductSelected(item, i)" 
       [style]="menuProduct1Styles[i]"></Button>
   </StackLayout>
   <StackLayout row="0" col="5" *ngIf="!isMainCategories">
     <Button class="glass" [text]="item.Name" *ngFor="let item of menuProducts2 let i=index" 
-      (tap)="menuProductSelected(item)" 
+      (tap)="menuProductSelected(item, i)" 
       [style]="menuProduct2Styles[i]"></Button>
   </StackLayout>
   <StackLayout row="0" col="6" *ngIf="!isMainCategories">
     <Button class="glass" [text]="item.Name" *ngFor="let item of menuProducts3 let i=index" 
-      (tap)="menuProductSelected(item)" 
+      (tap)="menuProductSelected(item, i)" 
       [style]="menuProduct3Styles[i]"></Button>
   </StackLayout>
 </GridLayout>

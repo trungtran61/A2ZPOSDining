@@ -9,8 +9,8 @@ import { MyTablesComponent } from "~/app/home/mytables/my-tables.component";
 import { TableGuestsComponent } from "~/app/home/tableguests/table-guests.component";
 import { MenuComponent } from "~/app/home/menu/menu.component";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
-import { ModifiersComponent } from "~/app/home/menu/modifiers.component";
-import { ChoicesComponent } from "~/app/home/menu/choices/choices.component";
+import { ModifiersComponent } from "~/app/home/menu/modifiers/modifiers.component";
+import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 
 @NgModule({
@@ -26,7 +26,7 @@ import { ChoicesComponent } from "~/app/home/menu/choices/choices.component";
         MenuComponent,
         ModifyCheckItemComponent,
         ModifiersComponent,
-        ChoicesComponent
+        ForcedModifiersComponent
     ],
     schemas: [
         NO_ERRORS_SCHEMA
