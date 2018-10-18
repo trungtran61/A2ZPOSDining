@@ -45,7 +45,8 @@ export class MenuComponent implements OnInit {
 
     menuCategoryStyles: string[] = [];
     
-    isMainCategories: boolean = true;    
+    isMainCategories: boolean = true;  
+    showProducts: boolean = false;  
 
     TAX_RATE: number = .08;
     MAX_GUESTS: number = 6;
@@ -170,6 +171,8 @@ let that = this;
                 this.loadMenuProductStyles(this.menuProducts3, that.menuProduct3Styles);                     
             }
         });
+
+        this.showProducts = true;
     }
 
     loadMenuProductStyles(menuProducts: MenuProduct[], menuProductStyles: string[])
@@ -218,14 +221,8 @@ let that = this;
         if (product.UseForcedModifier)
         {
             this.showForcedModifierDialog(product, -1);
-        }
-
-        this.currentSeatNumber++;
-        this.checkItems.push({
-            "ProductName": product.Name, "UnitPrice": product.UnitPrice,
-            "Modifiers": [], "Qty": 1, "SeatNumber": 1, "Price": product.UnitPrice
-        });
-        this.totalPrice();   
+        }       
+        //this.showProducts = false;
     }
 
     showForcedModifierDialog(product: MenuProduct, checkItemIndex:number)
@@ -238,7 +235,16 @@ let that = this;
 
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
             (selectedChoices) => {
-                this.checkItems[checkItemIndex].ForcedModifiers = selectedChoices;                
+                if (selectedChoices != null)
+                {
+                    this.currentSeatNumber++;
+                    this.checkItems.push({
+                        "ProductName": product.Name, "UnitPrice": product.UnitPrice,
+                        "Modifiers": [], "Qty": 1, "SeatNumber": 1, "Price": product.UnitPrice
+                    });
+                    this.totalPrice();               
+                    this.checkItems[checkItemIndex].ForcedModifiers = selectedChoices;                
+                }                
             });
     }
 

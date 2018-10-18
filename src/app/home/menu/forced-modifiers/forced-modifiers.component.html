@@ -1,7 +1,7 @@
 <GridLayout class="p-10" columns="200,*" rows="*,40" style="background-color: black">
     <StackLayout col="0" style="background-color: white" class="p-5" >
         <Button [text]="item.ChoiceName" *ngFor="let item of choiceLayers let i=index" 
-        (tap)="choiceLayerSelected(item)" 
+        (tap)="choiceLayerSelected(item, i)" 
         [class]="choiceLayerClasses[i]"
         ></Button>
     </StackLayout>
