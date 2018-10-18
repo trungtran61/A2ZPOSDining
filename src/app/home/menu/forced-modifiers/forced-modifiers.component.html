@@ -1,12 +1,14 @@
-<GridLayout columns="200,*">
-    <StackLayout col="0">
-        <Button class="glass" [text]="item.ChoiceName" *ngFor="let item of choiceLayers let i=index" 
+<GridLayout class="p-10" columns="200,*" rows="*,40" style="background-color: black">
+    <StackLayout col="0" style="background-color: white" class="p-5" >
+        <Button [text]="item.ChoiceName" *ngFor="let item of choiceLayers let i=index" 
         (tap)="choiceLayerSelected(item)" 
-        [style]="choiceLayerStyles[i]"></Button>
+        [class]="choiceLayerClasses[i]"
+        ></Button>
     </StackLayout>
-    <GridLayout rows="*,*,*,*,*,*,*,*" columns="*,*,*,*" col="1" >
-        <Button class="glass" [text]="item.Name" *ngFor="let item of choices let i=index" 
-        (tap)="choiceSelected(item)" 
-        [style]="choiceStyles[i]"></Button>
-    </GridLayout> 
+    <GridLayout rows="*,*,*,*,*,*,*,*,40" columns="*,*,*,*" col="1" >
+        <Button class="glass choiceItem" [text]="item.Name" *ngFor="let item of choiceItems let i=index" 
+        (tap)="choiceSelected(item)" [col]='itemCols[i]' [row]='itemRows[i]'
+        ></Button>
+        <Button class="glass btnCancel" text="Cancel" (tap)="close()" row="8" col="0"></Button>
+    </GridLayout>     
 </GridLayout>

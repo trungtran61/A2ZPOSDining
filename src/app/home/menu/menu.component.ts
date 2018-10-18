@@ -213,18 +213,19 @@ let that = this;
         });
     }
 
-    menuProductSelected(product: MenuProduct, checkItemIndex:number) {
+    menuProductSelected(product: MenuProduct) {        
+
+        if (product.UseForcedModifier)
+        {
+            this.showForcedModifierDialog(product, -1);
+        }
+
         this.currentSeatNumber++;
         this.checkItems.push({
             "ProductName": product.Name, "UnitPrice": product.UnitPrice,
             "Modifiers": [], "Qty": 1, "SeatNumber": 1, "Price": product.UnitPrice
         });
-        this.totalPrice();    
-
-        if (product.UseForcedModifier)
-        {
-            this.showForcedModifierDialog(product, checkItemIndex);
-        }
+        this.totalPrice();   
     }
 
     showForcedModifierDialog(product: MenuProduct, checkItemIndex:number)
@@ -232,7 +233,7 @@ let that = this;
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
-            context: { productCode: product.ProductCode, currentChoices: this.checkItems[checkItemIndex].ForcedModifiers}
+            context: { productCode: product.ProductCode, currentChoices: checkItemIndex > -1 ? this.checkItems[checkItemIndex].ForcedModifiers : []}
         };
 
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(

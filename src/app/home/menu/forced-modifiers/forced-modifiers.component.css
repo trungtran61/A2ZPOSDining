@@ -1,0 +1,28 @@
+.choiceLayer
+{
+    background-color: white;
+    color: silver;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 10px;
+    border-color: darkblue;
+    height: 200px;
+    margin-bottom: 5px;
+}
+
+.choiceLayerActive
+{
+    background-color: antiquewhite;
+    color: black;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: gray;
+    height: 200px; 
+    margin-bottom: 5px;   
+}
+
+.choiceItem
+{
+    width: 340px; height: 100px; color: black;background-image: linear-gradient(gold, white); margin: 2px;
+}

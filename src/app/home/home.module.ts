@@ -32,7 +32,8 @@ import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/force
         NO_ERRORS_SCHEMA
     ],    
     entryComponents: [
-        ModifyCheckItemComponent
+        ModifyCheckItemComponent,
+        ForcedModifiersComponent
     ]  
 })
 export class HomeModule { }

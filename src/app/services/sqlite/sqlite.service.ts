@@ -33,102 +33,111 @@ export class SQLiteService {
                 SQLiteService.database = db;
                 SQLiteService.isInstantiated = true;
                 console.log("FullServiceDining DB opened.");
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS Employees (EmployeeID TEXT PRIMARY KEY, FirstName TEXT);").then(id => {
-                    console.log("Employees table created");
-                    this.getRecordCount('Employees');
-                }, error => {
-                    console.log("CREATE TABLE Employees ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS CategoryCodes (PriKey INTEGER PRIMARY KEY, CategoryCode1 TEXT, Description TEXT, PrintGroup INTEGER);").then(id => {
-                    console.log("categorycodes table created");
-                    this.getRecordCount('CategoryCodes');
-                }, error => {
-                    console.log("CREATE TABLE CategoryCodes ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER,ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,MenuChoice TEXT,UseMenuChoice INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
-                    console.log("Products table created");
-                    this.getRecordCount('Products');
-                }, error => {
-                    console.log("CREATE TABLE Products ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS ProductCategories (PriKey INTEGER PRIMARY KEY, ProductFilter INTEGER, Category INTEGER, SubCategory INTEGER, Position INTEGER, ButtonColor TEXT, ButtonForeColor TEXT);").then(id => {
-                    console.log("ProductCategories table created");
-                    this.getRecordCount('ProductCategories');
-                }, error => {
-                    console.log("CREATE TABLE CategoryCodes ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
-                    console.log("Table Areas created");
-                    this.getRecordCount('Areas');
-                }, error => {
-                    console.log("CREATE TABLE Areas ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS Tables (AreaID INTEGER, Name TEXT, Height INTEGER, Width INTEGER, PosX INTEGER, PosY INTEGER, TableType INTEGER);").then(id => {
-                    this.getRecordCount('Tables');
-                }, error => {
-                    console.log("CREATE TABLE Tables ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS MenuCategories (CategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-                    console.log("Tables MenuCategories created");
-                    this.getRecordCount('MenuCategories');
-                }, error => {
-                    console.log("CREATE TABLE MenuCategories ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubCategories (CategoryID INTEGER, SubCategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-                    console.log("Tables MenuSubCategories created");
-                    this.getRecordCount('MenuSubCategories');
-                }, error => {
-                    console.log("CREATE TABLE MenuSubCategories ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS MenuProducts (CategoryID INTEGER, SubCategoryID INTEGER,ProductID INTEGER,Name TEXT,Position INTEGER,ProductCode INTEGER,ButtonColor INTEGER,ButtonColorHex TEXT,ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-                    console.log("Tables Products created");
-                    this.getRecordCount('MenuProducts');
-                }, error => {
-                    console.log("CREATE TABLE Products ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS MenuChoices (Charge REAL, ChoiceID INTEGER, ChoiceName TEXT, ForcedChoice INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
-                    console.log("Table MenuChoices screated");
-                    this.getRecordCount('MenuChoices');
-                }, error => {
-                    console.log("CREATE TABLE MenuChoices ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS Options (PriKey INTEGER, Name TEXT, Price REAL, PrintName TEXT, CategoryCode INTEGER);").then(id => {
-                    console.log("Table Options created");
-                    this.getRecordCount('Options');
-                }, error => {
-                    console.log("CREATE TABLE Options ERROR", error);
-                });
-
-                db.execSQL("CREATE TABLE IF NOT EXISTS OptionCategories (PriKey INTEGER, Name TEXT);").then(id => {
-                    console.log("Table OptionCategories created");
-                    this.getRecordCount('OptionCategories');
-                }, error => {
-                    console.log("CREATE TABLE OptionCategories ERROR", error);
-                });
-                
-               db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ReportProductMix INTEGER);").then(id => {
-                console.log("Table MenuSubOptions created");
-                this.getRecordCount('MenuSubOptions');
-            }, error => {
-                console.log("CREATE TABLE MenuSubOptions ERROR", error);
-            });
-
+                this.createTables(db);  
             }, error => {
                 console.log("OPEN DB ERROR", error);
             });
         }
     }
+
+    createTables(db)
+    {
+        if (db == null)
+        {
+            db = SQLiteService.database;
+        }
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS Employees (EmployeeID TEXT PRIMARY KEY, FirstName TEXT);").then(id => {
+            console.log("Employees table created");
+            this.getRecordCount('Employees');
+        }, error => {
+            console.log("CREATE TABLE Employees ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS CategoryCodes (PriKey INTEGER PRIMARY KEY, CategoryCode1 TEXT, Description TEXT, PrintGroup INTEGER);").then(id => {
+            console.log("categorycodes table created");
+            this.getRecordCount('CategoryCodes');
+        }, error => {
+            console.log("CREATE TABLE CategoryCodes ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER,ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier INTEGER, UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
+            console.log("Products table created");
+            this.getRecordCount('Products');
+        }, error => {
+            console.log("CREATE TABLE Products ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS ProductCategories (PriKey INTEGER PRIMARY KEY, ProductFilter INTEGER, Category INTEGER, SubCategory INTEGER, Position INTEGER, ButtonColor TEXT, ButtonForeColor TEXT);").then(id => {
+            console.log("ProductCategories table created");
+            this.getRecordCount('ProductCategories');
+        }, error => {
+            console.log("CREATE TABLE CategoryCodes ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
+            console.log("Table Areas created");
+            this.getRecordCount('Areas');
+        }, error => {
+            console.log("CREATE TABLE Areas ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS Tables (AreaID INTEGER, Name TEXT, Height INTEGER, Width INTEGER, PosX INTEGER, PosY INTEGER, TableType INTEGER);").then(id => {
+            this.getRecordCount('Tables');
+        }, error => {
+            console.log("CREATE TABLE Tables ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS MenuCategories (CategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
+            console.log("Tables MenuCategories created");
+            this.getRecordCount('MenuCategories');
+        }, error => {
+            console.log("CREATE TABLE MenuCategories ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubCategories (CategoryID INTEGER, SubCategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
+            console.log("Tables MenuSubCategories created");
+            this.getRecordCount('MenuSubCategories');
+        }, error => {
+            console.log("CREATE TABLE MenuSubCategories ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS MenuProducts (CategoryID INTEGER, SubCategoryID INTEGER,ProductID INTEGER,Name TEXT,Position INTEGER,ProductCode INTEGER,ButtonColor INTEGER,ButtonColorHex TEXT,ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
+            console.log("Tables Products created");
+            this.getRecordCount('MenuProducts');
+        }, error => {
+            console.log("CREATE TABLE Products ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS MenuChoices (Charge REAL, ChoiceID INTEGER, ChoiceName TEXT, ForcedChoice INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
+            console.log("Table MenuChoices screated");
+            this.getRecordCount('MenuChoices');
+        }, error => {
+            console.log("CREATE TABLE MenuChoices ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS Options (PriKey INTEGER, Name TEXT, Price REAL, PrintName TEXT, CategoryCode INTEGER);").then(id => {
+            console.log("Table Options created");
+            this.getRecordCount('Options');
+        }, error => {
+            console.log("CREATE TABLE Options ERROR", error);
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS OptionCategories (PriKey INTEGER, Name TEXT);").then(id => {
+            console.log("Table OptionCategories created");
+            this.getRecordCount('OptionCategories');
+        }, error => {
+            console.log("CREATE TABLE OptionCategories ERROR", error);
+        });
+        
+       db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ReportProductMix INTEGER);").then(id => {
+        console.log("Table MenuSubOptions created");
+        this.getRecordCount('MenuSubOptions');
+    }, error => {
+        console.log("CREATE TABLE MenuSubOptions ERROR", error);
+    });
+    }
+
 
     padZeroes(num: string, size: number): string {
         let s = num;
@@ -255,7 +264,7 @@ export class SQLiteService {
     public loadMenuProducts(MenuProducts: any[]) {
         let that = this;
         MenuProducts.forEach(function (menuProduct: MenuProduct) {
-            SQLiteService.database.execSQL("INSERT INTO MenuProducts (CategoryID, SubCategoryID, ProductID, Name, Position, ProductCode, ButtonColor, ButtonColorHex, ButtonForeColor, ButtonForeColorHex) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            SQLiteService.database.execSQL("INSERT INTO MenuProducts (CategoryID, SubCategoryID, ProductID, Name, ProductCode, Position, ButtonColor, ButtonColorHex, ButtonForeColor, ButtonForeColorHex) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 [menuProduct.CategoryID, menuProduct.SubCategoryID, menuProduct.ProductID, menuProduct.Name, menuProduct.ProductCode, menuProduct.Position,
                 menuProduct.ButtonColor, that.padZeroes(parseInt(menuProduct.ButtonColor.toString()).toString(16), 6),
                 menuProduct.ButtonForeColor, that.padZeroes(parseInt(menuProduct.ButtonForeColor.toString()).toString(16), 6)]);
@@ -265,7 +274,8 @@ export class SQLiteService {
 
     public getLocalMenuProducts(categoryID: number, subCategoryID: number): Promise<MenuProduct[]> {
 
-        return SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex, mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice, p.UseModifier, p.UseForcedModier " + 
+        return SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex," + 
+            " mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice, p.ForcedModifier, p.UseForcedModifier" + 
             "  FROM MenuProducts AS mp INNER JOIN Products AS p ON mp.ProductId=p.ProductFilter WHERE mp.CategoryID=? AND mp.SubCategoryID=? ORDER BY mp.Position", [categoryID, subCategoryID])
             .then(function (rows) {
                 let menuProducts: MenuProduct[] = [];
@@ -292,7 +302,7 @@ export class SQLiteService {
 
     public getOptionCategories() {
         let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetOption', { headers: headers })
+        this.http.get(this.apiUrl + 'GetOptionCategories', { headers: headers })
             .subscribe(
                 data => {
                     console.log('got OptionCategories from API: ' + data);
@@ -341,7 +351,7 @@ export class SQLiteService {
 
     public getOptions() {
         let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetOption', { headers: headers })
+        this.http.get(this.apiUrl + 'GetOptions', { headers: headers })
             .subscribe(
                 data => {
                     console.log('got Options from API: ' + data);
@@ -366,10 +376,10 @@ export class SQLiteService {
 
     public getMenuChoices() {
         let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetOption', { headers: headers })
+        this.http.get(this.apiUrl + 'GetMenuChoice', { headers: headers })
             .subscribe(
                 data => {
-                    console.log('got Options from API: ' + data);
+                    console.log('got MenuChoices from API: ' + data);
                     this.loadMenuChoices(<MenuChoice[]>data);
                 },
                 err => {
@@ -390,21 +400,25 @@ export class SQLiteService {
         );
     }
 
-    public getLocalMenuChoices(productCode: number, layer: number) {
-        return SQLiteService.database.all("SELECT DISTINCT ChoiceName FROM MenuChoices WHERE ProductCode=? AND Layer=?", [productCode, layer])
+    public getLocalMenuChoices(productCode: number) {
+        return SQLiteService.database.all("SELECT DISTINCT ChoiceName, Layer FROM MenuChoices WHERE ProductCode=?", [productCode])
         .then(function (rows) {
-            let choices: string[] = [];
+            let choices: MenuChoice[] = [];
             for (var row in rows) {
                 choices.push(
-                    rows[row][0]
+                    { 
+                      ChoiceName: rows[row][0],
+                      Layer:rows[row][1]  
+                    }
                 );
             }
             return (choices);
         });
     }
 
-    public getLocalMenuChoiceItems(productCode: number, choiceName: string) {
-        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position FROM MenuChoices WHERE ProductCode=? AND ChoiceName=?", [productCode, choiceName])
+    public getLocalMenuChoiceItems(menuChoice: MenuChoice, productCode: number) {
+        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position FROM MenuChoices WHERE ProductCode=? AND ChoiceName=? AND Layer=? ORDER BY Position", 
+            [productCode, menuChoice.ChoiceName, menuChoice.Layer])
         .then(function (rows) {
             let items: MenuChoice[] = [];
             for (var row in rows) {
@@ -485,7 +499,9 @@ export class SQLiteService {
 
     public loadProducts(products: any[]) {
         products.forEach(function (product: Product) {
-            SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode,ProductGroup,PrintCode1,CouponCode,GeneralCode,Description,AutoOption,PrintName,MenuChoice,UseMenuChoice,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings,Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode,ProductGroup,PrintCode1,CouponCode," + 
+                                        "GeneralCode,Description,AutoOption,PrintName,ForcedModifier,UseForcedModifier,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings," + 
+                                        "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 [product.ProductName,
                 product.ProductFilter,
                 product.UnitPrice,
@@ -670,7 +686,7 @@ export class SQLiteService {
     }
 
     public getLocalProducts(categoryCodeKey: number): Promise<Product[]> {
-        return SQLiteService.database.all("SELECT ProductName, UnitPrice, Product, UseForcedModifier FROM Products WHERE CategoryCode =?", [categoryCodeKey])
+        return SQLiteService.database.all("SELECT ProductName, UnitPrice, Product, ForcedModifier, UseForcedModifier FROM Products WHERE CategoryCode =?", [categoryCodeKey])
             .then(function (rows) {
                 let products: Product[] = [];
                 for (var row in rows) {
@@ -678,7 +694,8 @@ export class SQLiteService {
                         ProductName: rows[row][0],
                         UnitPrice: rows[row][1],
                         ProductCode: rows[row][2],
-                        UseForcedModifier: rows[row][3],                        
+                        ForcedModifier: rows[row][3],
+                        UseForcedModifier: rows[row][4],                        
                     });
                 }
                 return (products);
@@ -763,21 +780,18 @@ export class SQLiteService {
     }
 
     public dropTables() {
-        var promise = SQLiteService.database.execSQL('DROP TABLE IF EXISTS MenuCategories;');
-        promise.then(function (resultSet) {
-            console.log("Result set is:", resultSet);
-        });
-
-        var promise = SQLiteService.database.execSQL('DROP TABLE IF EXISTS MenuSubCategories;');
-        promise.then(function (resultSet) {
-            console.log("Result set is:", resultSet);
-        });
-
-        var promise = SQLiteService.database.execSQL('DROP TABLE IF EXISTS Products;');
-        promise.then(function (resultSet) {
+        SQLiteService.database.execSQL('DROP TABLE IF EXISTS MenuProducts;').then(function (resultSet) {
             console.log("Result set is:", resultSet);
         });
     }
+
+    getTableInfo(tableName:string){
+        SQLiteService.database.all("SELECT Name, ProductCode, Position FROM MenuProducts")
+            .then(function (rows) {                
+                console.log(rows);
+            });
+        
+        }
 
     private createRequestHeader() {
         let headers = new HttpHeaders({

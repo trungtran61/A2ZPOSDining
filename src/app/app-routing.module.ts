@@ -4,8 +4,7 @@ import { NativeScriptRouterModule } from "nativescript-angular/router";
 import { SplashComponent } from "~/app/home/splash/splash.component";
 
 const routes: Routes = [
-    { path: "", redirectTo: "/splash", pathMatch: "full" },  
-    { path: "splash", component: SplashComponent }, 
+    { path: "", redirectTo: "/home", pathMatch: "full" },  
     { path: "home", loadChildren: "~/app/home/home.module#HomeModule" }   
 ];
 

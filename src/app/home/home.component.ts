@@ -45,9 +45,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     logIn() {
-          this.DBService.login(this.employeeId).subscribe(res => {
-            //this.loginResponse = res;   
+          //this.DBService.createTables(this.DBService);
 
+          this.DBService.login(this.employeeId).subscribe(res => {
             switch (res.AccessType)
             {
             case 0:
@@ -73,6 +73,17 @@ export class HomeComponent implements OnInit, AfterViewInit {
         };
         
     });
+    }
+
+    managerFunctions()
+    {
+        //this.DBService.dropTables();
+        this.router.navigate(['/home/menu'])
+    }
+
+    loadTables()
+    {
+        this.DBService.getTableInfo('MenuProducts'); // .createTables(null);
     }
 
     ngAfterViewInit() {
