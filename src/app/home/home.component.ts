@@ -77,8 +77,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     managerFunctions()
     {
-        //this.DBService.dropTables();
         this.router.navigate(['/home/menu'])
+        //this.router.navigate(['/home/menuitems'])
     }
 
     loadTables()

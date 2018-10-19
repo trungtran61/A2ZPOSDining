@@ -1,7 +1,9 @@
-import { Component, OnInit, ViewContainerRef } from "@angular/core";
+import { Component, OnInit, ViewContainerRef, ViewChild, ChangeDetectorRef, AfterViewInit } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
+import { RadSideDrawerComponent, SideDrawerType } from "nativescript-ui-sidedrawer/angular";
+import { RadSideDrawer } from 'nativescript-ui-sidedrawer';
 
 import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
@@ -15,7 +17,7 @@ import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/force
     templateUrl: "./menu.component.html",
     styleUrls: ['./menu.component.scss']
 })
-export class MenuComponent implements OnInit {
+export class MenuComponent implements AfterViewInit, OnInit {
     menuCategories: MenuCategory[] = [];
     menuSubCategoriesOdd: MenuSubCategory[] = [];
     menuSubCategoriesEven: MenuSubCategory[] = [];
@@ -55,9 +57,24 @@ export class MenuComponent implements OnInit {
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
-        private viewContainerRef: ViewContainerRef) {
+        private viewContainerRef: ViewContainerRef,
+        private _changeDetectionRef: ChangeDetectorRef) {
         // Use the component constructor to inject providers.
 
+    }
+    @ViewChild(RadSideDrawerComponent) public drawerComponent: RadSideDrawerComponent;
+    private drawer: RadSideDrawer;
+
+    ngAfterViewInit() {
+        this.drawer = this.drawerComponent.sideDrawer;
+        this._changeDetectionRef.detectChanges();
+    }
+    public openDrawer() {
+        this.drawer.showDrawer();
+    }
+
+    public onCloseDrawerTap() {
+        this.drawer.closeDrawer();
     }
 
     ngOnInit(): void {
@@ -125,7 +142,7 @@ export class MenuComponent implements OnInit {
 
                 this.loadMenuCategoryStyles(this.menuSubCategoriesOdd, this.menuSubCategoryOddStyles);
                 this.loadMenuCategoryStyles(this.menuSubCategoriesEven, this.menuSubCategoryEvenStyles);
-                this.menuSubCategorySelected(menuSubCategories[0].SubCategoryID);
+                //this.menuSubCategorySelected(menuSubCategories[0].SubCategoryID);
             }
         });
     }
@@ -134,7 +151,7 @@ export class MenuComponent implements OnInit {
         menuCategories.forEach(function (menuCategory: MenuCategory) {
             let darkColor: string = menuCategory.ButtonColorHex;
             let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-            let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
+            let style: string = "height:70;color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
             menuCategoryStyles.push(style);
         });
     }
@@ -168,13 +185,14 @@ export class MenuComponent implements OnInit {
         });
 
         this.showProducts = true;
+        this.openDrawer();
     }
 
     loadMenuProductStyles(menuProducts: MenuProduct[], menuProductStyles: string[]) {
         menuProducts.forEach(function (menuProduct: MenuProduct) {
             let darkColor: string = menuProduct.ButtonColorHex;
             let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-            let style: string = "border-radius: 0px;color: #" + menuProduct.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
+            let style: string = "height: 80; border-radius: 0px;color: #" + menuProduct.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
             menuProductStyles.push(style);
         });
     }
@@ -300,6 +318,12 @@ export class MenuComponent implements OnInit {
             this.deleteCheckItem(checkItemIndex);
         }
 
+    }
+
+    onSideDrawerSwipe(args) {
+        if (args.direction == SwipeDirection.right ) {
+            this.onCloseDrawerTap();
+        }
     }
 
     deleteCheckItem(checkItemIndex: number) {
