@@ -24,7 +24,8 @@ export class ModifyCheckItemComponent implements OnInit {
     otherText: string = 'Other Quantity';
     isNormalChoice: boolean= true;
     enterQty: string = '';
-
+    checkItem: CheckItem = {};
+    hasModifier: boolean = false;
 
     changeTypeStyle: string ="color: black;background-image: linear-gradient(gray, white); border-color: black";
     changeTypeStyleSelected: string ="color: white;background-image: linear-gradient(black, gray); border-color: white";
@@ -73,21 +74,9 @@ export class ModifyCheckItemComponent implements OnInit {
 
     }
    
-    hide()
+    doAction(action:string)
     {
-        this.changeType = 'hide';   
-        this.close();
-    }
-
-    deleteItem()
-    {
-        this.changeType = 'delete';   
-        this.close();
-    }
-
-    repeatItem()
-    {
-        this.changeType = 'repeat';   
+        this.changeType = action;   
         this.close();
     }
 
@@ -127,7 +116,8 @@ export class ModifyCheckItemComponent implements OnInit {
     }
 
     ngOnInit() { 
-        this.checkItemIndex = this.params.context.checkItemIndex;
+        this.checkItem = this.params.context.checkItem;
+        this.hasModifier = this.checkItem.Product.UseModifier;
         //this.checkItems = this.params.context.checkItems;
     } 
 }

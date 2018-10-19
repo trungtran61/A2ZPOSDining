@@ -99,6 +99,7 @@ export interface Table {
 }
 
 export interface CheckItem {
+    Product?: MenuProduct;
     ProductName?: string;
     ProductCode?: number;
     UnitPrice?: number;

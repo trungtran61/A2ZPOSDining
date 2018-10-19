@@ -2,12 +2,12 @@
     <GridLayout class="m-5" rows="100,*,*" columns="*,100">
         <GridLayout rows="*" columns="*,*,*,*" row="0" col="0" *ngIf='isNormalChoice'>
             <StackLayout orientation="horizontal" colSpan="4" class="panel">
-                <Button text="Modify" class="glass" style="margin-left: 21px;width: 250px;height: 100px;color: orange;background-image: linear-gradient(#0a4e3d, lightgreen);"
-                    (tap)="modifyItem()"></Button>
+                <Button text="Modify" *ngIf='hasModifiers' class="glass" style="margin-left: 21px;width: 250px;height: 100px;color: orange;background-image: linear-gradient(#0a4e3d, lightgreen);"
+                    (tap)="doAction('modify')"></Button>
                 <Button text="Delete" class="glass" style="margin-left: 21px;width: 250px;height: 100px;background-image: linear-gradient(darkred,red);"
-                    (tap)="deleteItem()"></Button>
+                    (tap)="doAction('delete')"></Button>
                 <Button text="Repeat" class="glass" style="margin-left: 21px;width: 250px;height: 100px;color: gold; background-image: linear-gradient(brown,orange);"
-                    (tap)="repeatItem()"></Button>
+                    (tap)="doAction('repeat')"></Button>
             </StackLayout>
         </GridLayout>
         <GridLayout rows="*,*" columns="*,*" row="0" col="0" *ngIf='!isNormalChoice' class="panel">
@@ -48,7 +48,7 @@
             <Button text="Qty" class="glass" (tap)="setChangeType('quantity')" row="0" [style]="qtyTypeStyle"></Button>
             <Button text="Seat" class="glass" (tap)="setChangeType('seat')" row="1" [style]="seatTypeStyle"></Button>
             <Label text="" row="2"></Label>
-            <Button text="Hide" class="glass" style="background-image: linear-gradient(darkred,red);" (tap)="hide()" row="3"></Button>
+            <Button text="Hide" class="glass" style="background-image: linear-gradient(darkred,red);" (tap)="doAction('hide')" row="3"></Button>
         </GridLayout>
         <GridLayout rows="*,*" columns="*,*,*,*,*,*" row="2" colSpan="2">
             <Button class="glass" [text]="seat1" row="0" col="0"></Button>

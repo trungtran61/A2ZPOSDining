@@ -252,7 +252,8 @@ export class MenuComponent implements OnInit {
         this.checkItems.push({
             ProductName: product.Name, UnitPrice: product.UnitPrice,
             Modifiers: [], Qty: 1, SeatNumber: 1, Price: product.UnitPrice,
-            ProductCode: product.ProductCode
+            ProductCode: product.ProductCode,
+            Product: product
         });
         this.totalPrice();
     }   
@@ -261,7 +262,7 @@ export class MenuComponent implements OnInit {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: false,
-            //context: { changeType: changeType, currentOptions: currentOptions}
+            context: { checkItem: this.checkItems[checkItemIndex] }
         };
 
         this.modalService.showModal(ModifyCheckItemComponent, modalOptions).then(
