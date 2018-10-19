@@ -46,9 +46,7 @@ export class ForcedModifiersComponent implements OnInit {
             that.choiceLayerClasses.push('choiceLayer');                                        
         });
 
-        this.choiceLayerClasses[index] = 'choiceLayerActive';
-        //this.choiceLayerSelected(this.choiceLayers[index], index);
-        //this.activeLayerIndex = index;     
+        this.choiceLayerClasses[index] = 'choiceLayerActive';            
     }
 
     choiceLayerSelected(menuChoice: MenuChoice, index: number)
@@ -73,7 +71,23 @@ export class ForcedModifiersComponent implements OnInit {
 
     choiceSelected(choice: MenuChoice)
     {
-        this.currentChoices.push({ Layer: choice.Layer, Name : choice.Name })
+        // find current choice and set to new choice
+        if (this.currentChoices.length > 0)
+        {
+           let _choice  =  this.currentChoices.find(x => x.Layer == choice.Layer);
+            if (_choice != null)
+            {
+                _choice.Name = choice.Name;
+            }
+            else
+            {
+                this.currentChoices.push(choice)
+            }
+        }
+        else
+        {
+            this.currentChoices.push(choice)
+        }         
 
         // all layers choice made?
         if (this.currentChoices.length == this.choiceLayers.length)

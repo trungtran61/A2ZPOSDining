@@ -3,7 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct } from "~/app/models/products";
+import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
@@ -16,9 +16,9 @@ import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/force
     styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent implements OnInit {
-    menuCategories: MenuCategory[] = [];    
-    menuSubCategoriesOdd: MenuSubCategory[] = []; 
-    menuSubCategoriesEven: MenuSubCategory[] = [];  
+    menuCategories: MenuCategory[] = [];
+    menuSubCategoriesOdd: MenuSubCategory[] = [];
+    menuSubCategoriesEven: MenuSubCategory[] = [];
     menuSubCategoryOddStyles: string[] = [];
     menuSubCategoryEvenStyles: string[] = [];
 
@@ -44,9 +44,9 @@ export class MenuComponent implements OnInit {
     checkNumber: string = 'CK#1';
 
     menuCategoryStyles: string[] = [];
-    
-    isMainCategories: boolean = true;  
-    showProducts: boolean = false;  
+
+    isMainCategories: boolean = true;
+    showProducts: boolean = false;
 
     TAX_RATE: number = .08;
     MAX_GUESTS: number = 6;
@@ -66,9 +66,8 @@ export class MenuComponent implements OnInit {
         this.table = localStorage.getItem('table');
         //this.server = localStorage.getItem('server');
         //let that = this; // needed to access 'this' from callback
-let that = this;
-        if (this.isMainCategories)
-        {
+        let that = this;
+        if (this.isMainCategories) {
             this.DBService.getLocalMenuCategories().then((menuCategories) => {
                 if (menuCategories.length == 0) {
                     dialogs.alert("Main Categories not loaded.").then(() => {
@@ -77,10 +76,10 @@ let that = this;
                 }
                 else {
                     // activeStyle: string = "color: black;background-image: linear-gradient(darkred, red);";                    
-                    this.menuCategories = menuCategories;  
+                    this.menuCategories = menuCategories;
                     //console.log(this.menuCategories);
                     menuCategories.forEach(function (menuCategory: MenuCategory) {
-                        let darkColor: string =  menuCategory.ButtonColorHex;
+                        let darkColor: string = menuCategory.ButtonColorHex;
                         let lightColor: string = that.lightenDarkenColor(darkColor, 50);
                         let style: string = "margin-top:15px;width: 500px;height: 120px;color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
                         //console.log(style);
@@ -89,25 +88,23 @@ let that = this;
                 }
             });
         }
-        else
-        {
-        this.DBService.getLocalCategoryCodes().then((categoryCodes) => {
-            if (categoryCodes.length == 0) {
-                dialogs.alert("Category Codes not loaded.").then(() => {
-                    console.log("Dialog closed!");
-                });
-            }
-            else {
-                this.categoryCodes = categoryCodes;
-                this.categorySelected(this.categoryCodes[0].PriKey);
-            }
-        });
+        else {
+            this.DBService.getLocalCategoryCodes().then((categoryCodes) => {
+                if (categoryCodes.length == 0) {
+                    dialogs.alert("Category Codes not loaded.").then(() => {
+                        console.log("Dialog closed!");
+                    });
+                }
+                else {
+                    this.categoryCodes = categoryCodes;
+                    this.categorySelected(this.categoryCodes[0].PriKey);
+                }
+            });
 
         }
     }
 
-    menuCategorySelected(categoryID: number)
-    {
+    menuCategorySelected(categoryID: number) {
         localStorage.setItem("CategoryID", categoryID.toString());
         //localStorage.setItem("CategoryID", "20");
         this.isMainCategories = false;
@@ -118,11 +115,11 @@ let that = this;
                     console.log("Dialog closed!");
                 });
             }
-            else {              
-                this.menuSubCategoriesOdd = menuSubCategories.filter(function (menuSubCategory:MenuSubCategory) {
+            else {
+                this.menuSubCategoriesOdd = menuSubCategories.filter(function (menuSubCategory: MenuSubCategory) {
                     return (menuSubCategory.Position % 2 !== 0);
                 });
-                this.menuSubCategoriesEven = menuSubCategories.filter(function (menuSubCategory:MenuSubCategory) {
+                this.menuSubCategoriesEven = menuSubCategories.filter(function (menuSubCategory: MenuSubCategory) {
                     return (menuSubCategory.Position % 2 === 0);
                 });
 
@@ -132,22 +129,20 @@ let that = this;
             }
         });
     }
-    
-    loadMenuCategoryStyles(menuCategories: MenuCategory[], menuCategoryStyles: string[])
-    {
-        menuCategories.forEach(function (menuCategory:MenuCategory) {
-            let darkColor: string =  menuCategory.ButtonColorHex;
+
+    loadMenuCategoryStyles(menuCategories: MenuCategory[], menuCategoryStyles: string[]) {
+        menuCategories.forEach(function (menuCategory: MenuCategory) {
+            let darkColor: string = menuCategory.ButtonColorHex;
             let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-            let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";                     
+            let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
             menuCategoryStyles.push(style);
         });
     }
 
-    menuSubCategorySelected(subCategoryID: number)
-    {
+    menuSubCategorySelected(subCategoryID: number) {
         // build menu products list
         let that = this;
-        let categoryID:number = parseInt(localStorage.getItem("CategoryID"));
+        let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
         //subCategoryID = 50;
 
         this.DBService.getLocalMenuProducts(categoryID, subCategoryID).then((menuProducts) => {
@@ -156,54 +151,53 @@ let that = this;
                     console.log("Dialog closed!");
                 });
             }
-            else {              
-                this.menuProducts1 = menuProducts.filter(function (menuProduct:MenuProduct) {
+            else {
+                this.menuProducts1 = menuProducts.filter(function (menuProduct: MenuProduct) {
                     return (menuProduct.Position % 2 !== 0);
                 });
-                this.menuProducts2 = menuProducts.filter(function (menuProduct:MenuProduct) {
+                this.menuProducts2 = menuProducts.filter(function (menuProduct: MenuProduct) {
                     return (menuProduct.Position % 2 === 0);
                 });
-                this.menuProducts3 = menuProducts.filter(function (menuProduct:MenuProduct) {
+                this.menuProducts3 = menuProducts.filter(function (menuProduct: MenuProduct) {
                     return (menuProduct.Position % 3 === 0);
                 });
                 this.loadMenuProductStyles(this.menuProducts1, that.menuProduct1Styles);
                 this.loadMenuProductStyles(this.menuProducts2, that.menuProduct2Styles);
-                this.loadMenuProductStyles(this.menuProducts3, that.menuProduct3Styles);                     
+                this.loadMenuProductStyles(this.menuProducts3, that.menuProduct3Styles);
             }
         });
 
         this.showProducts = true;
     }
 
-    loadMenuProductStyles(menuProducts: MenuProduct[], menuProductStyles: string[])
-    {
-        menuProducts.forEach(function (menuProduct:MenuProduct) {
-            let darkColor: string =  menuProduct.ButtonColorHex;
+    loadMenuProductStyles(menuProducts: MenuProduct[], menuProductStyles: string[]) {
+        menuProducts.forEach(function (menuProduct: MenuProduct) {
+            let darkColor: string = menuProduct.ButtonColorHex;
             let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-            let style: string = "border-radius: 0px;color: #" + menuProduct.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";                     
+            let style: string = "border-radius: 0px;color: #" + menuProduct.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
             menuProductStyles.push(style);
         });
     }
-    
-    shadeColor(color, percent) {   
-        var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
-        return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+
+    shadeColor(color, percent) {
+        var f = parseInt(color.slice(1), 16), t = percent < 0 ? 0 : 255, p = percent < 0 ? percent * -1 : percent, R = f >> 16, G = f >> 8 & 0x00FF, B = f & 0x0000FF;
+        return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
     }
 
     // usage - col = "3F6D2A", amt = 10
-    lightenDarkenColor(col,amt) {
-        
-        var num = parseInt(col,16);
+    lightenDarkenColor(col, amt) {
+
+        var num = parseInt(col, 16);
         var r = (num >> 16) + amt;
         var b = ((num >> 8) & 0x00FF) + amt;
         var g = (num & 0x0000FF) + amt;
         var newColor = g | (b << 8) | (r << 16);
         return newColor.toString(16);
-        
+
     }
 
     categorySelected(categoryCodeKey: number) {
-        
+
         this.DBService.getLocalProducts(categoryCodeKey).then((products) => {
             if (products.length == 0) {
                 dialogs.alert("Products not loaded for categoryCode: " + categoryCodeKey).then(() => {
@@ -216,37 +210,52 @@ let that = this;
         });
     }
 
-    menuProductSelected(product: MenuProduct) {        
+    menuProductSelected(product: MenuProduct) {
 
-        if (product.UseForcedModifier)
+        if (product.UseForcedModifier) {
+            this.showForcedModifierDialog(product, -1, null, true);
+        }
+        else
         {
-            this.showForcedModifierDialog(product, -1);
-        }       
+            this.addProductToCheck(product); 
+        }
         //this.showProducts = false;
     }
 
-    showForcedModifierDialog(product: MenuProduct, checkItemIndex:number)
-    {
+    showForcedModifierDialog(product: MenuProduct, checkItemIndex: number, choice, isAdding: boolean) {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
-            context: { productCode: product.ProductCode, currentChoices: checkItemIndex > -1 ? this.checkItems[checkItemIndex].ForcedModifiers : []}
+            context: { productCode: product.ProductCode, currentChoices: checkItemIndex > -1 ? this.checkItems[checkItemIndex].ForcedModifiers : [] }
         };
 
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
             (selectedChoices) => {
-                if (selectedChoices != null)
-                {
+                if (selectedChoices != null) {
                     this.currentSeatNumber++;
-                    this.checkItems.push({
-                        "ProductName": product.Name, "UnitPrice": product.UnitPrice,
-                        "Modifiers": [], "Qty": 1, "SeatNumber": 1, "Price": product.UnitPrice
-                    });
-                    this.totalPrice();               
-                    this.checkItems[checkItemIndex].ForcedModifiers = selectedChoices;                
-                }                
+                    if (isAdding)
+                    {
+                        this.addProductToCheck(product);                    
+                    }
+                    this.checkItems[this.checkItems.length-1].ForcedModifiers = selectedChoices;                    
+                }
             });
     }
+
+    changeChoice(product: MenuProduct, checkItemIndex: number, choice: MenuChoice)
+    {
+        this.showForcedModifierDialog(product, checkItemIndex, choice, false);
+    }
+
+    addProductToCheck(product: MenuProduct)
+    {
+        this.checkItems.push({
+            ProductName: product.Name, UnitPrice: product.UnitPrice,
+            Modifiers: [], Qty: 1, SeatNumber: 1, Price: product.UnitPrice,
+            ProductCode: product.ProductCode
+        });
+        this.totalPrice();
+    }   
 
     showModifyDialog(checkItemIndex: number) {
         const modalOptions: ModalDialogOptions = {
@@ -261,7 +270,7 @@ let that = this;
                 switch (choice.ChangeType) {
                     case 'quantity':
                         this.checkItems[checkItemIndex].Qty = parseFloat(choice.SelectedNumber);
-                        this.checkItems[checkItemIndex].Price = this.checkItems[checkItemIndex].UnitPrice * parseFloat(choice.SelectedNumber);                        
+                        this.checkItems[checkItemIndex].Price = this.checkItems[checkItemIndex].UnitPrice * parseFloat(choice.SelectedNumber);
                         this.totalPrice();
                         break;
                     case 'seat':
@@ -289,7 +298,7 @@ let that = this;
         if (direction == 'left') {
             this.deleteCheckItem(checkItemIndex);
         }
-        
+
     }
 
     deleteCheckItem(checkItemIndex: number) {

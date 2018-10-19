@@ -100,11 +100,12 @@ export interface Table {
 
 export interface CheckItem {
     ProductName?: string;
+    ProductCode?: number;
     UnitPrice?: number;
     Qty?: number;
     SeatNumber?: number;
     Price?: number;
-    ForcedModifiers?: ForcedModifier[]
+    ForcedModifiers?: MenuChoice[]
     Modifiers?: Modifier[]
 }
 

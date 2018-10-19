@@ -8,12 +8,17 @@
     </StackLayout>    
     <ListView [items]="checkItems" separatorColor="white" class="m-0" height="505">
       <ng-template let-item="item" let-i="index">
-        <StackLayout class="m-b-10" orientation="horizontal" (tap)="showModifyDialog(i)" (swipe)="onSwipe($event, i)">
+        <StackLayout class="m-b-10">
+        <StackLayout orientation="horizontal" (tap)="showModifyDialog(i)" (swipe)="onSwipe($event, i)">
           <Label [text]="item.Qty" style="text-align: right; margin-right: 10;width:15;"></Label>
           <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
           <Label [text]="item.Price | currency" style="text-align: right; width:50; margin-right:5"></Label>
           <Label [text]="item.SeatNumber" style="text-align: right; width:15;"></Label>
         </StackLayout>
+          <StackLayout *ngFor="let choice of item.ForcedModifiers let j=index">
+            <Label style='margin-left: 30px;' [text]='choice.Name' (tap)='changeChoice(item, i, choice)'></Label>
+          </StackLayout>
+        </StackLayout>        
       </ng-template>
     </ListView>
     <StackLayout style="background-color: rgb(46, 44, 44);color: white">
