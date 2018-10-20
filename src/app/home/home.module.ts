@@ -11,16 +11,13 @@ import { MenuComponent } from "~/app/home/menu/menu.component";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
 import { ModifiersComponent } from "~/app/home/menu/modifiers/modifiers.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
-import { NativeScriptUISideDrawerModule } from "nativescript-ui-sidedrawer/angular/side-drawer-directives";
-import { MenuItemsComponent } from "./menu/menu-items/menu-items.component";
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 
 @NgModule({
     imports: [
         NativeScriptCommonModule,
         NativeScriptHttpClientModule,
-        HomeRoutingModule,
-        NativeScriptUISideDrawerModule  
+        HomeRoutingModule
     ],
     declarations: [
         HomeComponent,
@@ -29,8 +26,7 @@ import { MenuItemsComponent } from "./menu/menu-items/menu-items.component";
         MenuComponent,
         ModifyCheckItemComponent,
         ModifiersComponent,
-        ForcedModifiersComponent,
-        MenuItemsComponent
+        ForcedModifiersComponent        
     ],
     schemas: [
         NO_ERRORS_SCHEMA

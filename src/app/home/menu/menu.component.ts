@@ -1,9 +1,7 @@
-import { Component, OnInit, ViewContainerRef, ViewChild, ChangeDetectorRef, AfterViewInit } from "@angular/core";
+import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
-import { RadSideDrawerComponent, SideDrawerType } from "nativescript-ui-sidedrawer/angular";
-import { RadSideDrawer } from 'nativescript-ui-sidedrawer';
 
 import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
@@ -17,22 +15,21 @@ import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/force
     templateUrl: "./menu.component.html",
     styleUrls: ['./menu.component.scss']
 })
-export class MenuComponent implements AfterViewInit, OnInit {
-    menuCategories: MenuCategory[] = [];
-    menuSubCategoriesOdd: MenuSubCategory[] = [];
-    menuSubCategoriesEven: MenuSubCategory[] = [];
-    menuSubCategoryOddStyles: string[] = [];
-    menuSubCategoryEvenStyles: string[] = [];
+export class MenuComponent implements OnInit {
+    categories: MenuCategory[] = [];
+    categoryStyles: string[] = [];
 
-    menuProducts1: MenuProduct[] = [];
-    menuProducts2: MenuProduct[] = [];
-    menuProducts3: MenuProduct[] = [];
-    menuProduct1Styles: string[] = [];
-    menuProduct2Styles: string[] = [];
-    menuProduct3Styles: string[] = [];
+    subCategories: MenuCategory[] = [];
+    subCategoryStyles: string[] = [];
+    subCategoryCols: number[] = [];
+    subCategoryRows: number[] = [];
+
+    products: MenuProduct[] = [];    
+    productStyles: string[] = [];
+    productCols: number[] = [];
+    productRows: number[] = [];
 
     categoryCodes: CategoryCode[] = [];
-    products: Product[] = [];
     checkItems: CheckItem[] = [];
     currentSeatNumber: 0;
     checkTotal: number = 0;
@@ -43,13 +40,11 @@ export class MenuComponent implements AfterViewInit, OnInit {
     guests: number = 0;
     table: string = '';
     server: string = 'Trung';
-    checkNumber: string = 'CK#1';
-
-    menuCategoryStyles: string[] = [];
+    checkNumber: string = 'CK#1';    
 
     isMainCategories: boolean = true;
     showProducts: boolean = false;
-
+  
     TAX_RATE: number = .08;
     MAX_GUESTS: number = 6;
     TIPS_PCT: number = .15;
@@ -57,24 +52,9 @@ export class MenuComponent implements AfterViewInit, OnInit {
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
-        private viewContainerRef: ViewContainerRef,
-        private _changeDetectionRef: ChangeDetectorRef) {
+        private viewContainerRef: ViewContainerRef) {
         // Use the component constructor to inject providers.
 
-    }
-    @ViewChild(RadSideDrawerComponent) public drawerComponent: RadSideDrawerComponent;
-    private drawer: RadSideDrawer;
-
-    ngAfterViewInit() {
-        this.drawer = this.drawerComponent.sideDrawer;
-        this._changeDetectionRef.detectChanges();
-    }
-    public openDrawer() {
-        this.drawer.showDrawer();
-    }
-
-    public onCloseDrawerTap() {
-        this.drawer.closeDrawer();
     }
 
     ngOnInit(): void {
@@ -85,22 +65,22 @@ export class MenuComponent implements AfterViewInit, OnInit {
         //let that = this; // needed to access 'this' from callback
         let that = this;
         if (this.isMainCategories) {
-            this.DBService.getLocalMenuCategories().then((menuCategories) => {
-                if (menuCategories.length == 0) {
+            this.DBService.getLocalMenuCategories().then((categories) => {
+                if (categories.length == 0) {
                     dialogs.alert("Main Categories not loaded.").then(() => {
                         console.log("Dialog closed!");
                     });
                 }
                 else {
                     // activeStyle: string = "color: black;background-image: linear-gradient(darkred, red);";                    
-                    this.menuCategories = menuCategories;
+                    this.categories = categories;
                     //console.log(this.menuCategories);
-                    menuCategories.forEach(function (menuCategory: MenuCategory) {
+                    this.categories.forEach(function (menuCategory: MenuCategory) {
                         let darkColor: string = menuCategory.ButtonColorHex;
                         let lightColor: string = that.lightenDarkenColor(darkColor, 50);
                         let style: string = "margin-top:15px;width: 500px;height: 120px;color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
                         //console.log(style);
-                        that.menuCategoryStyles.push(style);
+                        that.categoryStyles.push(style);
                     });
                 }
             });
@@ -121,79 +101,65 @@ export class MenuComponent implements AfterViewInit, OnInit {
         }
     }
 
-    menuCategorySelected(categoryID: number) {
+    categorySelected(categoryID: number) {
         localStorage.setItem("CategoryID", categoryID.toString());
         //localStorage.setItem("CategoryID", "20");
         this.isMainCategories = false;
         let that = this;
-        this.DBService.getLocalMenuSubCategories(categoryID).then((menuSubCategories) => {
-            if (menuSubCategories.length == 0) {
+        this.DBService.getLocalMenuSubCategories(categoryID).then((subCategories) => {
+            if (subCategories.length == 0) {
                 dialogs.alert("Menu SubCategories not loaded.").then(() => {
                     console.log("Dialog closed!");
                 });
             }
             else {
-                this.menuSubCategoriesOdd = menuSubCategories.filter(function (menuSubCategory: MenuSubCategory) {
-                    return (menuSubCategory.Position % 2 !== 0);
-                });
-                this.menuSubCategoriesEven = menuSubCategories.filter(function (menuSubCategory: MenuSubCategory) {
-                    return (menuSubCategory.Position % 2 === 0);
-                });
-
-                this.loadMenuCategoryStyles(this.menuSubCategoriesOdd, this.menuSubCategoryOddStyles);
-                this.loadMenuCategoryStyles(this.menuSubCategoriesEven, this.menuSubCategoryEvenStyles);
-                //this.menuSubCategorySelected(menuSubCategories[0].SubCategoryID);
+                this.subCategories = subCategories;
+                this.loadCategoryStyles(this.subCategories, this.subCategoryStyles);
+                this.subCategorySelected(subCategories[0].SubCategoryID);
             }
         });
     }
 
-    loadMenuCategoryStyles(menuCategories: MenuCategory[], menuCategoryStyles: string[]) {
-        menuCategories.forEach(function (menuCategory: MenuCategory) {
+    loadCategoryStyles(categories: MenuCategory[], categoryStyles: string[]) {
+        categories.forEach(function (menuCategory: MenuCategory) {
             let darkColor: string = menuCategory.ButtonColorHex;
             let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-            let style: string = "height:70;color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
-            menuCategoryStyles.push(style);
+            let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
+            categoryStyles.push(style);
         });
     }
 
-    menuSubCategorySelected(subCategoryID: number) {
+    subCategorySelected(subCategoryID: number) {
         // build menu products list
         let that = this;
         let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
         //subCategoryID = 50;
 
-        this.DBService.getLocalMenuProducts(categoryID, subCategoryID).then((menuProducts) => {
-            if (menuProducts.length == 0) {
+        this.DBService.getLocalMenuProducts(categoryID, subCategoryID).then((products) => {
+            if (products.length == 0) {
                 dialogs.alert("Menu Products not loaded.").then(() => {
                     console.log("Dialog closed!");
                 });
             }
             else {
-                this.menuProducts1 = menuProducts.filter(function (menuProduct: MenuProduct) {
-                    return (menuProduct.Position % 2 !== 0);
+                this.products = products;
+                this.products.forEach(function (menuProduct: MenuProduct) {
+                    that.productRows.push(Math.floor((menuProduct.Position - 1) / 4) );
+                    that.productCols.push((menuProduct.Position % 4) - 1);
                 });
-                this.menuProducts2 = menuProducts.filter(function (menuProduct: MenuProduct) {
-                    return (menuProduct.Position % 2 === 0);
-                });
-                this.menuProducts3 = menuProducts.filter(function (menuProduct: MenuProduct) {
-                    return (menuProduct.Position % 3 === 0);
-                });
-                this.loadMenuProductStyles(this.menuProducts1, that.menuProduct1Styles);
-                this.loadMenuProductStyles(this.menuProducts2, that.menuProduct2Styles);
-                this.loadMenuProductStyles(this.menuProducts3, that.menuProduct3Styles);
+                //this.loadProductStyles(this.products, that.productStyles);                
             }
         });
 
         this.showProducts = true;
-        this.openDrawer();
     }
 
-    loadMenuProductStyles(menuProducts: MenuProduct[], menuProductStyles: string[]) {
-        menuProducts.forEach(function (menuProduct: MenuProduct) {
+    loadProductStyles(products: MenuProduct[], productStyles: string[]) {
+        products.forEach(function (menuProduct: MenuProduct) {
             let darkColor: string = menuProduct.ButtonColorHex;
             let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-            let style: string = "height: 80; border-radius: 0px;color: #" + menuProduct.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
-            menuProductStyles.push(style);
+            let style: string = "border-radius: 0px;color: #" + menuProduct.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
+            productStyles.push(style);
         });
     }
 
@@ -212,23 +178,9 @@ export class MenuComponent implements AfterViewInit, OnInit {
         var newColor = g | (b << 8) | (r << 16);
         return newColor.toString(16);
 
-    }
+    }   
 
-    categorySelected(categoryCodeKey: number) {
-
-        this.DBService.getLocalProducts(categoryCodeKey).then((products) => {
-            if (products.length == 0) {
-                dialogs.alert("Products not loaded for categoryCode: " + categoryCodeKey).then(() => {
-                    console.log("Dialog closed!");
-                });
-            }
-            else {
-                this.products = products;
-            }
-        });
-    }
-
-    menuProductSelected(product: MenuProduct) {
+    productSelected(product: MenuProduct) {
 
         if (product.UseForcedModifier) {
             this.showForcedModifierDialog(product, -1, null, true);
@@ -270,8 +222,7 @@ export class MenuComponent implements AfterViewInit, OnInit {
         this.checkItems.push({
             ProductName: product.Name, UnitPrice: product.UnitPrice,
             Modifiers: [], Qty: 1, SeatNumber: 1, Price: product.UnitPrice,
-            ProductCode: product.ProductCode,
-            Product: product
+            ProductCode: product.ProductCode
         });
         this.totalPrice();
     }   
@@ -280,7 +231,7 @@ export class MenuComponent implements AfterViewInit, OnInit {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: false,
-            context: { checkItem: this.checkItems[checkItemIndex] }
+            //context: { changeType: changeType, currentOptions: currentOptions}
         };
 
         this.modalService.showModal(ModifyCheckItemComponent, modalOptions).then(
@@ -318,12 +269,6 @@ export class MenuComponent implements AfterViewInit, OnInit {
             this.deleteCheckItem(checkItemIndex);
         }
 
-    }
-
-    onSideDrawerSwipe(args) {
-        if (args.direction == SwipeDirection.right ) {
-            this.onCloseDrawerTap();
-        }
     }
 
     deleteCheckItem(checkItemIndex: number) {
