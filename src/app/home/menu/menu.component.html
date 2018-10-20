@@ -1,3 +1,8 @@
+<ActionBar android:title="Title">
+  <ActionItem [text]="checkTitle" ios.position="left"></ActionItem>
+  <ActionItem [text]="currentSubCategory" style="font-weight: bold" ios.position="right" android.position="popup"></ActionItem>  
+  <NavigationButton icon="res://ic_arrow_back_black_24dp" (tap)="goBack()"></NavigationButton>
+</ActionBar>
 <GridLayout rows="*, 50" columns="*,*,*,*,*,*,*" style="font-weight: bold">
   <StackLayout row="0" col="0" colSpan="2" [style]='pageStyle'>
     <StackLayout orientation="horizontal" style="background-color: antiquewhite;">
@@ -34,7 +39,7 @@
         <Label text="Tax" class="check-label"></Label>
         <Label [text]="tax | currency" class="check-amount"></Label>
       </StackLayout>
-      <StackLayout class="m-b-5" orientation="horizontal">
+      <StackLayout class="m-b-5" orientation="horizontal" *ngIf='tips > 0'>
         <Label text="Gratuity" class="check-label"></Label>
         <Label [text]="tips | currency" class="check-amount"></Label>
       </StackLayout>
@@ -56,12 +61,12 @@
     <Button class="glass" [text]="item.Name" *ngFor="let item of categories let i=index" (tap)="categorySelected(item.CategoryID)"
       [style]="categoryStyles[i]"></Button>
   </StackLayout>
-  <GridLayout row="0" col="2" *ngIf="!isMainCategories">
-    <Button class="glass" [text]="item.Name" *ngFor="let item of subCategories let i=index" (tap)="subCategorySelected(item.SubCategoryID)"
-      [style]="subCategoryStyles[i]" [col]='subCategoryCols[i]' [row]='subCategoryRows[i]'></Button>
+  <GridLayout row="0" col="2" *ngIf="!isMainCategories" rows="*,*,*,*,*,*,*,*,*">
+    <Button class="glass" [text]="item.Name" *ngFor="let item of subCategories let i=index" (tap)="subCategorySelected(item)"
+      [style]="subCategoryStyles[i]" [row]='subCategoryRows[i]' textWrap="true"></Button>
   </GridLayout>  
-    <GridLayout columns="*,*,*,*" rows="*,*,*,*,*,*" col="3" colSpan="4" *ngIf="!isMainCategories">      
+    <GridLayout columns="*,*,*,*" rows="*,*,*,*,*,*,*,*" col="3" colSpan="4" *ngIf="!isMainCategories">      
         <Button class="glass" [text]="item.Name" *ngFor="let item of products let i=index" (tap)="productSelected(item, i)"
-          [style]="productStyles[i]" [col]='productCols[i]' [row]='productRows[i]'></Button>      
+          [style]="productStyles[i]" [col]='productCols[i]' [row]='productRows[i]' textWrap="true"></Button>      
     </GridLayout>  
 </GridLayout>

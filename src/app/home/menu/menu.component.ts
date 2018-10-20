@@ -40,7 +40,9 @@ export class MenuComponent implements OnInit {
     guests: number = 0;
     table: string = '';
     server: string = 'Trung';
-    checkNumber: string = 'CK#1';    
+    checkNumber: string = 'CK#1';   
+    checkTitle: string = '';
+    currentSubCategory: string = ''; 
 
     isMainCategories: boolean = true;
     showProducts: boolean = false;
@@ -62,6 +64,7 @@ export class MenuComponent implements OnInit {
         this.guests = parseInt(localStorage.getItem('guests'));
         this.table = localStorage.getItem('table');
         //this.server = localStorage.getItem('server');
+        this.checkTitle = this.checkNumber + ' ' + this.server + ' ' + this.table + ' ' + this.guests;
         //let that = this; // needed to access 'this' from callback
         let that = this;
         if (this.isMainCategories) {
@@ -106,6 +109,8 @@ export class MenuComponent implements OnInit {
         //localStorage.setItem("CategoryID", "20");
         this.isMainCategories = false;
         let that = this;
+        this.subCategoryRows = [];
+
         this.DBService.getLocalMenuSubCategories(categoryID).then((subCategories) => {
             if (subCategories.length == 0) {
                 dialogs.alert("Menu SubCategories not loaded.").then(() => {
@@ -115,7 +120,12 @@ export class MenuComponent implements OnInit {
             else {
                 this.subCategories = subCategories;
                 this.loadCategoryStyles(this.subCategories, this.subCategoryStyles);
-                this.subCategorySelected(subCategories[0].SubCategoryID);
+                this.subCategories.forEach(function (subCategory: MenuSubCategory) {
+                    that.subCategoryRows.push(subCategory.Position-1);
+                    //that.subCategoryRows.push(0);
+                    //that.subCategoryCols.push(0);
+                });
+                this.subCategorySelected(subCategories[0]);
             }
         });
     }
@@ -129,13 +139,15 @@ export class MenuComponent implements OnInit {
         });
     }
 
-    subCategorySelected(subCategoryID: number) {
+    subCategorySelected(subCategory: MenuSubCategory) {
         // build menu products list
         let that = this;
         let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
         //subCategoryID = 50;
+        this.productRows = [];
+        this.productCols = [];
 
-        this.DBService.getLocalMenuProducts(categoryID, subCategoryID).then((products) => {
+        this.DBService.getLocalMenuProducts(categoryID, subCategory.SubCategoryID).then((products) => {
             if (products.length == 0) {
                 dialogs.alert("Menu Products not loaded.").then(() => {
                     console.log("Dialog closed!");
@@ -144,13 +156,15 @@ export class MenuComponent implements OnInit {
             else {
                 this.products = products;
                 this.products.forEach(function (menuProduct: MenuProduct) {
-                    that.productRows.push(Math.floor((menuProduct.Position - 1) / 4) );
-                    that.productCols.push((menuProduct.Position % 4) - 1);
+                    that.productRows.push(Math.floor((menuProduct.Position -1 ) / 4));
+                    that.productCols.push((menuProduct.Position - 1) % 4);
+                    //that.productRows.push(0);
+                    //that.productCols.push(0);
                 });
-                //this.loadProductStyles(this.products, that.productStyles);                
+                this.loadProductStyles(this.products, that.productStyles);                
             }
         });
-
+        this.currentSubCategory = subCategory.Name;
         this.showProducts = true;
     }
 
