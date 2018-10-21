@@ -14,7 +14,7 @@ import { SplashComponent } from "~/app/home/splash/splash.component";
     imports: [
         NativeScriptModule,
         AppRoutingModule,
-        HttpClientModule
+        HttpClientModule,        
     ],
     declarations: [
         AppComponent,

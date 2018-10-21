@@ -11,8 +11,8 @@
             </StackLayout>
         </GridLayout>
         <GridLayout rows="*,*" columns="*,*" row="0" col="0" *ngIf='!isNormalChoice' class="panel">
-            <Label text="Quantity" row="0" col="0" colSpan="2"></Label>
-            <Label [text]="enterQty" row="1" col="0"></Label>
+            <Label text="Quantity" row="0" col="0" style="text-align: center;color:white; font-weight: bold"></Label>
+            <Label [text]="enterQty" row="1" col="0" style="text-align: center;color:white; font-weight: bold; font-size: 25px"></Label>
             <Button text="Back" class="glass" (tap)="backSpace()" row="1" col="1"></Button>
         </GridLayout>
         <GridLayout rows="*,*,*,*" columns="*,*,*" row="1" col="0" *ngIf='isNormalChoice' class="panel">
@@ -49,20 +49,6 @@
             <Button text="Seat" class="glass" (tap)="setChangeType('seat')" row="1" [style]="seatTypeStyle"></Button>
             <Label text="" row="2"></Label>
             <Button text="Hide" class="glass" style="background-image: linear-gradient(darkred,red);" (tap)="doAction('hide')" row="3"></Button>
-        </GridLayout>
-        <GridLayout rows="*,*" columns="*,*,*,*,*,*" row="2" colSpan="2">
-            <Button class="glass" [text]="seat1" row="0" col="0"></Button>
-            <Button class="glass" [text]="seat2" row="0" col="1"></Button>
-            <Button class="glass" [text]="seat3" row="0" col="2"></Button>
-            <Button class="glass" [text]="seat4" row="0" col="3"></Button>
-            <Button class="glass" [text]="seat5" row="0" col="4"></Button>
-            <Button class="glass" [text]="seat1+5" row="1" col="0"></Button>
-            <Button class="glass" [text]="seat2+5" row="1" col="1"></Button>
-            <Button class="glass" [text]="seat3+5" row="1" col="2"></Button>
-            <Button class="glass" [text]="seat4+5" row="1" col="3"></Button>
-            <Button class="glass" [text]="seat5+5" row="1" col="4"></Button>
-            <Button class="glass" text="next" row="0" col="5"></Button>
-            <Button class="glass" text="prev" row="1" col="5"></Button>
-        </GridLayout>
+        </GridLayout>        
     </GridLayout>
 </StackLayout>

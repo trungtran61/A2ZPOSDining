@@ -86,6 +86,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.DBService.getTableInfo('MenuProducts'); // .createTables(null);
     }
 
+    dropTables()
+    {
+        this.DBService.getTableInfo('MenuCategories'); // .createTables(null);
+    }
+
     ngAfterViewInit() {
         require("nativescript-localstorage");
         localStorage.removeItem('dataloaded');

@@ -158,8 +158,6 @@ export class MenuComponent implements OnInit {
                 this.products.forEach(function (menuProduct: MenuProduct) {
                     that.productRows.push(Math.floor((menuProduct.Position -1 ) / 4));
                     that.productCols.push((menuProduct.Position - 1) % 4);
-                    //that.productRows.push(0);
-                    //that.productCols.push(0);
                 });
                 this.loadProductStyles(this.products, that.productStyles);                
             }
@@ -234,39 +232,39 @@ export class MenuComponent implements OnInit {
     addProductToCheck(product: MenuProduct)
     {
         this.checkItems.push({
-            ProductName: product.Name, UnitPrice: product.UnitPrice,
             Modifiers: [], Qty: 1, SeatNumber: 1, Price: product.UnitPrice,
-            ProductCode: product.ProductCode
+            Product: product
         });
         this.totalPrice();
     }   
 
-    showModifyDialog(checkItemIndex: number) {
+    showModifyDialog(checkItem: CheckItem, checkItemIndex: number) {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: false,
-            //context: { changeType: changeType, currentOptions: currentOptions}
+            context: { checkItem: checkItem}
         };
-
+       
         this.modalService.showModal(ModifyCheckItemComponent, modalOptions).then(
             (choice: Choice) => {
                 console.log(choice.ChangeType);
                 switch (choice.ChangeType) {
                     case 'quantity':
-                        this.checkItems[checkItemIndex].Qty = parseFloat(choice.SelectedNumber);
-                        this.checkItems[checkItemIndex].Price = this.checkItems[checkItemIndex].UnitPrice * parseFloat(choice.SelectedNumber);
+                        checkItem.Qty = parseFloat(choice.SelectedNumber);
+                        checkItem.Price = checkItem.Product.UnitPrice * parseFloat(choice.SelectedNumber);
                         this.totalPrice();
                         break;
                     case 'seat':
-                        this.checkItems[checkItemIndex].SeatNumber = parseInt(choice.SelectedNumber);
+                        checkItem.SeatNumber = parseInt(choice.SelectedNumber);
                         break;
                     case 'delete':
                         this.deleteCheckItem(checkItemIndex);
                         break;
                     case 'repeat':
                         this.checkItems.push({
-                            "ProductName": this.checkItems[checkItemIndex].ProductName, "UnitPrice": this.checkItems[checkItemIndex].UnitPrice,
-                            "Modifiers": [], "Qty": 1, "SeatNumber": 1, "Price": this.checkItems[checkItemIndex].UnitPrice
+                            "Product": checkItem.Product,
+                            "Modifiers": [], "Qty": 1, "SeatNumber": 1,
+                            "Price": checkItem.Product.UnitPrice
                         });
                         this.totalPrice();
                         break;
@@ -295,7 +293,7 @@ export class MenuComponent implements OnInit {
 
         for (var i = 0; i < this.checkItems.length; i++) {
             {
-                this.subTotal += (this.checkItems[i].UnitPrice * this.checkItems[i].Qty);
+                this.subTotal += (this.checkItems[i].Product.UnitPrice * this.checkItems[i].Qty);
             }
             this.tax = this.subTotal * this.TAX_RATE;
             this.checkTotal = this.subTotal + this.tax;

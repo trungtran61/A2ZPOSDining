@@ -292,8 +292,8 @@ export class SQLiteService {
                         ButtonForeColor: rows[row][8],
                         ButtonForeColorHex: rows[row][9],
                         UnitPrice: rows[row][10],
-                        UseModifier: rows[row][11],
-                        UseForcedModifier: rows[row][12]
+                        UseModifier: rows[row][11] == "true",
+                        UseForcedModifier: rows[row][12] == "true"
                     });
                 }
                 return (menuProducts);
@@ -572,6 +572,12 @@ export class SQLiteService {
                         ImageURL: rows[row][3],
                     });
                 }
+                areas.push({
+                    AreaID: 99,
+                    Name: 'Take Out',
+                    Position: '99',
+                    ImageURL: ''
+                });
                 return (areas);
             });
     }
@@ -781,7 +787,7 @@ export class SQLiteService {
     }
 
     public dropTables() {
-        SQLiteService.database.execSQL('DROP TABLE IF EXISTS MenuProducts;').then(function (resultSet) {
+        SQLiteService.database.execSQL('DROP TABLE IF EXISTS MenuCategories;').then(function (resultSet) {
             console.log("Result set is:", resultSet);
         });
     }

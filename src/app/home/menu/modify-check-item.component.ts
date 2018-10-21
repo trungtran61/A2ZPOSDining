@@ -118,6 +118,5 @@ export class ModifyCheckItemComponent implements OnInit {
     ngOnInit() { 
         this.checkItem = this.params.context.checkItem;
         this.hasModifier = this.checkItem.Product.UseModifier;
-        //this.checkItems = this.params.context.checkItems;
     } 
 }

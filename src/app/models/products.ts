@@ -100,9 +100,6 @@ export interface Table {
 
 export interface CheckItem {
     Product?: MenuProduct;
-    ProductName?: string;
-    ProductCode?: number;
-    UnitPrice?: number;
     Qty?: number;
     SeatNumber?: number;
     Price?: number;
