@@ -25,7 +25,7 @@ export class ModifyCheckItemComponent implements OnInit {
     isNormalChoice: boolean= true;
     enterQty: string = '';
     checkItem: CheckItem = {};
-    hasModifier: boolean = false;
+    hasModifiers: boolean = false;
 
     changeTypeStyle: string ="color: black;background-image: linear-gradient(gray, white); border-color: black";
     changeTypeStyleSelected: string ="color: white;background-image: linear-gradient(black, gray); border-color: white";
@@ -117,6 +117,6 @@ export class ModifyCheckItemComponent implements OnInit {
 
     ngOnInit() { 
         this.checkItem = this.params.context.checkItem;
-        this.hasModifier = this.checkItem.Product.UseModifier;
+        this.hasModifiers = this.checkItem.Product.UseModifier;
     } 
 }

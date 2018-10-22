@@ -8,6 +8,7 @@ import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
+import { Page } from "tns-core-modules/ui/page/page";
 
 @Component({
     selector: "Menu",
@@ -43,8 +44,12 @@ export class MenuComponent implements OnInit {
     checkNumber: string = 'CK#1';   
     checkTitle: string = '';
     currentSubCategory: string = ''; 
+    subCategoriesTitle: string = '';
+    mainCategory: string = '';
 
-    isMainCategories: boolean = true;
+    showMainCategories: boolean = true;
+    showSubCategories: boolean = false;
+    showOptions: boolean = false;        
     showProducts: boolean = false;
   
     TAX_RATE: number = .08;
@@ -54,7 +59,9 @@ export class MenuComponent implements OnInit {
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
-        private viewContainerRef: ViewContainerRef) {
+        private viewContainerRef: ViewContainerRef,
+        private page: Page) {
+            page.actionBarHidden = true;
         // Use the component constructor to inject providers.
 
     }
@@ -67,7 +74,7 @@ export class MenuComponent implements OnInit {
         this.checkTitle = this.checkNumber + ' ' + this.server + ' ' + this.table + ' ' + this.guests;
         //let that = this; // needed to access 'this' from callback
         let that = this;
-        if (this.isMainCategories) {
+        if (this.showMainCategories) {
             this.DBService.getLocalMenuCategories().then((categories) => {
                 if (categories.length == 0) {
                     dialogs.alert("Main Categories not loaded.").then(() => {
@@ -88,6 +95,7 @@ export class MenuComponent implements OnInit {
                 }
             });
         }
+        /*
         else {
             this.DBService.getLocalCategoryCodes().then((categoryCodes) => {
                 if (categoryCodes.length == 0) {
@@ -97,21 +105,31 @@ export class MenuComponent implements OnInit {
                 }
                 else {
                     this.categoryCodes = categoryCodes;
-                    this.categorySelected(this.categoryCodes[0].PriKey);
+                    this.categorySelected(this.categoryCodes[0]);
                 }
             });
-
         }
+        */
     }
 
-    categorySelected(categoryID: number) {
-        localStorage.setItem("CategoryID", categoryID.toString());
+    displayMainCategories()
+    {
+        this.showMainCategories = true;
+        this.showSubCategories = false;
+        this.showOptions = false;
+    }
+
+    categorySelected(category: MenuCategory) {
+        localStorage.setItem("CategoryID", category.CategoryID.toString());
         //localStorage.setItem("CategoryID", "20");
-        this.isMainCategories = false;
+        this.showMainCategories = false;
+        this.showSubCategories = true;     
+        this.showOptions = false;           
         let that = this;
         this.subCategoryRows = [];
+        this.mainCategory = category.Name;
 
-        this.DBService.getLocalMenuSubCategories(categoryID).then((subCategories) => {
+        this.DBService.getLocalMenuSubCategories(category.CategoryID).then((subCategories) => {
             if (subCategories.length == 0) {
                 dialogs.alert("Menu SubCategories not loaded.").then(() => {
                     console.log("Dialog closed!");
@@ -121,9 +139,7 @@ export class MenuComponent implements OnInit {
                 this.subCategories = subCategories;
                 this.loadCategoryStyles(this.subCategories, this.subCategoryStyles);
                 this.subCategories.forEach(function (subCategory: MenuSubCategory) {
-                    that.subCategoryRows.push(subCategory.Position-1);
-                    //that.subCategoryRows.push(0);
-                    //that.subCategoryCols.push(0);
+                    that.subCategoryRows.push(subCategory.Position);                    
                 });
                 this.subCategorySelected(subCategories[0]);
             }
@@ -141,6 +157,7 @@ export class MenuComponent implements OnInit {
 
     subCategorySelected(subCategory: MenuSubCategory) {
         // build menu products list
+        this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
         let that = this;
         let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
         //subCategoryID = 50;
@@ -156,7 +173,7 @@ export class MenuComponent implements OnInit {
             else {
                 this.products = products;
                 this.products.forEach(function (menuProduct: MenuProduct) {
-                    that.productRows.push(Math.floor((menuProduct.Position -1 ) / 4));
+                    that.productRows.push(Math.floor((menuProduct.Position -1 ) / 4) + 1);
                     that.productCols.push((menuProduct.Position - 1) % 4);
                 });
                 this.loadProductStyles(this.products, that.productStyles);                

@@ -57,15 +57,17 @@
     <Button row="0" col="10" colSpan="2" class="glass" tap="send()" textWrap="true" text="Send" style="width:100;height:120;"></Button>
     <Button row="0" col="6" colSpan="2" class="glass" tap="productInfo()" textWrap="true" text="Product Info" style="width:100;height:120;"></Button>
   </GridLayout>
-  <StackLayout row="0" col="2" colSpan="2" *ngIf="isMainCategories">
-    <Button class="glass" [text]="item.Name" *ngFor="let item of categories let i=index" (tap)="categorySelected(item.CategoryID)"
+  <StackLayout row="0" col="2" colSpan="2" *ngIf="showMainCategories">    
+    <Button class="glass" [text]="item.Name" *ngFor="let item of categories let i=index" (tap)="categorySelected(item)"
       [style]="categoryStyles[i]"></Button>
   </StackLayout>
-  <GridLayout row="0" col="2" *ngIf="!isMainCategories" rows="*,*,*,*,*,*,*,*,*">
+  <GridLayout row="0" col="2" *ngIf="showSubCategories" rows="60,*,*,*,*,*,*,*,*">
+    <Button class="glass" text='MAIN CATEGORIES' textWrap="true" row='0' col='0' style='text-align: center' (tap)='displayMainCategories()'></Button> 
     <Button class="glass" [text]="item.Name" *ngFor="let item of subCategories let i=index" (tap)="subCategorySelected(item)"
       [style]="subCategoryStyles[i]" [row]='subCategoryRows[i]' textWrap="true"></Button>
   </GridLayout>  
-    <GridLayout columns="*,*,*,*" rows="*,*,*,*,*,*,*,*" col="3" colSpan="4" *ngIf="!isMainCategories">      
+    <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="3" colSpan="4" *ngIf="showSubCategories">      
+        <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label> 
         <Button class="glass" [text]="item.Name" *ngFor="let item of products let i=index" (tap)="productSelected(item, i)"
           [style]="productStyles[i]" [col]='productCols[i]' [row]='productRows[i]' textWrap="true"></Button>      
     </GridLayout>  
