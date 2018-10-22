@@ -11,6 +11,7 @@ import { MenuComponent } from "~/app/home/menu/menu.component";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
 import { ModifiersComponent } from "~/app/home/menu/modifiers/modifiers.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
+
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 
 @NgModule({
@@ -26,14 +27,14 @@ import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/force
         MenuComponent,
         ModifyCheckItemComponent,
         ModifiersComponent,
-        ForcedModifiersComponent        
+        ForcedModifiersComponent            
     ],
     schemas: [
         NO_ERRORS_SCHEMA
     ],    
     entryComponents: [
         ModifyCheckItemComponent,
-        ForcedModifiersComponent
+        ForcedModifiersComponent,      
     ]  
 })
 export class HomeModule { }

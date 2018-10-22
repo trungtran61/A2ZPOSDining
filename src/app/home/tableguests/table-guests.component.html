@@ -1,10 +1,25 @@
 <ActionBar class="action-bar">
   <Label class="action-bar-title" [text]="tableGuestsTitle"></Label>
 </ActionBar>
+<StackLayout>
+  
+  <GridLayout style="padding: 200px" rows="*,*,*,*,*,*" columns="*,*,*" *ngIf='isNormalChoice'>
+    <Button [text]="digit" *ngFor="let digit of digits let i=index" class="glass" (tap)="setGuests(digit)" [row]="digitRows[i]"
+      [col]="digitCols[i]"></Button>
+    <Button text="Other" class="glass" (tap)="otherQty()" row="3" col='0' colSpan="2"></Button>
+    <Button text="Cancel" class="glass" (tap)="goBack()" row="3" col="2"></Button>
+  </GridLayout>
 
-<GridLayout style="padding: 200px" rows="*,*,*,*,*,*" columns="*,*,*">
-    <Button [text]="digit" *ngFor="let digit of digits let i=index" class="glass" (tap)="setGuests(digit)" 
-      [row]="digitRows[i]" [col]="digitCols[i]" ></Button>    
-    <Button text="Other" class="glass" (tap)="otherNumber()" row="3" col='0' colSpan="2"></Button>
-    <Button text="Done" class="glass" (tap)="router.navigate(['/home/menu'])" row="3" col="2"></Button>
-</GridLayout>
+  <GridLayout  style="padding: 200px" rows="*,*,*,*,*,*" columns="*,*,*" *ngIf='!isNormalChoice' class="panel">
+      <GridLayout rows="*,*" columns="*,*" row="0" colSpan="3" class="panel">
+          <Label text="Quantity" row="0" col="0" style="text-align: center;color:white; font-weight: bold"></Label>
+          <Label [text]="guestsEntered" row="1" col="0" style="text-align: center;color:white; font-weight: bold; font-size: 25px"></Label>
+          <Button text="Back" class="glass" (tap)="backSpace()" row="1" col="1"></Button>
+      </GridLayout>
+      <Button [text]="digit" *ngFor="let digit of digits let i=index" class="glass" (tap)="addDigit(digit)" [row]="digitRows[i]"
+      [col]="digitCols[i]"></Button>
+      <Button text="0" class="glass" (tap)="addDigit('0')" row="4" col="0"></Button>
+      <Button text="Cancel" class="glass" (tap)="goBack()" row="4" col="1"></Button>
+      <Button text="Enter" class="glass" (tap)="saveEnteredGuests()" row="4" col="2"></Button>
+  </GridLayout>
+</StackLayout>
