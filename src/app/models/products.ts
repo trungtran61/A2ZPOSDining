@@ -122,8 +122,8 @@ export interface MenuOption {
     Charge: number;
     Name: string;
     Position: number;
-    ProductCode: number;
-    ReportProductMix: boolean;
+    ProductCode?: number;
+    ReportProductMix?: boolean;
 }
 
 export interface MenuSubOption {

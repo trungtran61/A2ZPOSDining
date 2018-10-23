@@ -71,4 +71,21 @@
         <Button class="glass" [text]="item.Name" *ngFor="let item of products let i=index" (tap)="productSelected(item, i)"
           [style]="productStyles[i]" [col]='productCols[i]' [row]='productRows[i]' textWrap="true"></Button>      
     </GridLayout>  
+    <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="4" colSpan="4" *ngIf="showOptions">      
+      <FlexBoxLayout row='0' col='0' colSpan="4">
+        <Button text='All' class="glass"></Button>
+      </FlexBoxLayout>
+      <Label text="Product Options" row='1' textWrap="true" col='3' class="glass"></Label>
+        <Button class="glass" text='NO' row='2' col='3' style='text-align: center' (tap)='NO_Selected = true'></Button> 
+        <Button class="glass" text='EXTRA' row='3' col='3' style='text-align: center' (tap)='EXTRA_Selected = true'></Button> 
+        <Button class="glass" text='LESS' row='4' col='3' style='text-align: center' (tap)='LESS_Selected = true'></Button> 
+        <Button class="glass" text='ADD' row='5' col='3' style='text-align: center' (tap)='ADD_Selected = true'></Button> 
+        <Button class="glass" text='ON THE SIDE' textWrap="true" row='6' col='3' style='text-align: center' (tap)='OTS_Selected = true'></Button> 
+        <Button class="glass" text='NO MAKE' textWrap="true" row='7' col='3' style='text-align: center' (tap)='NOMAKE_Selected = true'></Button> 
+        <Button class="glass" text='1/2' row='8' col='3' style='text-align: center' (tap)='HALF_Selected = true'></Button> 
+        <Button class="glass" text='TO GO' row='9' col='3' style='text-align: center' (tap)='TOGO_Selected = true'></Button> 
+        <Button class="glass" [text]="item.Name" *ngFor="let item of menuOptions let i=index" (tap)="optionSelected(item)"
+          style="border-radius: 5px;color: #000000;background-image: linear-gradient(#ffffff, silver);" 
+          [col]='optionCols[i]' [row]='optionRows[i]' textWrap="true"></Button>      
+    </GridLayout>  
 </GridLayout>

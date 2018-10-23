@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Employee } from "~/app/models/employees";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption } from "~/app/models/products";
+import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, MenuOption } from "~/app/models/products";
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
@@ -133,9 +133,16 @@ export class SQLiteService {
        db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ReportProductMix INTEGER);").then(id => {
         console.log("Table MenuSubOptions created");
         this.getRecordCount('MenuSubOptions');
-    }, error => {
+        }, error => {
         console.log("CREATE TABLE MenuSubOptions ERROR", error);
-    });
+        });
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS MenuOptions (ApplyCharge INTEGER, Charge REAL, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
+            console.log("Table MenuOptions created");
+            this.getRecordCount('MenuOptions');
+            }, error => {
+            console.log("CREATE TABLE MenuOptions ERROR", error);
+            });
     }
 
 
@@ -322,6 +329,48 @@ export class SQLiteService {
                 [optionCategory.PriKey, optionCategory.Name]);
         }
         );
+    }
+
+    public getMenuOptions() {
+        let headers = this.createRequestHeader();
+        this.http.get(this.apiUrl + 'GetMenuOption', { headers: headers })
+            .subscribe(
+                data => {
+                    console.log('got MenuOptions from API: ' + data);
+                    this.loadMenuOptions(<OptionCategory[]>data);
+                },
+                err => {
+                    console.log("Error occured while retrieving MenuOptions from API.");
+                    console.log(err);
+                }
+            );
+
+    }
+
+    public loadMenuOptions(menuOptions: any[]) {        
+        menuOptions.forEach(function (menuOption: MenuOption) {
+            SQLiteService.database.execSQL("INSERT INTO MenuOptions (ApplyCharge, Charge, Name, Position, ProductCode, ReportProductMix) VALUES (?,?,?,?,?,?)",
+                [menuOption.ApplyCharge, menuOption.Charge, menuOption.Name, menuOption.Position,
+                 menuOption.ProductCode, menuOption.ReportProductMix]);
+        }
+        );
+    }
+
+    public getLocalMenuOptions(productCode: number) : Promise<MenuOption[]>{
+        return SQLiteService.database.all("SELECT ApplyCharge, Charge, Name, Position FROM MenuOptions WHERE ProductCode=? ORDER BY Position", 
+            [productCode])
+        .then(function (rows) {
+            let items: MenuOption[] = [];
+            for (var row in rows) {
+                items.push({
+                    ApplyCharge: rows[row][0],
+                    Charge: rows[row][1],
+                    Name: rows[row][2],
+                    Position: rows[row][3]                   
+                });
+            }
+            return (items);
+        });
     }
 
     public getMenuSubOptions() {
@@ -773,6 +822,11 @@ export class SQLiteService {
                         case 'MenuSubOptions':
                         {
                             that.getMenuSubOptions();
+                            break;                            
+                        }
+                        case 'MenuOptions':
+                        {
+                            that.getMenuOptions();
                             break;                            
                         }
                     }

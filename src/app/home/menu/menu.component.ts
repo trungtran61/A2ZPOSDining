@@ -3,7 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice } from "~/app/models/products";
+import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, MenuOption } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
@@ -29,6 +29,10 @@ export class MenuComponent implements OnInit {
     productStyles: string[] = [];
     productCols: number[] = [];
     productRows: number[] = [];
+
+    menuOptions: MenuOption[];
+    optionCols: number[] = [];
+    optionRows: number[] = [];
 
     categoryCodes: CategoryCode[] = [];
     checkItems: CheckItem[] = [];
@@ -285,8 +289,31 @@ export class MenuComponent implements OnInit {
                         });
                         this.totalPrice();
                         break;
+                    case 'modify':
+                        this.getMenuOptions(checkItem.Product);                        
+                        break;
                 }
             });
+    }
+
+    getMenuOptions(product: MenuProduct)
+    {
+        let that = this;
+        this.DBService.getLocalMenuOptions(product.ProductCode).then((menuOptions) => {
+            if (menuOptions.length == 0) {
+                dialogs.alert("Missing Menu Options");
+            }
+            else {
+                this.menuOptions = menuOptions; 
+                this.menuOptions.forEach(function (menuOption: MenuOption) {
+                    that.optionRows.push(Math.floor((menuOption.Position -1 ) / 4) + 1);
+                    that.optionCols.push((menuOption.Position - 1) % 3);
+                });
+                this.showOptions = true;   
+                this.showMainCategories = false;
+                this.showSubCategories = false;                
+            }
+        });
     }
 
     onSwipe(args, checkItemIndex) {
