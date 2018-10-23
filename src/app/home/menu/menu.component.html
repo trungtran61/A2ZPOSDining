@@ -20,9 +20,12 @@
             <Label [text]="item.Price | currency" style="text-align: right; width:50; margin-right:5"></Label>
             <Label [text]="item.SeatNumber" style="text-align: right; width:15;"></Label>
           </StackLayout>
-          <StackLayout *ngFor="let choice of item.ForcedModifiers let j=index">
+          <StackLayout *ngFor="let choice of item.ForcedModifiers let i=index">
             <Label style='margin-left: 30px;' [text]='choice.Name' (tap)='changeChoice(item, i, choice)'></Label>
           </StackLayout>
+          <StackLayout *ngFor="let option of item.Modifiers let i=index">
+              <Label style='margin-left: 30px;' [text]='option.Name' (tap)='changeModifier(item, i, option)'></Label>
+            </StackLayout>
         </StackLayout>
       </ng-template>
     </ListView>
@@ -83,7 +86,7 @@
           </Button>        
       </StackLayout>
     </StackLayout>
-    <Button class="glass" [text]="item.Name" *ngFor="let item of menuOptions let i=index" (tap)="optionSelected(item, i)"
+    <Button class="glass" [text]="item.Name" *ngFor="let item of menuOptions let i=index" (tap)="optionSelected(item)"
       style="border-radius: 5px;color: #000000;background-image: linear-gradient(#ffffff, silver);" [col]='optionCols[i]'
       [row]='optionRows[i]' textWrap="true"></Button>
   </GridLayout>

@@ -3,7 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, MenuOption } from "~/app/models/products";
+import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, MenuOption, Modifier } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
@@ -59,6 +59,9 @@ export class MenuComponent implements OnInit {
     fixedOptions: string[] = ['NO','EXTRA','LESS','ADD','OTS','NO MAKE','1/2','TO GO'];
     fixedOptionRows: number[] = [1,2,3,4,5,6,7,8];
     fixedOptionStyles: string[] = [];
+
+    currentCheckItemIndex: number = 0;
+    currentFixedOption: string = '';
   
     TAX_RATE: number = .08;
     MAX_GUESTS: number = 6;
@@ -294,7 +297,7 @@ export class MenuComponent implements OnInit {
                         this.totalPrice();
                         break;
                     case 'modify':
-                        this.getMenuOptions(checkItem.Product);                        
+                        this.getMenuOptions(checkItem.Product, checkItemIndex);                        
                         break;
                 }
             });
@@ -310,8 +313,9 @@ export class MenuComponent implements OnInit {
         }
     }
 
-    getMenuOptions(product: MenuProduct)
+    getMenuOptions(product: MenuProduct, itemIndex: number)    
     {
+        this.currentCheckItemIndex = itemIndex;
         this.resetFixedOptionStyles();
 
         let that = this;
@@ -336,7 +340,30 @@ export class MenuComponent implements OnInit {
     fixedOptionSelected(option: string, index: number)
     {
         this.resetFixedOptionStyles();
-        this.fixedOptionStyles[index] = 'background-image:linear-gradient(red, black);text-align: center; height: 123px;';
+
+        switch (option)
+        {
+            case 'NO MAKE':                
+            case 'TO GO':
+            {
+                this.checkItems[this.currentCheckItemIndex].Modifiers.push({ Name:option, Price: 0 });                            
+                break;                    
+            }    
+            default:
+            {
+                this.currentFixedOption = option;
+                this.fixedOptionStyles[index] = 'background-image:linear-gradient(red, black);text-align: center; height: 123px;';
+            }
+        }        
+    }
+
+    optionSelected(option: MenuOption)
+    {
+        // currentFixedOption
+        let modifier: Modifier = { Name: this.currentFixedOption + ' ' + option.Name, 
+                Price: option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0 };        
+
+        this.checkItems[this.currentCheckItemIndex].Modifiers.push(modifier);                            
     }
 
     onSwipe(args, checkItemIndex) {
