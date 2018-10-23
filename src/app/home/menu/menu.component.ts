@@ -55,6 +55,9 @@ export class MenuComponent implements OnInit {
     showSubCategories: boolean = false;
     showOptions: boolean = false;        
     showProducts: boolean = false;
+
+    fixedOptions: string[] = ['NO','EXTRA','LESS','ADD','OTS','NO MAKE','1/2','TO GO']
+    fixedOptionRows: number[] = [1,2,3,4,5,6,7,8]
   
     TAX_RATE: number = .08;
     MAX_GUESTS: number = 6;
