@@ -55,6 +55,7 @@ export class MenuComponent implements OnInit {
     showSubCategories: boolean = false;
     showOptions: boolean = false;        
     showProducts: boolean = false;
+    showDetails: boolean = true;
 
     fixedOptions: string[] = ['NO','EXTRA','LESS','ADD','OTS','NO MAKE','1/2','TO GO'];
     fixedOptionRows: number[] = [1,2,3,4,5,6,7,8];
@@ -309,7 +310,7 @@ export class MenuComponent implements OnInit {
 
         for (var i = 0; i < 8; i++)
         {
-            this.fixedOptionStyles.push('background-image:linear-gradient(#000, silver);text-align: center; height: 123px;')
+            this.fixedOptionStyles.push('background-image:linear-gradient(#000, silver);text-align: center; height: 118px;')
         }
     }
 
@@ -352,7 +353,7 @@ export class MenuComponent implements OnInit {
             default:
             {
                 this.currentFixedOption = option;
-                this.fixedOptionStyles[index] = 'background-image:linear-gradient(red, black);text-align: center; height: 123px;';
+                this.fixedOptionStyles[index] = 'background-image:linear-gradient(red, black);text-align: center; height: 118px;';
             }
         }        
     }
@@ -364,6 +365,18 @@ export class MenuComponent implements OnInit {
                 Price: option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0 };        
 
         this.checkItems[this.currentCheckItemIndex].Modifiers.push(modifier);                            
+    }
+
+    showHideDetails()
+    {
+        //console.log('whoo');
+        this.showDetails = !this.showDetails;
+    }
+
+    doneOption(){
+        this.showOptions = false;
+        this.showProducts = true;
+        this.showSubCategories = true;
     }
 
     onSwipe(args, checkItemIndex) {
