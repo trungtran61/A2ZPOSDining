@@ -17,3 +17,7 @@
 {
 background: url('https://www.nativescript.org/images/default-source/Blogs/ns-logo_share_600x315.png');
 }
+  
+Button:highlighted{
+    background-image:linear-gradient(red, silver)
+}

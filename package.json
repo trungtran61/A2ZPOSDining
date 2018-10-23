@@ -22,6 +22,7 @@
     "@angular/platform-browser-dynamic": "~6.1.0",
     "@angular/router": "~6.1.0",
     "nativescript-angular": "~6.1.0",
+    "nativescript-badge-button": "^0.1.2",
     "nativescript-localstorage": "^2.0.0",
     "nativescript-sqlite": "^2.2.3",
     "nativescript-theme-core": "~1.0.4",

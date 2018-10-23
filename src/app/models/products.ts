@@ -222,3 +222,9 @@ export interface ForcedModifier
     Layer: number;
     Name: string;    
 }
+
+export interface TableCheck
+{
+    TableName: string;
+    CheckItems: CheckItem[];    
+}

@@ -56,8 +56,9 @@ export class MenuComponent implements OnInit {
     showOptions: boolean = false;        
     showProducts: boolean = false;
 
-    fixedOptions: string[] = ['NO','EXTRA','LESS','ADD','OTS','NO MAKE','1/2','TO GO']
-    fixedOptionRows: number[] = [1,2,3,4,5,6,7,8]
+    fixedOptions: string[] = ['NO','EXTRA','LESS','ADD','OTS','NO MAKE','1/2','TO GO'];
+    fixedOptionRows: number[] = [1,2,3,4,5,6,7,8];
+    fixedOptionStyles: string[] = [];
   
     TAX_RATE: number = .08;
     MAX_GUESTS: number = 6;
@@ -74,7 +75,7 @@ export class MenuComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // Init your component properties here.
+        // Init your component properties here.        
         this.guests = parseInt(localStorage.getItem('guests'));
         this.table = localStorage.getItem('table');
         //this.server = localStorage.getItem('server');
@@ -299,8 +300,20 @@ export class MenuComponent implements OnInit {
             });
     }
 
+    resetFixedOptionStyles()
+    {
+        this.fixedOptionStyles = [];
+
+        for (var i = 0; i < 8; i++)
+        {
+            this.fixedOptionStyles.push('background-image:linear-gradient(#000, silver);text-align: center; height: 123px;')
+        }
+    }
+
     getMenuOptions(product: MenuProduct)
     {
+        this.resetFixedOptionStyles();
+
         let that = this;
         this.DBService.getLocalMenuOptions(product.ProductCode).then((menuOptions) => {
             if (menuOptions.length == 0) {
@@ -310,13 +323,20 @@ export class MenuComponent implements OnInit {
                 this.menuOptions = menuOptions; 
                 this.menuOptions.forEach(function (menuOption: MenuOption) {
                     that.optionRows.push(Math.floor((menuOption.Position -1 ) / 4) + 1);
-                    that.optionCols.push((menuOption.Position - 1) % 3);
-                });
+                    that.optionCols.push((menuOption.Position - 1) % 3);                    
+                });                
+
                 this.showOptions = true;   
                 this.showMainCategories = false;
-                this.showSubCategories = false;                
+                this.showSubCategories = false;                               
             }
         });
+    }
+
+    fixedOptionSelected(option: string, index: number)
+    {
+        this.resetFixedOptionStyles();
+        this.fixedOptionStyles[index] = 'background-image:linear-gradient(red, black);text-align: center; height: 123px;';
     }
 
     onSwipe(args, checkItemIndex) {
