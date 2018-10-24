@@ -9,6 +9,7 @@ import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 import { Page } from "tns-core-modules/ui/page/page";
+import { OpenProductComponent } from "./open-product/open-product.component";
 
 @Component({
     selector: "Menu",
@@ -302,6 +303,19 @@ export class MenuComponent implements OnInit {
         });
         this.totalPrice();
     }   
+
+    showOpenProduct()
+    {
+        const modalOptions: ModalDialogOptions = {
+            viewContainerRef: this.viewContainerRef,
+            fullscreen: true,
+            //context: { options: options, currentOptions: currentOptions}
+        };
+
+        this.modalService.showModal(OpenProductComponent, modalOptions).then(
+            (selectedModifiers) => {               
+            });
+    }
 
     showModifyDialog(checkItem: CheckItem, checkItemIndex: number) {
         const modalOptions: ModalDialogOptions = {

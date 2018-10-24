@@ -12,6 +12,7 @@ import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.comp
 import { ModifiersComponent } from "~/app/home/menu/modifiers/modifiers.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 import { TNSFontIconModule, TNSFontIconService } from "nativescript-ngx-fonticon";
+import { OpenProductComponent } from "./menu/open-product/open-product.component";
 
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 TNSFontIconService.debug = true;
@@ -32,14 +33,16 @@ TNSFontIconService.debug = true;
         MenuComponent,
         ModifyCheckItemComponent,
         ModifiersComponent,
-        ForcedModifiersComponent            
+        ForcedModifiersComponent,
+        OpenProductComponent            
     ],
     schemas: [
         NO_ERRORS_SCHEMA
     ],    
     entryComponents: [
         ModifyCheckItemComponent,
-        ForcedModifiersComponent,      
+        ForcedModifiersComponent, 
+        OpenProductComponent     
     ]  
 })
 export class HomeModule { }

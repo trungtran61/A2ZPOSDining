@@ -228,3 +228,16 @@ export interface TableCheck
     TableName: string;
     CheckItems: CheckItem[];    
 }
+
+export interface ProductGroup {
+    PriKey: number;
+    Code: string;
+    Description: string;
+    TipShare?: boolean;
+    TipSharePercentage: number;
+    Printer: string;
+    OpenProduct: boolean;
+    ProductType: number;
+    TaxRate: number;
+    Taxable: boolean;
+}

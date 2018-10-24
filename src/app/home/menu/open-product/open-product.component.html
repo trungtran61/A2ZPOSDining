@@ -1,0 +1,3 @@
+<FlexBoxLayout>
+    <Button class="glass" [text]="item.Description" *ngFor="let item of productGroups let i=index" (tap)="groupSelected(item)"></Button>
+</FlexBoxLayout>

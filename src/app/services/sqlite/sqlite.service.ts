@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Employee } from "~/app/models/employees";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, MenuOption } from "~/app/models/products";
+import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, MenuOption, ProductGroup } from "~/app/models/products";
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
@@ -143,6 +143,14 @@ export class SQLiteService {
             }, error => {
             console.log("CREATE TABLE MenuOptions ERROR", error);
             });
+        
+        db.execSQL("CREATE TABLE IF NOT EXISTS ProductGroups (PriKey INTEGER,Code TEXT,Description TEXT,TipShare INTEGER," +
+            "TipSharePercentage INTEGER,Printer TEXT,OpenProduct INTEGER,ProductType INTEGER,TaxRate REAL,Taxable INTEGER);").then(id => {
+                console.log("Table ProductGroups created");
+                this.getRecordCount('ProductGroups');
+                }, error => {
+                console.log("CREATE TABLE ProductGroups ERROR", error);
+                });    
     }
 
 
@@ -631,6 +639,50 @@ export class SQLiteService {
             });
     }
 
+    public getProductGroups() {
+        let headers = this.createRequestHeader();
+        this.http.get(this.apiUrl + 'GetProductGroups', { headers: headers })
+            .subscribe(
+                data => {
+                    console.log('got Product Groups from API' + data);
+                    this.loadProductGroups(<ProductGroup[]>data);
+                },
+                err => {
+                    console.log("Error occured while retrieving Product Groups from API.");
+                    console.log(err);
+                }
+            );
+    }
+
+    public loadProductGroups(productGroups: any[]) {
+
+        productGroups.forEach(function (productGroup: ProductGroup) {
+            SQLiteService.database.execSQL("INSERT INTO ProductGroups (PriKey, Code, Description, OpenProduct, Printer, ProductType," + 
+                "Taxable, TaxRate, TipShare, TipSharePercentage) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                [productGroup.PriKey, productGroup.Code, productGroup.Description, productGroup.OpenProduct, productGroup.Printer, productGroup.ProductType, 
+                    productGroup.Taxable, productGroup.TaxRate, productGroup.TipShare, productGroup.TipSharePercentage]).then(id => {
+                    console.log('added ' + productGroup.Description + ' to Product Groups');
+                });
+        });
+
+    }
+
+    public getLocalProductGroups(): Promise<ProductGroup[]> {
+        let sql: string = "SELECT * FROM ProductGroups;"
+        return SQLiteService.database.all(sql)
+            .then(function (rows) {
+                let productGroups: ProductGroup[] = [];
+                for (var row in rows) {
+                    productGroups.push({
+                        PriKey: rows[row][0],Code: rows[row][1],Description: rows[row][2],OpenProduct: rows[row][3],
+                        Printer: rows[row][4],ProductType: rows[row][5],Taxable: rows[row][7],TaxRate: rows[row][8], TipShare: rows[row][8],
+                        TipSharePercentage: rows[row][8]
+                    });
+                }
+                
+                return (productGroups);
+            });
+    }
     getBase64IntArray(arr: number[]) {
         return btoa(JSON.stringify(arr))
     }
@@ -827,6 +879,11 @@ export class SQLiteService {
                         case 'MenuOptions':
                         {
                             that.getMenuOptions();
+                            break;                            
+                        }
+                        case 'ProductGroups':
+                        {
+                            that.getProductGroups();
                             break;                            
                         }
                     }
