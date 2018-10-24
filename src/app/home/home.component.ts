@@ -14,6 +14,7 @@ import { Page } from "tns-core-modules/ui/page/page";
     styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, AfterViewInit {
+    
     employees: Employee[];
     employeeId: string = "";   
     isBusy = true;
@@ -25,14 +26,16 @@ export class HomeComponent implements OnInit, AfterViewInit {
     //loginResponse: LoginResponse;
     //loggedInUser: Employee = Object();
     
-    constructor(private router: RouterExtensions, private DBService: SQLiteService, private zone: NgZone, private page: Page) {
+    constructor(private router: RouterExtensions, private DBService: SQLiteService, 
+        private zone: NgZone, private page: Page,
+        ) {
         // Use the component constructor to inject providers.
     }
 
     ngOnInit(): void {
         //this.page.className = 'loginBG';
         //this.router.navigate(['/home/mytables'])
-        //this.router.navigate(['/home/menu'])
+        this.router.navigate(['/home/menu'])
         // Init your component properties here.
     }   
   

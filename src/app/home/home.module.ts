@@ -11,14 +11,19 @@ import { MenuComponent } from "~/app/home/menu/menu.component";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
 import { ModifiersComponent } from "~/app/home/menu/modifiers/modifiers.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
+import { TNSFontIconModule, TNSFontIconService } from "nativescript-ngx-fonticon";
 
 //import { SplashComponent } from "~/app/home/splash/splash.component";
+TNSFontIconService.debug = true;
 
 @NgModule({
     imports: [
         NativeScriptCommonModule,
         NativeScriptHttpClientModule,
-        HomeRoutingModule
+        HomeRoutingModule,
+        TNSFontIconModule.forRoot({
+			'fa': './assets/font-awesome.css'
+		})
     ],
     declarations: [
         HomeComponent,

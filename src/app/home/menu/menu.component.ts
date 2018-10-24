@@ -36,7 +36,7 @@ export class MenuComponent implements OnInit {
 
     categoryCodes: CategoryCode[] = [];
     checkItems: CheckItem[] = [];
-    currentSeatNumber: 0;
+    currentSeatNumber: number = 1;
     checkTotal: number = 0;
     subTotal: number = 0;
     tax: number = 0;
@@ -56,6 +56,7 @@ export class MenuComponent implements OnInit {
     showOptions: boolean = false;        
     showProducts: boolean = false;
     showDetails: boolean = true;
+    viewDetailsText: string = 'Hide Details';
 
     fixedOptions: string[] = ['NO','EXTRA','LESS','ADD','OTS','NO MAKE','1/2','TO GO'];
     fixedOptionRows: number[] = [1,2,3,4,5,6,7,8];
@@ -122,6 +123,11 @@ export class MenuComponent implements OnInit {
             });
         }
         */
+    }
+
+    nextSeat()
+    {
+        this.currentSeatNumber++;
     }
 
     displayMainCategories()
@@ -371,6 +377,7 @@ export class MenuComponent implements OnInit {
     {
         //console.log('whoo');
         this.showDetails = !this.showDetails;
+        this.viewDetailsText = this.showDetails? 'Hide Details' : 'View Details';
     }
 
     doneOption(){
