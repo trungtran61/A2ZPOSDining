@@ -62,7 +62,7 @@
     <Button class="glass btnBottom" (tap)="extraFunctions()" textWrap="true" text="Extra Functions" style="margin-left: 40"></Button>
     <Button class="glass btnBottom" (tap)="hold()" textWrap="true" text="Hold"></Button>
     <Button class="glass btnBottom" (tap)="send()" textWrap="true" text="Send"></Button>
-    <Button class="glass btnBottom" (tap)="productInfo()" textWrap="true" text="Product Info"></Button>
+    <Button [class]="productInfoClass" (tap)="productInfo()" textWrap="true" text="Product Info"></Button>
   </WrapLayout>
   <Button row="1" col="0" class="glass btnBottom btnCancel" text="Close" (tap)="closeExtraFunctions()" *ngIf='showExtraFunctions'></Button>
   <FlexBoxLayout row="1" col="3" colSpan="5" justifyContent="flex-end" *ngIf='showExtraFunctions'>      

@@ -57,6 +57,8 @@ export class MenuComponent implements OnInit {
     showProducts: boolean = false;
     showDetails: boolean = true;
     showExtraFunctions: boolean = false;
+    showProductInfo: boolean = false;
+    productInfoClass: string = 'glass btnBottom';
 
     viewDetailsText: string = 'Hide Details';
 
@@ -231,6 +233,18 @@ export class MenuComponent implements OnInit {
 
     productSelected(product: MenuProduct) {
 
+        if (this.showProductInfo)
+        {
+            dialogs.alert({
+                title: product.Name,
+                message: "Good, healthy ingredients only!",
+                okButtonText: "Close"
+            })
+            //this.showProductInfo = false;
+            this.productInfo();
+            return;
+        }
+
         if (product.UseForcedModifier) {
             this.showForcedModifierDialog(product, -1, null, true);
         }
@@ -259,6 +273,20 @@ export class MenuComponent implements OnInit {
                     this.checkItems[this.checkItems.length-1].ForcedModifiers = selectedChoices;                    
                 }
             });
+    }
+
+    productInfo()
+    {
+        this.showProductInfo = !this.showProductInfo;
+        if (this.showProductInfo)        
+            this.productInfoClass = 'glass btnBottom btnOK';
+        else
+            this.productInfoClass = 'glass btnBottom';    
+    }
+
+    changeGuestsNumber()
+    {
+        this.router.navigate(['/home/tableguests/'+ this.table]);    
     }
 
     changeChoice(product: MenuProduct, checkItemIndex: number, choice: MenuChoice)
