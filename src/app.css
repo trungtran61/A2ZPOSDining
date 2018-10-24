@@ -87,3 +87,7 @@ page
 .btnCancel{
 	background-image:linear-gradient(red, black)
 }
+
+.btnOK{
+	background-image:linear-gradient(green, black)
+}

@@ -56,6 +56,8 @@ export class MenuComponent implements OnInit {
     showOptions: boolean = false;        
     showProducts: boolean = false;
     showDetails: boolean = true;
+    showExtraFunctions: boolean = false;
+
     viewDetailsText: string = 'Hide Details';
 
     fixedOptions: string[] = ['NO','EXTRA','LESS','ADD','OTS','NO MAKE','1/2','TO GO'];
@@ -320,6 +322,16 @@ export class MenuComponent implements OnInit {
         }
     }
 
+    extraFunctions()
+    {
+        this.showExtraFunctions = true;
+    }
+
+    closeExtraFunctions()
+    {
+        this.showExtraFunctions = false;
+    }
+
     getMenuOptions(product: MenuProduct, itemIndex: number)    
     {
         this.currentCheckItemIndex = itemIndex;
@@ -362,6 +374,19 @@ export class MenuComponent implements OnInit {
                 this.fixedOptionStyles[index] = 'background-image:linear-gradient(red, black);text-align: center; height: 118px;';
             }
         }        
+    }
+
+    cancelOrder()
+    {       
+        dialogs.confirm({
+            title: "Cancel Order",
+            message: "Cancel this order?",
+            okButtonText: "Yes, cancel order",
+            cancelButtonText: "No"
+        }).then(isCanceling => {
+            if (isCanceling)
+                this.router.back();            
+        });
     }
 
     optionSelected(option: MenuOption)

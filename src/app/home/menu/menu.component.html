@@ -54,16 +54,22 @@
       </StackLayout>
     </StackLayout>
   </StackLayout>
-  <WrapLayout row="1" col="0" colSpan="8" style="margin-bottom:10">
-    <Button class="glass btnBottom btnCancel" text="Cancel" (tap)="cancel()" ></Button>
-    <Button class="glass btnBottom" [text]="viewDetailsText" textWrap="true" (tap)="showHideDetails()" ></Button>
+  <WrapLayout row="1" col="0" colSpan="8" style="margin-bottom:10" *ngIf='!showExtraFunctions'>
+    <Button *ngIf='this.checkItems.length > 0' class="glass btnBottom btnCancel" text="Cancel" (tap)="cancelOrder()"></Button>
+    <Button class="glass btnBottom" [text]="viewDetailsText" textWrap="true" (tap)="showHideDetails()"></Button>
     <Button class="glass btnBottom" (tap)="nextSeat()" textWrap="true" text="" style="background-image: url('res://images/Orders/Seat'); background-repeat: no-repeat; background-position: right 0"></Button>
-    <Label  class="nextSeat" [text]='currentSeatNumber'></Label>
-    <Button class="glass btnBottom" (tap)="extraFunction()" textWrap="true" text="Extra Function" style="margin-left: 100"></Button>
-    <Button class="glass btnBottom" (tap)="hold()" textWrap="true" text="Hold" style="width:100;height:120;"></Button>
-    <Button class="glass btnBottom" (tap)="send()" textWrap="true" text="Send" style="width:100;height:120;"></Button>
-    <Button class="glass btnBottom" (tap)="productInfo()" textWrap="true" text="Product Info" style="width:100;height:120;"></Button>
+    <Label class="nextSeat" [text]='currentSeatNumber'></Label>
+    <Button class="glass btnBottom" (tap)="extraFunctions()" textWrap="true" text="Extra Functions" style="margin-left: 40"></Button>
+    <Button class="glass btnBottom" (tap)="hold()" textWrap="true" text="Hold"></Button>
+    <Button class="glass btnBottom" (tap)="send()" textWrap="true" text="Send"></Button>
+    <Button class="glass btnBottom" (tap)="productInfo()" textWrap="true" text="Product Info"></Button>
   </WrapLayout>
+  <Button row="1" col="0" class="glass btnBottom btnCancel" text="Close" (tap)="closeExtraFunctions()" *ngIf='showExtraFunctions'></Button>
+  <FlexBoxLayout row="1" col="3" colSpan="5" justifyContent="flex-end" *ngIf='showExtraFunctions'>      
+      <Button class="glass btnBottom" text="Open Product" textWrap="true" (tap)="showOpenProduct()"></Button>
+      <Button class="glass btnBottom" text="Change # of Guests" (tap)="changeGuestsNumber()" textWrap="true"></Button>
+      <Button class="glass btnBottom btnOK" text="Tender" (tap)="tender()" textWrap="true"></Button>
+  </FlexBoxLayout>
   <StackLayout row="0" col="2" colSpan="2" *ngIf="showMainCategories">
     <Button class="glass" [text]="item.Name" *ngFor="let item of categories let i=index" (tap)="categorySelected(item)"
       [style]="categoryStyles[i]"></Button>
@@ -85,10 +91,9 @@
     <StackLayout row='1' col='3' rowSpan="7">
       <Label text="Product Options" textWrap="true" style='text-align: center; height: 100px;color: yellow;background-color:seagreen;margin:5px;padding:5px'></Label>
       <StackLayout *ngFor="let item of fixedOptions let i=index">
-        <Button class="glass" textWrap="true" [text]='item' [style]='fixedOptionStyles[i]' 
-        (tap)='fixedOptionSelected(item,i)'></Button>        
-      </StackLayout>   
-      <Button class="glass" text="DONE" (tap)="doneOption()" style='background-image:linear-gradient(green, black);text-align: center; height: 118px;border-radius: 20'></Button>   
+        <Button class="glass" textWrap="true" [text]='item' [style]='fixedOptionStyles[i]' (tap)='fixedOptionSelected(item,i)'></Button>
+      </StackLayout>
+      <Button class="glass" text="DONE" (tap)="doneOption()" style='background-image:linear-gradient(green, black);text-align: center; height: 118px;border-radius: 20'></Button>
     </StackLayout>
     <Button class="glass" [text]="item.Name" *ngFor="let item of menuOptions let i=index" (tap)="optionSelected(item)"
       style="border-radius: 5px;color: #000000;background-image: linear-gradient(#ffffff, silver);" [col]='optionCols[i]'
