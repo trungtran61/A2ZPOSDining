@@ -105,3 +105,11 @@ page
 .btnOK{
 	background-image:linear-gradient(green, black)
 }
+
+.a2zinput
+{
+	background-color: white!important;
+	color: #000;
+	font-size: 20;
+	font-weight: bold;
+}

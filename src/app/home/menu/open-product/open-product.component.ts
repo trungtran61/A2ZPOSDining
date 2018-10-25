@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewContainerRef } from "@angular/core";
+import { Component, OnInit, ViewContainerRef, ViewChild, ElementRef } from "@angular/core";
 import { ModalDialogParams, ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
@@ -6,29 +6,34 @@ import { MenuProduct, ProductGroup } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 
 @Component({
-    selector: "open-product.component",   
+    selector: "open-product.component",
     moduleId: module.id,
     templateUrl: "./open-product.component.html",
     styleUrls: ['./open-product.component.css']
 })
 export class OpenProductComponent implements OnInit {
-    
-    productGroups: ProductGroup[] = [];    
+    @ViewChild("productNameId") productNameId: ElementRef;
+    productGroups: ProductGroup[] = [];
     productGroupCols: number[] = [];
     productGroupRows: number[] = [];
     selectedGroup: string = '';
     showEditPanel: boolean = false;
+    productName: string = '';
+    quantity: number = 1;
+    price: number = 0.00;
 
-    groupSelected(group)
-    {
+    groupSelected(group) {
         this.selectedGroup = group;
-
+        this.showEditPanel = true;
+        setTimeout(() => {
+            this.productNameId.nativeElement.focus();
+        }, 600);
     }
 
-    constructor(private params: ModalDialogParams, 
+    constructor(private params: ModalDialogParams,
         private viewContainerRef: ViewContainerRef,
-        private DBService: SQLiteService) { 
-        
+        private DBService: SQLiteService) {
+
     }
 
     ngOnInit() {
@@ -39,14 +44,14 @@ export class OpenProductComponent implements OnInit {
                 dialogs.alert("Product Groups not loaded.")
             }
             else {
-                this.productGroups = productGroups;                
+                this.productGroups = productGroups;
                 let i: number = 1;
-                this.productGroups.forEach(function (productGroup: ProductGroup) {                       
+                this.productGroups.forEach(function (productGroup: ProductGroup) {
                     that.productGroupCols.push((i - 1) % 3);
                     that.productGroupRows.push(Math.floor((i - 1) / 3) + 1);
                     i++;
                 });
             }
-        });  
-    } 
+        });
+    }
 }

@@ -1,7 +1,17 @@
- <GridLayout columns="*,*,*" rows="50,*,*,*,300,*" class="p-30 page">
-    <Label class='pageHeader' text="Choose a Product Group" row='0' col='0' colSpan="3" ></Label>
-    <Button class="glass" [text]="item.Description" *ngFor="let item of productGroups let i=index" 
-        [col]='productGroupCols[i]' [row]='productGroupRows[i]' 
-        (tap)="groupSelected(item)"></Button>
-        
+<GridLayout columns="*,*,*" rows="50,*,*,*,70,*,50" class="p-30 page">
+    <Label class='pageHeader' text="Choose a Product Group" row='0' col='0' colSpan="3"></Label>
+    <Button class="glass" [text]="item.Description" *ngFor="let item of productGroups let i=index" [col]='productGroupCols[i]'
+        [row]='productGroupRows[i]' (tap)="groupSelected(item)"></Button>
+    <FlexBoxLayout row='4' col='0' colSpan="3" *ngIf='showEditPanel' style='margin-top:20'>
+        <TextField #productNameId hint="Enter Product Name" autocorrect="true" style='border-radius: 6; border-color: gray; border-width: 1; background-color: white; font-size: 20; font-weight: bold; padding-left: 5; width: 400; margin-right: 20'>
+        </TextField>
+        <TextField hint="Enter Quantity" autocorrect="false" class="a2zinput" keyboardType='number' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5; margin-right: 20'>
+        </TextField>
+        <TextField hint="Enter Price" autocorrect="false" class="a2zinput" keyboardType='number' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5'>
+        </TextField>
+    </FlexBoxLayout>
+    <FlexBoxLayout row='6' col='0' colSpan="3">
+        <Button class='glass btnCancel' text='Cancel'></Button>
+        <Button class='glass btnOK' text='Done' style="position: relative; right:0"></Button>
+    </FlexBoxLayout>
 </GridLayout>
