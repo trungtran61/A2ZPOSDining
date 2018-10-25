@@ -21,6 +21,20 @@ page
 	background-image: rgb(46, 44, 44);
 }
 
+.page
+{
+	background-color: rgb(46, 44, 44); /*for compatibility with older browsers*/
+	background-image: rgb(46, 44, 44);
+}
+
+.pageHeader
+{
+	font-size: 30;
+	font-weight: bold;
+	color: #fff;
+	text-align: center;
+}
+
 .btn {
     font-size: 18;
 }

@@ -33,53 +33,53 @@ export class SQLiteService {
                 SQLiteService.database = db;
                 SQLiteService.isInstantiated = true;
                 console.log("FullServiceDining DB opened.");
-                this.createTables(db);  
+                this.createTables(db);
             }, error => {
                 console.log("OPEN DB ERROR", error);
             });
         }
     }
 
-    createTables(db)
-    {
-        if (db == null)
-        {
+    createTables(db) {
+        if (db == null) {
             db = SQLiteService.database;
         }
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Employees (EmployeeID TEXT PRIMARY KEY, FirstName TEXT);").then(id => {
-            console.log("Employees table created");
+            //console.log("Employees table created");
             this.getRecordCount('Employees');
         }, error => {
             console.log("CREATE TABLE Employees ERROR", error);
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS CategoryCodes (PriKey INTEGER PRIMARY KEY, CategoryCode1 TEXT, Description TEXT, PrintGroup INTEGER);").then(id => {
-            console.log("categorycodes table created");
+            //console.log("categorycodes table created");
             this.getRecordCount('CategoryCodes');
         }, error => {
             console.log("CREATE TABLE CategoryCodes ERROR", error);
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER,ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier INTEGER, UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
-            console.log("Products table created");
+            //console.log("Products table created");
             this.getRecordCount('Products');
         }, error => {
             console.log("CREATE TABLE Products ERROR", error);
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS ProductCategories (PriKey INTEGER PRIMARY KEY, ProductFilter INTEGER, Category INTEGER, SubCategory INTEGER, Position INTEGER, ButtonColor TEXT, ButtonForeColor TEXT);").then(id => {
-            console.log("ProductCategories table created");
+            //console.log("ProductCategories table created");
             this.getRecordCount('ProductCategories');
         }, error => {
             console.log("CREATE TABLE CategoryCodes ERROR", error);
         });
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
-            console.log("Table Areas created");
-            this.getRecordCount('Areas');
-        }, error => {
-            console.log("CREATE TABLE Areas ERROR", error);
+        db.execSQL('DROP TABLE IF EXISTS Areas;').then(function (resultSet) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
+                //console.log("Table Areas created");
+                this.getRecordCount('Areas');
+            }, error => {
+                console.log("CREATE TABLE Areas ERROR", error);
+            });
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Tables (AreaID INTEGER, Name TEXT, Height INTEGER, Width INTEGER, PosX INTEGER, PosY INTEGER, TableType INTEGER);").then(id => {
@@ -89,68 +89,70 @@ export class SQLiteService {
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS MenuCategories (CategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-            console.log("Tables MenuCategories created");
+            //console.log("Tables MenuCategories created");
             this.getRecordCount('MenuCategories');
         }, error => {
             console.log("CREATE TABLE MenuCategories ERROR", error);
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubCategories (CategoryID INTEGER, SubCategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-            console.log("Tables MenuSubCategories created");
+            //console.log("Tables MenuSubCategories created");
             this.getRecordCount('MenuSubCategories');
         }, error => {
             console.log("CREATE TABLE MenuSubCategories ERROR", error);
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS MenuProducts (CategoryID INTEGER, SubCategoryID INTEGER,ProductID INTEGER,Name TEXT,Position INTEGER,ProductCode INTEGER,ButtonColor INTEGER,ButtonColorHex TEXT,ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-            console.log("Tables Products created");
+            //console.log("Tables Products created");
             this.getRecordCount('MenuProducts');
         }, error => {
             console.log("CREATE TABLE Products ERROR", error);
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS MenuChoices (Charge REAL, ChoiceID INTEGER, ChoiceName TEXT, ForcedChoice INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
-            console.log("Table MenuChoices screated");
+            //console.log("Table MenuChoices screated");
             this.getRecordCount('MenuChoices');
         }, error => {
             console.log("CREATE TABLE MenuChoices ERROR", error);
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Options (PriKey INTEGER, Name TEXT, Price REAL, PrintName TEXT, CategoryCode INTEGER);").then(id => {
-            console.log("Table Options created");
+            //console.log("Table Options created");
             this.getRecordCount('Options');
         }, error => {
             console.log("CREATE TABLE Options ERROR", error);
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS OptionCategories (PriKey INTEGER, Name TEXT);").then(id => {
-            console.log("Table OptionCategories created");
+            //console.log("Table OptionCategories created");
             this.getRecordCount('OptionCategories');
         }, error => {
             console.log("CREATE TABLE OptionCategories ERROR", error);
         });
-        
-       db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ReportProductMix INTEGER);").then(id => {
-        console.log("Table MenuSubOptions created");
-        this.getRecordCount('MenuSubOptions');
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ReportProductMix INTEGER);").then(id => {
+            //console.log("Table MenuSubOptions created");
+            this.getRecordCount('MenuSubOptions');
         }, error => {
-        console.log("CREATE TABLE MenuSubOptions ERROR", error);
+            console.log("CREATE TABLE MenuSubOptions ERROR", error);
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS MenuOptions (ApplyCharge INTEGER, Charge REAL, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
-            console.log("Table MenuOptions created");
+            //console.log("Table MenuOptions created");
             this.getRecordCount('MenuOptions');
-            }, error => {
+        }, error => {
             console.log("CREATE TABLE MenuOptions ERROR", error);
-            });
-        
-        db.execSQL("CREATE TABLE IF NOT EXISTS ProductGroups (PriKey INTEGER,Code TEXT,Description TEXT,TipShare INTEGER," +
-            "TipSharePercentage INTEGER,Printer TEXT,OpenProduct INTEGER,ProductType INTEGER,TaxRate REAL,Taxable INTEGER);").then(id => {
-                console.log("Table ProductGroups created");
-                this.getRecordCount('ProductGroups');
+        });
+
+        //db.execSQL('DROP TABLE IF EXISTS ProductGroups;').then(function (resultSet) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS ProductGroups (PriKey INTEGER,Code TEXT,Description TEXT,TipShare INTEGER," +
+                "TipSharePercentage INTEGER,Printer TEXT,OpenProduct INTEGER,ProductType INTEGER,TaxRate REAL,Taxable INTEGER);").then(id => {
+                    console.log("Table ProductGroups created");
+                    this.getRecordCount('ProductGroups');
                 }, error => {
-                console.log("CREATE TABLE ProductGroups ERROR", error);
-                });    
+                    console.log("CREATE TABLE ProductGroups ERROR", error);
+                });
+        //});
     }
 
 
@@ -289,8 +291,8 @@ export class SQLiteService {
 
     public getLocalMenuProducts(categoryID: number, subCategoryID: number): Promise<MenuProduct[]> {
 
-        return SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex," + 
-            " mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice, p.ForcedModifier, p.UseForcedModifier" + 
+        return SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex," +
+            " mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice, p.ForcedModifier, p.UseForcedModifier" +
             "  FROM MenuProducts AS mp INNER JOIN Products AS p ON mp.ProductId=p.ProductFilter WHERE mp.CategoryID=? AND mp.SubCategoryID=? ORDER BY mp.Position", [categoryID, subCategoryID])
             .then(function (rows) {
                 let menuProducts: MenuProduct[] = [];
@@ -331,7 +333,7 @@ export class SQLiteService {
 
     }
 
-    public loadOptionCategories(optionCategories: any[]) {        
+    public loadOptionCategories(optionCategories: any[]) {
         optionCategories.forEach(function (optionCategory: OptionCategory) {
             SQLiteService.database.execSQL("INSERT INTO OptionCategories (PriKey, Name) VALUES (?, ?)",
                 [optionCategory.PriKey, optionCategory.Name]);
@@ -355,30 +357,30 @@ export class SQLiteService {
 
     }
 
-    public loadMenuOptions(menuOptions: any[]) {        
+    public loadMenuOptions(menuOptions: any[]) {
         menuOptions.forEach(function (menuOption: MenuOption) {
             SQLiteService.database.execSQL("INSERT INTO MenuOptions (ApplyCharge, Charge, Name, Position, ProductCode, ReportProductMix) VALUES (?,?,?,?,?,?)",
                 [menuOption.ApplyCharge, menuOption.Charge, menuOption.Name, menuOption.Position,
-                 menuOption.ProductCode, menuOption.ReportProductMix]);
+                menuOption.ProductCode, menuOption.ReportProductMix]);
         }
         );
     }
 
-    public getLocalMenuOptions(productCode: number) : Promise<MenuOption[]>{
-        return SQLiteService.database.all("SELECT ApplyCharge, Charge, Name, Position FROM MenuOptions WHERE ProductCode=? ORDER BY Position", 
+    public getLocalMenuOptions(productCode: number): Promise<MenuOption[]> {
+        return SQLiteService.database.all("SELECT ApplyCharge, Charge, Name, Position FROM MenuOptions WHERE ProductCode=? ORDER BY Position",
             [productCode])
-        .then(function (rows) {
-            let items: MenuOption[] = [];
-            for (var row in rows) {
-                items.push({
-                    ApplyCharge: rows[row][0],
-                    Charge: rows[row][1],
-                    Name: rows[row][2],
-                    Position: rows[row][3]                   
-                });
-            }
-            return (items);
-        });
+            .then(function (rows) {
+                let items: MenuOption[] = [];
+                for (var row in rows) {
+                    items.push({
+                        ApplyCharge: rows[row][0],
+                        Charge: rows[row][1],
+                        Name: rows[row][2],
+                        Position: rows[row][3]
+                    });
+                }
+                return (items);
+            });
     }
 
     public getMenuSubOptions() {
@@ -397,11 +399,11 @@ export class SQLiteService {
 
     }
 
-    public loadMenuSubOptions(menuSubOptions: any[]) {        
+    public loadMenuSubOptions(menuSubOptions: any[]) {
         menuSubOptions.forEach(function (menuSubOption: MenuSubOption) {
             SQLiteService.database.execSQL("INSERT INTO MenuSubOptions (ApplyCharge, Charge, ChoiceID, Layer, Name, Position, ReportProductMix) VALUES (?,?,?,?,?,?,?)",
                 [menuSubOption.ApplyCharge, menuSubOption.Charge, menuSubOption.ChoiceID, menuSubOption.Layer,
-                    menuSubOption.Name, menuSubOption.Position, menuSubOption.ReportProductMix]);
+                menuSubOption.Name, menuSubOption.Position, menuSubOption.ReportProductMix]);
         }
         );
     }
@@ -426,7 +428,7 @@ export class SQLiteService {
         let that = this;
         Options.forEach(function (Option: Option) {
             SQLiteService.database.execSQL("INSERT INTO Options (PriKey, Name,Price,PrintName,CategoryCode) VALUES (?, ?, ?, ?, ?)",
-                [Option.PriKey, Option.Name,Option.Price,Option.PrintName,Option.CategoryCode]);
+                [Option.PriKey, Option.Name, Option.Price, Option.PrintName, Option.CategoryCode]);
         }
         );
     }
@@ -451,44 +453,44 @@ export class SQLiteService {
         let that = this;
         MenuChoices.forEach(function (menuChoice: MenuChoice) {
             SQLiteService.database.execSQL("INSERT INTO MenuChoices (Charge, ChoiceID, ChoiceName, ForcedChoice, Layer, Name, Position, ProductCode, ReportProductMix) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )",
-                [menuChoice.Charge, menuChoice.ChoiceID,menuChoice.ChoiceName,menuChoice.ForcedChoice, menuChoice.Layer,
-                menuChoice.Name,menuChoice.Position,menuChoice.ProductCode,menuChoice.ReportProductMix]);
+                [menuChoice.Charge, menuChoice.ChoiceID, menuChoice.ChoiceName, menuChoice.ForcedChoice, menuChoice.Layer,
+                menuChoice.Name, menuChoice.Position, menuChoice.ProductCode, menuChoice.ReportProductMix]);
         }
         );
     }
 
     public getLocalMenuChoices(productCode: number) {
         return SQLiteService.database.all("SELECT DISTINCT ChoiceName, Layer FROM MenuChoices WHERE ProductCode=?", [productCode])
-        .then(function (rows) {
-            let choices: MenuChoice[] = [];
-            for (var row in rows) {
-                choices.push(
-                    { 
-                      ChoiceName: rows[row][0],
-                      Layer:rows[row][1]  
-                    }
-                );
-            }
-            return (choices);
-        });
+            .then(function (rows) {
+                let choices: MenuChoice[] = [];
+                for (var row in rows) {
+                    choices.push(
+                        {
+                            ChoiceName: rows[row][0],
+                            Layer: rows[row][1]
+                        }
+                    );
+                }
+                return (choices);
+            });
     }
 
     public getLocalMenuChoiceItems(menuChoice: MenuChoice, productCode: number) {
-        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position, Layer FROM MenuChoices WHERE ProductCode=? AND ChoiceName=? AND Layer=? ORDER BY Position", 
+        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position, Layer FROM MenuChoices WHERE ProductCode=? AND ChoiceName=? AND Layer=? ORDER BY Position",
             [productCode, menuChoice.ChoiceName, menuChoice.Layer])
-        .then(function (rows) {
-            let items: MenuChoice[] = [];
-            for (var row in rows) {
-                items.push({
-                    ChoiceID: rows[row][0],
-                    Charge: rows[row][1],
-                    Name: rows[row][2],
-                    Position: rows[row][3],
-                    Layer: rows[row][4]
-                });
-            }
-            return (items);
-        });
+            .then(function (rows) {
+                let items: MenuChoice[] = [];
+                for (var row in rows) {
+                    items.push({
+                        ChoiceID: rows[row][0],
+                        Charge: rows[row][1],
+                        Name: rows[row][2],
+                        Position: rows[row][3],
+                        Layer: rows[row][4]
+                    });
+                }
+                return (items);
+            });
     }
 
     public getEmployees() {
@@ -557,9 +559,9 @@ export class SQLiteService {
 
     public loadProducts(products: any[]) {
         products.forEach(function (product: Product) {
-            SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode,ProductGroup,PrintCode1,CouponCode," + 
-                                        "GeneralCode,Description,AutoOption,PrintName,ForcedModifier,UseForcedModifier,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings," + 
-                                        "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode,ProductGroup,PrintCode1,CouponCode," +
+                "GeneralCode,Description,AutoOption,PrintName,ForcedModifier,UseForcedModifier,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings," +
+                "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 [product.ProductName,
                 product.ProductFilter,
                 product.UnitPrice,
@@ -657,29 +659,28 @@ export class SQLiteService {
     public loadProductGroups(productGroups: any[]) {
 
         productGroups.forEach(function (productGroup: ProductGroup) {
-            SQLiteService.database.execSQL("INSERT INTO ProductGroups (PriKey, Code, Description, OpenProduct, Printer, ProductType," + 
+            SQLiteService.database.execSQL("INSERT INTO ProductGroups (PriKey, Code, Description, OpenProduct, Printer, ProductType," +
                 "Taxable, TaxRate, TipShare, TipSharePercentage) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                [productGroup.PriKey, productGroup.Code, productGroup.Description, productGroup.OpenProduct, productGroup.Printer, productGroup.ProductType, 
-                    productGroup.Taxable, productGroup.TaxRate, productGroup.TipShare, productGroup.TipSharePercentage]).then(id => {
+                [productGroup.PriKey, productGroup.Code, productGroup.Description, productGroup.OpenProduct, productGroup.Printer, productGroup.ProductType,
+                productGroup.Taxable, productGroup.TaxRate, productGroup.TipShare, productGroup.TipSharePercentage]).then(id => {
                     console.log('added ' + productGroup.Description + ' to Product Groups');
                 });
         });
-
     }
 
     public getLocalProductGroups(): Promise<ProductGroup[]> {
-        let sql: string = "SELECT * FROM ProductGroups;"
+        let sql: string = "SELECT * FROM ProductGroups ORDER BY Description;"
         return SQLiteService.database.all(sql)
             .then(function (rows) {
                 let productGroups: ProductGroup[] = [];
                 for (var row in rows) {
                     productGroups.push({
-                        PriKey: rows[row][0],Code: rows[row][1],Description: rows[row][2],OpenProduct: rows[row][3],
-                        Printer: rows[row][4],ProductType: rows[row][5],Taxable: rows[row][7],TaxRate: rows[row][8], TipShare: rows[row][8],
+                        PriKey: rows[row][0], Code: rows[row][1], Description: rows[row][2], OpenProduct: rows[row][3],
+                        Printer: rows[row][4], ProductType: rows[row][5], Taxable: rows[row][7], TaxRate: rows[row][8], TipShare: rows[row][8],
                         TipSharePercentage: rows[row][8]
                     });
                 }
-                
+
                 return (productGroups);
             });
     }
@@ -803,7 +804,7 @@ export class SQLiteService {
                         UnitPrice: rows[row][1],
                         ProductCode: rows[row][2],
                         ForcedModifier: rows[row][3],
-                        UseForcedModifier: rows[row][4],                        
+                        UseForcedModifier: rows[row][4],
                     });
                 }
                 return (products);
@@ -872,20 +873,20 @@ export class SQLiteService {
                                 break;
                             }
                         case 'MenuSubOptions':
-                        {
-                            that.getMenuSubOptions();
-                            break;                            
-                        }
+                            {
+                                that.getMenuSubOptions();
+                                break;
+                            }
                         case 'MenuOptions':
-                        {
-                            that.getMenuOptions();
-                            break;                            
-                        }
+                            {
+                                that.getMenuOptions();
+                                break;
+                            }
                         case 'ProductGroups':
-                        {
-                            that.getProductGroups();
-                            break;                            
-                        }
+                            {
+                                that.getProductGroups();
+                                break;
+                            }
                     }
             });
     }
@@ -903,13 +904,13 @@ export class SQLiteService {
         });
     }
 
-    getTableInfo(tableName:string){
+    getTableInfo(tableName: string) {
         SQLiteService.database.all("SELECT Name, ProductCode, Position FROM MenuProducts")
-            .then(function (rows) {                
+            .then(function (rows) {
                 console.log(rows);
             });
-        
-        }
+
+    }
 
     private createRequestHeader() {
         let headers = new HttpHeaders({

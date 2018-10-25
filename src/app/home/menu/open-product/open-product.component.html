@@ -1,3 +1,7 @@
-<FlexBoxLayout>
-    <Button class="glass" [text]="item.Description" *ngFor="let item of productGroups let i=index" (tap)="groupSelected(item)"></Button>
-</FlexBoxLayout>
+ <GridLayout columns="*,*,*" rows="50,*,*,*,300,*" class="p-30 page">
+    <Label class='pageHeader' text="Choose a Product Group" row='0' col='0' colSpan="3" ></Label>
+    <Button class="glass" [text]="item.Description" *ngFor="let item of productGroups let i=index" 
+        [col]='productGroupCols[i]' [row]='productGroupRows[i]' 
+        (tap)="groupSelected(item)"></Button>
+        
+</GridLayout>

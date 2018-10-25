@@ -14,6 +14,16 @@ import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 export class OpenProductComponent implements OnInit {
     
     productGroups: ProductGroup[] = [];    
+    productGroupCols: number[] = [];
+    productGroupRows: number[] = [];
+    selectedGroup: string = '';
+    showEditPanel: boolean = false;
+
+    groupSelected(group)
+    {
+        this.selectedGroup = group;
+
+    }
 
     constructor(private params: ModalDialogParams, 
         private viewContainerRef: ViewContainerRef,
@@ -22,13 +32,19 @@ export class OpenProductComponent implements OnInit {
     }
 
     ngOnInit() {
+        let that = this;
+
         this.DBService.getLocalProductGroups().then((productGroups) => {
             if (productGroups.length == 0) {
                 dialogs.alert("Product Groups not loaded.")
             }
             else {
                 this.productGroups = productGroups;                
-                this.productGroups.forEach(function (productGroup: ProductGroup) {                    
+                let i: number = 1;
+                this.productGroups.forEach(function (productGroup: ProductGroup) {                       
+                    that.productGroupCols.push((i - 1) % 3);
+                    that.productGroupRows.push(Math.floor((i - 1) / 3) + 1);
+                    i++;
                 });
             }
         });  
