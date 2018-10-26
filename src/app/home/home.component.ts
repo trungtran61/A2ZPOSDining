@@ -2,6 +2,8 @@ import { Component, OnInit, AfterViewInit, NgZone } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { Observable } from 'rxjs';
 import { registerElement } from 'nativescript-angular';
+import {exit} from 'nativescript-exit';
+
 import { Employee, LoginResponse } from "~/app/models/employees";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import * as dialogs from "tns-core-modules/ui/dialogs";
@@ -29,8 +31,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
     
     constructor(private router: RouterExtensions, private DBService: SQLiteService, 
         private zone: NgZone, private page: Page,
-        ) {
-        // Use the component constructor to inject providers.
+        ) {          
+        page.actionBarHidden = true;
     }
 
     ngOnInit(): void {
@@ -115,6 +117,19 @@ export class HomeComponent implements OnInit, AfterViewInit {
             console.log('data loaded');
             this.isBusy = false;
         } 
+    }
+
+    shutDown()
+    {
+        dialogs.confirm({
+            title: "Shutdown",
+            message: "Shutdown A2ZPOSDining App?",
+            okButtonText: "Yes, shut down app",
+            cancelButtonText: "No"
+        }).then(isShuttingDown => {
+            if (isShuttingDown)
+                exit();            
+        });
     }
    
 }

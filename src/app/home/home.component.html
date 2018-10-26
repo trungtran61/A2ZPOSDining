@@ -2,31 +2,30 @@
     <Label class="action-bar-title" text="Login"></Label>
 </ActionBar>
 
-<GridLayout class="m-20" rows="10,*,100" columns="200,*,200" >            
-<GridLayout class="m-20" rows="83,83,83,83,83" columns="124,124,124" row="1" col="1">    
-    <TextField [text]="employeeId" row="0" col="0" colspan="3" class="glass btSquare" [secure]="isSecure" style='text-align: center; width: 366' ></TextField>
-        <Button text="1" class="glass btnSquare" (tap)="addDigit('1')" row="1" col="0" ></Button>
-        <Button text="2" class="glass btnSquare" (tap)="addDigit('2')" row="1" col="1" ></Button>
-        <Button text="3" class="glass btnSquare" (tap)="addDigit('3')" row="1" col="2" ></Button>
-        <Button text="4" class="glass btnSquare" (tap)="addDigit('4')" row="2" col="0" ></Button>
-        <Button text="5" class="glass btnSquare" (tap)="addDigit('5')" row="2" col="1" ></Button>
-        <Button text="6" class="glass btnSquare" (tap)="addDigit('6')" row="2" col="2" ></Button>
-        <Button text="7" class="glass btnSquare" (tap)="addDigit('7')" row="3" col="0" ></Button>
-        <Button text="8" class="glass btnSquare" (tap)="addDigit('8')" row="3" col="1" ></Button>
-        <Button text="9" class="glass btnSquare" (tap)="addDigit('9')" row="3" col="2" ></Button>
-        <Button text="0" class="glass btnSquare" (tap)="addDigit('0')" row="4" col="1" ></Button>
-        <Button text="CLEAR" class="glass btnSquare" row="4" col="0" (tap)="clearInput()" style='color: red;background-image:linear-gradient(white, lightgray )'></Button>        
-        <Button text="LOG IN" class="glass btnSquare" (tap)="logIn()" row="4" col="2" style='color: white;background-image:linear-gradient(lightgreen, darkgreen)' ></Button>        
+<GridLayout class="m-20" rows="10,*,*" columns="*,*,*">
+        <Image src='res://images/TigerTouch' col='0' row='1' style='margin: 25 0 0 0'></Image>
+    <GridLayout class="m-20" rows="83,83,83,83,83" columns="124,124,124" row="1" col="1">
+        <TextField [text]="employeeId" row="0" col="0" colspan="3" class="glass btSquare" [secure]="isSecure" style='text-align: center; width: 366'></TextField>
+        <Button text="1" class="glass btnSquare" (tap)="addDigit('1')" row="1" col="0"></Button>
+        <Button text="2" class="glass btnSquare" (tap)="addDigit('2')" row="1" col="1"></Button>
+        <Button text="3" class="glass btnSquare" (tap)="addDigit('3')" row="1" col="2"></Button>
+        <Button text="4" class="glass btnSquare" (tap)="addDigit('4')" row="2" col="0"></Button>
+        <Button text="5" class="glass btnSquare" (tap)="addDigit('5')" row="2" col="1"></Button>
+        <Button text="6" class="glass btnSquare" (tap)="addDigit('6')" row="2" col="2"></Button>
+        <Button text="7" class="glass btnSquare" (tap)="addDigit('7')" row="3" col="0"></Button>
+        <Button text="8" class="glass btnSquare" (tap)="addDigit('8')" row="3" col="1"></Button>
+        <Button text="9" class="glass btnSquare" (tap)="addDigit('9')" row="3" col="2"></Button>
+        <Button text="0" class="glass btnSquare" (tap)="addDigit('0')" row="4" col="1"></Button>
+        <Button text="CLEAR" class="glass btnSquare" row="4" col="0" (tap)="clearInput()" style='color: red;background-image:linear-gradient(white, lightgray )'></Button>
+        <Button text="LOG IN" class="glass btnSquare" (tap)="logIn()" row="4" col="2" style='color: white;background-image:linear-gradient(lightgreen, darkgreen)'></Button>
+    </GridLayout>
+    <StackLayout row="2" col="0" colSpan="3">
+        <FlexBoxLayout style='margin: 100 0 30 0'>
+            <Button text="Manager Functions" class="glass btSquare" (tap)="managerFunctions()"></Button>
+        </FlexBoxLayout>
+        <FlexBoxLayout>
+            <Image src="res://images/shutdown" (tap)="shutDown()" style="width: 100; border-radius: 100; border-width: 2; border-color: red; height: 100;"></Image>
+        </FlexBoxLayout>
+    </StackLayout>
+    <Image src='res://images/a2zlogo' col='1' row='2' colSpan="2" style="width: 600; height:100" ></Image>
 </GridLayout>
-<WrapLayout row="2" col="0" colSpan="3">    
-        <Button text="Shut Down" class="glass" (tap)="shutdown()"></Button>
-        <Label text="1" class='badge'></Label>
-        <Button text="Manager Functions" class="glass btSquare" (tap)="managerFunctions()"></Button>      
-        <Label text="2" style="margin-left:-10; margin-top: -20;background-color: red; border-width: 1; border-color:red; border-radius: 15; color:white;font-size: 20; padding: 2; text-align: center; width: 30; height: 30;"></Label>
-        <Button text="Load Tables" class="glass btSquare" (tap)="loadTables()"></Button>  
-        <Label text="3" style="margin-left:-10; margin-top: -20;background-color: red; border-width: 1; border-color:red; border-radius: 15; color:white;font-size: 20; padding: 2; text-align: center; width: 30; height: 30;"></Label>
-        <Button text="Drop Tables" class="glass btSquare" (tap)="dropTables()"></Button> 
-        <Label text="4" style="margin-left:-10; margin-top: -20;background-color: red; border-width: 1; border-color:red; border-radius: 15; color:white;font-size: 20; padding: 2; text-align: center; width: 30; height: 30;"></Label>
-    </WrapLayout>   
-</GridLayout>
-
