@@ -2,8 +2,9 @@ import { Component, OnInit, ViewContainerRef, ViewChild, ElementRef } from "@ang
 import { ModalDialogParams, ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { MenuProduct, ProductGroup } from "~/app/models/products";
+import { MenuProduct, ProductGroup, OpenProductItem } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
+
 
 @Component({
     selector: "open-product.component",
@@ -16,19 +17,36 @@ export class OpenProductComponent implements OnInit {
     productGroups: ProductGroup[] = [];
     productGroupCols: number[] = [];
     productGroupRows: number[] = [];
-    selectedGroup: string = '';
+    selectedGroup: ProductGroup = null;
     showEditPanel: boolean = false;
     productName: string = '';
-    quantity: number = 1;
-    price: number = 0.00;
+    quantity: number;
+    price: number;
+    pageTitle: string = 'Choose a Product Group';
 
-    groupSelected(group) {
+    groupSelected(group:ProductGroup)  {
         this.selectedGroup = group;
         this.showEditPanel = true;
+        this.pageTitle = group.Description;
+
         setTimeout(() => {
             this.productNameId.nativeElement.focus();
         }, 600);
     }
+
+    cancel() {  
+         this.params.closeCallback(null);
+    }
+
+    done() {  
+        let openProductItem: OpenProductItem = {
+                                ProductGroupId : this.selectedGroup.PriKey,
+                                    ProductName : this.productName,
+                                    Quantity : this.quantity,
+                                    UnitPrice : this.price
+                            }
+        this.params.closeCallback(openProductItem);
+   }
 
     constructor(private params: ModalDialogParams,
         private viewContainerRef: ViewContainerRef,

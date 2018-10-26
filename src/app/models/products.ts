@@ -20,15 +20,15 @@ export interface MenuSubCategory {
 }
 
 export interface MenuProduct {
-    CategoryID: number;
-    SubCategoryID: number;
-    ProductID: number;
+    CategoryID?: number;
+    SubCategoryID?: number;
+    ProductID?: number;
     Name: string;
-    Position: number;
-    ProductCode: number;   
-    ButtonColor: number;
+    Position?: number;
+    ProductCode?: number;   
+    ButtonColor?: number;
     ButtonColorHex?: string;
-    ButtonForeColor: number; 
+    ButtonForeColor?: number; 
     ButtonForeColorHex?: string; 
     UnitPrice?: number;
     UseModifier?: boolean;
@@ -240,4 +240,11 @@ export interface ProductGroup {
     ProductType: number;
     TaxRate: number;
     Taxable: boolean;
+}
+
+export interface OpenProductItem {
+    ProductGroupId: number;
+    ProductName: string;
+    Quantity: number;
+    UnitPrice: number;    
 }

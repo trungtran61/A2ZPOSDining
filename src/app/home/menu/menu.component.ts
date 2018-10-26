@@ -3,7 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, MenuOption, Modifier } from "~/app/models/products";
+import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, MenuOption, Modifier, OpenProductItem } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
@@ -298,7 +298,7 @@ export class MenuComponent implements OnInit {
     addProductToCheck(product: MenuProduct)
     {
         this.checkItems.push({
-            Modifiers: [], Qty: 1, SeatNumber: 1, Price: product.UnitPrice,
+            Modifiers: [], Qty: 1, SeatNumber: this.currentSeatNumber, Price: product.UnitPrice,
             Product: product
         });
         this.totalPrice();
@@ -312,8 +312,23 @@ export class MenuComponent implements OnInit {
             //context: { options: options, currentOptions: currentOptions}
         };
 
-        this.modalService.showModal(OpenProductComponent, modalOptions).then(
-            (selectedModifiers) => {               
+        this.modalService.showModal(OpenProductComponent, modalOptions).then(            
+            (openProductItem : OpenProductItem) => {    
+                this.showExtraFunctions = false;
+                if (openProductItem != null)           
+                    {
+                        this.checkItems.push({
+                            Modifiers: [], Qty: openProductItem.Quantity, SeatNumber: this.currentSeatNumber, 
+                                Price: openProductItem.UnitPrice * openProductItem.Quantity,                                 
+                                Product: {
+                                    Name : openProductItem.ProductName,
+                                    UnitPrice: openProductItem.UnitPrice,
+                                    UseModifier: false,
+                                    UseForcedModifier: false                                    
+                                }
+                        });
+                        this.totalPrice();
+                    }
             });
     }
 
