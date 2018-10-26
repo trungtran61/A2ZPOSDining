@@ -66,9 +66,18 @@ export class HomeComponent implements OnInit, AfterViewInit {
                 this.DBService.loggedInUser.EmployeeID = this.employeeId;
                 this.DBService.loggedInUser.PriKey = res.EmployeeID;
                 this.DBService.loggedInUser.AccessType = res.AccessType;
+                
+                this.DBService.getLocalEmployee(res.EmployeeID).then((data) => {
+                    if (data == null) {
+                        dialogs.alert("Employee Info not loaded");
+                    }
+                    else {
+                        this.DBService.loggedInUser.FirstName = data.FirstName;               
+                        this.zone.run(() => this.router.navigate(['/home/mytables']));       
+                    }
+                });                
                 //localStorage.setItem("loggedInUser", JSON.stringify(this.loggedInUser));
-                //this.router.navigate(['/home/mytables']);         
-                this.zone.run(() => this.router.navigate(['/home/mytables']));         
+                //this.router.navigate(['/home/mytables']);                          
                 break;
             case -3:
                 //dialogs.alert("Employee already logged in.");    
@@ -78,7 +87,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
                 });
                 break;
             default:  
-                dialogs.alert("Invalid Employee Id entered.");    
+                dialogs.alert("Invalid Employee Id entered.");   
+                this.employeeId= ''; 
                 break;             
         };
         
@@ -89,6 +99,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
     {
         //this.router.navigate(['/home/menu'])
         //this.router.navigate(['/home/menuitems'])
+        this.DBService.getEmployees();
+        //this.DBService.getAllEmployees();
+        //this.DBService.createTables(null);
     }
 
     loadTables()

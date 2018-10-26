@@ -33,7 +33,7 @@ export class SQLiteService {
                 SQLiteService.database = db;
                 SQLiteService.isInstantiated = true;
                 console.log("FullServiceDining DB opened.");
-                this.createTables(db);
+                //this.createTables(db);
             }, error => {
                 console.log("OPEN DB ERROR", error);
             });
@@ -45,11 +45,13 @@ export class SQLiteService {
             db = SQLiteService.database;
         }
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS Employees (EmployeeID TEXT PRIMARY KEY, FirstName TEXT);").then(id => {
+        db.execSQL("DROP TABLE IF EXISTS Employees;").then(id=> {
+            db.execSQL("CREATE TABLE IF NOT EXISTS Employees (PriKey INTEGER PRIMARY KEY, EmployeeID TEXT, FirstName TEXT);").then(id => {
             //console.log("Employees table created");
             this.getRecordCount('Employees');
-        }, error => {
+            }, error => {
             console.log("CREATE TABLE Employees ERROR", error);
+            });
         });
 
         db.execSQL("CREATE TABLE IF NOT EXISTS CategoryCodes (PriKey INTEGER PRIMARY KEY, CategoryCode1 TEXT, Description TEXT, PrintGroup INTEGER);").then(id => {
@@ -73,14 +75,13 @@ export class SQLiteService {
             console.log("CREATE TABLE CategoryCodes ERROR", error);
         });
 
-        db.execSQL('DROP TABLE IF EXISTS Areas;').then(function (resultSet) {
-            db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
+           db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
                 //console.log("Table Areas created");
                 this.getRecordCount('Areas');
             }, error => {
                 console.log("CREATE TABLE Areas ERROR", error);
             });
-        });
+       
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Tables (AreaID INTEGER, Name TEXT, Height INTEGER, Width INTEGER, PosX INTEGER, PosY INTEGER, TableType INTEGER);").then(id => {
             this.getRecordCount('Tables');
@@ -504,7 +505,7 @@ export class SQLiteService {
                     this.loadEmployees(<Employee[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving employees from API.");
+                    console.log("Error occured while retrieving Employees from API.");
                     console.log(err);
                 }
             );
@@ -513,7 +514,8 @@ export class SQLiteService {
 
     public loadEmployees(employees: any[]) {
         employees.forEach(function (employee: Employee) {
-            SQLiteService.database.execSQL("INSERT INTO employees (EmployeeID, FirstName) VALUES (?, ?)", [employee.EmployeeID, employee.FirstName]);
+            SQLiteService.database.execSQL("INSERT INTO Employees (PriKey, EmployeeID, FirstName) VALUES (?, ?, ?)", 
+                [employee.PriKey,employee.EmployeeID, employee.FirstName]);
             //console.log('added ' + employee.FirstName);
         }
         );
@@ -761,9 +763,10 @@ export class SQLiteService {
         );
     }
 
-    public getEmployee(employeeID: string): Promise<any> {
-        return SQLiteService.database.get("SELECT EmployeeID, FirstName FROM employees WHERE EmployeeID=?", [employeeID])
-            .then(function (employee) {
+    public getLocalEmployee(priKey: number): Promise<Employee> {
+        return SQLiteService.database.get("SELECT PriKey, EmployeeID, FirstName FROM Employees WHERE PriKey=?", [priKey])
+            .then(function (res) {
+                let employee: Employee = {PriKey: [res][0][0], EmployeeID: [res][0][1], FirstName: [res][0][2]}
                 return (employee);
             });
     }
@@ -892,7 +895,7 @@ export class SQLiteService {
     }
 
     public getAllEmployees() {
-        var promise = SQLiteService.database.all('SELECT * FROM employees;');
+        var promise = SQLiteService.database.all('SELECT * FROM Employees;');
         promise.then(function (resultSet) {
             console.log("Result set is:", resultSet);
         });

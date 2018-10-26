@@ -1,8 +1,8 @@
 export interface Employee {
-    EmployeeID: string;
-    FirstName: string;
     PriKey: number,
-    AccessType: AccessType;    
+    EmployeeID: string;
+    FirstName: string;   
+    AccessType?: AccessType;    
 }
 
 export interface LoginResponse {

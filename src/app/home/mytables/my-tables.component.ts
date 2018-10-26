@@ -5,6 +5,7 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { Area, TableDetail } from "~/app/models/products";
 import { Observable } from "rxjs";
+import { Page } from "tns-core-modules/ui/page/page";
 
 @Component({
     selector: "MyTables",
@@ -22,6 +23,7 @@ export class MyTablesComponent implements OnInit {
     httpProtocol: string = "http";
     displayTableActions: boolean = false;
     displayTableActionsClass: string = "sliderHide";
+    employeeName:string = this.DBService.loggedInUser.FirstName;
     
     onTableClick(table: TableDetail)
     {
@@ -104,6 +106,8 @@ export class MyTablesComponent implements OnInit {
         });
     }
 
-    constructor(private router:RouterExtensions, private DBService: SQLiteService) {        
+    constructor(private router:RouterExtensions, private DBService: SQLiteService,   private page: Page) 
+    {          
+        page.actionBarHidden = true;
     }
 }
