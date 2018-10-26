@@ -18,9 +18,8 @@ import { Page } from "tns-core-modules/ui/page/page";
 export class HomeComponent implements OnInit, AfterViewInit {
     
     employees: Employee[];
-    employeeId: string = "Enter ID";   
+    employeeId: string = "";   
     isBusy = true;
-    isSecure: boolean = false;
     protected employee: Observable<Employee>;
    
     public hidden: boolean;
@@ -42,14 +41,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         // Init your component properties here.
     }   
   
-    addDigit(digit: string) {
-        if (this.employeeId == 'Enter ID')
-        {
-            this.isSecure = true;
-            this.employeeId = '';
-        }
-            
-
+    addDigit(digit: string) {      
         this.employeeId += digit;        
     }
 
@@ -59,7 +51,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     logIn() {
           //this.DBService.createTables(this.DBService);
-          if (this.employeeId == '' || this.employeeId == 'Enter ID')
+          if (this.employeeId == '')
           {
               dialogs.alert("Please enter Employee Id.");    
               return;
