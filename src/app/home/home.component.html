@@ -2,10 +2,10 @@
     <Label class="action-bar-title" text="Login"></Label>
 </ActionBar>
 
-<GridLayout class="m-20" rows="10,*,*" columns="*,*,*">
-        <Image src='res://images/TigerTouch' col='0' row='1' style='margin: 25 0 0 0'></Image>
-    <GridLayout class="m-20" rows="83,83,83,83,83" columns="124,124,124" row="1" col="1">
-        <TextField [text]="employeeId" row="0" col="0" colspan="3" class="glass btSquare" [secure]="isSecure" style='text-align: center; width: 366'></TextField>
+<GridLayout class="m-20" rows="auto,auto,auto" columns="auto,auto,auto">
+        <Image src='res://images/TigerTouch' col='0' row='1' style='margin: 25 0 0 0'></Image>        
+    <GridLayout class="m-20" rows="auto,auto,auto,auto,auto" columns="auto,auto,auto" row="1" col="1">
+        <TextField [text]="employeeId" row="0" col="0" colspan="3" class="glass btSquare" [secure]="isSecure" style='text-align: center; width: 366; height: 80;'></TextField>
         <Button text="1" class="glass btnSquare" (tap)="addDigit('1')" row="1" col="0"></Button>
         <Button text="2" class="glass btnSquare" (tap)="addDigit('2')" row="1" col="1"></Button>
         <Button text="3" class="glass btnSquare" (tap)="addDigit('3')" row="1" col="2"></Button>
@@ -14,13 +14,13 @@
         <Button text="6" class="glass btnSquare" (tap)="addDigit('6')" row="2" col="2"></Button>
         <Button text="7" class="glass btnSquare" (tap)="addDigit('7')" row="3" col="0"></Button>
         <Button text="8" class="glass btnSquare" (tap)="addDigit('8')" row="3" col="1"></Button>
-        <Button text="9" class="glass btnSquare" (tap)="addDigit('9')" row="3" col="2"></Button>
-        <Button text="0" class="glass btnSquare" (tap)="addDigit('0')" row="4" col="1"></Button>
+        <Button text="9" class="glass btnSquare" (tap)="addDigit('9')" row="3" col="2"></Button>        
         <Button text="CLEAR" class="glass btnSquare" row="4" col="0" (tap)="clearInput()" style='color: red;background-image:linear-gradient(white, lightgray )'></Button>
-        <Button text="LOG IN" class="glass btnSquare" (tap)="logIn()" row="4" col="2" style='color: white;background-image:linear-gradient(lightgreen, darkgreen)'></Button>
+        <Button text="0" class="glass btnSquare" (tap)="addDigit('0')" row="4" col="1"></Button>        
+        <Button text="LOG IN" class="glass btnSquare" (tap)="logIn()" row="4" col="2" style='color: white;background-image:linear-gradient(lightgreen, darkgreen)'></Button>       
     </GridLayout>
     <StackLayout row="2" col="0" colSpan="3">
-        <FlexBoxLayout style='margin: 100 0 30 0'>
+        <FlexBoxLayout style='margin: 0 0 30 0'>
             <Button text="Manager Functions" class="glass btSquare" (tap)="managerFunctions()"></Button>
         </FlexBoxLayout>
         <FlexBoxLayout>

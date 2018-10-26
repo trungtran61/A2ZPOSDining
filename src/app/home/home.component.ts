@@ -59,6 +59,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     logIn() {
           //this.DBService.createTables(this.DBService);
+          if (this.employeeId == '' || this.employeeId == 'Enter ID')
+          {
+              dialogs.alert("Please enter Employee Id.");    
+              return;
+          }
 
           this.DBService.login(this.employeeId).subscribe(res => {
             switch (res.AccessType)
