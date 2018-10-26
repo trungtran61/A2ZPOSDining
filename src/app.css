@@ -113,3 +113,8 @@ page
 	font-size: 20;
 	font-weight: bold;
 }
+
+.btnSquare
+{
+	width: 120; height: 80;
+}

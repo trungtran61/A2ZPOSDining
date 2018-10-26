@@ -16,8 +16,9 @@ import { Page } from "tns-core-modules/ui/page/page";
 export class HomeComponent implements OnInit, AfterViewInit {
     
     employees: Employee[];
-    employeeId: string = "";   
+    employeeId: string = "Enter ID";   
     isBusy = true;
+    isSecure: boolean = false;
     protected employee: Observable<Employee>;
    
     public hidden: boolean;
@@ -35,11 +36,18 @@ export class HomeComponent implements OnInit, AfterViewInit {
     ngOnInit(): void {
         //this.page.className = 'loginBG';
         //this.router.navigate(['/home/mytables'])
-        this.router.navigate(['/home/menu'])
+        //this.router.navigate(['/home/menu'])
         // Init your component properties here.
     }   
   
     addDigit(digit: string) {
+        if (this.employeeId == 'Enter ID')
+        {
+            this.isSecure = true;
+            this.employeeId = '';
+        }
+            
+
         this.employeeId += digit;        
     }
 
@@ -80,7 +88,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     managerFunctions()
     {
-        this.router.navigate(['/home/menu'])
+        //this.router.navigate(['/home/menu'])
         //this.router.navigate(['/home/menuitems'])
     }
 
