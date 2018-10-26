@@ -23,7 +23,7 @@ TNSFontIconService.debug = true;
         NativeScriptCommonModule,
         NativeScriptHttpClientModule,
         NativeScriptFormsModule,
-        HomeRoutingModule,
+        HomeRoutingModule, 
         TNSFontIconModule.forRoot({
 			'fa': './assets/font-awesome.css'
 		})

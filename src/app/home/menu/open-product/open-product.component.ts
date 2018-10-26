@@ -13,7 +13,7 @@ import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
     styleUrls: ['./open-product.component.css']
 })
 export class OpenProductComponent implements OnInit {
-    @ViewChild("productNameId") productNameId: ElementRef;
+    @ViewChild("productNameModel") productNameModel: ElementRef;
     productGroups: ProductGroup[] = [];
     productGroupCols: number[] = [];
     productGroupRows: number[] = [];
@@ -24,29 +24,41 @@ export class OpenProductComponent implements OnInit {
     price: number;
     pageTitle: string = 'Choose a Product Group';
 
-    groupSelected(group:ProductGroup)  {
+    groupSelected(group: ProductGroup) {
         this.selectedGroup = group;
         this.showEditPanel = true;
         this.pageTitle = group.Description;
 
         setTimeout(() => {
-            this.productNameId.nativeElement.focus();
+            this.productNameModel.nativeElement.focus();
         }, 600);
     }
 
-    cancel() {  
-         this.params.closeCallback(null);
+    cancel() {
+        this.params.closeCallback(null);
     }
 
-    done() {  
-        let openProductItem: OpenProductItem = {
-                                ProductGroupId : this.selectedGroup.PriKey,
-                                    ProductName : this.productName,
-                                    Quantity : this.quantity,
-                                    UnitPrice : this.price
-                            }
-        this.params.closeCallback(openProductItem);
-   }
+    done() {
+        if (this.selectedGroup != null && this.productName != null &&
+            this.quantity != null && this.price != null)
+            if (this.productName != '' &&
+                this.quantity > 0 && this.price > 0) {
+                let openProductItem: OpenProductItem = {
+                    ProductGroupId: this.selectedGroup.PriKey,
+                    ProductName: this.productName,
+                    Quantity: this.quantity,
+                    UnitPrice: this.price
+                }
+                this.params.closeCallback(openProductItem);
+            }
+            else {
+                this.params.closeCallback(null);
+            }
+            else
+            {
+                this.params.closeCallback(null);
+            }
+    }
 
     constructor(private params: ModalDialogParams,
         private viewContainerRef: ViewContainerRef,
