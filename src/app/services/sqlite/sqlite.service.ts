@@ -5,6 +5,7 @@ import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, Menu
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
+import { SystemSettings } from "~/app/models/settings";
 //import { Observable } from "tns-core-modules/ui/page/page";
 
 var Sqlite = require("nativescript-sqlite");
@@ -44,6 +45,8 @@ export class SQLiteService {
         if (db == null) {
             db = SQLiteService.database;
         }
+
+        this.getSystemSettings(db);       
 
         db.execSQL("DROP TABLE IF EXISTS Employees;").then(id=> {
             db.execSQL("CREATE TABLE IF NOT EXISTS Employees (PriKey INTEGER PRIMARY KEY, EmployeeID TEXT, FirstName TEXT);").then(id => {
@@ -811,6 +814,50 @@ export class SQLiteService {
                     });
                 }
                 return (products);
+            });
+    }
+
+    public getSystemSettings(db)
+    {
+        db.execSQL("DROP TABLE IF EXISTS SystemSettings;").then(id=> {
+            db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER);").then(id => {            
+                let headers = this.createRequestHeader();
+                this.http.get(this.apiUrl + 'GetSettings', { headers: headers })
+                    .subscribe(
+                        data => {
+                            console.log('got Settings from API');
+                            this.loadSystemSettings(<SystemSettings[]>data);
+                        },
+                        err => {
+                            console.log("Error occured while retrieving Settings from API.");
+                            console.log(err);
+                        }
+                    );
+                
+            }, error => {
+            console.log("CREATE TABLE SystemSettings ERROR", error);
+            });
+        });
+       
+    }
+
+    public loadSystemSettings(systemSettings: any[]) {        
+        systemSettings.forEach(function (ss: SystemSettings) {
+            SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval) VALUES (?,?,?)",
+                [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval]);
+        }
+        );
+    }
+
+    public getLocalSystemSettings(): Promise<SystemSettings[]> {
+        return SQLiteService.database.get("SELECT PriKey, OrderScreenLogOffTimer, DineInTimerInterval FROM SystemSettings;")
+            .then(function (rows) {
+                let systemSettings: SystemSettings = {
+                    PriKey: rows[0][0],
+                    OrderScreenLogOffTimer: rows[0][1],
+                    DineInTimerInterval: rows[0][2]
+                };                
+                return (systemSettings);
             });
     }
 
