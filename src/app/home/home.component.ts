@@ -99,7 +99,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
     {
         //this.router.navigate(['/home/menu'])
         //this.router.navigate(['/home/menuitems'])
-        this.DBService.getEmployees();
+        //this.DBService.loadSystemSettings(null);
+        this.DBService.getLocalSystemSettings();
         //this.DBService.getAllEmployees();
         //this.DBService.createTables(null);
     }

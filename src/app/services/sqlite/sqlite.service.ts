@@ -46,14 +46,14 @@ export class SQLiteService {
             db = SQLiteService.database;
         }
 
-        this.getSystemSettings(db);       
+        this.loadSystemSettings(db);
 
-        db.execSQL("DROP TABLE IF EXISTS Employees;").then(id=> {
+        db.execSQL("DROP TABLE IF EXISTS Employees;").then(id => {
             db.execSQL("CREATE TABLE IF NOT EXISTS Employees (PriKey INTEGER PRIMARY KEY, EmployeeID TEXT, FirstName TEXT);").then(id => {
-            //console.log("Employees table created");
-            this.getRecordCount('Employees');
+                //console.log("Employees table created");
+                this.getRecordCount('Employees');
             }, error => {
-            console.log("CREATE TABLE Employees ERROR", error);
+                console.log("CREATE TABLE Employees ERROR", error);
             });
         });
 
@@ -78,13 +78,13 @@ export class SQLiteService {
             console.log("CREATE TABLE CategoryCodes ERROR", error);
         });
 
-           db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
-                //console.log("Table Areas created");
-                this.getRecordCount('Areas');
-            }, error => {
-                console.log("CREATE TABLE Areas ERROR", error);
-            });
-       
+        db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
+            //console.log("Table Areas created");
+            this.getRecordCount('Areas');
+        }, error => {
+            console.log("CREATE TABLE Areas ERROR", error);
+        });
+
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Tables (AreaID INTEGER, Name TEXT, Height INTEGER, Width INTEGER, PosX INTEGER, PosY INTEGER, TableType INTEGER);").then(id => {
             this.getRecordCount('Tables');
@@ -149,13 +149,13 @@ export class SQLiteService {
         });
 
         //db.execSQL('DROP TABLE IF EXISTS ProductGroups;').then(function (resultSet) {
-            db.execSQL("CREATE TABLE IF NOT EXISTS ProductGroups (PriKey INTEGER,Code TEXT,Description TEXT,TipShare INTEGER," +
-                "TipSharePercentage INTEGER,Printer TEXT,OpenProduct INTEGER,ProductType INTEGER,TaxRate REAL,Taxable INTEGER);").then(id => {
-                    console.log("Table ProductGroups created");
-                    this.getRecordCount('ProductGroups');
-                }, error => {
-                    console.log("CREATE TABLE ProductGroups ERROR", error);
-                });
+        db.execSQL("CREATE TABLE IF NOT EXISTS ProductGroups (PriKey INTEGER,Code TEXT,Description TEXT,TipShare INTEGER," +
+            "TipSharePercentage INTEGER,Printer TEXT,OpenProduct INTEGER,ProductType INTEGER,TaxRate REAL,Taxable INTEGER);").then(id => {
+                console.log("Table ProductGroups created");
+                this.getRecordCount('ProductGroups');
+            }, error => {
+                console.log("CREATE TABLE ProductGroups ERROR", error);
+            });
         //});
     }
 
@@ -517,8 +517,8 @@ export class SQLiteService {
 
     public loadEmployees(employees: any[]) {
         employees.forEach(function (employee: Employee) {
-            SQLiteService.database.execSQL("INSERT INTO Employees (PriKey, EmployeeID, FirstName) VALUES (?, ?, ?)", 
-                [employee.PriKey,employee.EmployeeID, employee.FirstName]);
+            SQLiteService.database.execSQL("INSERT INTO Employees (PriKey, EmployeeID, FirstName) VALUES (?, ?, ?)",
+                [employee.PriKey, employee.EmployeeID, employee.FirstName]);
             //console.log('added ' + employee.FirstName);
         }
         );
@@ -769,7 +769,7 @@ export class SQLiteService {
     public getLocalEmployee(priKey: number): Promise<Employee> {
         return SQLiteService.database.get("SELECT PriKey, EmployeeID, FirstName FROM Employees WHERE PriKey=?", [priKey])
             .then(function (res) {
-                let employee: Employee = {PriKey: [res][0][0], EmployeeID: [res][0][1], FirstName: [res][0][2]}
+                let employee: Employee = { PriKey: [res][0][0], EmployeeID: [res][0][1], FirstName: [res][0][2] }
                 return (employee);
             });
     }
@@ -817,46 +817,44 @@ export class SQLiteService {
             });
     }
 
-    public getSystemSettings(db)
-    {
-        db.execSQL("DROP TABLE IF EXISTS SystemSettings;").then(id=> {
-            db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER);").then(id => {            
+    public loadSystemSettings(db) {
+        if (db == null) {
+            db = SQLiteService.database;
+        }
+
+        db.execSQL("DROP TABLE IF EXISTS SystemSettings;").then(id => {
+            db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER, LoginTableLayout INTEGER);").then(id => {
                 let headers = this.createRequestHeader();
                 this.http.get(this.apiUrl + 'GetSettings', { headers: headers })
                     .subscribe(
                         data => {
                             console.log('got Settings from API');
-                            this.loadSystemSettings(<SystemSettings[]>data);
+                            let ss: SystemSettings = data;
+                            SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout) VALUES (?,?,?,?)",
+                                [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout]);
                         },
                         err => {
                             console.log("Error occured while retrieving Settings from API.");
                             console.log(err);
                         }
                     );
-                
+
             }, error => {
-            console.log("CREATE TABLE SystemSettings ERROR", error);
+                console.log("CREATE TABLE SystemSettings ERROR", error);
             });
         });
-       
-    }
 
-    public loadSystemSettings(systemSettings: any[]) {        
-        systemSettings.forEach(function (ss: SystemSettings) {
-            SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval) VALUES (?,?,?)",
-                [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval]);
-        }
-        );
     }
 
     public getLocalSystemSettings(): Promise<SystemSettings[]> {
-        return SQLiteService.database.get("SELECT PriKey, OrderScreenLogOffTimer, DineInTimerInterval FROM SystemSettings;")
-            .then(function (rows) {
+        return SQLiteService.database.get("SELECT PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout FROM SystemSettings;")
+            .then(function (row) {
                 let systemSettings: SystemSettings = {
-                    PriKey: rows[0][0],
-                    OrderScreenLogOffTimer: rows[0][1],
-                    DineInTimerInterval: rows[0][2]
-                };                
+                    PriKey: row[0],
+                    OrderScreenLogOffTimer: row[1],
+                    DineInTimerInterval: row[2],
+                    LoginTableLayout: row[3]
+                };
                 return (systemSettings);
             });
     }
