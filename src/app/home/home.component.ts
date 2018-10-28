@@ -29,7 +29,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     //loggedInUser: Employee = Object();
     
     constructor(private router: RouterExtensions, private DBService: SQLiteService, 
-        private zone: NgZone, private page: Page,
+        private zone: NgZone, private page: Page
         ) {          
         page.actionBarHidden = true;
     }
@@ -71,7 +71,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
                     if (data == null) {
                         dialogs.alert("Employee Info not loaded");
                     }
-                    else {
+                    else {                  
                         this.DBService.loggedInUser.FirstName = data.FirstName;               
                         this.zone.run(() => this.router.navigate(['/home/mytables']));       
                     }
@@ -100,9 +100,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
         //this.router.navigate(['/home/menu'])
         //this.router.navigate(['/home/menuitems'])
         //this.DBService.loadSystemSettings(null);
-        this.DBService.getLocalSystemSettings();
+        //this.DBService.loadEmployees(null);
+        //this.DBService.getLocalSystemSettings();
         //this.DBService.getAllEmployees();
-        //this.DBService.createTables(null);
+        this.DBService.createTables(null);
     }
 
     loadTables()

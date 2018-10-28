@@ -76,13 +76,13 @@
   </StackLayout>
   <GridLayout row="0" col="2" *ngIf="showSubCategories" rows="60,*,*,*,*,*,*,*,*">
     <Button class="glass" text='MAIN CATEGORIES' textWrap="true" row='0' col='0' style='text-align: center' (tap)='displayMainCategories()'></Button>
-    <Button class="glass" [text]="item.Name" *ngFor="let item of subCategories let i=index" (tap)="subCategorySelected(item)"
-      [style]="subCategoryStyles[i]" [row]='subCategoryRows[i]' textWrap="true"></Button>
+    <Button class="btnSubCategory" [text]="item.Name" *ngFor="let item of subCategories let i=index" (tap)="subCategorySelected(item)"
+      [row]='subCategoryRows[i]' textWrap="true"></Button>
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="3" colSpan="4" *ngIf="showSubCategories">
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>
-    <Button class="glass" [text]="item.Name" *ngFor="let item of products let i=index" (tap)="productSelected(item, i)"
-      [style]="productStyles[i]" [col]='productCols[i]' [row]='productRows[i]' textWrap="true"></Button>
+    <Button class="btnProduct" [text]="item.Name" *ngFor="let item of products let i=index" (tap)="productSelected(item, i)"
+      [col]='productCols[i]' [row]='productRows[i]' textWrap="true"></Button>
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="4" colSpan="4" *ngIf="showOptions">
     <FlexBoxLayout row='0' col='0' colSpan="4">
@@ -95,8 +95,7 @@
       </StackLayout>
       <Button class="glass" text="DONE" (tap)="doneOption()" style='background-image:linear-gradient(green, black);text-align: center; height: 118px;border-radius: 20'></Button>
     </StackLayout>
-    <Button class="glass" [text]="item.Name" *ngFor="let item of menuOptions let i=index" (tap)="optionSelected(item)"
-      style="border-radius: 5px;color: #000000;background-image: linear-gradient(#ffffff, silver);" [col]='optionCols[i]'
-      [row]='optionRows[i]' textWrap="true"></Button>
+    <Button class="btnMenuProduct" [text]="item.Name" *ngFor="let item of menuOptions let i=index" (tap)="optionSelected(item)"
+      [col]='optionCols[i]' [row]='optionRows[i]' textWrap="true"></Button>
   </GridLayout>
 </GridLayout>

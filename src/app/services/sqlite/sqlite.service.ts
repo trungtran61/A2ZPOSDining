@@ -47,15 +47,8 @@ export class SQLiteService {
         }
 
         this.loadSystemSettings(db);
-
-        db.execSQL("DROP TABLE IF EXISTS Employees;").then(id => {
-            db.execSQL("CREATE TABLE IF NOT EXISTS Employees (PriKey INTEGER PRIMARY KEY, EmployeeID TEXT, FirstName TEXT);").then(id => {
-                //console.log("Employees table created");
-                this.getRecordCount('Employees');
-            }, error => {
-                console.log("CREATE TABLE Employees ERROR", error);
-            });
-        });
+        this.loadLogos(db);
+        this.loadEmployees(db);
 
         db.execSQL("CREATE TABLE IF NOT EXISTS CategoryCodes (PriKey INTEGER PRIMARY KEY, CategoryCode1 TEXT, Description TEXT, PrintGroup INTEGER);").then(id => {
             //console.log("categorycodes table created");
@@ -515,15 +508,35 @@ export class SQLiteService {
 
     }
 
-    public loadEmployees(employees: any[]) {
-        employees.forEach(function (employee: Employee) {
-            SQLiteService.database.execSQL("INSERT INTO Employees (PriKey, EmployeeID, FirstName) VALUES (?, ?, ?)",
-                [employee.PriKey, employee.EmployeeID, employee.FirstName]);
-            //console.log('added ' + employee.FirstName);
+    public loadEmployees(db) {
+        if (db == null) {
+            db = SQLiteService.database;
         }
-        );
-    }
 
+        db.execSQL("DROP TABLE IF EXISTS Employees;").then(id => {
+            db.execSQL("CREATE TABLE IF NOT EXISTS Employees (PriKey INTEGER PRIMARY KEY, EmployeeID TEXT, FirstName TEXT);").then(id => {
+                let headers = this.createRequestHeader();
+                this.http.get(this.apiUrl + 'GetEmployees', { headers: headers })
+                    .subscribe(
+                        data => {
+                            console.log('got employees from API');                            
+                            let employees = <Employee[]>data;
+                            employees.forEach(function (emp: Employee) {
+                                SQLiteService.database.execSQL("INSERT INTO Employees (PriKey, EmployeeID, FirstName) VALUES (?,?,?)",
+                                    [emp.PriKey, emp.EmployeeID, emp.FirstName]);
+                            });
+                        },
+                        err => {
+                            console.log("Error occured while retrieving Employees from API.");
+                            console.log(err);
+                        }
+                    );
+            }, error => {
+                console.log("CREATE TABLE Employees ERROR", error);
+            });
+        });
+    }
+   
     public getCategoryCodes() {
         let headers = this.createRequestHeader();
         this.http.get(this.apiUrl + 'GetCategoryCodes', { headers: headers })
@@ -843,7 +856,34 @@ export class SQLiteService {
                 console.log("CREATE TABLE SystemSettings ERROR", error);
             });
         });
+    }
 
+    public loadLogos(db) {
+        if (db == null) {
+            db = SQLiteService.database;
+        }
+
+        db.execSQL("DROP TABLE IF EXISTS Logos;").then(id => {
+            db.execSQL("CREATE TABLE IF NOT EXISTS Logos (LogoUrl);").then(id => {
+                let headers = this.createRequestHeader();
+                this.http.get(this.apiUrl + 'GetSettings', { headers: headers })
+                    .subscribe(
+                        data => {
+                            console.log('got Settings from API');
+                            let ss: SystemSettings = data;
+                            SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout) VALUES (?,?,?,?)",
+                                [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout]);
+                        },
+                        err => {
+                            console.log("Error occured while retrieving Settings from API.");
+                            console.log(err);
+                        }
+                    );
+
+            }, error => {
+                console.log("CREATE TABLE SystemSettings ERROR", error);
+            });
+        });
     }
 
     public getLocalSystemSettings(): Promise<SystemSettings[]> {

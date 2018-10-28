@@ -1,7 +1,7 @@
 export interface Employee {
-    PriKey: number,
-    EmployeeID: string;
-    FirstName: string;   
+    PriKey?: number,
+    EmployeeID?: string;
+    FirstName?: string;   
     AccessType?: AccessType;    
 }
 
