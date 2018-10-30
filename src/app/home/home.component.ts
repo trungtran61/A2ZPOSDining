@@ -37,7 +37,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     ngOnInit(): void {
         //this.page.className = 'loginBG';
         //this.router.navigate(['/home/mytables'])
-        //this.router.navigate(['/home/menu'])
+        this.router.navigate(['/home/menu'])
         // Init your component properties here.
     }   
   

@@ -3,8 +3,7 @@ import { platformNativeScriptDynamic } from "nativescript-angular/platform";
 
 import { AppModule } from "./app/app.module";
 
-import { on as applicationOn, launchEvent, suspendEvent, resumeEvent, exitEvent, lowMemoryEvent, uncaughtErrorEvent, ApplicationEventData } from "tns-core-modules/application";
-import * as application from "tns-core-modules/application";
+import { on as applicationOn, launchEvent, suspendEvent, resumeEvent, exitEvent, lowMemoryEvent, uncaughtErrorEvent, ApplicationEventData, ios, run } from "tns-core-modules/application";
 
 applicationOn(launchEvent, (args: ApplicationEventData) => {
     if (args.android) {
@@ -66,14 +65,26 @@ applicationOn(uncaughtErrorEvent, (args: ApplicationEventData) => {
     }
 });
 
-/*
-class MyDelegate extends UIResponder implements UIGestureRecognizerDelegate {
+class myDelegate extends UIResponder implements UIApplicationDelegate {
     public static ObjCProtocols = [UIApplicationDelegate];
-
-    applicationDidBecomeActive(application:UIApplication):void {
-        console.log("A2Z becomes active: " + application)
+    
+    updateUserActivityState(activity: NSUserActivity)
+    {
+        //console.log("trung updated");
+        return true;
     }
+
+    applicationDidFinishLaunchingWithOptions(application: UIApplication, launchOptions: NSDictionary<any, any>): boolean {
+        console.log("applicationWillFinishLaunchingWithOptions: " + launchOptions)
+
+        return true;
+    }
+/*
+    applicationDidBecomeActive(application: UIApplication): void {
+        console.log("applicationDidBecomeActive: " + application)
+    }
+    */
 }
-application.ios.delegate = MyDelegate;
-*/
+ios.delegate = myDelegate;
+
 platformNativeScriptDynamic().bootstrapModule(AppModule);

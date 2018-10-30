@@ -106,6 +106,11 @@ export class MyTablesComponent implements OnInit {
         });
     }
 
+    pageTap()
+    {
+        console.log('tapped');
+    }
+
     constructor(private router:RouterExtensions, private DBService: SQLiteService,   private page: Page) 
     {          
         page.actionBarHidden = true;

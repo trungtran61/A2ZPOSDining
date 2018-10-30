@@ -124,10 +124,11 @@ page
 }
 
 .btnProduct {
+	height: 110;
 	font-size: 20px;
 	font-family: sans-serif;
     font-weight: bold;
-	border-radius: 10px;
+	border-radius: 20px;
 	border-color: #fff;
 	border-style: solid;
 	border-width: 2px;
@@ -137,32 +138,35 @@ page
 }
 
 .btnSubCategory {
-	font-size: 20px;
+	font-size: 25;
+	height: 110;
 	font-family: sans-serif;
     font-weight: bold;
-	margin: 3 3 3 3;
-	color: white; background-color: black;
+	margin: 5 5 5 5;
+	color: white; 
 	word-wrap: break-word;
 }
 
 .btnSubCategory:active,  .btnSubCategoryActive{ 
-	font-size: 20px;
+	font-size: 20;
 	font-family: sans-serif;
 	font-weight: bold;
-	border-radius: 10px;
+	/*
+	border-radius: 10;
 	border-color: #fff;
 	border-style: solid;
-	border-width: 2px;
+	border-width: 2;
+	*/
 	margin: 3 3 3 3;
-	color: white; background-color: black;
+	color: white; 
 	word-wrap: break-word;
 }
 
 .btnDone {
-	font-size: 20px;
+	font-size: 20;
 	font-family: sans-serif;
     font-weight: bold;
-	border-radius: 20px;
+	border-radius: 10;
 	border-color: #fff;
 	border-style: solid;
 	border-width: 2px;

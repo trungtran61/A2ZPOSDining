@@ -3,7 +3,7 @@
   <ActionItem [text]="currentSubCategory" style="font-weight: bold" ios.position="right" android.position="popup"></ActionItem>
   <NavigationButton icon="res://ic_arrow_back_black_24dp" (tap)="goBack()"></NavigationButton>
 </ActionBar>
-<GridLayout rows="*, 70" columns="*,*,*,*,*,*,*" style="font-weight: bold">
+<GridLayout rows="auto, 70" columns="*,*,*,*,*,*,*" style="font-weight: bold">
   <StackLayout row="0" col="0" colSpan="2" [style]='pageStyle'>
     <StackLayout orientation="horizontal" style="background-color: antiquewhite;">
       <Label [text]="checkNumber" style="text-align: left; margin-right: 5;width:75;"></Label> |
@@ -14,7 +14,7 @@
     <ListView [items]="checkItems" separatorColor="white" class="m-0" height="505">
       <ng-template let-item="item" let-i="index">
         <StackLayout class="m-b-10">
-          <StackLayout orientation="horizontal" (tap)="showModifyDialog(item,i)" (swipe)="onSwipe($event, i)">
+          <StackLayout orientation="horizontal" (tap)="showModifyDialog(item,i)" (swipe)="onCheckItemSwipe($event, i)">
             <Label [text]="item.Qty" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.Product.Name" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.Price | currency" style="text-align: right; width:50; margin-right:5"></Label>
@@ -75,14 +75,16 @@
       [style]="categoryStyles[i]"></Button>
   </StackLayout>
   <GridLayout row="0" col="2" *ngIf="showSubCategories" rows="60,*,*,*,*,*,*,*,*">
-    <Button class="glass" text='MAIN CATEGORIES' textWrap="true" row='0' col='0' style='text-align: center' (tap)='displayMainCategories()'></Button>
-    <Button class="btnSubCategory" [text]="item.Name" *ngFor="let item of subCategories let i=index" (tap)="subCategorySelected(item)"
-      [row]='subCategoryRows[i]' textWrap="true"></Button>
+    <Button class="glass" text='MAIN' textWrap="true" row='0' col='0' style='text-align: center' (tap)='displayMainCategories()'></Button>
+    <Button class="btnSubCategory" [text]="item.Name" *ngFor="let item of pageSubCategories let i=index" 
+      (swipe)="onSubCategorySwipe($event)"
+      (tap)="subCategorySelected(item)"
+      [row]='subCategoryRows[i]' textWrap="true" ></Button>
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="3" colSpan="4" *ngIf="showSubCategories">
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>
     <Button class="btnProduct" [text]="item.Name" *ngFor="let item of products let i=index" (tap)="productSelected(item, i)"
-      [col]='productCols[i]' [row]='productRows[i]' textWrap="true"></Button>
+      [col]='productCols[i]' [row]='productRows[i]' textWrap="true" [style]='productStyles[i]'></Button>
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="4" colSpan="4" *ngIf="showOptions">
     <FlexBoxLayout row='0' col='0' colSpan="4">

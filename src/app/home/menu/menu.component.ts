@@ -25,6 +25,10 @@ export class MenuComponent implements OnInit {
     subCategoryStyles: string[] = [];
     subCategoryCols: number[] = [];
     subCategoryRows: number[] = [];
+    pageSubCategories: MenuCategory[] = [];
+    totalSubCategoriesPages: number = 0;
+    subCategoryCurrentPage: number = 1;
+    subCategoryPageSize: number = 5;
 
     products: MenuProduct[] = [];    
     productStyles: string[] = [];
@@ -72,7 +76,7 @@ export class MenuComponent implements OnInit {
   
     TAX_RATE: number = .08;
     MAX_GUESTS: number = 6;
-    TIPS_PCT: number = .15;
+    TIPS_PCT: number = .15;  
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -106,7 +110,7 @@ export class MenuComponent implements OnInit {
                     this.categories.forEach(function (menuCategory: MenuCategory) {
                         let darkColor: string = menuCategory.ButtonColorHex;
                         let lightColor: string = that.lightenDarkenColor(darkColor, 50);
-                        let style: string = "margin-top:15px;width: 500px;height: 120px;color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
+                        let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
                         //console.log(style);
                         that.categoryStyles.push(style);
                     });
@@ -159,10 +163,18 @@ export class MenuComponent implements OnInit {
                 });
             }
             else {
+                this.subCategoryCurrentPage = 1;
                 this.subCategories = subCategories;
-                this.loadCategoryStyles(this.subCategories, this.subCategoryStyles);
-                this.subCategories.forEach(function (subCategory: MenuSubCategory) {
-                    that.subCategoryRows.push(subCategory.Position);                    
+        //        let startRecord: number = (pageNumber * pageSize) - pageSize + 1;
+        //let endRecord: number = startRecord + pageSize - 1;
+                this.totalSubCategoriesPages = Math.ceil(this.subCategories.length / this.subCategoryPageSize);
+
+                this.pageSubCategories = this.subCategories.slice(0, 
+                    this.subCategories.length >= this.subCategoryPageSize ? this.subCategoryPageSize - 1 :  this.subCategories.length - 1)
+                this.loadCategoryStyles(this.pageSubCategories, this.subCategoryStyles);                
+
+                this.subCategories.forEach(function (subCategory: MenuSubCategory) {                   
+                        that.subCategoryRows.push(subCategory.Position);                                        
                 });
                 this.subCategorySelected(subCategories[0]);
             }
@@ -170,6 +182,7 @@ export class MenuComponent implements OnInit {
     }
 
     loadCategoryStyles(categories: MenuCategory[], categoryStyles: string[]) {
+        categoryStyles = [];
         categories.forEach(function (menuCategory: MenuCategory) {
             let darkColor: string = menuCategory.ButtonColorHex;
             let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
@@ -210,7 +223,7 @@ export class MenuComponent implements OnInit {
         products.forEach(function (menuProduct: MenuProduct) {
             let darkColor: string = menuProduct.ButtonColorHex;
             let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-            let style: string = "border-radius: 0px;color: #" + menuProduct.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
+            let style: string = "color: #" + menuProduct.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
             productStyles.push(style);
         });
     }
@@ -468,15 +481,63 @@ export class MenuComponent implements OnInit {
         this.showSubCategories = true;
     }
 
-    onSwipe(args, checkItemIndex) {
-        let direction = args.direction == SwipeDirection.down ? "down" :
-            args.direction == SwipeDirection.up ? "up" :
-                args.direction == SwipeDirection.left ? "left" : "right";
-
-        if (direction == 'left') {
-            this.deleteCheckItem(checkItemIndex);
+    onSubCategorySwipe(args)
+    {
+        if (this.totalSubCategoriesPages <= 1 )
+            return;
+       
+        // at last page, can only swipe down
+        if (this.subCategoryCurrentPage == this.totalSubCategoriesPages)
+        {
+            if (args.direction == SwipeDirection.down ) {
+                this.getSubCategoryPage(false);                          
+            }
+        }
+        // at first page, can only swipe up
+        else
+        if (this.subCategoryCurrentPage == 1)
+        {
+            if (args.direction == SwipeDirection.up ) {
+                this.getSubCategoryPage(true);                       
+            }
+        }
+        // else, can swipe up or down
+        else            
+        if (this.subCategoryCurrentPage >= 1)
+        {
+            // go to next page            
+            if (args.direction == SwipeDirection.up ) {                  
+                this.getSubCategoryPage(true);                
+            }
+            else
+            // go to previous page
+            if (args.direction == SwipeDirection.down ) {
+                this.getSubCategoryPage(false);                        
+            }
         }
 
+    }
+    
+    getSubCategoryPage(nextPage: boolean)
+    {
+        if (nextPage)
+            this.subCategoryCurrentPage++;
+        else
+            this.subCategoryCurrentPage--;
+
+        let startRecord: number = (this.subCategoryCurrentPage * this.subCategoryPageSize) - this.subCategoryPageSize + 1;
+        let endRecord: number = startRecord + this.subCategoryPageSize - 1;
+        
+        if (endRecord > this.subCategories.length)       
+            endRecord =  this.subCategories.length;
+        
+        this.pageSubCategories = this.subCategories.slice(startRecord, endRecord);
+    }
+
+    onCheckItemSwipe(args, checkItemIndex) {
+        if (args.direction == SwipeDirection.left ) {
+            this.deleteCheckItem(checkItemIndex);
+        }
     }
 
     deleteCheckItem(checkItemIndex: number) {

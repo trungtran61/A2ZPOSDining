@@ -238,7 +238,9 @@ export class SQLiteService {
 
         let that = this;
         //SQLiteService.database.execSQL("DROP TABLE IF EXISTS MenuSubCategories;");
-        return SQLiteService.database.all("SELECT CategoryID, SubCategoryID, Name, Position, ButtonColor, ButtonColorHex, ButtonForeColor, ButtonForeColorHex FROM MenuSubCategories WHERE CategoryID=? ORDER BY Position", [categoryID])
+        
+        return SQLiteService.database.all("SELECT CategoryID, SubCategoryID, Name, Position, ButtonColor, ButtonColorHex, ButtonForeColor, ButtonForeColorHex " + 
+            "FROM MenuSubCategories WHERE CategoryID=? ORDER BY Position", [categoryID])
             .then(function (rows) {
                 let menuSubCategories: MenuSubCategory[] = [];
                 for (var row in rows) {
