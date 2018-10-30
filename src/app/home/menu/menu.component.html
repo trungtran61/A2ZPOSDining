@@ -83,7 +83,7 @@
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="3" colSpan="4" *ngIf="showSubCategories">
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>
-    <Button class="btnProduct" [text]="item.Name" *ngFor="let item of products let i=index" (tap)="productSelected(item, i)"
+    <Button class="btnProduct" [text]="item.Name" *ngFor="let item of pageProducts let i=index" (tap)="productSelected(item, i)" (swipe)='onProductSwipe'
       [col]='productCols[i]' [row]='productRows[i]' textWrap="true" [style]='productStyles[i]'></Button>
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="4" colSpan="4" *ngIf="showOptions">

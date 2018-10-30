@@ -34,6 +34,10 @@ export class MenuComponent implements OnInit {
     productStyles: string[] = [];
     productCols: number[] = [];
     productRows: number[] = [];
+    pageProducts: MenuProduct[] = [];
+    totalProductsPages: number = 0;
+    productCurrentPage: number = 1;
+    productPageSize: number = 20;
 
     menuOptions: MenuOption[];
     optionCols: number[] = [];
@@ -170,10 +174,10 @@ export class MenuComponent implements OnInit {
                 this.totalSubCategoriesPages = Math.ceil(this.subCategories.length / this.subCategoryPageSize);
 
                 this.pageSubCategories = this.subCategories.slice(0, 
-                    this.subCategories.length >= this.subCategoryPageSize ? this.subCategoryPageSize - 1 :  this.subCategories.length - 1)
+                    this.subCategories.length >= this.subCategoryPageSize ? this.subCategoryPageSize :  this.subCategories.length - 1)
                 this.loadCategoryStyles(this.pageSubCategories, this.subCategoryStyles);                
 
-                this.subCategories.forEach(function (subCategory: MenuSubCategory) {                   
+                this.pageSubCategories.forEach(function (subCategory: MenuSubCategory) {                   
                         that.subCategoryRows.push(subCategory.Position);                                        
                 });
                 this.subCategorySelected(subCategories[0]);
@@ -208,11 +212,17 @@ export class MenuComponent implements OnInit {
             }
             else {
                 this.products = products;
-                this.products.forEach(function (menuProduct: MenuProduct) {
+
+                this.totalProductsPages = Math.ceil(this.products.length / this.productPageSize);
+
+                this.pageProducts = this.products.slice(0, 
+                    this.products.length >= this.productPageSize ? this.productPageSize :  this.products.length - 1)
+
+                this.pageProducts.forEach(function (menuProduct: MenuProduct) {
                     that.productRows.push(Math.floor((menuProduct.Position -1 ) / 4) + 1);
                     that.productCols.push((menuProduct.Position - 1) % 4);
                 });
-                this.loadProductStyles(this.products, that.productStyles);                
+                this.loadProductStyles(this.pageProducts, that.productStyles);                
             }
         });
         this.currentSubCategory = subCategory.Name;
@@ -525,14 +535,68 @@ export class MenuComponent implements OnInit {
         else
             this.subCategoryCurrentPage--;
 
-        let startRecord: number = (this.subCategoryCurrentPage * this.subCategoryPageSize) - this.subCategoryPageSize + 1;
-        let endRecord: number = startRecord + this.subCategoryPageSize - 1;
+        let startRecord: number = (this.subCategoryCurrentPage * this.subCategoryPageSize) - this.subCategoryPageSize;
+        let endRecord: number = startRecord + this.subCategoryPageSize;
         
         if (endRecord > this.subCategories.length)       
             endRecord =  this.subCategories.length;
         
         this.pageSubCategories = this.subCategories.slice(startRecord, endRecord);
     }
+
+    onProductSwipe(args)
+    {
+        if (this.totalProductsPages <= 1 )
+            return;
+       
+        // at last page, can only swipe down
+        if (this.productCurrentPage == this.totalProductsPages)
+        {
+            if (args.direction == SwipeDirection.right ) {
+                this.getProductPage(false);                          
+            }
+        }
+        // at first page, can only swipe up
+        else
+        if (this.productCurrentPage == 1)
+        {
+            if (args.direction == SwipeDirection.left ) {
+                this.getProductPage(true);                       
+            }
+        }
+        // else, can swipe up or down
+        else            
+        if (this.productCurrentPage >= 1)
+        {
+            // go to next page            
+            if (args.direction == SwipeDirection.left ) {                  
+                this.getProductPage(true);                
+            }
+            else
+            // go to previous page
+            if (args.direction == SwipeDirection.right ) {
+                this.getProductPage(false);                        
+            }
+        }
+
+    }
+    
+    getProductPage(nextPage: boolean)
+    {
+        if (nextPage)
+            this.productCurrentPage++;
+        else
+            this.productCurrentPage--;
+
+        let startRecord: number = (this.productCurrentPage * this.productPageSize) - this.productPageSize;
+        let endRecord: number = startRecord + this.productPageSize;
+        
+        if (endRecord > this.products.length)       
+            endRecord =  this.products.length;
+        
+        this.pageProducts = this.products.slice(startRecord, endRecord);
+    }
+
 
     onCheckItemSwipe(args, checkItemIndex) {
         if (args.direction == SwipeDirection.left ) {
