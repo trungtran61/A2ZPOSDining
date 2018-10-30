@@ -29,6 +29,7 @@ export class MenuComponent implements OnInit {
     totalSubCategoriesPages: number = 0;
     subCategoryCurrentPage: number = 1;
     subCategoryPageSize: number = 5;
+    subCategoryClasses: string[] = [];
 
     products: MenuProduct[] = [];    
     productStyles: string[] = [];
@@ -120,22 +121,7 @@ export class MenuComponent implements OnInit {
                     });
                 }
             });
-        }
-        /*
-        else {
-            this.DBService.getLocalCategoryCodes().then((categoryCodes) => {
-                if (categoryCodes.length == 0) {
-                    dialogs.alert("Category Codes not loaded.").then(() => {
-                        console.log("Dialog closed!");
-                    });
-                }
-                else {
-                    this.categoryCodes = categoryCodes;
-                    this.categorySelected(this.categoryCodes[0]);
-                }
-            });
-        }
-        */
+        }       
     }
 
     nextSeat()
@@ -166,23 +152,26 @@ export class MenuComponent implements OnInit {
                     console.log("Dialog closed!");
                 });
             }
-            else {
-                this.subCategoryCurrentPage = 1;
-                this.subCategories = subCategories;
-        //        let startRecord: number = (pageNumber * pageSize) - pageSize + 1;
-        //let endRecord: number = startRecord + pageSize - 1;
+            else {                
+                this.subCategoryCurrentPage = 0;
+                this.subCategories = subCategories;        
                 this.totalSubCategoriesPages = Math.ceil(this.subCategories.length / this.subCategoryPageSize);
-
-                this.pageSubCategories = this.subCategories.slice(0, 
-                    this.subCategories.length >= this.subCategoryPageSize ? this.subCategoryPageSize :  this.subCategories.length - 1)
-                this.loadCategoryStyles(this.pageSubCategories, this.subCategoryStyles);                
-
-                this.pageSubCategories.forEach(function (subCategory: MenuSubCategory) {                   
-                        that.subCategoryRows.push(subCategory.Position);                                        
-                });
-                this.subCategorySelected(subCategories[0]);
+                this.getSubCategoryPage(true);                
+                this.subCategorySelected(subCategories[0], 0);                
             }
         });
+    }
+
+    setActiveSubCategoryClass(currentIndex)
+    {
+        this.subCategoryClasses = [];
+        let that = this;
+        
+        this.pageSubCategories.forEach(function (menuSubCategory: MenuSubCategory) {
+            that.subCategoryClasses.push('btnSubCategory');
+        });
+
+        this.subCategoryClasses[currentIndex] = 'btnSubCategoryActive';
     }
 
     loadCategoryStyles(categories: MenuCategory[], categoryStyles: string[]) {
@@ -195,8 +184,8 @@ export class MenuComponent implements OnInit {
         });
     }
 
-    subCategorySelected(subCategory: MenuSubCategory) {
-        // build menu products list
+    subCategorySelected(subCategory: MenuSubCategory, currentIndex: number) {
+        // build menu products list        
         this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
         let that = this;
         let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
@@ -206,27 +195,19 @@ export class MenuComponent implements OnInit {
 
         this.DBService.getLocalMenuProducts(categoryID, subCategory.SubCategoryID).then((products) => {
             if (products.length == 0) {
-                dialogs.alert("Menu Products not loaded.").then(() => {
-                    console.log("Dialog closed!");
-                });
+                dialogs.alert("Menu Products not loaded.")
             }
             else {
                 this.products = products;
-
-                this.totalProductsPages = Math.ceil(this.products.length / this.productPageSize);
-
-                this.pageProducts = this.products.slice(0, 
-                    this.products.length >= this.productPageSize ? this.productPageSize :  this.products.length - 1)
-
-                this.pageProducts.forEach(function (menuProduct: MenuProduct) {
-                    that.productRows.push(Math.floor((menuProduct.Position -1 ) / 4) + 1);
-                    that.productCols.push((menuProduct.Position - 1) % 4);
-                });
+                this.totalProductsPages = Math.ceil(this.products[this.products.length-1].Position / this.productPageSize);
+                this.productCurrentPage = 0;
+                this.getProductPage(true);                
                 this.loadProductStyles(this.pageProducts, that.productStyles);                
             }
         });
         this.currentSubCategory = subCategory.Name;
         this.showProducts = true;
+        this.setActiveSubCategoryClass(currentIndex);
     }
 
     loadProductStyles(products: MenuProduct[], productStyles: string[]) {
@@ -542,6 +523,11 @@ export class MenuComponent implements OnInit {
             endRecord =  this.subCategories.length;
         
         this.pageSubCategories = this.subCategories.slice(startRecord, endRecord);
+
+        let that = this;
+        this.pageSubCategories.forEach(function (subCategory: MenuSubCategory) {                   
+                that.subCategoryRows.push(subCategory.Position);                                        
+        });
     }
 
     onProductSwipe(args)
@@ -549,14 +535,14 @@ export class MenuComponent implements OnInit {
         if (this.totalProductsPages <= 1 )
             return;
        
-        // at last page, can only swipe down
+        // at last page, can only swipe right
         if (this.productCurrentPage == this.totalProductsPages)
         {
             if (args.direction == SwipeDirection.right ) {
                 this.getProductPage(false);                          
             }
         }
-        // at first page, can only swipe up
+        // at first page, can only swipe left
         else
         if (this.productCurrentPage == 1)
         {
@@ -564,7 +550,7 @@ export class MenuComponent implements OnInit {
                 this.getProductPage(true);                       
             }
         }
-        // else, can swipe up or down
+        // else, can swipe left or right
         else            
         if (this.productCurrentPage >= 1)
         {
@@ -588,16 +574,24 @@ export class MenuComponent implements OnInit {
         else
             this.productCurrentPage--;
 
-        let startRecord: number = (this.productCurrentPage * this.productPageSize) - this.productPageSize;
-        let endRecord: number = startRecord + this.productPageSize;
+        let startPosition: number = (this.productCurrentPage * this.productPageSize) - this.productPageSize;
+        let endPosition: number = startPosition + this.productPageSize;
         
-        if (endRecord > this.products.length)       
-            endRecord =  this.products.length;
+        if (endPosition > this.products[this.products.length-1].Position)       
+            endPosition =  this.products[this.products.length-1].Position;
         
-        this.pageProducts = this.products.slice(startRecord, endRecord);
+        //this.pageProducts = this.products.slice(startRecord, endRecord);
+
+        this.pageProducts = this.products.filter(
+            product => product.Position >= startPosition && product.Position <= endPosition);
+
+        let that = this;
+        this.pageProducts.forEach(function (menuProduct: MenuProduct) {
+            that.productRows.push(Math.floor((menuProduct.Position -1 ) / 4) + 1);
+            that.productCols.push((menuProduct.Position - 1) % 4);
+        });
     }
-
-
+    
     onCheckItemSwipe(args, checkItemIndex) {
         if (args.direction == SwipeDirection.left ) {
             this.deleteCheckItem(checkItemIndex);

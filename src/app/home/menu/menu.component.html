@@ -76,14 +76,14 @@
   </StackLayout>
   <GridLayout row="0" col="2" *ngIf="showSubCategories" rows="60,*,*,*,*,*,*,*,*">
     <Button class="glass" text='MAIN' textWrap="true" row='0' col='0' style='text-align: center' (tap)='displayMainCategories()'></Button>
-    <Button class="btnSubCategory" [text]="item.Name" *ngFor="let item of pageSubCategories let i=index" 
+    <Button [class]="subCategoryClasses[i]" [text]="item.Name" *ngFor="let item of pageSubCategories let i=index" 
       (swipe)="onSubCategorySwipe($event)"
-      (tap)="subCategorySelected(item)"
+      (tap)="subCategorySelected(item, i)"
       [row]='subCategoryRows[i]' textWrap="true" ></Button>
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="3" colSpan="4" *ngIf="showSubCategories">
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>
-    <Button class="btnProduct" [text]="item.Name" *ngFor="let item of pageProducts let i=index" (tap)="productSelected(item, i)" (swipe)='onProductSwipe'
+    <Button class="btnProduct" [text]="item.Name" *ngFor="let item of pageProducts let i=index" (tap)="productSelected(item, i)" (swipe)='onProductSwipe($event)'
       [col]='productCols[i]' [row]='productRows[i]' textWrap="true" [style]='productStyles[i]'></Button>
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="4" colSpan="4" *ngIf="showOptions">
