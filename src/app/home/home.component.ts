@@ -8,6 +8,7 @@ import { Employee, LoginResponse } from "~/app/models/employees";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import { Page } from "tns-core-modules/ui/page/page";
+import { Logos } from "../models/settings";
 
 @Component({
     selector: "Home",
@@ -27,6 +28,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     public accentColor: string;   
     //loginResponse: LoginResponse;
     //loggedInUser: Employee = Object();
+    logInLogo: string = '';
     
     constructor(private router: RouterExtensions, private DBService: SQLiteService, 
         private zone: NgZone, private page: Page
@@ -37,8 +39,30 @@ export class HomeComponent implements OnInit, AfterViewInit {
     ngOnInit(): void {
         //this.page.className = 'loginBG';
         //this.router.navigate(['/home/mytables'])
-        this.router.navigate(['/home/menu'])
+        //this.router.navigate(['/home/menu'])
         // Init your component properties here.
+        require("nativescript-localstorage");
+        this.logInLogo = localStorage.getItem('LoginLogo');
+
+        //if (this.logInLogo == null)
+        //{
+        this.DBService.getLocalLogos().then((data) => {
+            if (data == null) {
+                dialogs.alert("Logo Info not loaded");
+            }
+            else {                  
+                let logos: Logos = data;   
+                console.log(data);             
+                localStorage.setItem('LoginLogo', logos.LoginLogo);   
+                localStorage.setItem('MyChecksLogo', logos.MyChecksLogo);                             
+            }
+        });                        
+        //}  
+        //else
+        //{
+            this.logInLogo = 'http://' + localStorage.getItem('LoginLogo');
+            console.log(this.logInLogo);
+        //}      
     }   
   
     addDigit(digit: string) {      
@@ -117,7 +141,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        require("nativescript-localstorage");
+        
         localStorage.removeItem('dataloaded');
 
         if (localStorage.getItem('dataloaded') != 'true') {

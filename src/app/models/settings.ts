@@ -1,3 +1,8 @@
+export interface Logos {
+    LoginLogo?: string;
+    MyChecksLogo?: string;
+}
+
 export interface CreditCardPassword {
     Bytes?:any[];
 }

@@ -5,7 +5,7 @@ import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, Menu
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
-import { SystemSettings } from "~/app/models/settings";
+import { SystemSettings, Logos } from "~/app/models/settings";
 //import { Observable } from "tns-core-modules/ui/page/page";
 
 var Sqlite = require("nativescript-sqlite");
@@ -170,7 +170,7 @@ export class SQLiteService {
                     this.loadMenuCategories(<MenuCategory[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving MenuCategories from API.");
+                    console.log("Error occurred while retrieving MenuCategories from API.");
                     console.log(err);
                 }
             );
@@ -218,7 +218,7 @@ export class SQLiteService {
                     this.loadMenuSubCategories(<MenuSubCategory[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving MenuSubCategories from API.");
+                    console.log("Error occurred while retrieving MenuSubCategories from API.");
                     console.log(err);
                 }
             );
@@ -270,7 +270,7 @@ export class SQLiteService {
                     this.loadMenuProducts(<MenuProduct[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving MenuProducts from API.");
+                    console.log("Error occurred while retrieving MenuProducts from API.");
                     console.log(err);
                 }
             );
@@ -325,7 +325,7 @@ export class SQLiteService {
                     this.loadOptionCategories(<OptionCategory[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving OptionCategories from API.");
+                    console.log("Error occurred while retrieving OptionCategories from API.");
                     console.log(err);
                 }
             );
@@ -349,7 +349,7 @@ export class SQLiteService {
                     this.loadMenuOptions(<OptionCategory[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving MenuOptions from API.");
+                    console.log("Error occurred while retrieving MenuOptions from API.");
                     console.log(err);
                 }
             );
@@ -391,7 +391,7 @@ export class SQLiteService {
                     this.loadMenuSubOptions(<OptionCategory[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving MenuSubOptions from API.");
+                    console.log("Error occurred while retrieving MenuSubOptions from API.");
                     console.log(err);
                 }
             );
@@ -416,7 +416,7 @@ export class SQLiteService {
                     this.loadOptions(<Option[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving Options from API.");
+                    console.log("Error occurred while retrieving Options from API.");
                     console.log(err);
                 }
             );
@@ -441,7 +441,7 @@ export class SQLiteService {
                     this.loadMenuChoices(<MenuChoice[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving Options from API.");
+                    console.log("Error occurred while retrieving Options from API.");
                     console.log(err);
                 }
             );
@@ -503,7 +503,7 @@ export class SQLiteService {
                     this.loadEmployees(<Employee[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving Employees from API.");
+                    console.log("Error occurred while retrieving Employees from API.");
                     console.log(err);
                 }
             );
@@ -529,7 +529,7 @@ export class SQLiteService {
                             });
                         },
                         err => {
-                            console.log("Error occured while retrieving Employees from API.");
+                            console.log("Error occurred while retrieving Employees from API.");
                             console.log(err);
                         }
                     );
@@ -548,7 +548,7 @@ export class SQLiteService {
                     this.loadCategoryCodes(<CategoryCode[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving category codes from API.");
+                    console.log("Error occurred while retrieving category codes from API.");
                     console.log(err);
                 }
             );
@@ -571,7 +571,7 @@ export class SQLiteService {
                     this.loadProducts(<Product[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving products from API.");
+                    console.log("Error occurred while retrieving products from API.");
                     console.log(err);
                 }
             );
@@ -620,7 +620,7 @@ export class SQLiteService {
                     this.loadAreas(<Area[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving Areas from API.");
+                    console.log("Error occurred while retrieving Areas from API.");
                     console.log(err);
                 }
             );
@@ -670,7 +670,7 @@ export class SQLiteService {
                     this.loadProductGroups(<ProductGroup[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving Product Groups from API.");
+                    console.log("Error occurred while retrieving Product Groups from API.");
                     console.log(err);
                 }
             );
@@ -717,7 +717,7 @@ export class SQLiteService {
                     this.loadTables(<Table[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving Tables from API.");
+                    console.log("Error occurred while retrieving Tables from API.");
                     console.log(err);
                 }
             );
@@ -765,7 +765,7 @@ export class SQLiteService {
                     this.loadProductCategories(<ProductCategory[]>data);
                 },
                 err => {
-                    console.log("Error occured while retrieving ProductCategories from API.");
+                    console.log("Error occurred while retrieving ProductCategories from API.");
                     console.log(err);
                 }
             );
@@ -849,7 +849,7 @@ export class SQLiteService {
                                 [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout]);
                         },
                         err => {
-                            console.log("Error occured while retrieving Settings from API.");
+                            console.log("Error occurred while retrieving Settings from API.");
                             console.log(err);
                         }
                     );
@@ -866,26 +866,37 @@ export class SQLiteService {
         }
 
         db.execSQL("DROP TABLE IF EXISTS Logos;").then(id => {
-            db.execSQL("CREATE TABLE IF NOT EXISTS Logos (LogoUrl);").then(id => {
+            db.execSQL("CREATE TABLE IF NOT EXISTS Logos (LoginLogo, MyChecksLogo);").then(id => {
                 let headers = this.createRequestHeader();
-                this.http.get(this.apiUrl + 'GetSettings', { headers: headers })
+                this.http.get(this.apiUrl + 'GetLogos', { headers: headers })
                     .subscribe(
                         data => {
-                            console.log('got Settings from API');
-                            let ss: SystemSettings = data;
-                            SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout) VALUES (?,?,?,?)",
-                                [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout]);
+                            console.log('got Logos from API');
+                            let logos: Logos = data;
+                            SQLiteService.database.execSQL("INSERT INTO Logos (LoginLogo, MyChecksLogo) VALUES (?,?)",
+                                [logos.LoginLogo, logos.MyChecksLogo]);
                         },
                         err => {
-                            console.log("Error occured while retrieving Settings from API.");
+                            console.log("Error occurred while retrieving Logos from API.");
                             console.log(err);
                         }
                     );
 
             }, error => {
-                console.log("CREATE TABLE SystemSettings ERROR", error);
+                console.log("CREATE TABLE Logos ERROR", error);
             });
         });
+    }
+
+    public getLocalLogos(): Promise<Logos> {
+        return SQLiteService.database.get("SELECT LoginLogo, MyChecksLogo FROM Logos;")
+            .then(function (row) {
+                let logos: Logos = {
+                    LoginLogo: row[0],
+                    MyChecksLogo: row[1]
+                };
+                return (logos);
+            });
     }
 
     public getLocalSystemSettings(): Promise<SystemSettings[]> {
