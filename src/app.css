@@ -137,6 +137,15 @@ page
 	word-wrap: break-word;
 }
 
+.btnCategory {
+	font-size: 30;
+	height: 120;
+	font-family: sans-serif;
+    font-weight: bold;
+	margin: 10 10 10 10;
+	word-wrap: break-word;
+}
+
 .btnSubCategory {
 	font-size: 25;
 	height: 110;

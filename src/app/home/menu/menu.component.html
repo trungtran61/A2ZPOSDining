@@ -71,7 +71,7 @@
       <Button class="glass btnBottom btnOK" text="Tender" (tap)="tender()" textWrap="true"></Button>
   </FlexBoxLayout>
   <StackLayout row="0" col="2" colSpan="2" *ngIf="showMainCategories">
-    <Button class="glass" [text]="item.Name" *ngFor="let item of categories let i=index" (tap)="categorySelected(item)"
+    <Button class="glass btnCategory" [text]="item.Name" textWrap="true" *ngFor="let item of categories let i=index" (tap)="categorySelected(item)"
       [style]="categoryStyles[i]"></Button>
   </StackLayout>
   <GridLayout row="0" col="2" *ngIf="showSubCategories" rows="60,*,*,*,*,*,*,*,*">
