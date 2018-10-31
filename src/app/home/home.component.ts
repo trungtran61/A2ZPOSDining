@@ -49,7 +49,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
             (new Sqlite("FullServiceDining.db")).then(db => {
                 console.log("DB Created");
                 Promise.all([
-                    this.DBService.createTables(db)
+                    //this.DBService.createTables(db)
+                    this.loadLocalDataBase(db)
                 ]).then
                 {
                     this.isLoading = false;
@@ -140,37 +141,31 @@ export class HomeComponent implements OnInit, AfterViewInit {
         });
     }
 
-    managerFunctions() {
-        //this.router.navigate(['/home/menu'])
-        //this.router.navigate(['/home/menuitems'])
-        //this.DBService.loadSystemSettings(null);
-        //this.DBService.loadEmployees(null);
-        //this.DBService.getLocalSystemSettings();
-        //this.DBService.getAllEmployees();
-        this.isLoading = true;
-        //this.DBService.createTables(null);
-
+    loadLocalDataBase(db)
+    {
+        this.isLoading = true;        
         forkJoin([
-            this.DBService.loadSystemSettings(null),
-            this.DBService.loadLogos(null),
-            this.DBService.loadEmployees(null),
-            this.DBService.loadAreas(null),
-            this.DBService.loadProductGroups(null),
-            this.DBService.loadCategoryCodes(null),
-            this.DBService.loadProducts(null),
-            this.DBService.loadTables(null),
-            /*
-            this.loadMenuCategories(db),
-            this.loadMenuChoices(db),
-            this.loadMenuOptions(db),
-            this.loadMenuProducts(db),
-            this.loadMenuSubCategories(db),
-            this.loadMenuSubOptions(db),
-            this.loadOptionCategories(db),
-            this.loadProductCategories(db),                                    
-            this.loadMenuTimers(db),
-            this.loadOptions(db),
-            */
+            this.DBService.loadSystemSettings(db),
+            this.DBService.loadLogos(db),
+            this.DBService.loadEmployees(db),
+            this.DBService.loadAreas(db),
+            this.DBService.loadProductGroups(db),
+            this.DBService.loadCategoryCodes(db),
+            this.DBService.loadProducts(db),
+            this.DBService.loadTables(db),
+            this.DBService.loadMenuCategories(db),            
+            this.DBService.loadMenuProducts(db),
+            this.DBService.loadMenuSubCategories(db),            
+            this.DBService.loadMenuCategories(db),
+            this.DBService.loadMenuChoices(db),
+            this.DBService.loadMenuOptions(db),
+            this.DBService.loadMenuProducts(db),            
+            this.DBService.loadMenuSubCategories(db),
+            this.DBService.loadMenuSubOptions(db),            
+            this.DBService.loadOptionCategories(db),
+            this.DBService.loadProductCategories(db),                                    
+            this.DBService.loadMenuTimers(db),
+            this.DBService.loadOptions(db)        
         ])
             .subscribe(results => {
                 console.log(results);
@@ -178,12 +173,22 @@ export class HomeComponent implements OnInit, AfterViewInit {
             });        
     }
 
+    managerFunctions() {
+        //this.router.navigate(['/home/menu'])
+        //this.router.navigate(['/home/menuitems'])
+        //this.DBService.loadSystemSettings(db);
+        //this.DBService.loadEmployees(db);
+        //this.DBService.getLocalSystemSettings();
+        //this.DBService.getAllEmployees();
+        this.loadLocalDataBase(null);
+    }
+
     loadTables() {
-        this.DBService.getTableInfo('MenuProducts'); // .createTables(null);
+        this.DBService.getTableInfo('MenuProducts'); // .createTables(db);
     }
 
     dropTables() {
-        this.DBService.getTableInfo('MenuCategories'); // .createTables(null);
+        this.DBService.getTableInfo('MenuCategories'); // .createTables(db);
     }
 
     ngAfterViewInit() {

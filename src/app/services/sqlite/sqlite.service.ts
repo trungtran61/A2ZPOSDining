@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Employee } from "~/app/models/employees";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, MenuOption, ProductGroup } from "~/app/models/products";
+import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, MenuOption, ProductGroup, MenuTimer } from "~/app/models/products";
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { forkJoin } from "rxjs";
@@ -62,19 +62,17 @@ export class SQLiteService {
             this.loadProductGroups(db),
             this.loadCategoryCodes(db),
             this.loadProducts(db),
-            this.loadTables(db),
-            /*
-            this.loadMenuCategories(db),
-            this.loadMenuChoices(db),
-            this.loadMenuOptions(db),
+            this.loadTables(db),            
+            this.loadMenuCategories(db),            
             this.loadMenuProducts(db),
-            this.loadMenuSubCategories(db),
+            this.loadMenuSubCategories(db),            
+            this.loadMenuChoices(db),
+            this.loadMenuOptions(db),            
             this.loadMenuSubOptions(db),
             this.loadOptionCategories(db),
             this.loadProductCategories(db),                                    
             this.loadMenuTimers(db),
-            this.loadOptions(db),
-            */
+            this.loadOptions(db),               
         ])
             .subscribe(results => {
                 console.log(results);
@@ -88,33 +86,43 @@ export class SQLiteService {
         while (s.length < size) s = "0" + s;
         return s;
     }
+    
+    public loadMenuCategories(db) {      
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-    public getMenuCategories() {
-        console.log('getMenuCategories');
-
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetMenuCategory', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got MenuCategories from API');
-                    this.loadMenuCategories(<MenuCategory[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving MenuCategories from API.");
-                    console.log(err);
-                }
-            );
-
-    }
-
-    public loadMenuCategories(menuCategories: any[]) {
-        menuCategories.forEach(function (menuCategory: MenuCategory) {
-            SQLiteService.database.execSQL("INSERT INTO MenuCategories (CategoryID, Name, Position, ButtonColor, ButtonForeColor) VALUES (?, ?, ?, ?, ?)",
-                [menuCategory.CategoryID, menuCategory.Name, menuCategory.Position,
-                menuCategory.ButtonColor, menuCategory.ButtonForeColor]);
-            console.log('added ' + menuCategory.Name);
-        }
-        );
+            db.execSQL("DROP TABLE IF EXISTS MenuCategories;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuCategories (CategoryID INTEGER, Name , Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetMenuCategory', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let menuCategories = <MenuCategory[]>data;
+                                menuCategories.forEach(function (menuCategory: MenuCategory) {
+                                    SQLiteService.database.execSQL("INSERT INTO MenuCategories (CategoryID, Name, Position, ButtonColor, ButtonForeColor) VALUES (?, ?, ?, ?, ?)",
+                                    [menuCategory.CategoryID, menuCategory.Name, menuCategory.Position,
+                                        menuCategory.ButtonColor, menuCategory.ButtonForeColor]).then(id => {
+                                            resolve("Added MenuCategories records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add MenuCategories records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving MenuCategories from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE MenuCategories ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
     public getLocalMenuCategories(): Promise<MenuCategory[]> {
@@ -137,31 +145,42 @@ export class SQLiteService {
             });
     }
 
-    public getMenuSubCategories() {
-        console.log('getMenuSubCategories');
+    public loadMenuSubCategories(db) {
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetMenuSubCategory', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got MenuSubCategories from API');
-                    this.loadMenuSubCategories(<MenuSubCategory[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving MenuSubCategories from API.");
-                    console.log(err);
-                }
-            );
-
-    }
-
-    public loadMenuSubCategories(MenuSubCategories: any[]) {
-        MenuSubCategories.forEach(function (menuSubCategory: MenuSubCategory) {
-            SQLiteService.database.execSQL("INSERT INTO MenuSubCategories (CategoryID, SubCategoryID, Name, Position, ButtonColor, ButtonForeColor) VALUES (?, ?, ?, ?, ?, ?)",
-                [menuSubCategory.CategoryID, menuSubCategory.SubCategoryID, menuSubCategory.Name, menuSubCategory.Position, menuSubCategory.ButtonColor, menuSubCategory.ButtonForeColor]);
-            console.log('added ' + menuSubCategory.Name + ':' + menuSubCategory.CategoryID);
-        }
-        );
+            db.execSQL("DROP TABLE IF EXISTS MenuSubCategories;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubCategories (CategoryID INTEGER, SubCategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetMenuSubCategory', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let MenuSubCategories = <MenuSubCategory[]>data;
+                                MenuSubCategories.forEach(function (menuSubCategory: MenuSubCategory) {
+                                    SQLiteService.database.execSQL("INSERT INTO MenuSubCategories (CategoryID, SubCategoryID, Name, Position, ButtonColor, ButtonForeColor) VALUES (?, ?, ?, ?, ?, ?)",
+                                        [menuSubCategory.CategoryID, menuSubCategory.SubCategoryID, menuSubCategory.Name, 
+                                        menuSubCategory.Position, menuSubCategory.ButtonColor, menuSubCategory.ButtonForeColor]).then(id => {
+                                            resolve("Added MenuSubCategories records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add MenuSubCategories records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving MenuSubCategories from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE MenuSubCategories ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
     public getLocalMenuSubCategories(categoryID: number): Promise<MenuSubCategory[]> {
@@ -188,34 +207,45 @@ export class SQLiteService {
                 return (menuSubCategories);
             });
     }
+   
+    public loadMenuProducts(db) {        
 
-    public getMenuProducts() {
-        console.log('getMenuProducts');
-
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetMenuProduct', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got MenuProducts from API: ' + data);
-                    this.loadMenuProducts(<MenuProduct[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving MenuProducts from API.");
-                    console.log(err);
-                }
-            );
-
-    }
-
-    public loadMenuProducts(MenuProducts: any[]) {
         let that = this;
-        MenuProducts.forEach(function (menuProduct: MenuProduct) {
-            SQLiteService.database.execSQL("INSERT INTO MenuProducts (CategoryID, SubCategoryID, ProductID, Name, ProductCode, Position, ButtonColor, ButtonColorHex, ButtonForeColor, ButtonForeColorHex) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+
+            db.execSQL("DROP TABLE IF EXISTS MenuProducts;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuProducts (CategoryID INTEGER, SubCategoryID INTEGER,ProductID INTEGER,Name TEXT,Position INTEGER,ProductCode INTEGER,ButtonColor INTEGER,ButtonColorHex TEXT,ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetMenuProduct', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let menuProducts = <MenuProduct[]>data;
+                                menuProducts.forEach(function (menuProduct: MenuProduct) {
+                                    SQLiteService.database.execSQL("INSERT INTO MenuProducts (CategoryID, SubCategoryID, ProductID, Name, ProductCode, Position, ButtonColor, ButtonColorHex, ButtonForeColor, ButtonForeColorHex) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 [menuProduct.CategoryID, menuProduct.SubCategoryID, menuProduct.ProductID, menuProduct.Name, menuProduct.ProductCode, menuProduct.Position,
                 menuProduct.ButtonColor, that.padZeroes(parseInt(menuProduct.ButtonColor.toString()).toString(16), 6),
-                menuProduct.ButtonForeColor, that.padZeroes(parseInt(menuProduct.ButtonForeColor.toString()).toString(16), 6)]);
-        }
-        );
+                menuProduct.ButtonForeColor, that.padZeroes(parseInt(menuProduct.ButtonForeColor.toString()).toString(16), 6)]).then(id => {
+                                            resolve("Added MenuProducts records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add MenuProducts records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving MenuProducts from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE MenuProducts ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
     public getLocalMenuProducts(categoryID: number, subCategoryID: number): Promise<MenuProduct[]> {
@@ -262,37 +292,79 @@ export class SQLiteService {
 
     }
 
-    public loadOptionCategories(optionCategories: any[]) {
-        optionCategories.forEach(function (optionCategory: OptionCategory) {
-            SQLiteService.database.execSQL("INSERT INTO OptionCategories (PriKey, Name) VALUES (?, ?)",
-                [optionCategory.PriKey, optionCategory.Name]);
-        }
-        );
+    public loadOptionCategories(db) {        
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+
+            db.execSQL("DROP TABLE IF EXISTS OptionCategories;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS OptionCategories (CategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetOptionCategory', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let optionCategories = <OptionCategory[]>data;
+                                optionCategories.forEach(function (optionCategory: OptionCategory) {
+                                    SQLiteService.database.execSQL("INSERT INTO OptionCategories (PriKey, Name) VALUES (?, ?)",
+                                        [optionCategory.PriKey, optionCategory.Name]).then(id => {
+                                            resolve("Added OptionCategories records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add OptionCategories records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving OptionCategories from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE OptionCategories ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
-    public getMenuOptions() {
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetMenuOption', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got MenuOptions from API: ' + data);
-                    this.loadMenuOptions(<OptionCategory[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving MenuOptions from API.");
-                    console.log(err);
-                }
-            );
+    public loadMenuOptions(db) {
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-    }
-
-    public loadMenuOptions(menuOptions: any[]) {
-        menuOptions.forEach(function (menuOption: MenuOption) {
-            SQLiteService.database.execSQL("INSERT INTO MenuOptions (ApplyCharge, Charge, Name, Position, ProductCode, ReportProductMix) VALUES (?,?,?,?,?,?)",
-                [menuOption.ApplyCharge, menuOption.Charge, menuOption.Name, menuOption.Position,
-                menuOption.ProductCode, menuOption.ReportProductMix]);
-        }
-        );
+            db.execSQL("DROP TABLE IF EXISTS MenuOptions;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuOptions (ApplyCharge INTEGER, Charge REAL, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER;").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetMenuOption', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let menuOptions = <MenuOption[]>data;
+                                menuOptions.forEach(function (menuOption: MenuOption) {
+                                    SQLiteService.database.execSQL("INSERT INTO MenuOptions (ApplyCharge, Charge, Name, Position, ProductCode, ReportProductMix) VALUES (?,?,?,?,?,?)",
+                                        [menuOption.ApplyCharge, menuOption.Charge, menuOption.Name, menuOption.Position,
+                                        menuOption.ProductCode, menuOption.ReportProductMix]).then(id => {
+                                            resolve("Added MenuOptions records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add MenuOptions records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving MenuOptions from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE MenuOptions ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
     public getLocalMenuOptions(productCode: number): Promise<MenuOption[]> {
@@ -312,80 +384,120 @@ export class SQLiteService {
             });
     }
 
-    public getMenuSubOptions() {
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetMenuSubOption', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got MenuSubOptions from API: ' + data);
-                    this.loadMenuSubOptions(<OptionCategory[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving MenuSubOptions from API.");
-                    console.log(err);
-                }
-            );
+    public loadMenuSubOptions(db) {        
 
-    }
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-    public loadMenuSubOptions(menuSubOptions: any[]) {
-        menuSubOptions.forEach(function (menuSubOption: MenuSubOption) {
-            SQLiteService.database.execSQL("INSERT INTO MenuSubOptions (ApplyCharge, Charge, ChoiceID, Layer, Name, Position, ReportProductMix) VALUES (?,?,?,?,?,?,?)",
+            db.execSQL("DROP TABLE IF EXISTS MenuSubOptions;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ReportProductMix INTEGER);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetMenuSubOption', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let menuSubOptions = <MenuSubOption[]>data;
+                                menuSubOptions.forEach(function (menuSubOption: MenuSubOption) {
+                                    SQLiteService.database.execSQL("INSERT INTO MenuSubOptions (ApplyCharge, Charge, ChoiceID, Layer, Name, Position, ReportProductMix) VALUES (?,?,?,?,?,?,?)",
                 [menuSubOption.ApplyCharge, menuSubOption.Charge, menuSubOption.ChoiceID, menuSubOption.Layer,
-                menuSubOption.Name, menuSubOption.Position, menuSubOption.ReportProductMix]);
-        }
-        );
+                menuSubOption.Name, menuSubOption.Position, menuSubOption.ReportProductMix]).then(id => {
+                                            resolve("Added MenuSubOptions records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add MenuSubOptions records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving MenuSubOptions from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE MenuSubOptions ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
-    public getOptions() {
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetOptions', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got Options from API: ' + data);
-                    this.loadOptions(<Option[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving Options from API.");
-                    console.log(err);
-                }
-            );
-
-    }
-
-    public loadOptions(Options: any[]) {
+    public loadOptions(db) {
+        
         let that = this;
-        Options.forEach(function (Option: Option) {
-            SQLiteService.database.execSQL("INSERT INTO Options (PriKey, Name,Price,PrintName,CategoryCode) VALUES (?, ?, ?, ?, ?)",
-                [Option.PriKey, Option.Name, Option.Price, Option.PrintName, Option.CategoryCode]);
-        }
-        );
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+
+            db.execSQL("DROP TABLE IF EXISTS Options;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS Options (PriKey INTEGER, Name TEXT, Price REAL, PrintName TEXT, CategoryCode INTEGER);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetOptions', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let Options = <Option[]>data;
+                                Options.forEach(function (option: Option) {
+                                    SQLiteService.database.execSQL("INSERT INTO Options (PriKey, Name,Price,PrintName,CategoryCode) VALUES (?, ?, ?, ?, ?)",
+                                    [option.PriKey, option.Name, option.Price, option.PrintName, option.CategoryCode]).then(id => {
+                                            resolve("Added Options records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add Options records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving Options from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE Options ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
-    public getMenuChoices() {
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetMenuChoice', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got MenuChoices from API: ' + data);
-                    this.loadMenuChoices(<MenuChoice[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving Options from API.");
-                    console.log(err);
-                }
-            );
-
-    }
-
-    public loadMenuChoices(MenuChoices: any[]) {
+    public loadMenuChoices(db) {
+       
         let that = this;
-        MenuChoices.forEach(function (menuChoice: MenuChoice) {
-            SQLiteService.database.execSQL("INSERT INTO MenuChoices (Charge, ChoiceID, ChoiceName, ForcedChoice, Layer, Name, Position, ProductCode, ReportProductMix) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )",
-                [menuChoice.Charge, menuChoice.ChoiceID, menuChoice.ChoiceName, menuChoice.ForcedChoice, menuChoice.Layer,
-                menuChoice.Name, menuChoice.Position, menuChoice.ProductCode, menuChoice.ReportProductMix]);
-        }
-        );
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+
+            db.execSQL("DROP TABLE IF EXISTS MenuChoices;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuChoices (Charge REAL, ChoiceID INTEGER, ChoiceName TEXT, ForcedChoice INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {        
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetMenuChoice', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let menuChoices = <MenuChoice[]>data;
+                                menuChoices.forEach(function (menuChoice: MenuChoice) {
+                                    SQLiteService.database.execSQL("INSERT INTO MenuChoices (Charge, ChoiceID, ChoiceName, ForcedChoice, Layer, Name, Position, ProductCode, ReportProductMix) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )",
+                                        [menuChoice.Charge, menuChoice.ChoiceID, menuChoice.ChoiceName, menuChoice.ForcedChoice, menuChoice.Layer,
+                                        menuChoice.Name, menuChoice.Position, menuChoice.ProductCode, menuChoice.ReportProductMix]).then(id => {
+                                            resolve("Added MenuChoices records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add MenuChoices records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving MenuChoices from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE MenuChoices ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
     public getLocalMenuChoices(productCode: number) {
@@ -422,24 +534,7 @@ export class SQLiteService {
             });
     }
 
-    public getEmployees() {
-        console.log('getEmployees');
-
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetEmployees', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got employees from API');
-                    this.loadEmployees(<Employee[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving Employees from API.");
-                    console.log(err);
-                }
-            );
-
-    }
-
+    
     public loadEmployees(db) {
         let that = this;
         let promise = new Promise(function (resolve, reject) {
@@ -762,30 +857,45 @@ export class SQLiteService {
                 return (tables);
             });
     }
+   
+    public loadProductCategories(db) {
+        let sql: string = "";        
 
-    public getProductCategories() {
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetProductCategories', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got ProductCategories from API');
-                    this.loadProductCategories(<ProductCategory[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving ProductCategories from API.");
-                    console.log(err);
-                }
-            );
-    }
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-    public loadProductCategories(productCategories: any[]) {
-        let sql: string = "";
-        productCategories.forEach(function (productCategory: ProductCategory) {
-            SQLiteService.database.execSQL("INSERT INTO ProductCategories (PriKey, ProductFilter, Category, SubCategory, Position, ButtonColor, ButtonForeColor) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                [productCategory.PriKey, productCategory.Category, productCategory.SubCategory, productCategory.Position,
-                parseInt(productCategory.ButtonColor).toString(16), parseInt(productCategory.ButtonForeColor).toString(16)]);
-        }
-        );
+            db.execSQL("DROP TABLE IF EXISTS ProductCategories;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS ProductCategories (PriKey INTEGER PRIMARY KEY, ProductFilter INTEGER, Category INTEGER, SubCategory INTEGER, Position INTEGER, ButtonColor TEXT, ButtonForeColor TEXT);").then(id => {       
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetProductCategories', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let ProductCategories = <ProductCategory[]>data;
+                                ProductCategories.forEach(function (productCategory: ProductCategory) {
+                                    SQLiteService.database.execSQL("INSERT INTO ProductCategories (PriKey, ProductFilter, Category, SubCategory, Position, ButtonColor, ButtonForeColor) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                                    [productCategory.PriKey, productCategory.Category, productCategory.SubCategory, productCategory.Position,
+                                    parseInt(productCategory.ButtonColor).toString(16), parseInt(productCategory.ButtonForeColor).toString(16)]).then(id => {
+                                            resolve("Added ProductCategories records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add ProductCategories records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving ProductCategories from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE ProductCategories ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
     public getLocalEmployee(priKey: number): Promise<Employee> {
@@ -793,6 +903,66 @@ export class SQLiteService {
             .then(function (res) {
                 let employee: Employee = { PriKey: [res][0][0], EmployeeID: [res][0][1], FirstName: [res][0][2] }
                 return (employee);
+            });
+    }
+
+    public loadMenuTimers(db) {
+       
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+
+            db.execSQL("DROP TABLE IF EXISTS MenuTimers;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuTimers " + 
+                "(PriKey INTEGER,Name TEXT,Enabled INTEGER,HappyHourType INTEGER,PriceLevel INTEGER,StartTime TEXT,EndTime TEXT,CategoryToLock INTEGER," +
+                    "OverRideCategoryBar INTEGER,OverRideCategoryDineIn INTEGER,Mon INTEGER,Tue INTEGER,Wed INTEGER,Thu INTEGER,Fri INTEGER,Sat INTEGER,Sun INTEGER," + 
+                    "TableService INTEGER,WalkIn INTEGER,TakeOut INTEGER,Bar INTEGER,PhoneIn INTEGER,QuickSale INTEGER,DefaultCategory TEXT);").then(id => {        
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetMenuTimers', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let menuTimers = <MenuTimer[]>data;
+                                menuTimers.forEach(function (menuTimer: MenuTimer) {
+                                    SQLiteService.database.execSQL("INSERT INTO MenuTimers (PriKey,Name,Enabled,HappyHourType,PriceLevel,StartTime,EndTime,CategoryToLock" +
+                                            ",OverRideCategoryBar,OverRideCategoryDineIn,Mon,Tue,Wed,Thu,Fri,Sat,Sun" + 
+                                            ",TableService,WalkIn,TakeOut,Bar,PhoneIn,QuickSale,DefaultCategory) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )",
+                                        [menuTimer.PriKey,menuTimer.Name,menuTimer.Enabled,menuTimer.HappyHourType,menuTimer.PriceLevel,menuTimer.StartTime,menuTimer.EndTime,menuTimer.CategoryToLock
+                                        ,menuTimer.OverRideCategoryBar,menuTimer.OverRideCategoryDineIn,menuTimer.Mon,menuTimer.Tue,menuTimer.Wed,menuTimer.Thu,menuTimer.Fri,menuTimer.Sat,menuTimer.Sun 
+                                        ,menuTimer.TableService,menuTimer.WalkIn,menuTimer.TakeOut,menuTimer.Bar,menuTimer.PhoneIn,menuTimer.QuickSale,menuTimer.DefaultCategory]).then(id => {
+                                            resolve("Added MenuTimers records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add MenuTimers records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving MenuTimers from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE MenuTimers ERROR" + error);
+                });
+            });
+        });
+        return promise;
+    }
+
+    public getLocalMenuTimers(priKey: number) {
+        return SQLiteService.database.all("SELECT Name FROM MenuTimer WHERE PriKey=?", [priKey])
+            .then(function (rows) {
+                let timers: MenuTimer[] = [];
+                for (var row in rows) {
+                    timers.push(
+                        {
+                            Name: rows[row][0]
+                        }
+                    );
+                }
+                return (timers);
             });
     }
 

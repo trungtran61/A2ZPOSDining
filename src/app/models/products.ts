@@ -255,28 +255,28 @@ export enum MenuTimerTypes {
 }
 
 export interface MenuTimer {
-    PriKey: number;
-    Name: string;
-    Enabled: boolean;
-    HappyHourType: number;
-    PriceLevel: number;
-    StartTime: Date;
-    EndTime: Date;
-    CategoryToLock: number;
-    OverRideCategoryBar: boolean;
-    OverRideCategoryDineIn: boolean;
-    Mon: boolean;
-    Tue: boolean;
-    Wed: boolean;
-    Thu: boolean;
-    Fri: boolean;
-    Sat: boolean;
-    Sun: boolean;
-    TableService: boolean;
-    WalkIn: boolean;
-    TakeOut: boolean;
-    Bar: boolean;
-    PhoneIn: boolean;
-    QuickSale: boolean;
+    PriKey?: number;
+    Name?: string;
+    Enabled?: boolean;
+    HappyHourType?: number;
+    PriceLevel?: number;
+    StartTime?: Date;
+    EndTime?: Date;
+    CategoryToLock?: number;
+    OverRideCategoryBar?: boolean;
+    OverRideCategoryDineIn?: boolean;
+    Mon?: boolean;
+    Tue?: boolean;
+    Wed?: boolean;
+    Thu?: boolean;
+    Fri?: boolean;
+    Sat?: boolean;
+    Sun?: boolean;
+    TableService?: boolean;
+    WalkIn?: boolean;
+    TakeOut?: boolean;
+    Bar?: boolean;
+    PhoneIn?: boolean;
+    QuickSale?: boolean;
     DefaultCategory?: any;
 }
