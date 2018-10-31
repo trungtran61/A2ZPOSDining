@@ -27,5 +27,6 @@
             <Image src="res://images/shutdown" (tap)="shutDown()" style="width: 100; border-radius: 100; border-width: 2; border-color: red; height: 100;"></Image>
         </FlexBoxLayout>
     </StackLayout>
-    <Image src='res://images/a2zlogo' col='1' row='2' colSpan="2" style="width: 600; height:100" ></Image>
+    <Image src='res://images/a2zlogo' col='1' row='2' colSpan="2" style="width: 600; height:100" ></Image>   
+    <Image src='res://images/loading' [style]="loadingStyle" col='1' row='1' ></Image>
 </GridLayout>

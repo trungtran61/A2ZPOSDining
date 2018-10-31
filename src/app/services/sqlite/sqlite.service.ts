@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, MenuOption, ProductGroup } from "~/app/models/products";
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { forkJoin } from "rxjs";
 import { catchError } from 'rxjs/operators';
 import { SystemSettings, Logos } from "~/app/models/settings";
 //import { Observable } from "tns-core-modules/ui/page/page";
@@ -45,111 +46,41 @@ export class SQLiteService {
         if (db == null) {
             db = SQLiteService.database;
         }
-
-        this.loadSystemSettings(db);
-        this.loadLogos(db);
-        this.loadEmployees(db);
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS CategoryCodes (PriKey INTEGER PRIMARY KEY, CategoryCode1 TEXT, Description TEXT, PrintGroup INTEGER);").then(id => {
-            //console.log("categorycodes table created");
-            this.getRecordCount('CategoryCodes');
-        }, error => {
-            console.log("CREATE TABLE CategoryCodes ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER,ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier INTEGER, UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
-            //console.log("Products table created");
-            this.getRecordCount('Products');
-        }, error => {
-            console.log("CREATE TABLE Products ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS ProductCategories (PriKey INTEGER PRIMARY KEY, ProductFilter INTEGER, Category INTEGER, SubCategory INTEGER, Position INTEGER, ButtonColor TEXT, ButtonForeColor TEXT);").then(id => {
-            //console.log("ProductCategories table created");
-            this.getRecordCount('ProductCategories');
-        }, error => {
-            console.log("CREATE TABLE CategoryCodes ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
-            //console.log("Table Areas created");
-            this.getRecordCount('Areas');
-        }, error => {
-            console.log("CREATE TABLE Areas ERROR", error);
-        });
-
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS Tables (AreaID INTEGER, Name TEXT, Height INTEGER, Width INTEGER, PosX INTEGER, PosY INTEGER, TableType INTEGER);").then(id => {
-            this.getRecordCount('Tables');
-        }, error => {
-            console.log("CREATE TABLE Tables ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS MenuCategories (CategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-            //console.log("Tables MenuCategories created");
-            this.getRecordCount('MenuCategories');
-        }, error => {
-            console.log("CREATE TABLE MenuCategories ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubCategories (CategoryID INTEGER, SubCategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-            //console.log("Tables MenuSubCategories created");
-            this.getRecordCount('MenuSubCategories');
-        }, error => {
-            console.log("CREATE TABLE MenuSubCategories ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS MenuProducts (CategoryID INTEGER, SubCategoryID INTEGER,ProductID INTEGER,Name TEXT,Position INTEGER,ProductCode INTEGER,ButtonColor INTEGER,ButtonColorHex TEXT,ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
-            //console.log("Tables Products created");
-            this.getRecordCount('MenuProducts');
-        }, error => {
-            console.log("CREATE TABLE Products ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS MenuChoices (Charge REAL, ChoiceID INTEGER, ChoiceName TEXT, ForcedChoice INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
-            //console.log("Table MenuChoices screated");
-            this.getRecordCount('MenuChoices');
-        }, error => {
-            console.log("CREATE TABLE MenuChoices ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS Options (PriKey INTEGER, Name TEXT, Price REAL, PrintName TEXT, CategoryCode INTEGER);").then(id => {
-            //console.log("Table Options created");
-            this.getRecordCount('Options');
-        }, error => {
-            console.log("CREATE TABLE Options ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS OptionCategories (PriKey INTEGER, Name TEXT);").then(id => {
-            //console.log("Table OptionCategories created");
-            this.getRecordCount('OptionCategories');
-        }, error => {
-            console.log("CREATE TABLE OptionCategories ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ReportProductMix INTEGER);").then(id => {
-            //console.log("Table MenuSubOptions created");
-            this.getRecordCount('MenuSubOptions');
-        }, error => {
-            console.log("CREATE TABLE MenuSubOptions ERROR", error);
-        });
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS MenuOptions (ApplyCharge INTEGER, Charge REAL, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
-            //console.log("Table MenuOptions created");
-            this.getRecordCount('MenuOptions');
-        }, error => {
-            console.log("CREATE TABLE MenuOptions ERROR", error);
-        });
-
-        //db.execSQL('DROP TABLE IF EXISTS ProductGroups;').then(function (resultSet) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS ProductGroups (PriKey INTEGER,Code TEXT,Description TEXT,TipShare INTEGER," +
-            "TipSharePercentage INTEGER,Printer TEXT,OpenProduct INTEGER,ProductType INTEGER,TaxRate REAL,Taxable INTEGER);").then(id => {
-                console.log("Table ProductGroups created");
-                this.getRecordCount('ProductGroups');
-            }, error => {
-                console.log("CREATE TABLE ProductGroups ERROR", error);
+        /*
+                let loadSystemSettingsPromise = this.loadSystemSettings(db);
+                loadSystemSettingsPromise.then(function(resolveOutput) {
+                    console.log(resolveOutput);
+                }, function(rejectOutput) {
+                    console.log(rejectOutput);
+                });
+        */
+        forkJoin([
+            this.loadSystemSettings(db),
+            this.loadLogos(db),
+            this.loadEmployees(db),
+            this.loadAreas(db),
+            this.loadProductGroups(db),
+            /*
+            this.loadCategoryCodes(db),
+            this.loadMenuCategories(db),
+            this.loadMenuChoices(db),
+            this.loadMenuOptions(db),
+            this.loadMenuProducts(db),
+            this.loadMenuSubCategories(db),
+            this.loadMenuSubOptions(db),
+            this.loadOptionCategories(db),
+            this.loadProductCategories(db),            
+            this.loadProducts(db),
+            this.loadTables(db),
+            //this.loadMenuTimers(db),
+            this.loadOptions(db),
+            */
+        ])
+            .subscribe(results => {
+                console.log(results);
             });
-        //});
+
+        ;       
     }
 
 
@@ -238,8 +169,8 @@ export class SQLiteService {
 
         let that = this;
         //SQLiteService.database.execSQL("DROP TABLE IF EXISTS MenuSubCategories;");
-        
-        return SQLiteService.database.all("SELECT CategoryID, SubCategoryID, Name, Position, ButtonColor, ButtonColorHex, ButtonForeColor, ButtonForeColorHex " + 
+
+        return SQLiteService.database.all("SELECT CategoryID, SubCategoryID, Name, Position, ButtonColor, ButtonColorHex, ButtonForeColor, ButtonForeColorHex " +
             "FROM MenuSubCategories WHERE CategoryID=? ORDER BY Position", [categoryID])
             .then(function (rows) {
                 let menuSubCategories: MenuSubCategory[] = [];
@@ -511,34 +442,42 @@ export class SQLiteService {
     }
 
     public loadEmployees(db) {
-        if (db == null) {
-            db = SQLiteService.database;
-        }
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-        db.execSQL("DROP TABLE IF EXISTS Employees;").then(id => {
-            db.execSQL("CREATE TABLE IF NOT EXISTS Employees (PriKey INTEGER PRIMARY KEY, EmployeeID TEXT, FirstName TEXT);").then(id => {
-                let headers = this.createRequestHeader();
-                this.http.get(this.apiUrl + 'GetEmployees', { headers: headers })
-                    .subscribe(
-                        data => {
-                            console.log('got employees from API');                            
-                            let employees = <Employee[]>data;
-                            employees.forEach(function (emp: Employee) {
-                                SQLiteService.database.execSQL("INSERT INTO Employees (PriKey, EmployeeID, FirstName) VALUES (?,?,?)",
-                                    [emp.PriKey, emp.EmployeeID, emp.FirstName]);
-                            });
-                        },
-                        err => {
-                            console.log("Error occurred while retrieving Employees from API.");
-                            console.log(err);
-                        }
-                    );
-            }, error => {
-                console.log("CREATE TABLE Employees ERROR", error);
+            db.execSQL("DROP TABLE IF EXISTS Employees;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS Employees (PriKey INTEGER PRIMARY KEY, EmployeeID TEXT, FirstName TEXT);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetEmployees', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let employees = <Employee[]>data;
+                                employees.forEach(function (emp: Employee) {
+                                    SQLiteService.database.execSQL("INSERT INTO Employees (PriKey, EmployeeID, FirstName) VALUES (?,?,?)",
+                                        [emp.PriKey, emp.EmployeeID, emp.FirstName]).then(id => {
+                                            resolve("Added Employees records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add Employee records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving Employees from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE Employees ERROR" + error);
+                });
             });
         });
+        return promise;
     }
-   
+
     public getCategoryCodes() {
         let headers = this.createRequestHeader();
         this.http.get(this.apiUrl + 'GetCategoryCodes', { headers: headers })
@@ -609,32 +548,44 @@ export class SQLiteService {
                 product.FractionalQuantity]);
         }
         );
-    }
+    }   
 
-    public getAreas() {
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'Getareas2', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got Areas2 from API' + data);
-                    this.loadAreas(<Area[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving Areas from API.");
-                    console.log(err);
-                }
-            );
-    }
+    public loadAreas(db) {
 
-    public loadAreas(areas: any[]) {
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-        areas.forEach(function (area: Area) {
-            SQLiteService.database.execSQL("INSERT INTO Areas (AreaID, Name, Position, ImageURL) VALUES (?,?,?,?)",
-                [area.AreaID, area.Name, area.Position, area.ImageURL]).then(id => {
-                    console.log('added ' + area.ImageURL + ' to Areas');
+            db.execSQL("DROP TABLE IF EXISTS Areas;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER PRIMARY KEY, Name TEXT, Position INTEGER);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetAreas2', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let areas = <Area[]>data;
+                                areas.forEach(function (area: Area) {
+                                    SQLiteService.database.execSQL("INSERT INTO Areas (AreaID, Name, Position) VALUES (?,?,?)",
+                                        [area.AreaID, area.Name, area.Position]).then(id => {
+                                            resolve("Added Areas records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add Areas records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving Areas from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE Areas ERROR" + error);
                 });
+            });
         });
-
+        return promise;
     }
 
     public getLocalAreas(): Promise<Area[]> {
@@ -660,32 +611,46 @@ export class SQLiteService {
                 return (areas);
             });
     }
+    
+    public loadProductGroups(db) {
 
-    public getProductGroups() {
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetProductGroups', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got Product Groups from API' + data);
-                    this.loadProductGroups(<ProductGroup[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving Product Groups from API.");
-                    console.log(err);
-                }
-            );
-    }
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-    public loadProductGroups(productGroups: any[]) {
-
-        productGroups.forEach(function (productGroup: ProductGroup) {
-            SQLiteService.database.execSQL("INSERT INTO ProductGroups (PriKey, Code, Description, OpenProduct, Printer, ProductType," +
-                "Taxable, TaxRate, TipShare, TipSharePercentage) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                [productGroup.PriKey, productGroup.Code, productGroup.Description, productGroup.OpenProduct, productGroup.Printer, productGroup.ProductType,
-                productGroup.Taxable, productGroup.TaxRate, productGroup.TipShare, productGroup.TipSharePercentage]).then(id => {
-                    console.log('added ' + productGroup.Description + ' to Product Groups');
+            db.execSQL("DROP TABLE IF EXISTS ProductGroups;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS ProductGroups (PriKey INTEGER,Code TEXT,Description TEXT,TipShare INTEGER," +
+                "TipSharePercentage INTEGER,Printer TEXT,OpenProduct INTEGER,ProductType INTEGER,TaxRate REAL,Taxable INTEGER);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetProductGroups', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let productGroups = <ProductGroup[]>data;
+                                productGroups.forEach(function (productGroup: ProductGroup) {
+                                    SQLiteService.database.execSQL("INSERT INTO ProductGroups (PriKey, Code, Description, OpenProduct, Printer, ProductType," +
+                                    "Taxable, TaxRate, TipShare, TipSharePercentage) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                                    [productGroup.PriKey, productGroup.Code, productGroup.Description, productGroup.OpenProduct, productGroup.Printer, productGroup.ProductType,
+                                    productGroup.Taxable, productGroup.TaxRate, productGroup.TipShare, productGroup.TipSharePercentage]).then(id => {
+                                            resolve("Added ProductGroups records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add ProductGroups records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving ProductGroups from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE ProductGroups ERROR" + error);
                 });
+            });
         });
+        return promise;
     }
 
     public getLocalProductGroups(): Promise<ProductGroup[]> {
@@ -729,6 +694,8 @@ export class SQLiteService {
                 [table.AreaID, table.Name, table.Height, table.Width, table.PosX, table.PosY, table.TableType]);
         }
         );
+
+        
     }
 
     public getTablesDetails(areaID: number, employeeID: number, serverViewAll: boolean): Observable<any> {
@@ -833,59 +800,81 @@ export class SQLiteService {
     }
 
     public loadSystemSettings(db) {
-        if (db == null) {
-            db = SQLiteService.database;
-        }
+        let that = this;
 
-        db.execSQL("DROP TABLE IF EXISTS SystemSettings;").then(id => {
-            db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER, LoginTableLayout INTEGER);").then(id => {
-                let headers = this.createRequestHeader();
-                this.http.get(this.apiUrl + 'GetSettings', { headers: headers })
-                    .subscribe(
-                        data => {
-                            console.log('got Settings from API');
-                            let ss: SystemSettings = data;
-                            SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout) VALUES (?,?,?,?)",
-                                [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout]);
-                        },
-                        err => {
-                            console.log("Error occurred while retrieving Settings from API.");
-                            console.log(err);
-                        }
-                    );
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-            }, error => {
-                console.log("CREATE TABLE SystemSettings ERROR", error);
+            db.execSQL("DROP TABLE IF EXISTS SystemSettings;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER, LoginTableLayout INTEGER);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetSettings', { headers: headers })
+                        .subscribe(
+                            data => {
+                                console.log('got Settings from API');
+                                let ss: SystemSettings = data;
+                                SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout) VALUES (?,?,?,?)",
+                                    [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout]).then(id => {
+                                        console.log("Added SystemSettings records.");
+                                        resolve("Added SystemSettings records.")
+                                    },
+                                        err => {
+                                            reject("Failed to add SystemSettings records.")
+                                        }
+                                    );
+                            },
+                            err => {
+                                reject("Error occurred while retrieving Settings from API.");
+                                console.log(err);
+                            }
+                        );
+
+                }, error => {
+                    console.log("CREATE TABLE SystemSettings ERROR", error);
+                    reject("CREATE TABLE SystemSettings ERROR");
+                });
             });
         });
+        return promise;
     }
 
     public loadLogos(db) {
-        if (db == null) {
-            db = SQLiteService.database;
-        }
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-        db.execSQL("DROP TABLE IF EXISTS Logos;").then(id => {
-            db.execSQL("CREATE TABLE IF NOT EXISTS Logos (LoginLogo, MyChecksLogo);").then(id => {
-                let headers = this.createRequestHeader();
-                this.http.get(this.apiUrl + 'GetLogos', { headers: headers })
-                    .subscribe(
-                        data => {
-                            console.log('got Logos from API');
-                            let logos: Logos = data;
-                            SQLiteService.database.execSQL("INSERT INTO Logos (LoginLogo, MyChecksLogo) VALUES (?,?)",
-                                [logos.LoginLogo, logos.MyChecksLogo]);
-                        },
-                        err => {
-                            console.log("Error occurred while retrieving Logos from API.");
-                            console.log(err);
-                        }
-                    );
+            db.execSQL("DROP TABLE IF EXISTS Logos;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS Logos (LoginLogo, MyChecksLogo);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetLogos', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let logos: Logos = data;
+                                SQLiteService.database.execSQL("INSERT INTO Logos (LoginLogo, MyChecksLogo) VALUES (?,?)",
+                                    [logos.LoginLogo, logos.MyChecksLogo]).then(id => {
+                                        console.log("Added Logos records.");
+                                        resolve("Added Logos records.")
+                                    },
+                                        err => {
+                                            reject("Failed to add Logos records.")
+                                        }
+                                    );
+                            },
+                            err => {
+                                reject("Error occurred while retrieving Logos from API.");
+                            }
+                        );
 
-            }, error => {
-                console.log("CREATE TABLE Logos ERROR", error);
+                }, error => {
+                    reject("CREATE TABLE Logos ERROR" + error);
+                });
             });
         });
+        return promise;
     }
 
     public getLocalLogos(): Promise<Logos> {
@@ -910,87 +899,7 @@ export class SQLiteService {
                 };
                 return (systemSettings);
             });
-    }
-
-    public getRecordCount(tableName): Promise<number> {
-        let that = this; // needed to access 'this' from callback    
-
-        return SQLiteService.database.all('SELECT * FROM ' + tableName)
-            .then(function (rows) {
-                console.log(tableName + " row:", rows);
-                // only load data if table is empty
-                if (rows == "")
-                    switch (tableName) {
-                        case 'Employees': {
-                            that.getEmployees();
-                            break;
-                        }
-                        case 'CategoryCodes': {
-                            that.getCategoryCodes();
-                            break;
-                        }
-                        case 'Products': {
-                            that.getProducts();
-                            break;
-                        }
-                        case 'ProductCategories':
-                            {
-                                that.getProductCategories();
-                                break;
-                            }
-                        case 'Areas':
-                            {
-                                that.getAreas();
-                                break;
-                            }
-                        case 'Tables':
-                            {
-                                that.getTables();
-                                break;
-                            }
-                        case 'MenuCategories':
-                            {
-                                that.getMenuCategories();
-                                break;
-                            }
-                        case 'MenuSubCategories':
-                            {
-                                that.getMenuSubCategories();
-                                break;
-                            }
-                        case 'MenuProducts':
-                            {
-                                that.getMenuProducts();
-                                break;
-                            }
-                        case 'MenuChoices':
-                            {
-                                that.getMenuChoices();
-                                break;
-                            }
-                        case 'Options':
-                            {
-                                that.getOptions();
-                                break;
-                            }
-                        case 'MenuSubOptions':
-                            {
-                                that.getMenuSubOptions();
-                                break;
-                            }
-                        case 'MenuOptions':
-                            {
-                                that.getMenuOptions();
-                                break;
-                            }
-                        case 'ProductGroups':
-                            {
-                                that.getProductGroups();
-                                break;
-                            }
-                    }
-            });
-    }
+    }   
 
     public getAllEmployees() {
         var promise = SQLiteService.database.all('SELECT * FROM Employees;');

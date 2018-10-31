@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { ApplicationEventData } from "tns-core-modules/application/application";
-import * as appSettings from "application-settings";
+//import * as appSettings from "application-settings";
 
 var Sqlite = require("nativescript-sqlite");
 
@@ -15,18 +15,14 @@ var Sqlite = require("nativescript-sqlite");
 
 export class AppComponent implements OnInit {
 
+    loadingStyle: string = 'display:none';
+
     public constructor(private DBService: SQLiteService) {
     }
 
-    public ngOnInit() {
-
-        if (appSettings.getBoolean("isFirstLaunch", true)) {
-            console.log('First Launch;')
-            this.DBService.createTables(null);
-            appSettings.setBoolean("isFirstLaunch", false);
-        }
-
+    public ngOnInit() {        
     }
+
     onClick() {
         console.log('clicked');
     }

@@ -4,7 +4,7 @@ export interface MenuCategory {
     Position: number;
     ButtonColor: number;
     ButtonColorHex: string;
-    ButtonForeColor: number; 
+    ButtonForeColor: number;
     ButtonForeColorHex: string;
 }
 
@@ -15,8 +15,8 @@ export interface MenuSubCategory {
     Position: number;
     ButtonColor: number;
     ButtonColorHex: string;
-    ButtonForeColor: number; 
-    ButtonForeColorHex: string; 
+    ButtonForeColor: number;
+    ButtonForeColorHex: string;
 }
 
 export interface MenuProduct {
@@ -25,11 +25,11 @@ export interface MenuProduct {
     ProductID?: number;
     Name: string;
     Position?: number;
-    ProductCode?: number;   
+    ProductCode?: number;
     ButtonColor?: number;
     ButtonColorHex?: string;
-    ButtonForeColor?: number; 
-    ButtonForeColorHex?: string; 
+    ButtonForeColor?: number;
+    ButtonForeColorHex?: string;
     UnitPrice?: number;
     UseModifier?: boolean;
     UseForcedModifier?: boolean;
@@ -82,20 +82,20 @@ export interface ProductCategory {
 }
 
 export interface Area {
-    AreaID: number;    
+    AreaID: number;
     Name: string;
     Position?: string;
-    ImageURL?: string;    
+    ImageURL?: string;
 }
 
 export interface Table {
-    AreaID: number;    
+    AreaID: number;
     Name: string;
-    Height: number; 
-    Width: number; 
-    PosX: number; 
-    PosY: number; 
-    TableType?: number;    
+    Height: number;
+    Width: number;
+    PosX: number;
+    PosY: number;
+    TableType?: number;
 }
 
 export interface CheckItem {
@@ -114,7 +114,7 @@ export interface Modifier {
 
 export interface Choice {
     ChangeType: string;
-    SelectedNumber: string;    
+    SelectedNumber: string;
 }
 
 export interface MenuOption {
@@ -214,19 +214,17 @@ export interface MenuSubOption {
     ReportProductMix: boolean;
 }
 
-export interface ForcedModifier
-{
+export interface ForcedModifier {
     Charge: number;
     ChoiceID?: number;
     ChoiceName: string;
     Layer: number;
-    Name: string;    
+    Name: string;
 }
 
-export interface TableCheck
-{
+export interface TableCheck {
     TableName: string;
-    CheckItems: CheckItem[];    
+    CheckItems: CheckItem[];
 }
 
 export interface ProductGroup {
@@ -246,5 +244,39 @@ export interface OpenProductItem {
     ProductGroupId: number;
     ProductName: string;
     Quantity: number;
-    UnitPrice: number;    
+    UnitPrice: number;
+}
+
+export enum MenuTimerTypes {
+    Undefined = 0,
+    Price = 1,
+    Locked = 2,
+    Default = 3,
+}
+
+export interface MenuTimer {
+    PriKey: number;
+    Name: string;
+    Enabled: boolean;
+    HappyHourType: number;
+    PriceLevel: number;
+    StartTime: Date;
+    EndTime: Date;
+    CategoryToLock: number;
+    OverRideCategoryBar: boolean;
+    OverRideCategoryDineIn: boolean;
+    Mon: boolean;
+    Tue: boolean;
+    Wed: boolean;
+    Thu: boolean;
+    Fri: boolean;
+    Sat: boolean;
+    Sun: boolean;
+    TableService: boolean;
+    WalkIn: boolean;
+    TakeOut: boolean;
+    Bar: boolean;
+    PhoneIn: boolean;
+    QuickSale: boolean;
+    DefaultCategory?: any;
 }

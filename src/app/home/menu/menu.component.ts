@@ -3,7 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, MenuOption, Modifier, OpenProductItem } from "~/app/models/products";
+import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, MenuOption, Modifier, OpenProductItem, MenuTimerTypes, MenuTimer } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
@@ -635,4 +635,179 @@ export class MenuComponent implements OnInit {
                     this.checkItems[checkItemIndex].Modifiers = this.checkItems[checkItemIndex].Modifiers.concat(selectedModifiers);
             });
     }
+
+    CheckMenuTimer(timerType:MenuTimerTypes, overrideType: number, priceLevel: number, category: number, checkLocked:boolean): boolean
+        {
+            let checkMenuTimer: boolean = false;
+            priceLevel = 0;
+            let totalCategory: number = 0;
+            let _category: number = category;
+
+            let timers: MenuTimer[] = [];
+/*
+            if (timerType == MenuTimerTypes.Undefined)
+            {    
+                //timers = LocalData.menutimers.Where(x => x.Enabled == true).ToList();
+
+            }
+            else if (timerType == MenuTimerTypes.Locked)
+            {
+                if (!checkLocked)
+                    timers = LocalData.menutimers.Where(x => x.HappyHourType == (byte)timerType && x.Enabled == true).ToList();
+                else
+                {
+                    timers = LocalData.menutimers.Where(x => x.CategoryToLock == _category && x.HappyHourType == (byte)timerType && x.Enabled == true).ToList();
+                    totalCategory = timers.Count;
+                }
+            }
+            else
+                timers = LocalData.menutimers.Where(x => x.HappyHourType == (byte)timerType && x.Enabled == true).ToList();
+
+            if (timers.length == 0)
+            {
+                if (checkLocked == true)
+                    return true;
+            }
+
+            switch ((int)DateTime.Now.DayOfWeek)
+            {
+                case 1:
+                    timers = timers.Where(x => x.Mon == true).ToList();
+                    break;
+                case 2:
+                    timers = timers.Where(x => x.Tue == true).ToList();
+                    break;
+                case 3:
+                    timers = timers.Where(x => x.Wed == true).ToList();
+                    break;
+                case 4:
+                    timers = timers.Where(x => x.Thu == true).ToList();
+                    break;
+                case 5:
+                    timers = timers.Where(x => x.Fri == true).ToList();
+                    break;
+                case 6:
+                    timers = timers.Where(x => x.Sat == true).ToList();
+                    break;
+                case 0:
+                    timers = timers.Where(x => x.Sun == true).ToList();
+                    break;
+            }
+            foreach (ttpos.DataObjects.tblMenuTimer time in timers)
+            {
+                DateTime Date1, Date2;
+                if (DateTime.Compare(Convert.ToDateTime(((DateTime)time.StartTime).ToShortTimeString()), Convert.ToDateTime(((DateTime)time.EndTime).ToShortTimeString())) > 0)
+                {
+                    if (DateTime.Now.Hour <= ((DateTime)time.EndTime).Hour)
+                    {
+                        Date2 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.EndTime).ToShortTimeString());
+                        Date1 = Convert.ToDateTime(DateTime.Now.AddDays(-1).ToShortDateString() + " " + ((DateTime)time.StartTime).ToShortTimeString());
+                    }
+                    else
+                    {
+                        Date2 = Convert.ToDateTime(DateTime.Now.AddDays(1).ToShortDateString() + " " + ((DateTime)time.EndTime).ToShortTimeString());
+                        Date1 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.StartTime).ToShortTimeString());
+                    }
+                }
+                else
+                {
+                    Date1 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.StartTime).ToShortTimeString());
+                    Date2 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.EndTime).ToShortTimeString());
+                }
+
+                if (DateTime.Compare(DateTime.Now, Date1) >= 0 && DateTime.Compare(DateTime.Now, Date2) <= 0)
+                {
+                    switch (timerType)
+                    {
+                        case MenuTimerTypes.Price:
+                            priceLevel = (byte)time.PriceLevel;
+                            checkMenuTimer = true;
+                            break;
+                        case MenuTimerTypes.Locked:
+                            if (!checkLocked)
+                            {
+                                switch (overrideType)
+                                {
+                                    case 1:
+                                        if (!(bool)time.OverRideCategoryBar)
+                                            checkMenuTimer = false;
+                                        else
+                                        {
+                                            category = (int)time.CategoryToLock;
+                                            checkMenuTimer = true;
+                                        }
+
+                                        break;
+                                    case 2:
+                                        if (!(bool)time.OverRideCategoryDineIn)
+                                            checkMenuTimer = false;
+                                        else
+                                        {
+                                            category = (int)time.CategoryToLock;
+                                            checkMenuTimer = true;
+                                        }
+
+                                        break;
+                                }
+                                break;
+                            }
+                            else
+                                return true;
+                        case MenuTimerTypes.Default:
+                            category = (int)time.DefaultCategory;
+                            switch (OrderType)
+                            {
+                                case OrderTypes.DineIn:
+                                    if (!(bool)time.TableService)
+                                        checkMenuTimer = false;
+                                    break;
+                                case OrderTypes.here:
+                                case OrderTypes.togo:
+                                    if (!(bool)time.WalkIn)
+                                        checkMenuTimer = false;
+                                    break;
+                                case OrderTypes.takeOut:
+                                    if (!(bool)time.TakeOut)
+                                        checkMenuTimer = false;
+                                    break;
+                                case OrderTypes.BarQuickSale:
+                                case OrderTypes.BarTab:
+                                    if (!(bool)time.Bar)
+                                        checkMenuTimer = false;
+                                    break;
+                                case OrderTypes.PickUp:
+                                case OrderTypes.Delivery:
+                                    if (!(bool)time.PhoneIn)
+                                        checkMenuTimer = false;
+                                    break;
+                                case OrderTypes.FastFood:
+                                    if (!(bool)time.QuickSale)
+                                        checkMenuTimer = false;
+                                    break;
+                            }
+                            return checkMenuTimer;
+                    }
+                }
+                else
+                {
+                    if (timerType == MenuTimerTypes.Locked)
+                    {
+                        if (checkLocked)
+                        {
+                            if (category != (int)time.CategoryToLock)
+                                checkMenuTimer = true;
+                            else
+                            {
+                                checkMenuTimer = false;
+                                if (totalCategory == 1)
+                                    return checkMenuTimer;
+                            }
+                        }
+                    }
+                }
+            }
+            */
+            return checkMenuTimer;            
+        }
+
 }
