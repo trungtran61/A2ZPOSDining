@@ -60,8 +60,10 @@ export class SQLiteService {
             this.loadEmployees(db),
             this.loadAreas(db),
             this.loadProductGroups(db),
-            /*
             this.loadCategoryCodes(db),
+            this.loadProducts(db),
+            this.loadTables(db),
+            /*
             this.loadMenuCategories(db),
             this.loadMenuChoices(db),
             this.loadMenuOptions(db),
@@ -69,10 +71,8 @@ export class SQLiteService {
             this.loadMenuSubCategories(db),
             this.loadMenuSubOptions(db),
             this.loadOptionCategories(db),
-            this.loadProductCategories(db),            
-            this.loadProducts(db),
-            this.loadTables(db),
-            //this.loadMenuTimers(db),
+            this.loadProductCategories(db),                                    
+            this.loadMenuTimers(db),
             this.loadOptions(db),
             */
         ])
@@ -80,7 +80,6 @@ export class SQLiteService {
                 console.log(results);
             });
 
-        ;       
     }
 
 
@@ -478,77 +477,106 @@ export class SQLiteService {
         return promise;
     }
 
-    public getCategoryCodes() {
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetCategoryCodes', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got Category Codes from API');
-                    this.loadCategoryCodes(<CategoryCode[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving category codes from API.");
-                    console.log(err);
-                }
-            );
+    public loadCategoryCodes(db) {
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+
+            db.execSQL("DROP TABLE IF EXISTS CategoryCodes;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS CategoryCodes (PriKey INTEGER PRIMARY KEY, CategoryCode1 TEXT, Description TEXT, PrintGroup INTEGER);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetCategoryCodes', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let categoryCodes = <CategoryCode[]>data;
+                                categoryCodes.forEach(function (categoryCode: CategoryCode) {
+                                    SQLiteService.database.execSQL("INSERT INTO CategoryCodes (PriKey, CategoryCode1, Description, PrintGroup) VALUES (?, ?, ?, ?)",
+                                        [categoryCode.PriKey, categoryCode.CategoryCode1, categoryCode.Description, categoryCode.PrintGroup]).then(id => {
+                                            resolve("Added CategoryCodes records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add CategoryCode records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving CategoryCodes from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE CategoryCodes ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
-    public loadCategoryCodes(categoryCodes: any[]) {
-        categoryCodes.forEach(function (categoryCode: CategoryCode) {
-            SQLiteService.database.execSQL("INSERT INTO CategoryCodes (PriKey, CategoryCode1, Description, PrintGroup) VALUES (?, ?, ?, ?)",
-                [categoryCode.PriKey, categoryCode.CategoryCode1, categoryCode.Description, categoryCode.PrintGroup]);
-        }
-        );
-    }
+    public loadProducts(db) {
 
-    public getProducts() {
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetProducts', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got Products from API');
-                    this.loadProducts(<Product[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving products from API.");
-                    console.log(err);
-                }
-            );
-    }
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-    public loadProducts(products: any[]) {
-        products.forEach(function (product: Product) {
-            SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode,ProductGroup,PrintCode1,CouponCode," +
-                "GeneralCode,Description,AutoOption,PrintName,ForcedModifier,UseForcedModifier,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings," +
-                "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                [product.ProductName,
-                product.ProductFilter,
-                product.UnitPrice,
-                product.PrintCode,
-                product.Taxable,
-                product.CategoryCode,
-                product.ProductGroup,
-                product.PrintCode1,
-                product.CouponCode,
-                product.GeneralCode,
-                product.Description,
-                product.AutoOption,
-                product.PrintName,
-                product.ForcedModifier,
-                product.UseForcedModifier,
-                product.ShowAutoOption,
-                product.UseUnitPrice2,
-                product.UnitPrice2,
-                product.Toppings,
-                product.Pizza,
-                product.ProductType,
-                product.TaxRate,
-                product.PromptQuantity,
-                product.ModifierIgnoreQuantity,
-                product.FractionalQuantity]);
-        }
-        );
-    }   
+            db.execSQL("DROP TABLE IF EXISTS Products;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER,ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier INTEGER, UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetProducts', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let products = <Product[]>data;
+                                products.forEach(function (product: Product) {
+                                    SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode,ProductGroup,PrintCode1,CouponCode," +
+                                        "GeneralCode,Description,AutoOption,PrintName,ForcedModifier,UseForcedModifier,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings," +
+                                        "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                                        [product.ProductName,
+                                        product.ProductFilter,
+                                        product.UnitPrice,
+                                        product.PrintCode,
+                                        product.Taxable,
+                                        product.CategoryCode,
+                                        product.ProductGroup,
+                                        product.PrintCode1,
+                                        product.CouponCode,
+                                        product.GeneralCode,
+                                        product.Description,
+                                        product.AutoOption,
+                                        product.PrintName,
+                                        product.ForcedModifier,
+                                        product.UseForcedModifier,
+                                        product.ShowAutoOption,
+                                        product.UseUnitPrice2,
+                                        product.UnitPrice2,
+                                        product.Toppings,
+                                        product.Pizza,
+                                        product.ProductType,
+                                        product.TaxRate,
+                                        product.PromptQuantity,
+                                        product.ModifierIgnoreQuantity,
+                                        product.FractionalQuantity]).then(id => {
+                                            resolve("Added Products records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add Products records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving Products from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE Products ERROR" + error);
+                });
+            });
+        });
+        return promise;
+    }
 
     public loadAreas(db) {
 
@@ -611,7 +639,7 @@ export class SQLiteService {
                 return (areas);
             });
     }
-    
+
     public loadProductGroups(db) {
 
         let that = this;
@@ -622,32 +650,32 @@ export class SQLiteService {
 
             db.execSQL("DROP TABLE IF EXISTS ProductGroups;").then(id => {
                 db.execSQL("CREATE TABLE IF NOT EXISTS ProductGroups (PriKey INTEGER,Code TEXT,Description TEXT,TipShare INTEGER," +
-                "TipSharePercentage INTEGER,Printer TEXT,OpenProduct INTEGER,ProductType INTEGER,TaxRate REAL,Taxable INTEGER);").then(id => {
-                    let headers = that.createRequestHeader();
-                    that.http.get(that.apiUrl + 'GetProductGroups', { headers: headers })
-                        .subscribe(
-                            data => {
-                                let productGroups = <ProductGroup[]>data;
-                                productGroups.forEach(function (productGroup: ProductGroup) {
-                                    SQLiteService.database.execSQL("INSERT INTO ProductGroups (PriKey, Code, Description, OpenProduct, Printer, ProductType," +
-                                    "Taxable, TaxRate, TipShare, TipSharePercentage) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                                    [productGroup.PriKey, productGroup.Code, productGroup.Description, productGroup.OpenProduct, productGroup.Printer, productGroup.ProductType,
-                                    productGroup.Taxable, productGroup.TaxRate, productGroup.TipShare, productGroup.TipSharePercentage]).then(id => {
-                                            resolve("Added ProductGroups records.")
-                                        },
-                                            err => {
-                                                reject("Failed to add ProductGroups records.")
-                                            }
-                                        );
-                                });
-                            },
-                            err => {
-                                reject("Error occurred while retrieving ProductGroups from API.");
-                            }
-                        );
-                }, error => {
-                    reject("CREATE TABLE ProductGroups ERROR" + error);
-                });
+                    "TipSharePercentage INTEGER,Printer TEXT,OpenProduct INTEGER,ProductType INTEGER,TaxRate REAL,Taxable INTEGER);").then(id => {
+                        let headers = that.createRequestHeader();
+                        that.http.get(that.apiUrl + 'GetProductGroups', { headers: headers })
+                            .subscribe(
+                                data => {
+                                    let productGroups = <ProductGroup[]>data;
+                                    productGroups.forEach(function (productGroup: ProductGroup) {
+                                        SQLiteService.database.execSQL("INSERT INTO ProductGroups (PriKey, Code, Description, OpenProduct, Printer, ProductType," +
+                                            "Taxable, TaxRate, TipShare, TipSharePercentage) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                                            [productGroup.PriKey, productGroup.Code, productGroup.Description, productGroup.OpenProduct, productGroup.Printer, productGroup.ProductType,
+                                            productGroup.Taxable, productGroup.TaxRate, productGroup.TipShare, productGroup.TipSharePercentage]).then(id => {
+                                                resolve("Added ProductGroups records.")
+                                            },
+                                                err => {
+                                                    reject("Failed to add ProductGroups records.")
+                                                }
+                                            );
+                                    });
+                                },
+                                err => {
+                                    reject("Error occurred while retrieving ProductGroups from API.");
+                                }
+                            );
+                    }, error => {
+                        reject("CREATE TABLE ProductGroups ERROR" + error);
+                    });
             });
         });
         return promise;
@@ -673,29 +701,41 @@ export class SQLiteService {
         return btoa(JSON.stringify(arr))
     }
 
-    public getTables() {
-        let headers = this.createRequestHeader();
-        this.http.get(this.apiUrl + 'GetTableLayout', { headers: headers })
-            .subscribe(
-                data => {
-                    console.log('got Tables from API');
-                    this.loadTables(<Table[]>data);
-                },
-                err => {
-                    console.log("Error occurred while retrieving Tables from API.");
-                    console.log(err);
-                }
-            );
-    }
+    public loadTables(db) {
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
 
-    public loadTables(tables: any[]) {
-        tables.forEach(function (table: Table) {
-            SQLiteService.database.execSQL("INSERT INTO Tables (AreaID,  Name, Height, Width, PosX, PosY, TableType) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                [table.AreaID, table.Name, table.Height, table.Width, table.PosX, table.PosY, table.TableType]);
-        }
-        );
-
-        
+            db.execSQL("DROP TABLE IF EXISTS Tables;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS Tables (AreaID INTEGER, Name TEXT, Height INTEGER, Width INTEGER, PosX INTEGER, PosY INTEGER, TableType INTEGER)").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetTableLayout', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let Tables = <Table[]>data;
+                                Tables.forEach(function (table: Table) {
+                                    SQLiteService.database.execSQL("INSERT INTO Tables (AreaID,  Name, Height, Width, PosX, PosY, TableType) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                                        [table.AreaID, table.Name, table.Height, table.Width, table.PosX, table.PosY, table.TableType]).then(id => {
+                                            resolve("Added Tables records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add Table records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving Tables from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE Tables ERROR" + error);
+                });
+            });
+        });
+        return promise;
     }
 
     public getTablesDetails(areaID: number, employeeID: number, serverViewAll: boolean): Observable<any> {
@@ -899,7 +939,7 @@ export class SQLiteService {
                 };
                 return (systemSettings);
             });
-    }   
+    }
 
     public getAllEmployees() {
         var promise = SQLiteService.database.all('SELECT * FROM Employees;');

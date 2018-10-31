@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, NgZone } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { registerElement } from 'nativescript-angular';
 import { exit } from 'nativescript-exit';
 import * as appSettings from "application-settings";
@@ -33,7 +33,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     //loginResponse: LoginResponse;
     //loggedInUser: Employee = Object();
     logInLogo: string = '';
-    loadingStyle: string = 'display:none';
+    isLoading: boolean = false;
 
     constructor(private router: RouterExtensions, private DBService: SQLiteService,
         private zone: NgZone, private page: Page
@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     ngOnInit(): void {
 
         if (appSettings.getBoolean("isFirstLaunch", true)) {
-            this.loadingStyle = 'display:inline';
+            this.isLoading = true;
             console.log('First Launch');
             (new Sqlite("FullServiceDining.db")).then(db => {
                 console.log("DB Created");
@@ -52,7 +52,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
                     this.DBService.createTables(db)
                 ]).then
                 {
-                    this.loadingStyle = 'display:none';
+                    this.isLoading = false;
                     this.showLogos();
                 };
             }, error => {
@@ -147,7 +147,35 @@ export class HomeComponent implements OnInit, AfterViewInit {
         //this.DBService.loadEmployees(null);
         //this.DBService.getLocalSystemSettings();
         //this.DBService.getAllEmployees();
-        this.DBService.createTables(null);
+        this.isLoading = true;
+        //this.DBService.createTables(null);
+
+        forkJoin([
+            this.DBService.loadSystemSettings(null),
+            this.DBService.loadLogos(null),
+            this.DBService.loadEmployees(null),
+            this.DBService.loadAreas(null),
+            this.DBService.loadProductGroups(null),
+            this.DBService.loadCategoryCodes(null),
+            this.DBService.loadProducts(null),
+            this.DBService.loadTables(null),
+            /*
+            this.loadMenuCategories(db),
+            this.loadMenuChoices(db),
+            this.loadMenuOptions(db),
+            this.loadMenuProducts(db),
+            this.loadMenuSubCategories(db),
+            this.loadMenuSubOptions(db),
+            this.loadOptionCategories(db),
+            this.loadProductCategories(db),                                    
+            this.loadMenuTimers(db),
+            this.loadOptions(db),
+            */
+        ])
+            .subscribe(results => {
+                console.log(results);
+                this.isLoading = false;
+            });        
     }
 
     loadTables() {
