@@ -176,13 +176,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     managerFunctions() {
-        //this.router.navigate(['/home/menu'])
+        this.router.navigate(['/home/menu'])
         //this.router.navigate(['/home/menuitems'])
         //this.DBService.loadSystemSettings(db);
         //this.DBService.loadEmployees(db);
         //this.DBService.getLocalSystemSettings();
         //this.DBService.getAllEmployees();
-        this.loadLocalDataBase(null);
+        //this.loadLocalDataBase(null);
     }
 
     loadTables() {

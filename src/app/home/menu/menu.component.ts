@@ -102,28 +102,14 @@ export class MenuComponent implements OnInit {
         //let that = this; // needed to access 'this' from callback
         let that = this;
         if (this.showMainCategories) {
-            let categories: MenuCategory[] = [];
-            localStorage.removeItem('categories');
-
-            if (localStorage.getItem('categories') != null)
-            {
-                categories = JSON.parse(localStorage.getItem('categories'));
-                this.loadCategories(categories);
-            }
-            else {
-                console.log(Date.now());
-                this.DBService.getLocalMenuCategories().then((categories) => {
-                    if (categories.length == 0) {
-                        dialogs.alert("Main Categories not loaded.");
-                    }
-                    else {
-                        // activeStyle: string = "color: black;background-image: linear-gradient(darkred, red);";                    
-                        localStorage.setItem('categories', JSON.stringify(categories));
-                        this.loadCategories(categories);
-                        console.log(Date.now());
-                    }
-                });
-            }
+            this.DBService.getLocalMenuCategories().then((categories) => {
+                if (categories.length == 0) {
+                    dialogs.alert("Main Categories not loaded.");
+                }
+                else {
+                    this.loadCategories(categories);                    
+                }
+            });
         }
     }
 
