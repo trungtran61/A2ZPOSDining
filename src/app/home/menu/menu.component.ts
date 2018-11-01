@@ -31,7 +31,7 @@ export class MenuComponent implements OnInit {
     subCategoryPageSize: number = 5;
     subCategoryClasses: string[] = [];
 
-    products: MenuProduct[] = [];    
+    products: MenuProduct[] = [];
     productStyles: string[] = [];
     productCols: number[] = [];
     productRows: number[] = [];
@@ -55,15 +55,15 @@ export class MenuComponent implements OnInit {
     guests: number = 0;
     table: string = '';
     server: string = 'Trung';
-    checkNumber: string = 'CK#1';   
+    checkNumber: string = 'CK#1';
     checkTitle: string = '';
-    currentSubCategory: string = ''; 
+    currentSubCategory: string = '';
     subCategoriesTitle: string = '';
     mainCategory: string = '';
 
     showMainCategories: boolean = true;
     showSubCategories: boolean = false;
-    showOptions: boolean = false;        
+    showOptions: boolean = false;
     showProducts: boolean = false;
     showDetails: boolean = true;
     showExtraFunctions: boolean = false;
@@ -72,23 +72,23 @@ export class MenuComponent implements OnInit {
 
     viewDetailsText: string = 'Hide Details';
 
-    fixedOptions: string[] = ['NO','EXTRA','LESS','ADD','OTS','NO MAKE','1/2','TO GO'];
-    fixedOptionRows: number[] = [1,2,3,4,5,6,7,8];
+    fixedOptions: string[] = ['NO', 'EXTRA', 'LESS', 'ADD', 'OTS', 'NO MAKE', '1/2', 'TO GO'];
+    fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
     fixedOptionStyles: string[] = [];
 
     currentCheckItemIndex: number = 0;
     currentFixedOption: string = '';
-  
+
     TAX_RATE: number = .08;
     MAX_GUESTS: number = 6;
-    TIPS_PCT: number = .15;  
+    TIPS_PCT: number = .15;
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
         private viewContainerRef: ViewContainerRef,
         private page: Page) {
-            page.actionBarHidden = true;
+        page.actionBarHidden = true;
         // Use the component constructor to inject providers.
 
     }
@@ -102,35 +102,47 @@ export class MenuComponent implements OnInit {
         //let that = this; // needed to access 'this' from callback
         let that = this;
         if (this.showMainCategories) {
-            this.DBService.getLocalMenuCategories().then((categories) => {
-                if (categories.length == 0) {
-                    dialogs.alert("Main Categories not loaded.").then(() => {
-                        console.log("Dialog closed!");
-                    });
-                }
-                else {
-                    // activeStyle: string = "color: black;background-image: linear-gradient(darkred, red);";                    
-                    this.categories = categories;
-                    //console.log(this.menuCategories);
-                    this.categories.forEach(function (menuCategory: MenuCategory) {
-                        let darkColor: string = menuCategory.ButtonColorHex;
-                        let lightColor: string = that.lightenDarkenColor(darkColor, 50);
-                        let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
-                        //console.log(style);
-                        that.categoryStyles.push(style);
-                    });
-                }
-            });
-        }       
+            let categories: MenuCategory[] = [];
+            localStorage.removeItem('categories');
+
+            if (localStorage.getItem('categories') != null)
+            {
+                categories = JSON.parse(localStorage.getItem('categories'));
+                this.loadCategories(categories);
+            }
+            else {
+                console.log(Date.now());
+                this.DBService.getLocalMenuCategories().then((categories) => {
+                    if (categories.length == 0) {
+                        dialogs.alert("Main Categories not loaded.");
+                    }
+                    else {
+                        // activeStyle: string = "color: black;background-image: linear-gradient(darkred, red);";                    
+                        localStorage.setItem('categories', JSON.stringify(categories));
+                        this.loadCategories(categories);
+                        console.log(Date.now());
+                    }
+                });
+            }
+        }
     }
 
-    nextSeat()
-    {
+    loadCategories(categories: MenuCategory[]) {
+        let that = this;
+        this.categories = categories;
+        this.categories.forEach(function (menuCategory: MenuCategory) {
+            let darkColor: string = menuCategory.ButtonColorHex;
+            let lightColor: string = that.lightenDarkenColor(darkColor, 50);
+            let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
+            that.categoryStyles.push(style);
+        });
+    }
+
+    nextSeat() {
         this.currentSeatNumber++;
     }
 
-    displayMainCategories()
-    {
+    displayMainCategories() {
         this.showMainCategories = true;
         this.showSubCategories = false;
         this.showOptions = false;
@@ -140,8 +152,8 @@ export class MenuComponent implements OnInit {
         localStorage.setItem("CategoryID", category.CategoryID.toString());
         //localStorage.setItem("CategoryID", "20");
         this.showMainCategories = false;
-        this.showSubCategories = true;     
-        this.showOptions = false;           
+        this.showSubCategories = true;
+        this.showOptions = false;
         let that = this;
         this.subCategoryRows = [];
         this.mainCategory = category.Name;
@@ -152,21 +164,20 @@ export class MenuComponent implements OnInit {
                     console.log("Dialog closed!");
                 });
             }
-            else {                
+            else {
                 this.subCategoryCurrentPage = 0;
-                this.subCategories = subCategories;        
+                this.subCategories = subCategories;
                 this.totalSubCategoriesPages = Math.ceil(this.subCategories.length / this.subCategoryPageSize);
-                this.getSubCategoryPage(true);                
-                this.subCategorySelected(subCategories[0], 0);                
+                this.getSubCategoryPage(true);
+                this.subCategorySelected(subCategories[0], 0);
             }
         });
     }
 
-    setActiveSubCategoryClass(currentIndex)
-    {
+    setActiveSubCategoryClass(currentIndex) {
         this.subCategoryClasses = [];
         let that = this;
-        
+
         this.pageSubCategories.forEach(function (menuSubCategory: MenuSubCategory) {
             that.subCategoryClasses.push('btnSubCategory');
         });
@@ -199,10 +210,10 @@ export class MenuComponent implements OnInit {
             }
             else {
                 this.products = products;
-                this.totalProductsPages = Math.ceil(this.products[this.products.length-1].Position / this.productPageSize);
+                this.totalProductsPages = Math.ceil(this.products[this.products.length - 1].Position / this.productPageSize);
                 this.productCurrentPage = 0;
-                this.getProductPage(true);                
-                this.loadProductStyles(this.pageProducts, that.productStyles);                
+                this.getProductPage(true);
+                this.loadProductStyles(this.pageProducts, that.productStyles);
             }
         });
         this.currentSubCategory = subCategory.Name;
@@ -234,12 +245,11 @@ export class MenuComponent implements OnInit {
         var newColor = g | (b << 8) | (r << 16);
         return newColor.toString(16);
 
-    }   
+    }
 
     productSelected(product: MenuProduct) {
 
-        if (this.showProductInfo)
-        {
+        if (this.showProductInfo) {
             dialogs.alert({
                 title: product.Name,
                 message: "Good, healthy ingredients only!",
@@ -253,9 +263,8 @@ export class MenuComponent implements OnInit {
         if (product.UseForcedModifier) {
             this.showForcedModifierDialog(product, -1, null, true);
         }
-        else
-        {
-            this.addProductToCheck(product); 
+        else {
+            this.addProductToCheck(product);
         }
         //this.showProducts = false;
     }
@@ -271,68 +280,61 @@ export class MenuComponent implements OnInit {
             (selectedChoices) => {
                 if (selectedChoices != null) {
                     this.currentSeatNumber++;
-                    if (isAdding)
-                    {
-                        this.addProductToCheck(product);                    
+                    if (isAdding) {
+                        this.addProductToCheck(product);
                     }
-                    this.checkItems[this.checkItems.length-1].ForcedModifiers = selectedChoices;                    
+                    this.checkItems[this.checkItems.length - 1].ForcedModifiers = selectedChoices;
                 }
             });
     }
 
-    productInfo()
-    {
+    productInfo() {
         this.showProductInfo = !this.showProductInfo;
-        if (this.showProductInfo)        
+        if (this.showProductInfo)
             this.productInfoClass = 'glass btnBottom btnOK';
         else
-            this.productInfoClass = 'glass btnBottom';    
+            this.productInfoClass = 'glass btnBottom';
     }
 
-    changeGuestsNumber()
-    {
-        this.router.navigate(['/home/tableguests/'+ this.table]);    
+    changeGuestsNumber() {
+        this.router.navigate(['/home/tableguests/' + this.table]);
     }
 
-    changeChoice(product: MenuProduct, checkItemIndex: number, choice: MenuChoice)
-    {
+    changeChoice(product: MenuProduct, checkItemIndex: number, choice: MenuChoice) {
         this.showForcedModifierDialog(product, checkItemIndex, choice, false);
     }
 
-    addProductToCheck(product: MenuProduct)
-    {
+    addProductToCheck(product: MenuProduct) {
         this.checkItems.push({
             Modifiers: [], Qty: 1, SeatNumber: this.currentSeatNumber, Price: product.UnitPrice,
             Product: product
         });
         this.totalPrice();
-    }   
+    }
 
-    showOpenProduct()
-    {
+    showOpenProduct() {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
             //context: { options: options, currentOptions: currentOptions}
         };
 
-        this.modalService.showModal(OpenProductComponent, modalOptions).then(            
-            (openProductItem : OpenProductItem) => {    
+        this.modalService.showModal(OpenProductComponent, modalOptions).then(
+            (openProductItem: OpenProductItem) => {
                 this.showExtraFunctions = false;
-                if (openProductItem != null)           
-                    {
-                        this.checkItems.push({
-                            Modifiers: [], Qty: openProductItem.Quantity, SeatNumber: this.currentSeatNumber, 
-                                Price: openProductItem.UnitPrice * openProductItem.Quantity,                                 
-                                Product: {
-                                    Name : openProductItem.ProductName,
-                                    UnitPrice: openProductItem.UnitPrice,
-                                    UseModifier: false,
-                                    UseForcedModifier: false                                    
-                                }
-                        });
-                        this.totalPrice();
-                    }
+                if (openProductItem != null) {
+                    this.checkItems.push({
+                        Modifiers: [], Qty: openProductItem.Quantity, SeatNumber: this.currentSeatNumber,
+                        Price: openProductItem.UnitPrice * openProductItem.Quantity,
+                        Product: {
+                            Name: openProductItem.ProductName,
+                            UnitPrice: openProductItem.UnitPrice,
+                            UseModifier: false,
+                            UseForcedModifier: false
+                        }
+                    });
+                    this.totalPrice();
+                }
             });
     }
 
@@ -340,9 +342,9 @@ export class MenuComponent implements OnInit {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: false,
-            context: { checkItem: checkItem}
+            context: { checkItem: checkItem }
         };
-       
+
         this.modalService.showModal(ModifyCheckItemComponent, modalOptions).then(
             (choice: Choice) => {
                 console.log(choice.ChangeType);
@@ -367,34 +369,29 @@ export class MenuComponent implements OnInit {
                         this.totalPrice();
                         break;
                     case 'modify':
-                        this.getMenuOptions(checkItem.Product, checkItemIndex);                        
+                        this.getMenuOptions(checkItem.Product, checkItemIndex);
                         break;
                 }
             });
     }
 
-    resetFixedOptionStyles()
-    {
+    resetFixedOptionStyles() {
         this.fixedOptionStyles = [];
 
-        for (var i = 0; i < 8; i++)
-        {
+        for (var i = 0; i < 8; i++) {
             this.fixedOptionStyles.push('background-image:linear-gradient(#000, silver);text-align: center; height: 118px;')
         }
     }
 
-    extraFunctions()
-    {
+    extraFunctions() {
         this.showExtraFunctions = true;
     }
 
-    closeExtraFunctions()
-    {
+    closeExtraFunctions() {
         this.showExtraFunctions = false;
     }
 
-    getMenuOptions(product: MenuProduct, itemIndex: number)    
-    {
+    getMenuOptions(product: MenuProduct, itemIndex: number) {
         this.currentCheckItemIndex = itemIndex;
         this.resetFixedOptionStyles();
 
@@ -404,113 +401,110 @@ export class MenuComponent implements OnInit {
                 dialogs.alert("Missing Menu Options");
             }
             else {
-                this.menuOptions = menuOptions; 
+                this.menuOptions = menuOptions;
                 this.menuOptions.forEach(function (menuOption: MenuOption) {
-                    that.optionRows.push(Math.floor((menuOption.Position -1 ) / 4) + 1);
-                    that.optionCols.push((menuOption.Position - 1) % 3);                    
-                });                
+                    that.optionRows.push(Math.floor((menuOption.Position - 1) / 4) + 1);
+                    that.optionCols.push((menuOption.Position - 1) % 3);
+                });
 
-                this.showOptions = true;   
+                this.showOptions = true;
                 this.showMainCategories = false;
-                this.showSubCategories = false;                               
+                this.showSubCategories = false;
             }
         });
     }
 
-    fixedOptionSelected(option: string, index: number)
-    {
+    fixedOptionSelected(option: string, index: number) {
         this.resetFixedOptionStyles();
 
-        switch (option)
-        {
-            case 'NO MAKE':                
+        switch (option) {
+            case 'NO MAKE':
             case 'TO GO':
-            {
-                this.checkItems[this.currentCheckItemIndex].Modifiers.push({ Name:option, Price: 0 });                            
-                break;                    
-            }    
+                {
+                    this.checkItems[this.currentCheckItemIndex].Modifiers.push({ Name: option, Price: 0 });
+                    break;
+                }
             default:
-            {
-                this.currentFixedOption = option;
-                this.fixedOptionStyles[index] = 'background-image:linear-gradient(red, black);text-align: center; height: 118px;';
-            }
-        }        
+                {
+                    this.currentFixedOption = option;
+                    this.fixedOptionStyles[index] = 'background-image:linear-gradient(red, black);text-align: center; height: 118px;';
+                }
+        }
     }
 
-    cancelOrder()
-    {       
-        dialogs.confirm({
-            title: "Cancel Order",
-            message: "Cancel this order?",
-            okButtonText: "Yes, cancel order",
-            cancelButtonText: "No"
-        }).then(isCanceling => {
-            if (isCanceling)
-                this.router.back();            
-        });
+    cancelOrder() {
+        if (this.checkItems.length > 0) {
+            dialogs.confirm({
+                title: "Cancel Order",
+                message: "Cancel this order?",
+                okButtonText: "Yes, cancel order",
+                cancelButtonText: "No"
+            }).then(isCanceling => {
+                if (isCanceling)
+                    this.router.back();
+            });
+        }
+        else {
+            this.router.back();
+        }
     }
 
-    optionSelected(option: MenuOption)
-    {
+    optionSelected(option: MenuOption) {
         // currentFixedOption
-        let modifier: Modifier = { Name: this.currentFixedOption + ' ' + option.Name, 
-                Price: option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0 };        
+        let modifier: Modifier = {
+            Name: this.currentFixedOption + ' ' + option.Name,
+            Price: option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0
+        };
 
-        this.checkItems[this.currentCheckItemIndex].Modifiers.push(modifier);                            
+        this.checkItems[this.currentCheckItemIndex].Modifiers.push(modifier);
     }
 
-    showHideDetails()
-    {
+    showHideDetails() {
         //console.log('whoo');
         this.showDetails = !this.showDetails;
-        this.viewDetailsText = this.showDetails? 'Hide Details' : 'View Details';
+        this.viewDetailsText = this.showDetails ? 'Hide Details' : 'View Details';
     }
 
-    doneOption(){
+    doneOption() {
         this.showOptions = false;
         this.showProducts = true;
         this.showSubCategories = true;
     }
 
-    onSubCategorySwipe(args)
-    {
-        if (this.totalSubCategoriesPages <= 1 )
+    onSubCategorySwipe(args) {
+        if (this.totalSubCategoriesPages <= 1)
             return;
-       
+
         // at last page, can only swipe down
-        if (this.subCategoryCurrentPage == this.totalSubCategoriesPages)
-        {
-            if (args.direction == SwipeDirection.down ) {
-                this.getSubCategoryPage(false);                          
+        if (this.subCategoryCurrentPage == this.totalSubCategoriesPages) {
+            if (args.direction == SwipeDirection.down) {
+                this.getSubCategoryPage(false);
             }
         }
         // at first page, can only swipe up
         else
-        if (this.subCategoryCurrentPage == 1)
-        {
-            if (args.direction == SwipeDirection.up ) {
-                this.getSubCategoryPage(true);                       
+            if (this.subCategoryCurrentPage == 1) {
+                if (args.direction == SwipeDirection.up) {
+                    this.getSubCategoryPage(true);
+                }
             }
-        }
-        // else, can swipe up or down
-        else            
-        if (this.subCategoryCurrentPage >= 1)
-        {
-            // go to next page            
-            if (args.direction == SwipeDirection.up ) {                  
-                this.getSubCategoryPage(true);                
-            }
+            // else, can swipe up or down
             else
-            // go to previous page
-            if (args.direction == SwipeDirection.down ) {
-                this.getSubCategoryPage(false);                        
-            }
-        }
+                if (this.subCategoryCurrentPage >= 1) {
+                    // go to next page            
+                    if (args.direction == SwipeDirection.up) {
+                        this.getSubCategoryPage(true);
+                    }
+                    else
+                        // go to previous page
+                        if (args.direction == SwipeDirection.down) {
+                            this.getSubCategoryPage(false);
+                        }
+                }
 
     }
-    
-    getSubCategoryPage(nextPage: boolean)
-    {
+
+    getSubCategoryPage(nextPage: boolean) {
         if (nextPage)
             this.subCategoryCurrentPage++;
         else
@@ -518,57 +512,52 @@ export class MenuComponent implements OnInit {
 
         let startRecord: number = (this.subCategoryCurrentPage * this.subCategoryPageSize) - this.subCategoryPageSize;
         let endRecord: number = startRecord + this.subCategoryPageSize;
-        
-        if (endRecord > this.subCategories.length)       
-            endRecord =  this.subCategories.length;
-        
+
+        if (endRecord > this.subCategories.length)
+            endRecord = this.subCategories.length;
+
         this.pageSubCategories = this.subCategories.slice(startRecord, endRecord);
 
         let that = this;
-        this.pageSubCategories.forEach(function (subCategory: MenuSubCategory) {                   
-                that.subCategoryRows.push(subCategory.Position);                                        
+        this.pageSubCategories.forEach(function (subCategory: MenuSubCategory) {
+            that.subCategoryRows.push(subCategory.Position);
         });
     }
 
-    onProductSwipe(args)
-    {
-        if (this.totalProductsPages <= 1 )
+    onProductSwipe(args) {
+        if (this.totalProductsPages <= 1)
             return;
-       
+
         // at last page, can only swipe right
-        if (this.productCurrentPage == this.totalProductsPages)
-        {
-            if (args.direction == SwipeDirection.right ) {
-                this.getProductPage(false);                          
+        if (this.productCurrentPage == this.totalProductsPages) {
+            if (args.direction == SwipeDirection.right) {
+                this.getProductPage(false);
             }
         }
         // at first page, can only swipe left
         else
-        if (this.productCurrentPage == 1)
-        {
-            if (args.direction == SwipeDirection.left ) {
-                this.getProductPage(true);                       
+            if (this.productCurrentPage == 1) {
+                if (args.direction == SwipeDirection.left) {
+                    this.getProductPage(true);
+                }
             }
-        }
-        // else, can swipe left or right
-        else            
-        if (this.productCurrentPage >= 1)
-        {
-            // go to next page            
-            if (args.direction == SwipeDirection.left ) {                  
-                this.getProductPage(true);                
-            }
+            // else, can swipe left or right
             else
-            // go to previous page
-            if (args.direction == SwipeDirection.right ) {
-                this.getProductPage(false);                        
-            }
-        }
+                if (this.productCurrentPage >= 1) {
+                    // go to next page            
+                    if (args.direction == SwipeDirection.left) {
+                        this.getProductPage(true);
+                    }
+                    else
+                        // go to previous page
+                        if (args.direction == SwipeDirection.right) {
+                            this.getProductPage(false);
+                        }
+                }
 
     }
-    
-    getProductPage(nextPage: boolean)
-    {
+
+    getProductPage(nextPage: boolean) {
         if (nextPage)
             this.productCurrentPage++;
         else
@@ -576,10 +565,10 @@ export class MenuComponent implements OnInit {
 
         let startPosition: number = (this.productCurrentPage * this.productPageSize) - this.productPageSize;
         let endPosition: number = startPosition + this.productPageSize;
-        
-        if (endPosition > this.products[this.products.length-1].Position)       
-            endPosition =  this.products[this.products.length-1].Position;
-        
+
+        if (endPosition > this.products[this.products.length - 1].Position)
+            endPosition = this.products[this.products.length - 1].Position;
+
         //this.pageProducts = this.products.slice(startRecord, endRecord);
 
         this.pageProducts = this.products.filter(
@@ -587,13 +576,13 @@ export class MenuComponent implements OnInit {
 
         let that = this;
         this.pageProducts.forEach(function (menuProduct: MenuProduct) {
-            that.productRows.push(Math.floor((menuProduct.Position -1 ) / 4) + 1);
+            that.productRows.push(Math.floor((menuProduct.Position - 1) / 4) + 1);
             that.productCols.push((menuProduct.Position - 1) % 4);
         });
     }
-    
+
     onCheckItemSwipe(args, checkItemIndex) {
-        if (args.direction == SwipeDirection.left ) {
+        if (args.direction == SwipeDirection.left) {
             this.deleteCheckItem(checkItemIndex);
         }
     }
@@ -636,178 +625,177 @@ export class MenuComponent implements OnInit {
             });
     }
 
-    CheckMenuTimer(timerType:MenuTimerTypes, overrideType: number, priceLevel: number, category: number, checkLocked:boolean): boolean
-        {
-            let checkMenuTimer: boolean = false;
-            priceLevel = 0;
-            let totalCategory: number = 0;
-            let _category: number = category;
+    CheckMenuTimer(timerType: MenuTimerTypes, overrideType: number, priceLevel: number, category: number, checkLocked: boolean): boolean {
+        let checkMenuTimer: boolean = false;
+        priceLevel = 0;
+        let totalCategory: number = 0;
+        let _category: number = category;
 
-            let timers: MenuTimer[] = [];
-/*
-            if (timerType == MenuTimerTypes.Undefined)
-            {    
-                //timers = LocalData.menutimers.Where(x => x.Enabled == true).ToList();
-
-            }
-            else if (timerType == MenuTimerTypes.Locked)
-            {
-                if (!checkLocked)
-                    timers = LocalData.menutimers.Where(x => x.HappyHourType == (byte)timerType && x.Enabled == true).ToList();
-                else
-                {
-                    timers = LocalData.menutimers.Where(x => x.CategoryToLock == _category && x.HappyHourType == (byte)timerType && x.Enabled == true).ToList();
-                    totalCategory = timers.Count;
-                }
-            }
-            else
-                timers = LocalData.menutimers.Where(x => x.HappyHourType == (byte)timerType && x.Enabled == true).ToList();
-
-            if (timers.length == 0)
-            {
-                if (checkLocked == true)
-                    return true;
-            }
-
-            switch ((int)DateTime.Now.DayOfWeek)
-            {
-                case 1:
-                    timers = timers.Where(x => x.Mon == true).ToList();
-                    break;
-                case 2:
-                    timers = timers.Where(x => x.Tue == true).ToList();
-                    break;
-                case 3:
-                    timers = timers.Where(x => x.Wed == true).ToList();
-                    break;
-                case 4:
-                    timers = timers.Where(x => x.Thu == true).ToList();
-                    break;
-                case 5:
-                    timers = timers.Where(x => x.Fri == true).ToList();
-                    break;
-                case 6:
-                    timers = timers.Where(x => x.Sat == true).ToList();
-                    break;
-                case 0:
-                    timers = timers.Where(x => x.Sun == true).ToList();
-                    break;
-            }
-            foreach (ttpos.DataObjects.tblMenuTimer time in timers)
-            {
-                DateTime Date1, Date2;
-                if (DateTime.Compare(Convert.ToDateTime(((DateTime)time.StartTime).ToShortTimeString()), Convert.ToDateTime(((DateTime)time.EndTime).ToShortTimeString())) > 0)
-                {
-                    if (DateTime.Now.Hour <= ((DateTime)time.EndTime).Hour)
+        let timers: MenuTimer[] = [];
+        /*
+                    if (timerType == MenuTimerTypes.Undefined)
+                    {    
+                        //timers = LocalData.menutimers.Where(x => x.Enabled == true).ToList();
+        
+                    }
+                    else if (timerType == MenuTimerTypes.Locked)
                     {
-                        Date2 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.EndTime).ToShortTimeString());
-                        Date1 = Convert.ToDateTime(DateTime.Now.AddDays(-1).ToShortDateString() + " " + ((DateTime)time.StartTime).ToShortTimeString());
+                        if (!checkLocked)
+                            timers = LocalData.menutimers.Where(x => x.HappyHourType == (byte)timerType && x.Enabled == true).ToList();
+                        else
+                        {
+                            timers = LocalData.menutimers.Where(x => x.CategoryToLock == _category && x.HappyHourType == (byte)timerType && x.Enabled == true).ToList();
+                            totalCategory = timers.Count;
+                        }
                     }
                     else
+                        timers = LocalData.menutimers.Where(x => x.HappyHourType == (byte)timerType && x.Enabled == true).ToList();
+        
+                    if (timers.length == 0)
                     {
-                        Date2 = Convert.ToDateTime(DateTime.Now.AddDays(1).ToShortDateString() + " " + ((DateTime)time.EndTime).ToShortTimeString());
-                        Date1 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.StartTime).ToShortTimeString());
+                        if (checkLocked == true)
+                            return true;
                     }
-                }
-                else
-                {
-                    Date1 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.StartTime).ToShortTimeString());
-                    Date2 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.EndTime).ToShortTimeString());
-                }
-
-                if (DateTime.Compare(DateTime.Now, Date1) >= 0 && DateTime.Compare(DateTime.Now, Date2) <= 0)
-                {
-                    switch (timerType)
+        
+                    switch ((int)DateTime.Now.DayOfWeek)
                     {
-                        case MenuTimerTypes.Price:
-                            priceLevel = (byte)time.PriceLevel;
-                            checkMenuTimer = true;
+                        case 1:
+                            timers = timers.Where(x => x.Mon == true).ToList();
                             break;
-                        case MenuTimerTypes.Locked:
-                            if (!checkLocked)
-                            {
-                                switch (overrideType)
-                                {
-                                    case 1:
-                                        if (!(bool)time.OverRideCategoryBar)
-                                            checkMenuTimer = false;
-                                        else
-                                        {
-                                            category = (int)time.CategoryToLock;
-                                            checkMenuTimer = true;
-                                        }
-
-                                        break;
-                                    case 2:
-                                        if (!(bool)time.OverRideCategoryDineIn)
-                                            checkMenuTimer = false;
-                                        else
-                                        {
-                                            category = (int)time.CategoryToLock;
-                                            checkMenuTimer = true;
-                                        }
-
-                                        break;
-                                }
-                                break;
-                            }
-                            else
-                                return true;
-                        case MenuTimerTypes.Default:
-                            category = (int)time.DefaultCategory;
-                            switch (OrderType)
-                            {
-                                case OrderTypes.DineIn:
-                                    if (!(bool)time.TableService)
-                                        checkMenuTimer = false;
-                                    break;
-                                case OrderTypes.here:
-                                case OrderTypes.togo:
-                                    if (!(bool)time.WalkIn)
-                                        checkMenuTimer = false;
-                                    break;
-                                case OrderTypes.takeOut:
-                                    if (!(bool)time.TakeOut)
-                                        checkMenuTimer = false;
-                                    break;
-                                case OrderTypes.BarQuickSale:
-                                case OrderTypes.BarTab:
-                                    if (!(bool)time.Bar)
-                                        checkMenuTimer = false;
-                                    break;
-                                case OrderTypes.PickUp:
-                                case OrderTypes.Delivery:
-                                    if (!(bool)time.PhoneIn)
-                                        checkMenuTimer = false;
-                                    break;
-                                case OrderTypes.FastFood:
-                                    if (!(bool)time.QuickSale)
-                                        checkMenuTimer = false;
-                                    break;
-                            }
-                            return checkMenuTimer;
+                        case 2:
+                            timers = timers.Where(x => x.Tue == true).ToList();
+                            break;
+                        case 3:
+                            timers = timers.Where(x => x.Wed == true).ToList();
+                            break;
+                        case 4:
+                            timers = timers.Where(x => x.Thu == true).ToList();
+                            break;
+                        case 5:
+                            timers = timers.Where(x => x.Fri == true).ToList();
+                            break;
+                        case 6:
+                            timers = timers.Where(x => x.Sat == true).ToList();
+                            break;
+                        case 0:
+                            timers = timers.Where(x => x.Sun == true).ToList();
+                            break;
                     }
-                }
-                else
-                {
-                    if (timerType == MenuTimerTypes.Locked)
+                    foreach (ttpos.DataObjects.tblMenuTimer time in timers)
                     {
-                        if (checkLocked)
+                        DateTime Date1, Date2;
+                        if (DateTime.Compare(Convert.ToDateTime(((DateTime)time.StartTime).ToShortTimeString()), Convert.ToDateTime(((DateTime)time.EndTime).ToShortTimeString())) > 0)
                         {
-                            if (category != (int)time.CategoryToLock)
-                                checkMenuTimer = true;
+                            if (DateTime.Now.Hour <= ((DateTime)time.EndTime).Hour)
+                            {
+                                Date2 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.EndTime).ToShortTimeString());
+                                Date1 = Convert.ToDateTime(DateTime.Now.AddDays(-1).ToShortDateString() + " " + ((DateTime)time.StartTime).ToShortTimeString());
+                            }
                             else
                             {
-                                checkMenuTimer = false;
-                                if (totalCategory == 1)
+                                Date2 = Convert.ToDateTime(DateTime.Now.AddDays(1).ToShortDateString() + " " + ((DateTime)time.EndTime).ToShortTimeString());
+                                Date1 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.StartTime).ToShortTimeString());
+                            }
+                        }
+                        else
+                        {
+                            Date1 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.StartTime).ToShortTimeString());
+                            Date2 = Convert.ToDateTime(DateTime.Now.ToShortDateString() + " " + ((DateTime)time.EndTime).ToShortTimeString());
+                        }
+        
+                        if (DateTime.Compare(DateTime.Now, Date1) >= 0 && DateTime.Compare(DateTime.Now, Date2) <= 0)
+                        {
+                            switch (timerType)
+                            {
+                                case MenuTimerTypes.Price:
+                                    priceLevel = (byte)time.PriceLevel;
+                                    checkMenuTimer = true;
+                                    break;
+                                case MenuTimerTypes.Locked:
+                                    if (!checkLocked)
+                                    {
+                                        switch (overrideType)
+                                        {
+                                            case 1:
+                                                if (!(bool)time.OverRideCategoryBar)
+                                                    checkMenuTimer = false;
+                                                else
+                                                {
+                                                    category = (int)time.CategoryToLock;
+                                                    checkMenuTimer = true;
+                                                }
+        
+                                                break;
+                                            case 2:
+                                                if (!(bool)time.OverRideCategoryDineIn)
+                                                    checkMenuTimer = false;
+                                                else
+                                                {
+                                                    category = (int)time.CategoryToLock;
+                                                    checkMenuTimer = true;
+                                                }
+        
+                                                break;
+                                        }
+                                        break;
+                                    }
+                                    else
+                                        return true;
+                                case MenuTimerTypes.Default:
+                                    category = (int)time.DefaultCategory;
+                                    switch (OrderType)
+                                    {
+                                        case OrderTypes.DineIn:
+                                            if (!(bool)time.TableService)
+                                                checkMenuTimer = false;
+                                            break;
+                                        case OrderTypes.here:
+                                        case OrderTypes.togo:
+                                            if (!(bool)time.WalkIn)
+                                                checkMenuTimer = false;
+                                            break;
+                                        case OrderTypes.takeOut:
+                                            if (!(bool)time.TakeOut)
+                                                checkMenuTimer = false;
+                                            break;
+                                        case OrderTypes.BarQuickSale:
+                                        case OrderTypes.BarTab:
+                                            if (!(bool)time.Bar)
+                                                checkMenuTimer = false;
+                                            break;
+                                        case OrderTypes.PickUp:
+                                        case OrderTypes.Delivery:
+                                            if (!(bool)time.PhoneIn)
+                                                checkMenuTimer = false;
+                                            break;
+                                        case OrderTypes.FastFood:
+                                            if (!(bool)time.QuickSale)
+                                                checkMenuTimer = false;
+                                            break;
+                                    }
                                     return checkMenuTimer;
                             }
                         }
+                        else
+                        {
+                            if (timerType == MenuTimerTypes.Locked)
+                            {
+                                if (checkLocked)
+                                {
+                                    if (category != (int)time.CategoryToLock)
+                                        checkMenuTimer = true;
+                                    else
+                                    {
+                                        checkMenuTimer = false;
+                                        if (totalCategory == 1)
+                                            return checkMenuTimer;
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
-            }
-            */
-            return checkMenuTimer;            
-        }
+                    */
+        return checkMenuTimer;
+    }
 
 }

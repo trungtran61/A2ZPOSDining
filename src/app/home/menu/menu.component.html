@@ -55,7 +55,7 @@
     </StackLayout>
   </StackLayout>
   <WrapLayout row="1" col="0" colSpan="8" style="margin-bottom:10" *ngIf='!showExtraFunctions'>
-    <Button *ngIf='this.checkItems.length > 0' class="glass btnBottom btnCancel" text="Cancel" (tap)="cancelOrder()"></Button>
+    <Button class="glass btnBottom btnCancel" text="Cancel" (tap)="cancelOrder()"></Button>
     <Button class="glass btnBottom" [text]="viewDetailsText" textWrap="true" (tap)="showHideDetails()"></Button>
     <Button class="glass btnBottom" (tap)="nextSeat()" textWrap="true" text="" style="background-image: url('res://images/Orders/Seat'); background-repeat: no-repeat; background-position: right 0"></Button>
     <Label class="nextSeat" [text]='currentSeatNumber'></Label>

@@ -260,8 +260,8 @@ export interface MenuTimer {
     Enabled?: boolean;
     HappyHourType?: number;
     PriceLevel?: number;
-    StartTime?: Date;
-    EndTime?: Date;
+    StartTime?: string;
+    EndTime?: string;
     CategoryToLock?: number;
     OverRideCategoryBar?: boolean;
     OverRideCategoryDineIn?: boolean;

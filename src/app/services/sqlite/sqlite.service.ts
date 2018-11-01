@@ -125,7 +125,7 @@ export class SQLiteService {
         return promise;
     }
 
-    public getLocalMenuCategories(): Promise<MenuCategory[]> {
+    public getLocalMenuCategories(): Promise<MenuCategory[]> {        
         let that = this;
         return SQLiteService.database.all("SELECT CategoryID, Name, Position, ButtonColor, ButtonColorHex, ButtonForeColor, ButtonForeColorHex FROM MenuCategories ORDER BY Position")
             .then(function (rows) {
@@ -217,7 +217,8 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS MenuProducts;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS MenuProducts (CategoryID INTEGER, SubCategoryID INTEGER,ProductID INTEGER,Name TEXT,Position INTEGER,ProductCode INTEGER,ButtonColor INTEGER,ButtonColorHex TEXT,ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuProducts (CategoryID INTEGER, SubCategoryID INTEGER,ProductID INTEGER,Name TEXT,Position INTEGER,ProductCode INTEGER," + 
+                "ButtonColor INTEGER,ButtonColorHex TEXT,ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
                     let headers = that.createRequestHeader();
                     that.http.get(that.apiUrl + 'GetMenuProduct', { headers: headers })
                         .subscribe(
@@ -300,9 +301,9 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS OptionCategories;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS OptionCategories (CategoryID INTEGER, Name TEXT, Position INTEGER, ButtonColor INTEGER, ButtonColorHex TEXT, ButtonForeColor INTEGER, ButtonForeColorHex TEXT);").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS OptionCategories (PriKey INTEGER, Name TEXT);").then(id => {
                     let headers = that.createRequestHeader();
-                    that.http.get(that.apiUrl + 'GetOptionCategory', { headers: headers })
+                    that.http.get(that.apiUrl + 'GetOptionCategories', { headers: headers })
                         .subscribe(
                             data => {
                                 let optionCategories = <OptionCategory[]>data;
@@ -337,7 +338,7 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS MenuOptions;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS MenuOptions (ApplyCharge INTEGER, Charge REAL, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuOptions (ApplyCharge INTEGER, Charge REAL, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
                     let headers = that.createRequestHeader();
                     that.http.get(that.apiUrl + 'GetMenuOption', { headers: headers })
                         .subscribe(
@@ -618,7 +619,8 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS Products;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER,ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier INTEGER, UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER," + 
+                "ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier INTEGER, UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
                     let headers = that.createRequestHeader();
                     that.http.get(that.apiUrl + 'GetProducts', { headers: headers })
                         .subscribe(
@@ -927,8 +929,9 @@ export class SQLiteService {
                                 menuTimers.forEach(function (menuTimer: MenuTimer) {
                                     SQLiteService.database.execSQL("INSERT INTO MenuTimers (PriKey,Name,Enabled,HappyHourType,PriceLevel,StartTime,EndTime,CategoryToLock" +
                                             ",OverRideCategoryBar,OverRideCategoryDineIn,Mon,Tue,Wed,Thu,Fri,Sat,Sun" + 
-                                            ",TableService,WalkIn,TakeOut,Bar,PhoneIn,QuickSale,DefaultCategory) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )",
-                                        [menuTimer.PriKey,menuTimer.Name,menuTimer.Enabled,menuTimer.HappyHourType,menuTimer.PriceLevel,menuTimer.StartTime,menuTimer.EndTime,menuTimer.CategoryToLock
+                                            ",TableService,WalkIn,TakeOut,Bar,PhoneIn,QuickSale,DefaultCategory) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                                        [menuTimer.PriKey,menuTimer.Name,menuTimer.Enabled,menuTimer.HappyHourType,menuTimer.PriceLevel,that.converTimestampToDate(menuTimer.StartTime),
+                                            that.converTimestampToDate(menuTimer.EndTime),menuTimer.CategoryToLock
                                         ,menuTimer.OverRideCategoryBar,menuTimer.OverRideCategoryDineIn,menuTimer.Mon,menuTimer.Tue,menuTimer.Wed,menuTimer.Thu,menuTimer.Fri,menuTimer.Sat,menuTimer.Sun 
                                         ,menuTimer.TableService,menuTimer.WalkIn,menuTimer.TakeOut,menuTimer.Bar,menuTimer.PhoneIn,menuTimer.QuickSale,menuTimer.DefaultCategory]).then(id => {
                                             resolve("Added MenuTimers records.")
@@ -949,6 +952,17 @@ export class SQLiteService {
             });
         });
         return promise;
+    }
+
+    converTimestampToDate(timestamp: string)
+    {
+        var dateString = timestamp.substr(6, timestamp.indexOf('+')-7);
+        var currentTime = new Date(parseInt(dateString));
+        var month = currentTime.getMonth() + 1;
+        var day = currentTime.getDate();
+        var year = currentTime.getFullYear();
+        var date = day + "/" + month + "/" + year;
+        return date;
     }
 
     public getLocalMenuTimers(priKey: number) {

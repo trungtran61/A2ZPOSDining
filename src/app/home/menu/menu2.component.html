@@ -1,0 +1,7 @@
+<ActionBar>  
+</ActionBar>
+
+  <StackLayout>
+    <Button class="glass btnCategory" [text]="item.Name" textWrap="true" *ngFor="let item of categories let i=index" (tap)="categorySelected(item)"
+      [style]="categoryStyles[i]"></Button>
+  </StackLayout>

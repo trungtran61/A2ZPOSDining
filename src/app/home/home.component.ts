@@ -50,7 +50,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
                 console.log("DB Created");
                 Promise.all([
                     //this.DBService.createTables(db)
-                    this.loadLocalDataBase(db)
+                    //this.loadLocalDataBase(db)
                 ]).then
                 {
                     this.isLoading = false;
@@ -155,21 +155,23 @@ export class HomeComponent implements OnInit, AfterViewInit {
             this.DBService.loadTables(db),
             this.DBService.loadMenuCategories(db),            
             this.DBService.loadMenuProducts(db),
-            this.DBService.loadMenuSubCategories(db),            
-            this.DBService.loadMenuCategories(db),
-            this.DBService.loadMenuChoices(db),
-            this.DBService.loadMenuOptions(db),
-            this.DBService.loadMenuProducts(db),            
-            this.DBService.loadMenuSubCategories(db),
+            this.DBService.loadMenuSubCategories(db),                        
+            this.DBService.loadMenuChoices(db),            
+            this.DBService.loadMenuOptions(db),              
             this.DBService.loadMenuSubOptions(db),            
             this.DBService.loadOptionCategories(db),
             this.DBService.loadProductCategories(db),                                    
             this.DBService.loadMenuTimers(db),
-            this.DBService.loadOptions(db)        
+            this.DBService.loadOptions(db)                    
         ])
             .subscribe(results => {
                 console.log(results);
                 this.isLoading = false;
+            },            
+            err => {
+                this.isLoading = false;
+                dialogs.alert(err);
+            // Do stuff whith your error
             });        
     }
 
