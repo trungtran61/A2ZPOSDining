@@ -9,6 +9,7 @@ import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { SplashComponent } from "~/app/home/splash/splash.component";
+import { APIService } from "./services/api/api.service";
 
 //TNSFontIconService.debug = true;
 
@@ -30,6 +31,9 @@ import { SplashComponent } from "~/app/home/splash/splash.component";
     schemas: [
         NO_ERRORS_SCHEMA
     ],   
-    providers: [SQLiteService] 
+    providers: [
+        SQLiteService,
+        APIService
+    ] 
 })
 export class AppModule { }

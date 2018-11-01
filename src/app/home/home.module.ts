@@ -14,6 +14,7 @@ import { ModifiersComponent } from "~/app/home/menu/modifiers/modifiers.componen
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 import { TNSFontIconModule, TNSFontIconService } from "nativescript-ngx-fonticon";
 import { OpenProductComponent } from "./menu/open-product/open-product.component";
+import { PizzaComponent } from "./menu/pizza/pizza.component";
 
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 TNSFontIconService.debug = true;
@@ -36,7 +37,8 @@ TNSFontIconService.debug = true;
         ModifyCheckItemComponent,
         ModifiersComponent,
         ForcedModifiersComponent,
-        OpenProductComponent            
+        OpenProductComponent,
+        PizzaComponent            
     ],
     schemas: [
         NO_ERRORS_SCHEMA

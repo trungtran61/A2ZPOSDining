@@ -66,7 +66,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         //this.router.navigate(['/home/mytables'])
         //this.router.navigate(['/home/menu'])
         // Init your component properties here.
-        
+        //this.router.navigate(['/home/pizza']);        
     }
 
     showLogos()

@@ -7,7 +7,6 @@ import { map } from 'rxjs/operators';
 import { forkJoin } from "rxjs";
 import { catchError } from 'rxjs/operators';
 import { SystemSettings, Logos } from "~/app/models/settings";
-//import { Observable } from "tns-core-modules/ui/page/page";
 
 var Sqlite = require("nativescript-sqlite");
 
@@ -17,8 +16,7 @@ export class SQLiteService {
     private static database: any;
     public categories: Array<any>;
     public products: Array<any>;
-    private apiUrl = "http://a2zpos.azurewebsites.net/DBService.svc/";
-    //, private http: HttpClient
+    private apiUrl = "http://a2zpos.azurewebsites.net/DBService.svc/";    
     public loggedInUser: Employee = Object();
 
     public static isInstantiated: boolean;
@@ -46,14 +44,7 @@ export class SQLiteService {
         if (db == null) {
             db = SQLiteService.database;
         }
-        /*
-                let loadSystemSettingsPromise = this.loadSystemSettings(db);
-                loadSystemSettingsPromise.then(function(resolveOutput) {
-                    console.log(resolveOutput);
-                }, function(rejectOutput) {
-                    console.log(rejectOutput);
-                });
-        */
+       
         forkJoin([
             this.loadSystemSettings(db),
             this.loadLogos(db),
@@ -965,8 +956,9 @@ export class SQLiteService {
         return date;
     }
 
-    public getLocalMenuTimers(priKey: number) {
-        return SQLiteService.database.all("SELECT Name FROM MenuTimer WHERE PriKey=?", [priKey])
+    public getLocalMenuTimers() {
+        
+        return SQLiteService.database.all("SELECT * FROM MenuTimer")
             .then(function (rows) {
                 let timers: MenuTimer[] = [];
                 for (var row in rows) {
@@ -977,6 +969,10 @@ export class SQLiteService {
                     );
                 }
                 return (timers);
+            },
+            err => 
+            {
+                return null;
             });
     }
 

@@ -25,5 +25,6 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 
 .btnMenuOption
 {
-    background: linear-gradient(lightgray,silver);
+    background: linear-gradient(lightgray,gray);
+    color: black;
 }
