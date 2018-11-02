@@ -95,8 +95,11 @@
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="3" colSpan="4" *ngIf="showSubCategories">
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>
-    <Button class="btnProduct" [text]="item.Name" *ngFor="let item of pageProducts let i=index" (tap)="productSelected(item, i)" (swipe)='onProductSwipe($event)'
-      [col]='productCols[i]' [row]='productRows[i]' textWrap="true" [style]='productStyles[i]'></Button>
+    <StackLayout orientation="horizontal" *ngFor="let item of pageProducts let i=index"  [col]='productCols[i]' [row]='productRows[i]'>
+    <Button class="btnProduct" [text]="item.Name" (tap)="productSelected(item, i)" (swipe)='onProductSwipe($event)'
+      textWrap="true" [style]='productStyles[i]'></Button>
+      <Label class="availableQty" [text]='currentSeatNumber'></Label>
+      </StackLayout>
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="4" colSpan="4" *ngIf="showOptions">
     <FlexBoxLayout row='0' col='0' colSpan="4">

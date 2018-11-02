@@ -28,3 +28,8 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
     background: linear-gradient(lightgray,gray);
     color: black;
 }
+
+.availableQty
+{
+    margin: -25 0 0 -65;  color:red;font-size: 18; padding: 0; text-align: center; width: 30; height: 30; background-color: white; border-radius: 20;
+}

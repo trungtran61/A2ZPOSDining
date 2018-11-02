@@ -11,9 +11,10 @@ import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/force
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
 import { DeprecatedDatePipe } from "@angular/common";
-import { OrderTypes, CountDown } from "~/app/models/orders";
+import { OrderTypes, Countdown } from "~/app/models/orders";
 import { APIService } from "~/app/services/api/api.service";
 import { count } from "rxjs/operators";
+import { forkJoin } from "rxjs";
 
 @Component({
     selector: "Menu",
@@ -82,7 +83,7 @@ export class MenuComponent implements OnInit {
 
     currentCheckItemIndex: number = 0;
     currentFixedOption: string = '';
-    countDowns: CountDown[] = [];
+    countdowns: Countdown[] = [];
     allTimers: MenuTimer[] = [];
 
     TAX_RATE: number = .08;
@@ -121,6 +122,10 @@ export class MenuComponent implements OnInit {
             });
         }
         this.getMenuTimers();
+        this.ApiSvc.reloadCountdowns().then(result => {
+            this.countdowns = <Countdown[]>result;
+        }
+        );
     }
 
     loadCategories(categories: MenuCategory[]) {
@@ -199,30 +204,68 @@ export class MenuComponent implements OnInit {
         //subCategoryID = 50;
         this.productRows = [];
         this.productCols = [];
-
+        /*
+                Promise.all([
+                    this.ApiSvc.reloadCountdowns(),
+                    this.DBService.getLocalMenuProductsX(categoryID, subCategory.SubCategoryID)
+                ]).then(value =>
+                {   
+                    //let countdowns: Countdown[] = <Countdown[]>value[0];     
+                    this.products = <MenuProduct[]>value[1];
+                    //let result = products.map(p => {
+                    //    return Object.assign({}, p, countdowns.filter(cd => cd.PriKey === p.ProductID)[0]);
+                    //});
+                    console.log(value[0]);   
+                    
+                    //this.products = products;     
+                    this.totalProductsPages = Math.ceil(this.products[that.products.length - 1].Position / this.productPageSize);
+                    this.productCurrentPage = 0;
+                    this.getProductPage(true);
+                    
+                    this.loadProductStyles(this.pageProducts, that.productStyles);
+                    this.currentSubCategory = subCategory.Name;
+                    this.showProducts = true;
+                    this.setActiveSubCategoryClass(currentIndex);    
+                    
+                });
+        */
         this.DBService.getLocalMenuProducts(categoryID, subCategory.SubCategoryID).then((products) => {
             if (products.length == 0) {
                 dialogs.alert("Menu Products not loaded.")
             }
             else {
                 this.products = products;
-                this.totalProductsPages = Math.ceil(this.products[this.products.length - 1].Position / this.productPageSize);
+                this.totalProductsPages = Math.ceil(this.products[that.products.length - 1].Position / this.productPageSize);
                 this.productCurrentPage = 0;
                 this.getProductPage(true);
                 this.loadProductStyles(this.pageProducts, that.productStyles);
+                this.currentSubCategory = subCategory.Name;
+                this.showProducts = true;
+                this.setActiveSubCategoryClass(currentIndex);
             }
         });
-        this.currentSubCategory = subCategory.Name;
-        this.showProducts = true;
-        this.setActiveSubCategoryClass(currentIndex);
     }
 
     loadProductStyles(products: MenuProduct[], productStyles: string[]) {
-        products.forEach(function (menuProduct: MenuProduct) {
-            let darkColor: string = menuProduct.ButtonColorHex;
+        let that = this;
+
+        products.forEach(function (product: MenuProduct) {
+            let darkColor: string = product.ButtonColorHex;
             let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-            let style: string = "color: #" + menuProduct.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
+            let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
             productStyles.push(style);
+
+            let countdown = that.countdowns.find(p => p.PriKey == product.ProductID);
+
+            if (countdown != null) {
+                product.CountDownActivated = countdown.Activated;
+                product.QtyAvailable = countdown.Quantity;
+                product.QtyAllocated = countdown.QuantityChange;
+            }
+            else {
+                product.CountDownActivated = false;
+            }
+
         });
     }
 
@@ -255,25 +298,26 @@ export class MenuComponent implements OnInit {
             return;
         }
 
-        this.ApiSvc.getCountDowns().subscribe(countDowns => {
-            this.countDowns = countDowns;
-            if (this.countDowns.length == 0) {
-                if (product.UseForcedModifier) {
-                    this.showForcedModifierDialog(product, -1, null, true);
-                }
-                else {
-                    this.addProductToCheck(product);
-                }
-            }
-            else
-            {
-                dialogs.alert({
-                    title: product.Name,
-                    message: "No more " + product.Name + " available!",
-                    okButtonText: "Close"
-                })
-            }
-        });
+        // this.ApiSvc.getCountDowns().subscribe(countDowns => {
+        //     this.countDowns = countDowns;
+        //     if (this.countDowns.length == 0) {
+        if (product.UseForcedModifier) {
+            this.showForcedModifierDialog(product, -1, null, true);
+        }
+        else {
+            this.addProductToCheck(product);
+        }
+        /*         
+             }
+             else {
+                 dialogs.alert({
+                     title: product.Name,
+                     message: "No more " + product.Name + " available!",
+                     okButtonText: "Close"
+                 })
+             }
+         });
+         */
     }
 
     showForcedModifierDialog(product: MenuProduct, checkItemIndex: number, choice, isAdding: boolean) {

@@ -1,4 +1,4 @@
-export interface CountDown {
+export interface Countdown {
     Activated?: boolean;
     ItemName?: string;
     PriKey?: number;

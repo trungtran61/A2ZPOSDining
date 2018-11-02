@@ -162,7 +162,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
             this.DBService.loadOptionCategories(db),
             this.DBService.loadProductCategories(db),                                    
             this.DBService.loadMenuTimers(db),
-            this.DBService.loadOptions(db)                    
+            this.DBService.loadOptions(db),
+            //this.DBService.loadCountdowns(db)             
         ])
             .subscribe(results => {
                 console.log(results);
@@ -176,13 +177,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     managerFunctions() {
-        this.router.navigate(['/home/menu'])
+        //this.router.navigate(['/home/menu'])
         //this.router.navigate(['/home/menuitems'])
         //this.DBService.loadSystemSettings(db);
         //this.DBService.loadEmployees(db);
         //this.DBService.getLocalSystemSettings();
         //this.DBService.getAllEmployees();
-        //this.loadLocalDataBase(null);
+        this.loadLocalDataBase(null);
     }
 
     loadTables() {
