@@ -185,7 +185,7 @@ export class HomeComponent implements OnInit {
     }
 
     managerFunctions() {
-        this.router.navigate(['/home/menu'])
+        //this.router.navigate(['/home/menu'])
         //this.router.navigate(['/home/menuitems'])
         //this.DBService.loadSystemSettings(db);
         //this.DBService.loadEmployees(db);

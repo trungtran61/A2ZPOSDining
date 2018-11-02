@@ -142,7 +142,7 @@ export class MenuComponent implements OnInit {
         this.categories.forEach(function (menuCategory: MenuCategory) {
             let lightColor: string = '#' + menuCategory.ButtonColorHex;
             let darkColor: string = that.colorLuminance(lightColor, -.3);
-            let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + " 10%," + lightColor + " 80%," + darkColor + ");";
+            let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
             that.categoryStyles.push(style);
         });
 
@@ -267,7 +267,7 @@ export class MenuComponent implements OnInit {
             let lightColor: string = '#' + product.ButtonColorHex;
             //let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
             let darkColor: string = that.colorLuminance(lightColor, -0.2);
-            let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + " 10%," + lightColor + " 80%," + darkColor + ");";
+            let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
             product.Style = style;
 
             product.QtyClass = '';
