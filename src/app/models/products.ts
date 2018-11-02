@@ -17,6 +17,7 @@ export interface MenuSubCategory {
     ButtonColorHex: string;
     ButtonForeColor: number;
     ButtonForeColorHex: string;
+    Class?: string;
 }
 
 export interface MenuProduct {
@@ -37,6 +38,9 @@ export interface MenuProduct {
     QtyAvailable?: number;
     QtyAllocated?: number;
     PromptQty?: boolean;
+    Disabled?: boolean;
+    QtyClass?: string;
+    Style?: string;
 }
 
 export interface CategoryCode {

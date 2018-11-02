@@ -35,13 +35,14 @@ export class MenuComponent implements OnInit {
     totalSubCategoriesPages: number = 0;
     subCategoryCurrentPage: number = 1;
     subCategoryPageSize: number = 5;
-    subCategoryClasses: string[] = [];
+    //subCategoryClasses: string[] = [];
 
     products: MenuProduct[] = [];
-    productStyles: string[] = [];
+    //productStyles: string[] = [];
     productCols: number[] = [];
     productRows: number[] = [];
     pageProducts: MenuProduct[] = [];
+
     totalProductsPages: number = 0;
     productCurrentPage: number = 1;
     productPageSize: number = 20;
@@ -79,7 +80,7 @@ export class MenuComponent implements OnInit {
     viewDetailsCode: string = String.fromCharCode(0xf06e) + ' View Details'
     hideDetailsCode: string = String.fromCharCode(0xf070) + ' Hide Details'
 
-    viewDetailsText: string = this.hideDetailsCode ;
+    viewDetailsText: string = this.hideDetailsCode;
 
     fixedOptions: string[] = ['NO', 'EXTRA', 'LESS', 'ADD', 'OTS', 'NO MAKE', '1/2', 'TO GO'];
     fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -93,6 +94,8 @@ export class MenuComponent implements OnInit {
     TAX_RATE: number = .08;
     MAX_GUESTS: number = 6;
     TIPS_PCT: number = .15;
+
+    qtyEntered: number = 1;
 
     orderType: number = OrderTypes.DineIn;
 
@@ -114,39 +117,39 @@ export class MenuComponent implements OnInit {
         this.server = localStorage.getItem('server');
         this.checkTitle = this.checkNumber + ' ' + this.server + ' ' + this.table + ' ' + this.guests;             
         */
-        let that = this;
-        if (this.showMainCategories) {
-            this.DBService.getLocalMenuCategories().then((categories) => {
-                if (categories.length == 0) {
-                    dialogs.alert("Main Categories not loaded.");
-                }
-                else {
-                    this.loadCategories(categories);
-                }
-            });
-        }
-        this.getMenuTimers();
         this.ApiSvc.reloadCountdowns().then(result => {
             this.countdowns = <Countdown[]>result;
+            if (this.showMainCategories) {
+                this.DBService.getLocalMenuCategories().then((categories) => {
+                    if (categories.length == 0) {
+                        dialogs.alert("Main Categories not loaded.");
+                    }
+                    else {
+                        this.loadCategories(categories);
+                    }
+                });
+            }
         }
-        );       
+        );
+
+        this.getMenuTimers();
+
     }
 
     loadCategories(categories: MenuCategory[]) {
         let that = this;
         this.categories = categories;
         this.categories.forEach(function (menuCategory: MenuCategory) {
-            let darkColor: string = menuCategory.ButtonColorHex;
-            let lightColor: string = that.lightenDarkenColor(darkColor, 50);
-            let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
+            let lightColor: string = '#' + menuCategory.ButtonColorHex;
+            let darkColor: string = that.colorLuminance(lightColor, -.3);
+            let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + " 10%," + lightColor + " 80%," + darkColor + ");";
             that.categoryStyles.push(style);
         });
 
-         // CategoryName is actually CategoryID
-         if (this.DBService.systemSettings.AutoCategory)
-         {
-          this.categorySelected(this.categories.find(x => x.CategoryID == this.DBService.systemSettings.CategoryName));
-         }
+        // CategoryName is actually CategoryID
+        if (this.DBService.systemSettings.AutoCategory) {
+            this.categorySelected(this.categories.find(x => x.CategoryID == this.DBService.systemSettings.CategoryName));
+        }
     }
 
     nextSeat() {
@@ -185,27 +188,28 @@ export class MenuComponent implements OnInit {
         });
     }
 
-    setActiveSubCategoryClass(currentIndex) {
-        this.subCategoryClasses = [];
+    setActiveSubCategoryClass(currentSubCategory: MenuSubCategory) {
+        //this.subCategoryClasses = [];
         let that = this;
 
         this.pageSubCategories.forEach(function (menuSubCategory: MenuSubCategory) {
-            that.subCategoryClasses.push('btnSubCategory');
+            menuSubCategory.Class = 'btnSubCategory'
+            //that.subCategoryClasses.push('btnSubCategory');
         });
-
-        this.subCategoryClasses[currentIndex] = 'btnSubCategoryActive';
+        currentSubCategory.Class = 'btnSubCategoryActive';
+        //this.subCategoryClasses[currentIndex] = 'btnSubCategoryActive';
     }
-
+/*
     loadCategoryStyles(categories: MenuCategory[], categoryStyles: string[]) {
         categoryStyles = [];
         categories.forEach(function (menuCategory: MenuCategory) {
             let darkColor: string = menuCategory.ButtonColorHex;
-            let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
+            let lightColor: string = this.colorLuminance(darkColor, 0.5);
             let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
             categoryStyles.push(style);
         });
     }
-
+*/ 
     subCategorySelected(subCategory: MenuSubCategory, currentIndex: number) {
         // build menu products list        
         this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
@@ -248,59 +252,72 @@ export class MenuComponent implements OnInit {
                 this.totalProductsPages = Math.ceil(this.products[that.products.length - 1].Position / this.productPageSize);
                 this.productCurrentPage = 0;
                 this.getProductPage(true);
-                this.loadProductStyles(this.pageProducts, that.productStyles);
+                this.setProductAttributes(this.pageProducts);
                 this.currentSubCategory = subCategory.Name;
                 this.showProducts = true;
-                this.setActiveSubCategoryClass(currentIndex);
+                this.setActiveSubCategoryClass(subCategory);
             }
         });
     }
 
-    loadProductStyles(products: MenuProduct[], productStyles: string[]) {
+    setProductAttributes(products: MenuProduct[]) {
         let that = this;
 
         products.forEach(function (product: MenuProduct) {
-            let darkColor: string = product.ButtonColorHex;
-            let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-            let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
-            productStyles.push(style);
+            let lightColor: string = '#' + product.ButtonColorHex;
+            //let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
+            let darkColor: string = that.colorLuminance(lightColor, -0.2);
+            let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + " 10%," + lightColor + " 80%," + darkColor + ");";
+            product.Style = style;
 
-            let countdown = that.countdowns.find(p => p.PriKey == product.ProductID);
+            product.QtyClass = '';
+            product.Disabled = false;
+            product.CountdownActivated = false;
+
+            let countdown = that.countdowns.find(p => p.ProductFilter == product.ProductID);
 
             if (countdown != null) {
-                product.CountdownActivated = countdown.Activated;
+                product.CountdownActivated = true; // countdown.Activated;
                 product.QtyAvailable = countdown.Quantity;
                 product.QtyAllocated = countdown.QuantityChange;
-            }
-            else {
-                product.CountdownActivated = false;
-            }
 
+                if (product.QtyAvailable <= product.QtyAllocated)
+                    product.QtyClass = 'qtyLow';
+                else
+                    product.QtyClass = 'qtyAvailable';    
+                
+                    product.Disabled = product.QtyAvailable == 0;
+            }
         });
     }
 
-    shadeColor(color, percent) {
-        var f = parseInt(color.slice(1), 16), t = percent < 0 ? 0 : 255, p = percent < 0 ? percent * -1 : percent, R = f >> 16, G = f >> 8 & 0x00FF, B = f & 0x0000FF;
-        return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
+     /*
+    ColorLuminance("#69c", 0);		// returns "#6699cc"
+    ColorLuminance("6699CC", 0.2);	// "#7ab8f5" - 20% lighter
+    ColorLuminance("69C", -0.5);	// "#334d66" - 50% darker
+    */
+
+   colorLuminance(hex, lum) {
+
+    // validate hex string
+    hex = String(hex).replace(/[^0-9a-f]/gi, '');
+    if (hex.length < 6) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+    lum = lum || 0;
+
+    // convert to decimal and change luminosity
+    var rgb = "#", c, i;
+    for (i = 0; i < 3; i++) {
+        c = parseInt(hex.substr(i * 2, 2), 16);
+        c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+        rgb += ("00" + c).substr(c.length);
     }
 
-    // usage - col = "3F6D2A", amt = 10
-    lightenDarkenColor(col, amt) {
-
-        var num = parseInt(col, 16);
-        var r = (num >> 16) + amt;
-        var b = ((num >> 8) & 0x00FF) + amt;
-        var g = (num & 0x0000FF) + amt;
-        var newColor = g | (b << 8) | (r << 16);
-        return newColor.toString(16);
-
-    }
-
+    return rgb;
+}
+ 
     productSelected(product: MenuProduct) {
-        if (!product.PromptQty)
-        {
-            this.showPromptQty(product);
-        }
 
         if (this.showProductInfo) {
             dialogs.alert({
@@ -313,26 +330,16 @@ export class MenuComponent implements OnInit {
             return;
         }
 
-        // this.ApiSvc.getCountDowns().subscribe(countDowns => {
-        //     this.countDowns = countDowns;
-        //     if (this.countDowns.length == 0) {
-        if (product.UseForcedModifier) {
-            this.showForcedModifierDialog(product, -1, null, true);
+        if (!product.PromptQty) {
+            this.showPromptQty(product);
         }
-        else {
-            this.addProductToCheck(product);
-        }
-        /*         
-             }
-             else {
-                 dialogs.alert({
-                     title: product.Name,
-                     message: "No more " + product.Name + " available!",
-                     okButtonText: "Close"
-                 })
-             }
-         });
-         */
+        else
+            if (product.UseForcedModifier) {
+                this.showForcedModifierDialog(product, -1, null, true);
+            }
+            else {
+                this.addProductToCheck(product);
+            }
     }
 
     showForcedModifierDialog(product: MenuProduct, checkItemIndex: number, choice, isAdding: boolean) {
@@ -372,7 +379,7 @@ export class MenuComponent implements OnInit {
 
     addProductToCheck(product: MenuProduct) {
         this.checkItems.push({
-            Modifiers: [], Qty: 1, SeatNumber: this.currentSeatNumber, Price: product.UnitPrice,
+            Modifiers: [], Qty: this.qtyEntered, SeatNumber: this.currentSeatNumber, Price: product.UnitPrice * this.qtyEntered,
             Product: product
         });
         this.totalPrice();
@@ -413,7 +420,16 @@ export class MenuComponent implements OnInit {
 
         this.modalService.showModal(PromptQtyComponent, modalOptions).then(
             (qtyEntered: number) => {
-                console.log(qtyEntered);                
+                console.log(qtyEntered);
+                if (qtyEntered != null) {
+                    this.qtyEntered = qtyEntered;
+                }
+                if (product.UseForcedModifier) {
+                    this.showForcedModifierDialog(product, -1, null, true);
+                }
+                else {
+                    this.addProductToCheck(product);
+                }
             });
     }
 

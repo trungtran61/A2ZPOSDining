@@ -31,5 +31,9 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 
 .qtyAvailable
 {
+    margin: 75 0 0 -105;  color:darkblue;font-size: 18; padding: 0; text-align: center; width: 30; height: 30; 
+}
+.qtyLow
+{
     margin: 75 0 0 -105;  color:red;font-size: 18; padding: 0; text-align: center; width: 30; height: 30; background-color: white; border-radius: 20;
 }

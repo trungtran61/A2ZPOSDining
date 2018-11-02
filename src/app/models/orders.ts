@@ -1,10 +1,8 @@
 export interface Countdown {
     Activated?: boolean;
-    ItemName?: string;
-    PriKey?: number;
+    ProductFilter?: number;
     Quantity?: number;
-    QuantityChange?: number;
-    TimeStamp?: number;
+    QuantityChange?: number;    
 }
 
 export enum OrderTypes {

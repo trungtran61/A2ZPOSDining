@@ -16,11 +16,11 @@ export class APIService {
     
     public constructor(private http: HttpClient) {
     }
-
+/*
     public getCountDowns(products: MenuProduct[]) {
         let promise = new Promise(((resolve, reject) => {
             let headers = this.createRequestHeader();
-            this.http.get(this.apiUrl + 'GetCountDowns', { headers: headers })
+            this.http.get(this.apiUrl + 'GetProductCountDowns', { headers: headers })
                 .toPromise()
                 .then(res => {
                     let _countDowns = <Countdown[]>res;
@@ -37,12 +37,12 @@ export class APIService {
 
         return promise;
     }
-
+*/
     public reloadCountdowns() {
         let that = this;
         let headers = this.createRequestHeader();
         let promise = new Promise(function (resolve, reject) {           
-            that.http.get(that.apiUrl + 'GetCountdowns', { headers: headers })
+            that.http.get(that.apiUrl + 'GetProductCountdowns', { headers: headers })
                 .subscribe(
                     data => {
                         let countdowns = <Countdown[]>data;
