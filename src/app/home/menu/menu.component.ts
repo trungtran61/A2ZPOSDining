@@ -15,6 +15,7 @@ import { OrderTypes, Countdown } from "~/app/models/orders";
 import { APIService } from "~/app/services/api/api.service";
 import { count } from "rxjs/operators";
 import { forkJoin } from "rxjs";
+import { PromptQtyComponent } from "./prompt-qty.component";
 
 @Component({
     selector: "Menu",
@@ -65,6 +66,7 @@ export class MenuComponent implements OnInit {
     currentSubCategory: string = '';
     subCategoriesTitle: string = '';
     mainCategory: string = '';
+    lockedCategoryId: number = 0;
 
     showMainCategories: boolean = true;
     showSubCategories: boolean = false;
@@ -73,9 +75,11 @@ export class MenuComponent implements OnInit {
     showDetails: boolean = true;
     showExtraFunctions: boolean = false;
     showProductInfo: boolean = false;
-    productInfoClass: string = 'glass btnBottom';
+    productInfoClass: string = 'glass btnBottom fa';
+    viewDetailsCode: string = String.fromCharCode(0xf06e) + ' View Details'
+    hideDetailsCode: string = String.fromCharCode(0xf070) + ' Hide Details'
 
-    viewDetailsText: string = 'Hide Details';
+    viewDetailsText: string = this.hideDetailsCode ;
 
     fixedOptions: string[] = ['NO', 'EXTRA', 'LESS', 'ADD', 'OTS', 'NO MAKE', '1/2', 'TO GO'];
     fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -104,11 +108,12 @@ export class MenuComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        /*
         this.guests = parseInt(localStorage.getItem('guests'));
         this.table = localStorage.getItem('table');
-        //this.server = localStorage.getItem('server');
+        this.server = localStorage.getItem('server');
         this.checkTitle = this.checkNumber + ' ' + this.server + ' ' + this.table + ' ' + this.guests;             
-        
+        */
         let that = this;
         if (this.showMainCategories) {
             this.DBService.getLocalMenuCategories().then((categories) => {
@@ -292,6 +297,11 @@ export class MenuComponent implements OnInit {
     }
 
     productSelected(product: MenuProduct) {
+        if (!product.PromptQty)
+        {
+            this.showPromptQty(product);
+        }
+
         if (this.showProductInfo) {
             dialogs.alert({
                 title: product.Name,
@@ -347,9 +357,9 @@ export class MenuComponent implements OnInit {
     productInfo() {
         this.showProductInfo = !this.showProductInfo;
         if (this.showProductInfo)
-            this.productInfoClass = 'glass btnBottom btnOK';
+            this.productInfoClass = 'glass btnBottom btnOK fa';
         else
-            this.productInfoClass = 'glass btnBottom';
+            this.productInfoClass = 'glass btnBottom fa';
     }
 
     changeGuestsNumber() {
@@ -391,6 +401,19 @@ export class MenuComponent implements OnInit {
                     });
                     this.totalPrice();
                 }
+            });
+    }
+
+    showPromptQty(product: MenuProduct) {
+        const modalOptions: ModalDialogOptions = {
+            viewContainerRef: this.viewContainerRef,
+            fullscreen: false,
+            context: { product: product }
+        };
+
+        this.modalService.showModal(PromptQtyComponent, modalOptions).then(
+            (qtyEntered: number) => {
+                console.log(qtyEntered);                
             });
     }
 
@@ -518,7 +541,7 @@ export class MenuComponent implements OnInit {
     showHideDetails() {
         //console.log('whoo');
         this.showDetails = !this.showDetails;
-        this.viewDetailsText = this.showDetails ? 'Hide Details' : 'View Details';
+        this.viewDetailsText = this.showDetails ? this.hideDetailsCode : this.viewDetailsCode;
     }
 
     doneOption() {
@@ -703,12 +726,12 @@ export class MenuComponent implements OnInit {
         return new Date(date.getTime() + (daysToAdd * (1000 * 60 * 60 * 24)));
     }
 
-    checkMenuTimer(timerType: MenuTimerTypes, overrideType: number, priceLevel: number, category: number, checkLocked: boolean): boolean {
+    checkMenuTimer(timerType: MenuTimerTypes, overrideType: number, priceLevel: number, checkLocked: boolean): boolean {
         let checkMenuTimer: boolean = false;
         priceLevel = 0;
         let totalCategory: number = 0;
-        let _category: number = category;
         let timers: MenuTimer[] = [];
+        let _category = this.lockedCategoryId;
 
         if (timerType == MenuTimerTypes.Undefined) {
             timers = this.allTimers.filter(x => x.Enabled == true);
@@ -790,7 +813,7 @@ export class MenuComponent implements OnInit {
                                     if (!timer.OverRideCategoryBar)
                                         checkMenuTimer = false;
                                     else {
-                                        category = timer.CategoryToLock;
+                                        this.lockedCategoryId = timer.CategoryToLock;
                                         checkMenuTimer = true;
                                     }
 
@@ -799,7 +822,7 @@ export class MenuComponent implements OnInit {
                                     if (!timer.OverRideCategoryDineIn)
                                         checkMenuTimer = false;
                                     else {
-                                        category = timer.CategoryToLock;
+                                        this.lockedCategoryId = timer.CategoryToLock;
                                         checkMenuTimer = true;
                                     }
 
@@ -810,7 +833,7 @@ export class MenuComponent implements OnInit {
                         else
                             return true;
                     case MenuTimerTypes.Default:
-                        category = timer.DefaultCategory;
+                        this.lockedCategoryId = timer.DefaultCategory;
                         switch (this.orderType) {
                             case OrderTypes.DineIn:
                                 if (!timer.TableService)
@@ -846,7 +869,7 @@ export class MenuComponent implements OnInit {
             else {
                 if (timerType == MenuTimerTypes.Locked) {
                     if (checkLocked) {
-                        if (category != timer.CategoryToLock)
+                        if (this.lockedCategoryId != timer.CategoryToLock)
                             checkMenuTimer = true;
                         else {
                             checkMenuTimer = false;

@@ -1,0 +1,25 @@
+<StackLayout style="background-color: rgb(54, 52, 52); border-color: black; border-width: 3px;">
+    <GridLayout class="m-5" rows="120,*" columns="*">
+        <GridLayout rows="40,*" columns="*,*" row="0" col="0" class="panel">
+            <Label text="Quantity" row="0" col="0" style="text-align: center;color:white; font-weight: bold"></Label>
+            <WrapLayout row="1" col="0" colSpan="2">
+                <Label [text]="enterQty" class='numericTextBox' width="200"></Label>
+                <Button text="&#xf100;" class="glass fa" (tap)="backSpace()" width="60" height="60"></Button>
+            </WrapLayout>
+        </GridLayout>
+        <GridLayout rows="*,*,*,*" columns="*,*,*" row="1" col="0" class="panel">
+            <Button text="1" class="glass" (tap)="setEnterQty('1')" row="0" col="0"></Button>
+            <Button text="2" class="glass" (tap)="setEnterQty('2')" row="0" col="1"></Button>
+            <Button text="3" class="glass" (tap)="setEnterQty('3')" row="0" col="2"></Button>
+            <Button text="4" class="glass" (tap)="setEnterQty('4')" row="1" col="0"></Button>
+            <Button text="5" class="glass" (tap)="setEnterQty('5')" row="1" col="1"></Button>
+            <Button text="6" class="glass" (tap)="setEnterQty('6')" row="1" col="2"></Button>
+            <Button text="7" class="glass" (tap)="setEnterQty('7')" row="2" col="0"></Button>
+            <Button text="8" class="glass" (tap)="setEnterQty('8')" row="2" col="1"></Button>
+            <Button text="9" class="glass" (tap)="setEnterQty('9')" row="2" col="2"></Button>
+            <Button text="0" class="glass" (tap)="setEnterQty('0')" row="3" col="0"></Button>
+            <Button text="." class="glass" (tap)="setEnterQty('.')" row="3" col="1"></Button>
+            <Button text="Done" class="glass" (tap)="setQty()" row="3" col="2"></Button>
+        </GridLayout>
+    </GridLayout>
+</StackLayout>

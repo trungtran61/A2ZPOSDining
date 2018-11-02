@@ -69,7 +69,7 @@ export class HomeComponent implements OnInit {
                 }
             });  
         }
-        console.log(this.DBService.systemSettings);
+        
         //this.page.className = 'loginBG';
         //this.router.navigate(['/home/mytables'])
         //this.router.navigate(['/home/menu'])
@@ -185,7 +185,7 @@ export class HomeComponent implements OnInit {
     }
 
     managerFunctions() {
-        //this.router.navigate(['/home/menu'])
+        this.router.navigate(['/home/menu'])
         //this.router.navigate(['/home/menuitems'])
         //this.DBService.loadSystemSettings(db);
         //this.DBService.loadEmployees(db);

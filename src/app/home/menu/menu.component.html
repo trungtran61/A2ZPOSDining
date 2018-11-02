@@ -67,14 +67,14 @@
     </StackLayout>
   </StackLayout>
   <WrapLayout row="1" col="0" colSpan="8" style="margin-bottom:10" *ngIf='!showExtraFunctions'>
-    <Button class="glass btnBottom btnCancel" text="Cancel" (tap)="cancelOrder()"></Button>
-    <Button class="glass btnBottom" [text]="viewDetailsText" textWrap="true" (tap)="showHideDetails()"></Button>
+    <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancelOrder()"></Button>
+    <Button class="glass btnBottom fa" [text]="viewDetailsText" textWrap="true" (tap)="showHideDetails()"></Button>
     <Button class="glass btnBottom" (tap)="nextSeat()" textWrap="true" text="" style="background-image: url('res://images/Orders/Seat'); background-repeat: no-repeat; background-position: right 0"></Button>
     <Label class="nextSeat" [text]='currentSeatNumber'></Label>
-    <Button class="glass btnBottom" (tap)="extraFunctions()" textWrap="true" text="Extra Functions" style="margin-left: 40"></Button>
-    <Button class="glass btnBottom" (tap)="hold()" textWrap="true" text="Hold"></Button>
-    <Button class="glass btnBottom" (tap)="send()" textWrap="true" text="Send"></Button>
-    <Button [class]="productInfoClass" (tap)="productInfo()" textWrap="true" text="Product Info"></Button>
+    <Button class="glass btnBottom fa" (tap)="extraFunctions()" textWrap="true" text="&#xf0fe; Extra Functions" style="margin-left: 40"></Button>
+    <Button class="glass btnBottom fa" (tap)="hold()" textWrap="true" text="&#xf256; Hold"></Button>
+    <Button class="glass btnBottom fa" (tap)="send()" textWrap="true" text="&#xf14d; Send"></Button>
+    <Button [class]="productInfoClass" (tap)="productInfo()" textWrap="true" text="&#xf05a; Product Info"></Button>
   </WrapLayout>
   <Button row="1" col="0" class="glass btnBottom btnCancel" text="Close" (tap)="closeExtraFunctions()" *ngIf='showExtraFunctions'></Button>
   <FlexBoxLayout row="1" col="3" colSpan="5" justifyContent="flex-end" *ngIf='showExtraFunctions'>      

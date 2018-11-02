@@ -41,6 +41,7 @@ page
 
 .glass{
 	/* background styles */	
+	text-align: center;
 	position: relative;
 	display: inline-block;
 	padding: 8px 0px;
@@ -180,4 +181,20 @@ page
 	border-width: 2px;
 	color: cyan; background-color: black;
 	word-wrap: break-word;
+}
+
+.fa {
+	font-family: "Font Awesome 5 Free", "FontAwesome";
+	color: white;
+	font-size: 20
+}
+
+.numericTextBox
+{
+	text-align: center;color:white; font-weight: bold; font-size: 25px;
+	border-color: silver;
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 10px;
+	margin: 0 10 0 10;
 }

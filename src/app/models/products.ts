@@ -36,6 +36,7 @@ export interface MenuProduct {
     CountdownActivated?: boolean;
     QtyAvailable?: number;
     QtyAllocated?: number;
+    PromptQty?: boolean;
 }
 
 export interface CategoryCode {
