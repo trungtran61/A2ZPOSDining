@@ -258,12 +258,12 @@ export class MenuComponent implements OnInit {
             let countdown = that.countdowns.find(p => p.PriKey == product.ProductID);
 
             if (countdown != null) {
-                product.CountDownActivated = countdown.Activated;
+                product.CountdownActivated = countdown.Activated;
                 product.QtyAvailable = countdown.Quantity;
                 product.QtyAllocated = countdown.QuantityChange;
             }
             else {
-                product.CountDownActivated = false;
+                product.CountdownActivated = false;
             }
 
         });

@@ -33,7 +33,7 @@ export interface MenuProduct {
     UnitPrice?: number;
     UseModifier?: boolean;
     UseForcedModifier?: boolean;
-    CountDownActivated?: boolean;
+    CountdownActivated?: boolean;
     QtyAvailable?: number;
     QtyAllocated?: number;
 }
