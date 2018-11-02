@@ -20,6 +20,7 @@ export class SQLiteService {
     public products: Array<any>;
     private apiUrl = "http://a2zpos.azurewebsites.net/DBService.svc/";
     public loggedInUser: Employee = Object();
+    public systemSettings: SystemSettings = null;
 
     public static isInstantiated: boolean;
 
@@ -1068,15 +1069,18 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS SystemSettings;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER, LoginTableLayout INTEGER);").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER, LoginTableLayout INTEGER" + 
+                    ",AutoCategory INTEGER, CategoryName INTEGER" +
+                    ");").then(id => {
                     let headers = that.createRequestHeader();
                     that.http.get(that.apiUrl + 'GetSettings', { headers: headers })
                         .subscribe(
                             data => {
                                 console.log('got Settings from API');
                                 let ss: SystemSettings = data;
-                                SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout) VALUES (?,?,?,?)",
-                                    [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout]).then(id => {
+                                SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout" +
+                                    ",AutoCategory, CategoryName) VALUES (?,?,?,?,?,?)",
+                                    [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout, ss.AutoCategory, ss.CategoryName]).then(id => {
                                         console.log("Added SystemSettings records.");
                                         resolve("Added SystemSettings records.")
                                     },
@@ -1098,6 +1102,24 @@ export class SQLiteService {
             });
         });
         return promise;
+    }
+
+    public getLocalSystemSettings(): Promise<SystemSettings[]> {
+        let that = this;
+
+        return SQLiteService.database.get("SELECT PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout, AutoCategory, CategoryName FROM SystemSettings;")
+            .then(function (row) {
+                let systemSettings: SystemSettings = {
+                    PriKey: row[0],
+                    OrderScreenLogOffTimer: row[1],
+                    DineInTimerInterval: row[2],
+                    LoginTableLayout: row[3],
+                    AutoCategory: row[4],
+                    CategoryName: row[5],
+                };
+                that.systemSettings = systemSettings;
+                return (systemSettings);
+            });
     }
 
     public loadLogos(db) {
@@ -1145,19 +1167,6 @@ export class SQLiteService {
                     MyChecksLogo: row[1]
                 };
                 return (logos);
-            });
-    }
-
-    public getLocalSystemSettings(): Promise<SystemSettings[]> {
-        return SQLiteService.database.get("SELECT PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout FROM SystemSettings;")
-            .then(function (row) {
-                let systemSettings: SystemSettings = {
-                    PriKey: row[0],
-                    OrderScreenLogOffTimer: row[1],
-                    DineInTimerInterval: row[2],
-                    LoginTableLayout: row[3]
-                };
-                return (systemSettings);
             });
     }
 

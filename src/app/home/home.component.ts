@@ -20,11 +20,10 @@ var Sqlite = require("nativescript-sqlite");
     styleUrls: ['./home.component.css']
 })
 
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit {
 
     employees: Employee[];
     employeeId: string = "";
-    isBusy = true;
     protected employee: Observable<Employee>;
 
     public hidden: boolean;
@@ -61,7 +60,16 @@ export class HomeComponent implements OnInit, AfterViewInit {
             });
             appSettings.setBoolean("isFirstLaunch", false);
         }
-
+        
+        if (this.DBService.systemSettings == null)
+        {
+            this.DBService.getLocalSystemSettings().then((systemSettings) => {
+                if (systemSettings.length == 0) {
+                    console.log("SystemSettings not loaded.")
+                }
+            });  
+        }
+        console.log(this.DBService.systemSettings);
         //this.page.className = 'loginBG';
         //this.router.navigate(['/home/mytables'])
         //this.router.navigate(['/home/menu'])
@@ -193,21 +201,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     dropTables() {
         this.DBService.getTableInfo('MenuCategories'); // .createTables(db);
     }
-
-    ngAfterViewInit() {
-
-        localStorage.removeItem('dataloaded');
-
-        if (localStorage.getItem('dataloaded') != 'true') {
-            console.log('data not loaded');
-            this.isBusy = false;
-        }
-        else {
-            console.log('data loaded');
-            this.isBusy = false;
-        }
-    }
-
+ 
     shutDown() {
         dialogs.confirm({
             title: "Shutdown",
