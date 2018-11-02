@@ -104,12 +104,11 @@ export class MenuComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // Init your component properties here.        
         this.guests = parseInt(localStorage.getItem('guests'));
         this.table = localStorage.getItem('table');
         //this.server = localStorage.getItem('server');
-        this.checkTitle = this.checkNumber + ' ' + this.server + ' ' + this.table + ' ' + this.guests;
-        //let that = this; // needed to access 'this' from callback
+        this.checkTitle = this.checkNumber + ' ' + this.server + ' ' + this.table + ' ' + this.guests;             
+        
         let that = this;
         if (this.showMainCategories) {
             this.DBService.getLocalMenuCategories().then((categories) => {
@@ -125,7 +124,7 @@ export class MenuComponent implements OnInit {
         this.ApiSvc.reloadCountdowns().then(result => {
             this.countdowns = <Countdown[]>result;
         }
-        );
+        );       
     }
 
     loadCategories(categories: MenuCategory[]) {
@@ -137,6 +136,12 @@ export class MenuComponent implements OnInit {
             let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
             that.categoryStyles.push(style);
         });
+
+         // CategoryName is actually CategoryID
+         if (this.DBService.systemSettings.AutoCategory)
+         {
+          this.categorySelected(this.categories.find(x => x.CategoryID == this.DBService.systemSettings.CategoryName));
+         }
     }
 
     nextSeat() {
