@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import { ModalDialogParams, ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
-import { Choice, CheckItem } from "~/app/models/products";
+import { Choice } from "~/app/models/products";
+import { CheckItem } from "~/app/models/orders";
 
 @Component({
     selector: "modify-check-item",   
