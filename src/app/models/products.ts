@@ -106,43 +106,6 @@ export interface Table {
     TableType?: number;
 }
 
-export interface CheckItem {
-    Product?: MenuProduct;
-    Qty?: number;
-    SeatNumber?: number;
-    Price?: number;
-    ForcedModifiers?: MenuChoice[]
-    Modifiers?: Modifier[]
-}
-
-export interface Modifier {
-    Name: string;
-    Price: number;
-}
-
-export interface Choice {
-    ChangeType: string;
-    SelectedNumber: string;
-}
-
-export interface MenuOption {
-    ApplyCharge: boolean;
-    Charge: number;
-    Name: string;
-    Position: number;
-    ProductCode?: number;
-    ReportProductMix?: boolean;
-}
-
-export interface MenuSubOption {
-    ApplyCharge: boolean;
-    Charge: number;
-    ChoiceID?: number;
-    Layer: number;
-    Name: string;
-    Position: number;
-    ReportProductMix: boolean;
-}
 
 export interface TableDetail {
     Name: string;
@@ -230,11 +193,6 @@ export interface ForcedModifier {
     Name: string;
 }
 
-export interface TableCheck {
-    TableName: string;
-    CheckItems: CheckItem[];
-}
-
 export interface ProductGroup {
     PriKey: number;
     Code: string;
@@ -287,4 +245,42 @@ export interface MenuTimer {
     PhoneIn?: boolean;
     QuickSale?: boolean;
     DefaultCategory?: any;
+}
+
+export interface Modifier {
+    Name: string;
+    Price: number;
+}
+
+export interface Choice {
+    ChangeType: string;
+    SelectedNumber: string;
+}
+
+export interface MenuOption {
+    ApplyCharge: boolean;
+    Charge: number;
+    Name: string;
+    Position: number;
+    ProductCode?: number;
+    ReportProductMix?: boolean;
+}
+
+export interface MenuSubOption {
+    ApplyCharge: boolean;
+    Charge: number;
+    ChoiceID?: number;
+    Layer: number;
+    Name: string;
+    Position: number;
+    ReportProductMix: boolean;
+}
+
+export interface TaxRate {
+    TaxID?: number;
+    Name?: string;
+    RateType?: number;
+    EffectiveRate?: number;
+    Disabled?: boolean;
+    DateEntered?: string;
 }

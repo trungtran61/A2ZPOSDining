@@ -3,7 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { CategoryCode, Product, CheckItem, Choice, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, MenuOption, Modifier, OpenProductItem, MenuTimerTypes, MenuTimer } from "~/app/models/products";
+import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice,  OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
@@ -11,7 +11,7 @@ import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/force
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
 import { DeprecatedDatePipe } from "@angular/common";
-import { OrderTypes, Countdown } from "~/app/models/orders";
+import { OrderTypes, Countdown, CheckItem } from "~/app/models/orders";
 import { APIService } from "~/app/services/api/api.service";
 import { count } from "rxjs/operators";
 import { forkJoin } from "rxjs";

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Employee } from "~/app/models/employees";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, MenuOption, ProductGroup, MenuTimer } from "~/app/models/products";
+import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, ProductGroup, MenuTimer, MenuOption, TaxRate } from "~/app/models/products";
 import { Observable, throwError } from 'rxjs';
 import { map, count } from 'rxjs/operators';
 import { forkJoin } from "rxjs";
@@ -247,34 +247,34 @@ export class SQLiteService {
         let that = this;
         let promise = new Promise(function (resolve, reject) {
 
-        SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex," +
-            " mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice, p.ForcedModifier, p.UseForcedModifier" +
-            "  FROM MenuProducts AS mp INNER JOIN Products AS p ON mp.ProductId=p.ProductFilter WHERE mp.CategoryID=? AND mp.SubCategoryID=? ORDER BY mp.Position", [categoryID, subCategoryID])
-            .then(function (rows) {
-                let menuProducts: MenuProduct[] = [];
-                for (var row in rows) {
-                    menuProducts.push({
-                        CategoryID: rows[row][0],
-                        SubCategoryID: rows[row][1],
-                        ProductID: rows[row][2],
-                        Name: rows[row][3],
-                        Position: rows[row][4],
-                        ProductCode: rows[row][5],
-                        ButtonColor: rows[row][6],
-                        ButtonColorHex: rows[row][7],
-                        ButtonForeColor: rows[row][8],
-                        ButtonForeColorHex: rows[row][9],
-                        UnitPrice: rows[row][10],
-                        UseModifier: rows[row][11] == "true",
-                        UseForcedModifier: rows[row][12] == "true"
-                    });
-                }                
-                resolve(menuProducts);
-            },
-            err => {
-                reject("Error occurred while retrieving MenuProducts from Sqlite.");
-            }
-            );
+            SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex," +
+                " mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice, p.ForcedModifier, p.UseForcedModifier" +
+                "  FROM MenuProducts AS mp INNER JOIN Products AS p ON mp.ProductId=p.ProductFilter WHERE mp.CategoryID=? AND mp.SubCategoryID=? ORDER BY mp.Position", [categoryID, subCategoryID])
+                .then(function (rows) {
+                    let menuProducts: MenuProduct[] = [];
+                    for (var row in rows) {
+                        menuProducts.push({
+                            CategoryID: rows[row][0],
+                            SubCategoryID: rows[row][1],
+                            ProductID: rows[row][2],
+                            Name: rows[row][3],
+                            Position: rows[row][4],
+                            ProductCode: rows[row][5],
+                            ButtonColor: rows[row][6],
+                            ButtonColorHex: rows[row][7],
+                            ButtonForeColor: rows[row][8],
+                            ButtonForeColorHex: rows[row][9],
+                            UnitPrice: rows[row][10],
+                            UseModifier: rows[row][11] == "true",
+                            UseForcedModifier: rows[row][12] == "true"
+                        });
+                    }
+                    resolve(menuProducts);
+                },
+                    err => {
+                        reject("Error occurred while retrieving MenuProducts from Sqlite.");
+                    }
+                );
         });
 
         return promise;
@@ -1069,36 +1069,36 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS SystemSettings;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER, LoginTableLayout INTEGER" + 
+                db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER, LoginTableLayout INTEGER" +
                     ",AutoCategory INTEGER, CategoryName INTEGER" +
                     ");").then(id => {
-                    let headers = that.createRequestHeader();
-                    that.http.get(that.apiUrl + 'GetSettings', { headers: headers })
-                        .subscribe(
-                            data => {
-                                console.log('got Settings from API');
-                                let ss: SystemSettings = data;
-                                SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout" +
-                                    ",AutoCategory, CategoryName) VALUES (?,?,?,?,?,?)",
-                                    [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout, ss.AutoCategory, ss.CategoryName]).then(id => {
-                                        console.log("Added SystemSettings records.");
-                                        resolve("Added SystemSettings records.")
-                                    },
-                                        err => {
-                                            reject("Failed to add SystemSettings records.")
-                                        }
-                                    );
-                            },
-                            err => {
-                                reject("Error occurred while retrieving Settings from API.");
-                                console.log(err);
-                            }
-                        );
+                        let headers = that.createRequestHeader();
+                        that.http.get(that.apiUrl + 'GetSettings', { headers: headers })
+                            .subscribe(
+                                data => {
+                                    console.log('got Settings from API');
+                                    let ss: SystemSettings = data;
+                                    SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout" +
+                                        ",AutoCategory, CategoryName) VALUES (?,?,?,?,?,?)",
+                                        [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout, ss.AutoCategory, ss.CategoryName]).then(id => {
+                                            console.log("Added SystemSettings records.");
+                                            resolve("Added SystemSettings records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add SystemSettings records.")
+                                            }
+                                        );
+                                },
+                                err => {
+                                    reject("Error occurred while retrieving Settings from API.");
+                                    console.log(err);
+                                }
+                            );
 
-                }, error => {
-                    console.log("CREATE TABLE SystemSettings ERROR", error);
-                    reject("CREATE TABLE SystemSettings ERROR");
-                });
+                    }, error => {
+                        console.log("CREATE TABLE SystemSettings ERROR", error);
+                        reject("CREATE TABLE SystemSettings ERROR");
+                    });
             });
         });
         return promise;
@@ -1169,7 +1169,62 @@ export class SQLiteService {
                 return (logos);
             });
     }
+    // new Date(parseInt("\/Date(628318530718)\/".slice(6,18)))
+    public loadTaxRates(db) {
 
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+
+            db.execSQL("DROP TABLE IF EXISTS TaxRates;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS TaxRates(TaxID INTEGER,Name TEXT, RateType INTEGER, EffectiveRate REAL, RateType INTEGER,Disabled INTEGER,DateEntered TEXT);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetTaxRates', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let taxRates = <TaxRate[]>data;
+                                taxRates.forEach(function (taxRate: TaxRate) {
+                                    SQLiteService.database.execSQL(
+                                        "INSERT INTO TaxRates (TaxID,Name, RateType, EffectiveRate, RateType,Disabled,DateEntered VALUES (?,?,?,?,?,?)",
+                                        [taxRate.TaxID, taxRate.Name, taxRate.RateType, taxRate.EffectiveRate,
+                                        taxRate.Disabled, taxRate.DateEntered]).then(id => {
+                                            resolve("Added TaxRates records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add TaxRates records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving TaxRates from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE TaxRates ERROR" + error);
+                });
+            });
+        });
+        return promise;
+    }
+
+    public getLocalTaxRates(): Promise<TaxRate> {
+        return SQLiteService.database.get("SELECT TaxID,Name, RateType, EffectiveRate, RateType,Disabled,DateEntered FROM TaxRates;")
+            .then(function (row) {
+                let taxRate: TaxRate = {
+                    TaxID: row[0],
+                    Name: row[1],
+                    RateType: row[2],
+                    EffectiveRate: row[3],
+                    Disabled: row[4],
+                    DateEntered: row[5]
+                };
+                return (taxRate);
+            });
+    }
+    
     public loadCountdowns(db) {
 
         let that = this;
@@ -1179,34 +1234,31 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS Countdowns;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS Countdowns(Activated INTEGER,ItemName TEXT,PriKey INTEGER," +
-                    "Quantity INTEGER, QuantityChange INTEGER,TimeStamp INTEGER);").then(id => {
-                        let headers = that.createRequestHeader();
-                        that.http.get(that.apiUrl + 'GetCountdowns', { headers: headers })
-                            .subscribe(
-                                data => {
-                                    let countdowns = <Countdown[]>data;
-                                    countdowns.forEach(function (countdown: Countdown) {
-                                        SQLiteService.database.execSQL(
-                                            "INSERT INTO Countdowns (Activated ,ItemName,PriKey ," +
-                                            "Quantity , QuantityChange ,TimeStamp) VALUES (?,?,?,?,?,?)",
-                                            [countdown.Activated, countdown.ItemName, countdown.PriKey,
-                                            countdown.Quantity, countdown.QuantityChange, countdown.TimeStamp]).then(id => {
-                                                resolve("Added Countdowns records.")
-                                            },
-                                                err => {
-                                                    reject("Failed to add Countdowns records.")
-                                                }
-                                            );
-                                    });
-                                },
-                                err => {
-                                    reject("Error occurred while retrieving Countdowns from API.");
-                                }
-                            );
-                    }, error => {
-                        reject("CREATE TABLE Countdowns ERROR" + error);
-                    });
+                db.execSQL("CREATE TABLE IF NOT EXISTS Countdowns(ProductFilter INTEGER,Quantity INTEGER, QuantityChange INTEGER);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetCountdowns', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let countdowns = <Countdown[]>data;
+                                countdowns.forEach(function (countdown: Countdown) {
+                                    SQLiteService.database.execSQL(
+                                        "INSERT INTO Countdowns (ProductFilter,Quantity, QuantityChange) VALUES (?,?,?)",
+                                        [countdown.ProductFilter, countdown.Quantity, countdown.QuantityChange]).then(id => {
+                                            resolve("Added Countdowns records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add Countdowns records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving Countdowns from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE Countdowns ERROR" + error);
+                });
             });
         });
         return promise;
@@ -1229,9 +1281,8 @@ export class SQLiteService {
                             countdowns.forEach(function (countdown: Countdown) {
                                 SQLiteService.database.execSQL(
                                     "INSERT INTO Countdowns (Activated ,ItemName,PriKey ," +
-                                    "Quantity , QuantityChange ,TimeStamp) VALUES (?,?,?,?,?,?)",
-                                    [countdown.Activated, countdown.ItemName, countdown.PriKey,
-                                    countdown.Quantity, countdown.QuantityChange, countdown.TimeStamp]).then(id => {
+                                    "Quantity , QuantityChange ,TimeStamp) VALUES (?,?,?)",
+                                    [countdown.ProductFilter, countdown.Quantity, countdown.QuantityChange]).then(id => {
                                         resolve("Added Countdowns records.")
                                     },
                                         err => {

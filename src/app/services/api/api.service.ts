@@ -1,13 +1,6 @@
 import { Injectable } from "@angular/core";
-import { Employee } from "~/app/models/employees";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, MenuOption, ProductGroup, MenuTimer } from "~/app/models/products";
-import { Observable, throwError } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { catchError } from 'rxjs/operators';
-import { SystemSettings, Logos } from "~/app/models/settings";
 import { Countdown } from "~/app/models/orders";
-//import { Observable } from "tns-core-modules/ui/page/page";
 
 @Injectable()
 export class APIService {

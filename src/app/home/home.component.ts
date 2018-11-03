@@ -48,8 +48,7 @@ export class HomeComponent implements OnInit {
             (new Sqlite("FullServiceDining.db")).then(db => {
                 console.log("DB Created");
                 Promise.all([
-                    //this.DBService.createTables(db)
-                    //this.loadLocalDataBase(db)
+                    this.loadLocalDataBase(db)
                 ]).then
                 {
                     this.isLoading = false;
@@ -171,7 +170,7 @@ export class HomeComponent implements OnInit {
             this.DBService.loadProductCategories(db),                                    
             this.DBService.loadMenuTimers(db),
             this.DBService.loadOptions(db),
-            //this.DBService.loadCountdowns(db)             
+            this.DBService.loadTaxRates(db)             
         ])
             .subscribe(results => {
                 console.log(results);
