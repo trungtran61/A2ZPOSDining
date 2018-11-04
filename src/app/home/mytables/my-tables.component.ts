@@ -106,12 +106,12 @@ export class MyTablesComponent implements OnInit {
             this.router.navigate(['/home/']);              
         });
     }
-
+/*
     pageTap()
     {
         this.utilSvc.idleTimer = 0;
     }
-
+*/
     constructor(private router:RouterExtensions, private DBService: SQLiteService
         ,private page: Page, private utilSvc: UtilityService) 
     {          

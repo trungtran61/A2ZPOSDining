@@ -26,5 +26,10 @@ export class UtilityService {
             });
     }
 
+    resetIdleTImer()
+    {
+        this.idleTimer = 0;
+    }
+
     
 }

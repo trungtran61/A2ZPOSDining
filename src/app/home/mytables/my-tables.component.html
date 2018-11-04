@@ -1,4 +1,4 @@
-        <AbsoluteLayout [style]="areaStyle" (tap)='pageTap()'>     
+        <AbsoluteLayout [style]="areaStyle" (tap)='utilSvc.resetIdleTImer()'>     
             <Label [text]="employeeName" left="10" top="10" width="100" [height]="20" style="color:white; font-weight: bold"></Label>   
           <Label [text]="table.Name" [left]="table.PosX" [top]="table.PosY" [width]="table.Width" [height]="table.Height" 
             class='table' [style]="tableStyles[i]"
