@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Countdown, Order } from "~/app/models/orders";
 
 @Injectable()
-export class APIService {
+export class OrderService {
 
     private apiUrl = "http://a2zpos.azurewebsites.net/DBService.svc/";
     

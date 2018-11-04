@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 
-import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
+import { SQLiteService } from "~/app/services/sqlite.service";
 import { ApplicationEventData } from "tns-core-modules/application/application";
 //import * as appSettings from "application-settings";
 

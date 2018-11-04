@@ -2,10 +2,11 @@ import { Component, OnInit } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
+import { SQLiteService } from "~/app/services/sqlite.service";
 import { Area, TableDetail } from "~/app/models/products";
 import { Observable } from "rxjs";
 import { Page } from "tns-core-modules/ui/page/page";
+import { UtilityService } from "~/app/services/utility.service";
 
 @Component({
     selector: "MyTables",
@@ -108,10 +109,11 @@ export class MyTablesComponent implements OnInit {
 
     pageTap()
     {
-        console.log('tapped');
+        this.utilSvc.idleTimer = 0;
     }
 
-    constructor(private router:RouterExtensions, private DBService: SQLiteService,   private page: Page) 
+    constructor(private router:RouterExtensions, private DBService: SQLiteService
+        ,private page: Page, private utilSvc: UtilityService) 
     {          
         page.actionBarHidden = true;
     }

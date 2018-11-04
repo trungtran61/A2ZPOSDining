@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
-import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
+import { SQLiteService } from "~/app/services/sqlite.service";
 
 @Component({
     selector: "splash-screen",

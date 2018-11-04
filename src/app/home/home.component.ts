@@ -6,10 +6,11 @@ import { exit } from 'nativescript-exit';
 import * as appSettings from "application-settings";
 
 import { Employee, LoginResponse } from "~/app/models/employees";
-import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
+import { SQLiteService } from "~/app/services/sqlite.service";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import { Page } from "tns-core-modules/ui/page/page";
 import { Logos } from "../models/settings";
+import { UtilityService } from "../services/utility.service";
 
 var Sqlite = require("nativescript-sqlite");
 
@@ -35,7 +36,7 @@ export class HomeComponent implements OnInit {
     isLoading: boolean = false;
 
     constructor(private router: RouterExtensions, private DBService: SQLiteService,
-        private zone: NgZone, private page: Page
+        private zone: NgZone, private page: Page, private utilSvc: UtilityService
     ) {
         page.actionBarHidden = true;
     }
@@ -125,7 +126,10 @@ export class HomeComponent implements OnInit {
                             dialogs.alert("Employee Info not loaded");
                         }
                         else {
+
                             this.DBService.loggedInUser.FirstName = data.FirstName;
+                            this.utilSvc.startTimer();
+                            
                             this.zone.run(() => this.router.navigate(['/home/mytables']));
                         }
                     });

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import { MenuChoice, ForcedModifier } from "~/app/models/products";
-import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
+import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogParams } from "nativescript-angular";
 
 @Component({

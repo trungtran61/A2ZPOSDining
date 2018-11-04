@@ -7,7 +7,7 @@ import { map, count } from 'rxjs/operators';
 import { forkJoin } from "rxjs";
 import { catchError } from 'rxjs/operators';
 import { SystemSettings, Logos } from "~/app/models/settings";
-import { APIService } from "../api/api.service";
+import { APIService } from "./api.service";
 import { Countdown } from "~/app/models/orders";
 
 var Sqlite = require("nativescript-sqlite");

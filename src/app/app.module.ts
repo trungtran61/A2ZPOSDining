@@ -7,9 +7,11 @@ import { HttpClientModule } from "@angular/common/http";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
+import { SQLiteService } from "~/app/services/sqlite.service";
 import { SplashComponent } from "~/app/home/splash/splash.component";
-import { APIService } from "./services/api/api.service";
+import { APIService } from "./services/api.service";
+import { UtilityService } from "./services/utility.service";
+import { OrderService } from "./services/order.service";
 
 //TNSFontIconService.debug = true;
 
@@ -33,7 +35,9 @@ import { APIService } from "./services/api/api.service";
     ],   
     providers: [
         SQLiteService,
-        APIService
+        APIService,
+        UtilityService,
+        OrderService
     ] 
 })
 export class AppModule { }

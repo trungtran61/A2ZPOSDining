@@ -3,7 +3,7 @@ import { ModalDialogParams, ModalDialogOptions, ModalDialogService } from "nativ
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import { MenuProduct, ProductGroup, OpenProductItem } from "~/app/models/products";
-import { SQLiteService } from "~/app/services/sqlite/sqlite.service";
+import { SQLiteService } from "~/app/services/sqlite.service";
 
 
 @Component({
