@@ -128,8 +128,7 @@ export class HomeComponent implements OnInit {
                         else {
 
                             this.DBService.loggedInUser.FirstName = data.FirstName;
-                            this.utilSvc.startTimer();
-                            
+                            //this.utilSvc.startTimer();                            
                             this.zone.run(() => this.router.navigate(['/home/mytables']));
                         }
                     });
@@ -174,7 +173,8 @@ export class HomeComponent implements OnInit {
             this.DBService.loadProductCategories(db),                                    
             this.DBService.loadMenuTimers(db),
             this.DBService.loadOptions(db),
-            this.DBService.loadTaxRates(db)             
+            this.DBService.loadTaxRates(db),
+            this.DBService.loadUserModifiers(db)             
         ])
             .subscribe(results => {
                 console.log(results);

@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Countdown } from "~/app/models/orders";
+import { Countdown, Order } from "~/app/models/orders";
 
 @Injectable()
 export class APIService {
@@ -9,28 +9,7 @@ export class APIService {
     
     public constructor(private http: HttpClient) {
     }
-/*
-    public getCountDowns(products: MenuProduct[]) {
-        let promise = new Promise(((resolve, reject) => {
-            let headers = this.createRequestHeader();
-            this.http.get(this.apiUrl + 'GetProductCountDowns', { headers: headers })
-                .toPromise()
-                .then(res => {
-                    let _countDowns = <Countdown[]>res;
-                    let result = products.map(mp => {
-                        return Object.assign({}, mp, _countDowns.filter(cd => cd.PriKey === mp.ProductID)[0]);
-                    });
-                    resolve(result);
-                },
-                    err => {
-                        reject("Error occurred while retrieving CountDowns from API.");
-                    }
-                );
-        }));
-
-        return promise;
-    }
-*/
+    
     public reloadCountdowns() {
         let that = this;
         let headers = this.createRequestHeader();
@@ -50,7 +29,7 @@ export class APIService {
         return promise;
     }
 
-    private createRequestHeader() {
+    public createRequestHeader() {
         let headers = new HttpHeaders({
             "AuthKey": "my-key",
             "AuthToken": "my-token",
@@ -58,5 +37,11 @@ export class APIService {
         });
 
         return headers;
+    }
+
+    GetOrder(orderFilter: number, ph1: boolean, ph2: boolean): Order
+    {
+        let order: Order;
+        return order;
     }
 }

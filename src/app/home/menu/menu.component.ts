@@ -3,7 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice,  OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier } from "~/app/models/products";
+import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier, TaxRate } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
@@ -11,11 +11,13 @@ import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/force
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
 import { DeprecatedDatePipe } from "@angular/common";
-import { OrderTypes, Countdown, CheckItem } from "~/app/models/orders";
+import { OrderTypes, Countdown, CheckItem, Order } from "~/app/models/orders";
 import { APIService } from "~/app/services/api.service";
 import { count } from "rxjs/operators";
-import { forkJoin } from "rxjs";
+import { forkJoin, from } from "rxjs";
 import { PromptQtyComponent } from "./prompt-qty.component";
+import { on } from "tns-core-modules/application/application";
+import { nullSafeIsEquivalent } from "@angular/compiler/src/output/output_ast";
 
 @Component({
     selector: "Menu",
@@ -50,6 +52,7 @@ export class MenuComponent implements OnInit {
     menuOptions: MenuOption[];
     optionCols: number[] = [];
     optionRows: number[] = [];
+    userModifiers: MenuOption[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
     checkItems: CheckItem[] = [];
@@ -132,8 +135,8 @@ export class MenuComponent implements OnInit {
         }
         );
 
-        this.getMenuTimers();
-
+        this.getMenuTimers();       
+        this.getUserModifiers();
     }
 
     loadCategories(categories: MenuCategory[]) {
@@ -199,17 +202,17 @@ export class MenuComponent implements OnInit {
         currentSubCategory.Class = 'btnSubCategoryActive';
         //this.subCategoryClasses[currentIndex] = 'btnSubCategoryActive';
     }
-/*
-    loadCategoryStyles(categories: MenuCategory[], categoryStyles: string[]) {
-        categoryStyles = [];
-        categories.forEach(function (menuCategory: MenuCategory) {
-            let darkColor: string = menuCategory.ButtonColorHex;
-            let lightColor: string = this.colorLuminance(darkColor, 0.5);
-            let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
-            categoryStyles.push(style);
-        });
-    }
-*/ 
+    /*
+        loadCategoryStyles(categories: MenuCategory[], categoryStyles: string[]) {
+            categoryStyles = [];
+            categories.forEach(function (menuCategory: MenuCategory) {
+                let darkColor: string = menuCategory.ButtonColorHex;
+                let lightColor: string = this.colorLuminance(darkColor, 0.5);
+                let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
+                categoryStyles.push(style);
+            });
+        }
+    */
     subCategorySelected(subCategory: MenuSubCategory, currentIndex: number) {
         // build menu products list        
         this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
@@ -284,39 +287,39 @@ export class MenuComponent implements OnInit {
                 if (product.QtyAvailable <= product.QtyAllocated)
                     product.QtyClass = 'qtyLow';
                 else
-                    product.QtyClass = 'qtyAvailable';    
-                
-                    product.Disabled = product.QtyAvailable == 0;
+                    product.QtyClass = 'qtyAvailable';
+
+                product.Disabled = product.QtyAvailable == 0;
             }
         });
     }
 
-     /*
-    ColorLuminance("#69c", 0);		// returns "#6699cc"
-    ColorLuminance("6699CC", 0.2);	// "#7ab8f5" - 20% lighter
-    ColorLuminance("69C", -0.5);	// "#334d66" - 50% darker
-    */
+    /*
+   ColorLuminance("#69c", 0);		// returns "#6699cc"
+   ColorLuminance("6699CC", 0.2);	// "#7ab8f5" - 20% lighter
+   ColorLuminance("69C", -0.5);	// "#334d66" - 50% darker
+   */
 
-   colorLuminance(hex, lum) {
+    colorLuminance(hex, lum) {
 
-    // validate hex string
-    hex = String(hex).replace(/[^0-9a-f]/gi, '');
-    if (hex.length < 6) {
-        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        // validate hex string
+        hex = String(hex).replace(/[^0-9a-f]/gi, '');
+        if (hex.length < 6) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+        lum = lum || 0;
+
+        // convert to decimal and change luminosity
+        var rgb = "#", c, i;
+        for (i = 0; i < 3; i++) {
+            c = parseInt(hex.substr(i * 2, 2), 16);
+            c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+            rgb += ("00" + c).substr(c.length);
+        }
+
+        return rgb;
     }
-    lum = lum || 0;
 
-    // convert to decimal and change luminosity
-    var rgb = "#", c, i;
-    for (i = 0; i < 3; i++) {
-        c = parseInt(hex.substr(i * 2, 2), 16);
-        c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
-        rgb += ("00" + c).substr(c.length);
-    }
-
-    return rgb;
-}
- 
     productSelected(product: MenuProduct) {
 
         if (this.showProductInfo) {
@@ -330,7 +333,7 @@ export class MenuComponent implements OnInit {
             return;
         }
 
-        if (!product.PromptQty) {
+        if (product.PromptQty) {
             this.showPromptQty(product);
         }
         else
@@ -379,7 +382,10 @@ export class MenuComponent implements OnInit {
 
     addProductToCheck(product: MenuProduct) {
         this.checkItems.push({
-            Modifiers: [], Qty: this.qtyEntered, SeatNumber: this.currentSeatNumber, Price: product.UnitPrice * this.qtyEntered,
+            Modifiers: [], 
+            Qty: this.qtyEntered, 
+            SeatNumber: this.currentSeatNumber, 
+            Price: product.UnitPrice * this.qtyEntered,
             Product: product
         });
         this.totalPrice();
@@ -505,6 +511,19 @@ export class MenuComponent implements OnInit {
                 this.showOptions = true;
                 this.showMainCategories = false;
                 this.showSubCategories = false;
+            }
+        });
+    }
+
+    getUserModifiers()
+    {
+        let that = this;
+        this.DBService.getLocalUserModifiers().then((userModifiers) => {
+            if (userModifiers.length == 0) {
+                dialogs.alert("Missing UserModifiers");
+            }
+            else {
+                this.userModifiers = userModifiers;              
             }
         });
     }
@@ -899,5 +918,72 @@ export class MenuComponent implements OnInit {
 
         return checkMenuTimer;
     }
+
+    getTaxTotal(orderFilter: number, remote: boolean, grouped: boolean, order: Order, taxrates: TaxRate[]) {
+        let taxTotal: number = 0;
+
+        if (order == null || order.CheckItems.length == 0)
+            return true;
+
+        let orderDetails = order.CheckItems.filter(x => x.Tag == null);
+
+        let discount = 0, lineDiscount = 0, itemTotal = 0;
+
+        if (remote) {
+            let order = this.ApiSvc.GetOrder(orderFilter, false, false);
+            if (order == null)
+                return false;
+            orderDetails = order.CheckItems.filter(x => x.Tag == null);
+        }
+
+        discount = order.Discount;
+        if (order.TaxExempt)
+            return true;
+/*
+        itemTotal = orderDetails.filter(x => x.Refund == false && x.Voided == null && x.Comped == false && x.Price != null).Sum(x => x.ExtPrice);
+        if (itemTotal == 0)
+            return true;
+
+        var linediscounts = from orderdetail in orderDetails
+        join taxrate in taxrates on(byte)orderdetail.TaxRate equals(byte)taxrate.TaxID
+        select new { orderdetail.ExtPrice, taxrate.EffectiveRate, orderdetail.Refund, orderdetail.Voided, orderdetail.Comped, orderdetail.ProductType, orderdetail.Taxable, orderdetail.IgnoreTax };
+        if (g.setSmartTax) {
+            int counts = (int)orderDetails.Where(x => x.Refund == false && x.Voided == null && x.Comped == false && x.ProductType != 4 && x.ProductType != 5 && x.Taxable == 0).Count();
+            if (counts > 0) {
+                linediscounts = linediscounts.Where(x => (bool)x.Refund == false && x.IgnoreTax == false && x.Voided == null && x.Comped == false && (byte)x.ProductType != 4 && (byte)x.ProductType != 5 && (byte)x.Taxable != 2 && x.ExtPrice != null && x.ExtPrice != 0);
+                if (linediscounts.Count() == 0)
+                    return true;
+                lineDiscount = (((decimal)linediscounts.Where(x => x.ExtPrice != null).Sum(x => x.ExtPrice) / itemTotal) * Discount) / linediscounts.Count();
+                taxTotal = linediscounts.Where(x => x.ExtPrice != null).Sum(x => ((decimal)x.ExtPrice - lineDiscount) * (decimal)x.EffectiveRate);
+            }
+            else {
+                linediscounts = linediscounts.Where(x => (bool)x.Refund == false && x.IgnoreTax == false && x.Voided == null && x.Comped == false && (byte)x.Taxable == 0);
+                try {
+                    lineDiscount = (((decimal)linediscounts.Where(x => x.ExtPrice != null).Sum(x => x.ExtPrice) / itemTotal) * Discount) / linediscounts.Count();
+                }
+                catch (Exception ex)
+                { }
+                taxTotal = linediscounts.Where(x => x.ExtPrice != null).Sum(x => ((decimal)x.ExtPrice - lineDiscount) * (decimal)x.EffectiveRate);
+            }
+        }
+        else {
+            linediscounts = linediscounts.Where(x => (bool)x.Refund == false && x.Voided == null && x.Comped == false && (byte)x.Taxable == 0 && x.ExtPrice != null && x.ExtPrice != 0);
+            try {
+                lineDiscount = (((decimal)linediscounts.Where(x => x.ExtPrice != null).Sum(x => x.ExtPrice) / itemTotal) * Discount) / linediscounts.Count();
+            }
+            catch (Exception ex)
+            { }
+            taxTotal = linediscounts.Where(x => x.ExtPrice != null).Sum(x => ((decimal)x.ExtPrice - lineDiscount) * (decimal)x.EffectiveRate);
+        }
+
+        if (g.setTaxGratuity)
+            taxTotal += ((decimal)order.Gratuity * (decimal)g.setGratuityTaxRate);
+
+        taxTotal = Math.Round(taxTotal, 2, MidpointRounding.AwayFromZero);
+                */
+        return true;
+    }
+
+
 
 }

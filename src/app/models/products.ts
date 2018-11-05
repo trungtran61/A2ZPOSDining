@@ -252,6 +252,19 @@ export interface Modifier {
     Price: number;
 }
 
+export interface UserModifier {
+    PriKey?: number;
+    Position?: number;
+    Modifier?: string;
+    ApplyCharge?: boolean;
+    Price?: number;
+    ButtonFunction?: number;
+    StampPrice?: boolean;
+    TextPosition?: number;
+    FontSize?: number;
+    ItemName?: string;
+}
+
 export interface Choice {
     ChangeType: string;
     SelectedNumber: string;

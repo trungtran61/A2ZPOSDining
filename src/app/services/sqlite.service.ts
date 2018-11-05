@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Employee } from "~/app/models/employees";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, ProductGroup, MenuTimer, MenuOption, TaxRate } from "~/app/models/products";
+import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, ProductGroup, MenuTimer, MenuOption, TaxRate, UserModifier } from "~/app/models/products";
 import { Observable, throwError } from 'rxjs';
 import { map, count } from 'rxjs/operators';
 import { forkJoin } from "rxjs";
@@ -494,6 +494,71 @@ export class SQLiteService {
             });
         });
         return promise;
+    }
+
+    public loadUserModifiers(db) {
+
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+
+            db.execSQL("DROP TABLE IF EXISTS UserModifiers;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS UserModifiers (PriKey INTEGER,Position INTEGER,Modifier TEXT," +
+                    "ApplyCharge INTEGER,Price INTEGER,ButtonFunction INTEGER,StampPrice INTEGER,TextPosition INTEGER," +
+                    "FontSize INTEGER,ItemName TEXT);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetModifiers', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let userModifiers = <UserModifier[]>data;
+                                userModifiers.forEach(function (userModifier: UserModifier) {
+                                    SQLiteService.database.execSQL("INSERT INTO UserModifiers (PriKey ,Position ,Modifier, ApplyCharge ,Price" + 
+                                        ",ButtonFunction ,StampPrice ,TextPosition , FontSize ,ItemName)" + 
+                                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                          [userModifier.PriKey, userModifier.Position, userModifier.Modifier, userModifier.ApplyCharge,  userModifier.Price,
+                                           userModifier.ButtonFunction, userModifier.StampPrice, userModifier.TextPosition, userModifier.FontSize, userModifier.ItemName]).then(id => {
+                                            resolve("Added UserModifiers records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add UserModifiers records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving UserModifiers from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE UserModifiers ERROR" + error);
+                });
+            });
+        });
+        return promise;
+    }
+
+    public getLocalUserModifiers() {
+        return SQLiteService.database.all("SELECT PriKey,Position,Modifier,ApplyCharge,Price,ButtonFunction,StampPrice,TextPosition,FontSize,ItemName FROM UserModifiers ORDER BY Position")
+            .then(function (rows) {
+                let items: UserModifier[] = [];
+                for (var row in rows) {
+                    items.push({
+                        PriKey: rows[row][0],
+                        Position: rows[row][1],
+                        Modifier: rows[row][2],
+                        ApplyCharge: rows[row][3],
+                        Price: rows[row][4],
+                        ButtonFunction: rows[row][5],
+                        StampPrice: rows[row][6],
+                        TextPosition: rows[row][7],
+                        FontSize: rows[row][8],
+                        ItemName: rows[row][9]
+                    });
+                }
+                return (items);
+            });
     }
 
     public loadMenuChoices(db) {
@@ -1179,7 +1244,7 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS TaxRates;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS TaxRates(TaxID INTEGER,Name TEXT, RateType INTEGER, EffectiveRate REAL, RateType INTEGER,Disabled INTEGER,DateEntered TEXT);").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS TaxRates(TaxID INTEGER,Name TEXT, RateType INTEGER, EffectiveRate REAL,Disabled INTEGER,DateEntered TEXT);").then(id => {
                     let headers = that.createRequestHeader();
                     that.http.get(that.apiUrl + 'GetTaxRates', { headers: headers })
                         .subscribe(
@@ -1187,9 +1252,9 @@ export class SQLiteService {
                                 let taxRates = <TaxRate[]>data;
                                 taxRates.forEach(function (taxRate: TaxRate) {
                                     SQLiteService.database.execSQL(
-                                        "INSERT INTO TaxRates (TaxID,Name, RateType, EffectiveRate, RateType,Disabled,DateEntered VALUES (?,?,?,?,?,?)",
+                                        "INSERT INTO TaxRates (TaxID,Name,RateType,EffectiveRate,Disabled,DateEntered) VALUES (?,?,?,?,?,?)",
                                         [taxRate.TaxID, taxRate.Name, taxRate.RateType, taxRate.EffectiveRate,
-                                        taxRate.Disabled, taxRate.DateEntered]).then(id => {
+                                        taxRate.Disabled, that.converTimestampToDate(taxRate.DateEntered)]).then(id => {
                                             resolve("Added TaxRates records.")
                                         },
                                             err => {

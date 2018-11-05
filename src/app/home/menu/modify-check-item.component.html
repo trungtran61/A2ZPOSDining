@@ -2,7 +2,7 @@
     <GridLayout class="m-5" rows="100,*,*" columns="*,100">
         <GridLayout rows="*" columns="*,*,*,*" row="0" col="0" *ngIf='isNormalChoice'>
             <StackLayout orientation="horizontal" colSpan="4" class="panel">
-                <Button text="Modify" *ngIf='hasModifiers' class="glass" style="margin-left: 21px;width: 250px;height: 100px;color: orange;background-image: linear-gradient(#0a4e3d, lightgreen);"
+                <Button text="Modify" class="glass" style="margin-left: 21px;width: 250px;height: 100px;color: orange;background-image: linear-gradient(#0a4e3d, lightgreen);"
                     (tap)="doAction('modify')"></Button>
                 <Button text="Delete" class="glass" style="margin-left: 21px;width: 250px;height: 100px;background-image: linear-gradient(darkred,red);"
                     (tap)="doAction('delete')"></Button>

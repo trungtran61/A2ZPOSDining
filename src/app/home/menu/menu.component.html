@@ -115,4 +115,8 @@
     <Button class="glass btnMenuOption" [text]="item.Name" *ngFor="let item of menuOptions let i=index" (tap)="optionSelected(item)"
       [col]='optionCols[i]' [row]='optionRows[i]' textWrap="true"></Button>
   </GridLayout>
+  <StackLayout orientation="horizontal" *ngIf="showOptions">
+    <Button class="glass btnMenuOption" [text]="item.Name" *ngFor="let item of userModifiers let i=index" (tap)="optionSelected(item)"
+      ></Button>
+  </StackLayout>
 </GridLayout>

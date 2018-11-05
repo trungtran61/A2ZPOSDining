@@ -3,7 +3,7 @@ import { MenuProduct, MenuChoice, Modifier } from "./products";
 export interface Countdown {
     ProductFilter?: number;
     Quantity?: number;
-    QuantityChange?: number;    
+    QuantityChange?: number;
 }
 
 export enum OrderTypes {
@@ -24,10 +24,18 @@ export interface CheckItem {
     SeatNumber?: number;
     Price?: number;
     ForcedModifiers?: MenuChoice[]
-    Modifiers?: Modifier[]    
+    Modifiers?: Modifier[],
+    Tag?: string,
+    Refund?: boolean,
+    Voided?: boolean,
+    Comped?: boolean
 }
 
 export interface Order {
     CheckNumber: number;
+    ServerID: number;
+    TableName: string;
+    Discount: number;
+    TaxExempt: boolean;
     CheckItems: CheckItem[];
 }
