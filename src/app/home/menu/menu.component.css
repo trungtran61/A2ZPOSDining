@@ -37,3 +37,18 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 {
     margin: 75 0 0 -105;  color:red;font-size: 18; padding: 0; text-align: center; width: 30; height: 30; background-color: white; border-radius: 20;
 }
+
+.btnOptionActive
+{
+    background-image:linear-gradient(red, black);text-align: center; height: 118px;
+}
+
+.btnOption
+{
+    text-align: center;height: 118px;
+}
+
+.btnMemo
+{
+    background-image:linear-gradient(orange, white);text-align: center; height: 118px; border-width: 2; border-color: bisque; border-radius: 30;
+}

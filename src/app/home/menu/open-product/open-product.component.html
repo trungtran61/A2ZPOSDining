@@ -6,33 +6,29 @@
     </GridLayout>
     <FlexBoxLayout row='1' col='0' colSpan="3" *ngIf='showEditPanel' style='margin-top:20;height:100'>
         <StackLayout>
-            <TextField hint="Enter Product Name" [text]='productName' [(ngModel)]='productName' 
-                required #productNameModel='ngModel'
-                autocorrect="true" style='border-radius: 6; border-color: gray; border-width: 1; background-color: white; font-size: 20; font-weight: bold; padding-left: 5; width: 400; margin-right: 20'>
-            </TextField>          
-            <Label class="validation" style='color:red' [visibility]="productNameModel.valid ? 'collapse' : 'visible'"
-                text="Product Name is required"></Label>
-        </StackLayout>
-        <StackLayout>     
-           <TextField hint="Enter Quantity" [text]='quantity' [(ngModel)]='quantity' required #qtyModel='ngModel'
-                autocorrect="false" class="a2zinput" keyboardType='number' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5; margin-right: 20'>
-            </TextField>            
-            <Label class="validation" style='color:red' [visibility]="qtyModel.valid ? 'collapse' : 'visible'" text="Quantity is required"></Label>
+            <TextField hint="Enter Product Name" [text]='productName' [(ngModel)]='productName' required
+                #productNameModel='ngModel' autocorrect="true" style='border-radius: 6; border-color: gray; border-width: 1; background-color: white; font-size: 20; font-weight: bold; padding-left: 5; width: 400; margin-right: 20'>
+            </TextField>
+            <Label class="validation" [visibility]="productNameModel.valid ? 'collapse' : 'visible'" text="Product Name is required"></Label>
         </StackLayout>
         <StackLayout>
-        <TextField hint="Enter Price" [text]='price' [(ngModel)]='price' required #priceModel='ngModel'
-            autocorrect="false" class="a2zinput"
-            keyboardType='number' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5'>
-        </TextField>
-        <Label class="validation" style='color:red' [visibility]="priceModel.valid ? 'collapse' : 'visible'" text="Price is required"></Label>
-    </StackLayout>
+            <TextField hint="Enter Quantity" [text]='quantity' [(ngModel)]='quantity' required #qtyModel='ngModel'
+                autocorrect="false" class="a2zinput" keyboardType='number' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5; margin-right: 20'>
+            </TextField>
+            <Label class="validation" [visibility]="qtyModel.valid ? 'collapse' : 'visible'" text="Quantity is required"></Label>
+        </StackLayout>
+        <StackLayout>
+            <TextField hint="Enter Price" [text]='price' [(ngModel)]='price' required #priceModel='ngModel' autocorrect="false"
+                class="a2zinput" keyboardType='number' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5'>
+            </TextField>
+            <Label class="validation" [visibility]="priceModel.valid ? 'collapse' : 'visible'" text="Price is required"></Label>
+        </StackLayout>
     </FlexBoxLayout>
-    <FlexBoxLayout row='4' col='0' colSpan="3">           
+    <FlexBoxLayout row='4' col='0' colSpan="3">
         <Button class='glass btnCancel' text='Cancel' (tap)='cancel()'></Button>
     </FlexBoxLayout>
-    <FlexBoxLayout row='4' col='1' colSpan="2" justifyContent="flex-end">            
+    <FlexBoxLayout row='4' col='1' colSpan="2" justifyContent="flex-end">
         <Button class='glass btnOK' text='Done' 
-            [visibility]="priceModel.valid && productNameModel.valid && qtyModel.valid ? 'visible' : 'collapse'"
             (tap)='done()' style="position: relative; right:0; width: 100"></Button>
-    </FlexBoxLayout>    
+    </FlexBoxLayout>
 </GridLayout>

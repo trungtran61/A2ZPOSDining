@@ -1,0 +1,19 @@
+<StackLayout class="p-30 page">
+    <StackLayout orientation="horizontal">
+        <TextField hint="Enter Memo" [text]='memo' [(ngModel)]='memo' required #memoModel='ngModel' autocorrect="true"
+            class="textEntryActive">
+        </TextField>
+        <Label class="validation" [visibility]="memoModel.valid ? 'collapse' : 'visible'" text="Product Name is required"></Label>
+        <TextField hint="Enter Price" [text]='price' [(ngModel)]='price' required #priceModel='ngModel' autocorrect="false"
+            class="textEntry" keyboardType='number' >
+        </TextField>       
+    </StackLayout>
+    <StackLayout orientation="horizontal">
+        <FlexBoxLayout>
+            <Button class='glass btnCancel' text='Cancel' (tap)='cancel()'></Button>
+        </FlexBoxLayout>
+        <FlexBoxLayout justifyContent="flex-end">
+            <Button class='glass btnOK' text='Done' (tap)='done()'></Button>
+        </FlexBoxLayout>
+    </StackLayout>
+</StackLayout>

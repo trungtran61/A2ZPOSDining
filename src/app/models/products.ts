@@ -213,6 +213,11 @@ export interface OpenProductItem {
     UnitPrice: number;
 }
 
+export interface Memo {
+    Memo: string;
+    Price: number;
+}
+
 export enum MenuTimerTypes {
     Undefined = 0,
     Price = 1,
@@ -263,6 +268,7 @@ export interface UserModifier {
     TextPosition?: number;
     FontSize?: number;
     ItemName?: string;
+    Class?: string;
 }
 
 export interface Choice {

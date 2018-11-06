@@ -66,7 +66,7 @@
       </StackLayout>
     </StackLayout>
   </StackLayout>
-  <WrapLayout row="1" col="0" colSpan="8" style="margin-bottom:10" *ngIf='!showExtraFunctions'>
+  <WrapLayout row="1" col="0" colSpan="8" style="margin-bottom:10" *ngIf='!showExtraFunctions && !showOptions'>
     <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancelOrder()"></Button>
     <Button class="glass btnBottom fa" [text]="viewDetailsText" textWrap="true" (tap)="showHideDetails()"></Button>
     <Button class="glass btnBottom" (tap)="nextSeat()" textWrap="true" text="" style="background-image: url('res://images/Orders/Seat'); background-repeat: no-repeat; background-position: right 0"></Button>
@@ -108,15 +108,15 @@
     <StackLayout row='1' col='3' rowSpan="7">
       <Label text="Product Options" textWrap="true" style='text-align: center; height: 100px;color: yellow;background-color:seagreen;margin:5px;padding:5px'></Label>
       <StackLayout *ngFor="let item of fixedOptions let i=index">
-        <Button class="glass" textWrap="true" [text]='item' [style]='fixedOptionStyles[i]' (tap)='fixedOptionSelected(item,i)'></Button>
+        <Button [class]="item.Class" textWrap="true" [text]='item.Name' (tap)='fixedOptionSelected(item)'></Button>
       </StackLayout>
       <Button class="glass" text="DONE" (tap)="doneOption()" style='background-image:linear-gradient(green, black);text-align: center; height: 118px;border-radius: 20'></Button>
     </StackLayout>
     <Button class="glass btnMenuOption" [text]="item.Name" *ngFor="let item of menuOptions let i=index" (tap)="optionSelected(item)"
       [col]='optionCols[i]' [row]='optionRows[i]' textWrap="true"></Button>
+      <Button class="btnMemo" width="120" text="MEMO" (tap)="showMemoDialog()" col='1' row='7'></Button>  
   </GridLayout>
-  <StackLayout orientation="horizontal" *ngIf="showOptions">
-    <Button class="glass btnMenuOption" [text]="item.Name" *ngFor="let item of userModifiers let i=index" (tap)="optionSelected(item)"
-      ></Button>
+  <StackLayout orientation="horizontal" *ngIf="showOptions" row='1' col='0' colSpan="6">
+    <Button [class]="item.Class" width="120" [text]="item.ItemName" *ngFor="let item of userModifiers let i=index" (tap)="userModifierSelected(item)"></Button>
   </StackLayout>
 </GridLayout>

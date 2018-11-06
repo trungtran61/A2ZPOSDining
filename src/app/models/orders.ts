@@ -39,3 +39,9 @@ export interface Order {
     TaxExempt: boolean;
     CheckItems: CheckItem[];
 }
+
+export interface FixedOption {
+    Name?: string;
+    Position?: number;
+    Class?: string;    
+}

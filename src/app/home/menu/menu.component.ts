@@ -3,7 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier, TaxRate } from "~/app/models/products";
+import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
@@ -11,13 +11,14 @@ import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/force
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
 import { DeprecatedDatePipe } from "@angular/common";
-import { OrderTypes, Countdown, CheckItem, Order } from "~/app/models/orders";
+import { OrderTypes, Countdown, CheckItem, Order, FixedOption } from "~/app/models/orders";
 import { APIService } from "~/app/services/api.service";
 import { count } from "rxjs/operators";
 import { forkJoin, from } from "rxjs";
 import { PromptQtyComponent } from "./prompt-qty.component";
 import { on } from "tns-core-modules/application/application";
 import { nullSafeIsEquivalent } from "@angular/compiler/src/output/output_ast";
+import { MemoComponent } from "./memo.component";
 
 @Component({
     selector: "Menu",
@@ -52,7 +53,7 @@ export class MenuComponent implements OnInit {
     menuOptions: MenuOption[];
     optionCols: number[] = [];
     optionRows: number[] = [];
-    userModifiers: MenuOption[]; // bottom row user defined options
+    userModifiers: UserModifier[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
     checkItems: CheckItem[] = [];
@@ -85,12 +86,15 @@ export class MenuComponent implements OnInit {
 
     viewDetailsText: string = this.hideDetailsCode;
 
-    fixedOptions: string[] = ['NO', 'EXTRA', 'LESS', 'ADD', 'OTS', 'NO MAKE', '1/2', 'TO GO'];
-    fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
-    fixedOptionStyles: string[] = [];
+    fixedOptions: FixedOption[] = [{Name :'NO', Class: 'glass btnOption', Position: 1},{Name :'EXTRA', Class: 'glass btnOption', Position: 2},{Name :'LESS', Class: 'glass btnOption', Position: 3},{Name :'ADD', Class: 'glass btnOption', Position: 4},
+        {Name :'OTS', Class: 'glass btnOption', Position: 5},{Name :'NO MAKE', Class: 'glass btnOption', Position: 5},{Name :'1/2', Class: 'glass btnOption', Position: 6},{Name :'TO GO', Class: 'glass btnOption', Position: 7}];
+    fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];    
 
     currentCheckItemIndex: number = 0;
-    currentFixedOption: string = '';
+    currentCheckItem: CheckItem = null;
+    currentFixedOption: FixedOption;
+    currentUserModifier: string = '';
+
     countdowns: Countdown[] = [];
     allTimers: MenuTimer[] = [];
 
@@ -440,6 +444,9 @@ export class MenuComponent implements OnInit {
     }
 
     showModifyDialog(checkItem: CheckItem, checkItemIndex: number) {
+        
+        this.currentCheckItem = checkItem;
+
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: false,
@@ -476,12 +483,10 @@ export class MenuComponent implements OnInit {
             });
     }
 
-    resetFixedOptionStyles() {
-        this.fixedOptionStyles = [];
-
-        for (var i = 0; i < 8; i++) {
-            this.fixedOptionStyles.push('background-image:linear-gradient(#000, silver);text-align: center; height: 118px;')
-        }
+    resetFixedOptionClasses() {        
+        this.fixedOptions.forEach(function (fixedOption: FixedOption) {
+            fixedOption.Class = 'glass btnOption';
+        });
     }
 
     extraFunctions() {
@@ -493,8 +498,9 @@ export class MenuComponent implements OnInit {
     }
 
     getMenuOptions(product: MenuProduct, itemIndex: number) {
-        this.currentCheckItemIndex = itemIndex;
-        this.resetFixedOptionStyles();
+        this.currentCheckItemIndex = itemIndex;        
+        this.resetFixedOptionClasses();
+        this.resetUserModifierClasses();
 
         let that = this;
         this.DBService.getLocalMenuOptions(product.ProductCode).then((menuOptions) => {
@@ -528,20 +534,21 @@ export class MenuComponent implements OnInit {
         });
     }
 
-    fixedOptionSelected(option: string, index: number) {
-        this.resetFixedOptionStyles();
+    fixedOptionSelected(fixedOption: FixedOption) {
+        this.resetFixedOptionClasses();
+        this.resetUserModifierClasses();
 
-        switch (option) {
+        switch (fixedOption.Name) {
             case 'NO MAKE':
             case 'TO GO':
                 {
-                    this.checkItems[this.currentCheckItemIndex].Modifiers.push({ Name: option, Price: 0 });
+                    this.checkItems[this.currentCheckItemIndex].Modifiers.push({ Name: fixedOption.Name, Price: 0 });
                     break;
                 }
             default:
                 {
-                    this.currentFixedOption = option;
-                    this.fixedOptionStyles[index] = 'background-image:linear-gradient(red, black);text-align: center; height: 118px;';
+                    this.currentFixedOption = fixedOption;
+                    fixedOption.Class = 'glass btnOptionActive';
                 }
         }
     }
@@ -566,11 +573,26 @@ export class MenuComponent implements OnInit {
     optionSelected(option: MenuOption) {
         // currentFixedOption
         let modifier: Modifier = {
-            Name: this.currentFixedOption + ' ' + option.Name,
+            Name: this.currentFixedOption.Name + ' ' + option.Name,
             Price: option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0
         };
 
         this.checkItems[this.currentCheckItemIndex].Modifiers.push(modifier);
+    }
+
+    userModifierSelected(userModifier: UserModifier)
+    {
+        this.resetUserModifierClasses();
+        this.resetFixedOptionClasses();
+        this.currentUserModifier = userModifier.ItemName;
+        userModifier.Class = 'glass btnOptionActive';                      
+    }
+
+    resetUserModifierClasses()
+    {
+        this.userModifiers.forEach(function (userModifier: UserModifier) {
+            userModifier.Class = 'glass btnOption';
+        });
     }
 
     showHideDetails() {
@@ -736,6 +758,18 @@ export class MenuComponent implements OnInit {
                     this.checkItems[checkItemIndex].Modifiers = selectedModifiers;
                 else
                     this.checkItems[checkItemIndex].Modifiers = this.checkItems[checkItemIndex].Modifiers.concat(selectedModifiers);
+            });
+    }
+
+    showMemoDialog() {
+        const modalOptions: ModalDialogOptions = {
+            viewContainerRef: this.viewContainerRef,
+            fullscreen: true
+        };
+
+        this.modalService.showModal(MemoComponent, modalOptions).then(
+            (memo: Memo) => {
+               this.currentCheckItem.Modifiers.push({Name: memo.Memo, Price: memo.Price })
             });
     }
 

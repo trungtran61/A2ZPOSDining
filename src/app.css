@@ -198,3 +198,23 @@ page
 	border-radius: 10px;
 	margin: 0 10 0 10;
 }
+
+.validation
+{
+	color: red;
+	margin-top: 5;
+}
+
+.textEntry
+{
+	border-radius: 6; border-color: gray; border-width: 1; background-color: black; 
+	font-size: 20; font-weight: bold; padding-left: 5; width: 400; margin-right: 20; height:60;
+	color: white;
+}
+
+.textEntryActive
+{
+	border-radius: 6; border-color: gray; border-width: 1; background-color: white; 
+	font-size: 20; font-weight: bold; padding-left: 5; width: 400; margin-right: 20; height:60;
+	color: black
+}
