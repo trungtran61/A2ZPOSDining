@@ -590,7 +590,8 @@ export class MenuComponent implements OnInit {
 
         let modifier: Modifier = {
             Name: name,
-            Price: price
+            Price: price,
+            DisplayPrice: price > 0 ? price : null
         };
         
         this.checkItems[this.currentCheckItemIndex].Modifiers.push(modifier);

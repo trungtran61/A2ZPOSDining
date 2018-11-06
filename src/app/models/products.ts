@@ -255,6 +255,7 @@ export interface MenuTimer {
 export interface Modifier {
     Name: string;
     Price: number;
+    DisplayPrice?: number;
 }
 
 export interface UserModifier {
@@ -268,7 +269,7 @@ export interface UserModifier {
     TextPosition?: number;
     FontSize?: number;
     ItemName?: string;
-    Class?: string;
+    Class?: string;   
 }
 
 export interface Choice {

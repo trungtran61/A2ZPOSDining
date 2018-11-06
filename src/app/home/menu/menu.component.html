@@ -27,7 +27,7 @@
             <StackLayout *ngFor="let option of item.Modifiers let i=index" (tap)='changeModifier(item, i, option)'>
             <StackLayout orientation="horizontal">
               <Label style='margin-left: 30px;' [text]='option.Name' ></Label>
-              <Label style='margin-left: 10px;' [text]='option.Price | currency'></Label>
+              <Label style='margin-left: 10px;' [text]='option.DisplayPrice | currency'></Label>
             </StackLayout>
             </StackLayout>
           </StackLayout>
