@@ -93,7 +93,8 @@ export class MenuComponent implements OnInit {
     currentCheckItemIndex: number = 0;
     currentCheckItem: CheckItem = null;
     currentFixedOption: FixedOption;
-    currentUserModifier: string = '';
+    currentUserModifier: UserModifier;
+    userModifierActive: boolean = false; 
 
     countdowns: Countdown[] = [];
     allTimers: MenuTimer[] = [];
@@ -537,6 +538,7 @@ export class MenuComponent implements OnInit {
     fixedOptionSelected(fixedOption: FixedOption) {
         this.resetFixedOptionClasses();
         this.resetUserModifierClasses();
+        this.userModifierActive = false; 
 
         switch (fixedOption.Name) {
             case 'NO MAKE':
@@ -571,21 +573,42 @@ export class MenuComponent implements OnInit {
     }
 
     optionSelected(option: MenuOption) {
-        // currentFixedOption
-        let modifier: Modifier = {
-            Name: this.currentFixedOption.Name + ' ' + option.Name,
-            Price: option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0
-        };
+      
+        let name: string = '';
+        let price: number = 0;
 
+        if (this.userModifierActive)
+        {
+            name = this.currentUserModifier.ItemName + ' ' + option.Name;
+            price = this.currentUserModifier.StampPrice ? this.currentUserModifier.Price : option.Charge;
+        }
+        else
+        {
+            this.currentFixedOption.Name + ' ' + option.Name;
+            price = option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0;
+        }
+
+        let modifier: Modifier = {
+            Name: name,
+            Price: price
+        };
+        
         this.checkItems[this.currentCheckItemIndex].Modifiers.push(modifier);
     }
 
     userModifierSelected(userModifier: UserModifier)
     {
+        if (userModifier.ButtonFunction == 1)
+        {
+            this.checkItems[this.currentCheckItemIndex].Modifiers.push({ Name: userModifier.ItemName, Price: 0});
+            return;
+        }
+
         this.resetUserModifierClasses();
         this.resetFixedOptionClasses();
-        this.currentUserModifier = userModifier.ItemName;
-        userModifier.Class = 'glass btnOptionActive';                      
+        this.currentUserModifier = userModifier;
+        userModifier.Class = 'glass btnOptionActive';     
+        this.userModifierActive = true;        
     }
 
     resetUserModifierClasses()
