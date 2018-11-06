@@ -15,6 +15,8 @@ export class MemoComponent implements OnInit {
     memo: string = '';
     price: number;
     pageTitle: string = 'Enter Memo';
+    memoClass: string = 'textEntryActive';
+    priceClass: string = 'textEntry';
 
     cancel() {
         this.params.closeCallback(null);
@@ -28,6 +30,18 @@ export class MemoComponent implements OnInit {
         }
         this.params.closeCallback(openProductItem);
 
+    }
+
+    activateMemo()
+    {
+        this.memoClass = 'textEntryActive';
+        this.priceClass = 'textEntry';
+    }
+
+    activatePrice()
+    {
+        this.memoClass = 'textEntry';
+        this.priceClass = 'textEntryActive';
     }
 
     constructor(private params: ModalDialogParams,
