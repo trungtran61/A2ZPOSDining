@@ -22,7 +22,7 @@ export class ModifiersComponent implements OnInit {
         console.log(modifier);
     }
 
-    addModifierToCheckItem(modifier)
+    addModifierToOrderItem(modifier)
     {
         this.selectedModifiers.push(this.modifier + ' ' + modifier);
         this.currentModifiers.push(this.modifier + ' ' + modifier);

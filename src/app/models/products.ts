@@ -37,6 +37,10 @@ export interface MenuProduct {
     CountdownActivated?: boolean;
     QtyAvailable?: number;
     QtyAllocated?: number;
+    TaxRate?: number;
+    ProductType?: number;
+    Taxable?: number;
+    IgnoreTax?: boolean;
     PromptQty?: boolean;
     Disabled?: boolean;
     QtyClass?: string;
@@ -167,7 +171,8 @@ export interface MenuChoice {
     Name?: string;
     Position?: number;
     ProductCode?: number;
-    ReportProductMix?: boolean;   
+    ReportProductMix?: boolean;
+    SubOptions?: MenuSubOption[];   
 }
 
 export interface OptionCategory {

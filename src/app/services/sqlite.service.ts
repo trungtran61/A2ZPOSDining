@@ -9,6 +9,7 @@ import { catchError } from 'rxjs/operators';
 import { SystemSettings, Logos } from "~/app/models/settings";
 import { APIService } from "./api.service";
 import { Countdown } from "~/app/models/orders";
+import { UtilityService } from "./utility.service";
 
 var Sqlite = require("nativescript-sqlite");
 
@@ -242,50 +243,15 @@ export class SQLiteService {
         });
         return promise;
     }
-
-    public getLocalMenuProductsX(categoryID: number, subCategoryID: number) {
-        let that = this;
-        let promise = new Promise(function (resolve, reject) {
-
-            SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex," +
-                " mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice, p.ForcedModifier, p.UseForcedModifier" +
-                "  FROM MenuProducts AS mp INNER JOIN Products AS p ON mp.ProductId=p.ProductFilter WHERE mp.CategoryID=? AND mp.SubCategoryID=? ORDER BY mp.Position", [categoryID, subCategoryID])
-                .then(function (rows) {
-                    let menuProducts: MenuProduct[] = [];
-                    for (var row in rows) {
-                        menuProducts.push({
-                            CategoryID: rows[row][0],
-                            SubCategoryID: rows[row][1],
-                            ProductID: rows[row][2],
-                            Name: rows[row][3],
-                            Position: rows[row][4],
-                            ProductCode: rows[row][5],
-                            ButtonColor: rows[row][6],
-                            ButtonColorHex: rows[row][7],
-                            ButtonForeColor: rows[row][8],
-                            ButtonForeColorHex: rows[row][9],
-                            UnitPrice: rows[row][10],
-                            UseModifier: rows[row][11] == "true",
-                            UseForcedModifier: rows[row][12] == "true"
-                        });
-                    }
-                    resolve(menuProducts);
-                },
-                    err => {
-                        reject("Error occurred while retrieving MenuProducts from Sqlite.");
-                    }
-                );
-        });
-
-        return promise;
-    }
-
+    
     public getLocalMenuProducts(categoryID: number, subCategoryID: number): Promise<MenuProduct[]> {
         let that = this;
 
         return SQLiteService.database.all("SELECT mp.CategoryID, mp.SubCategoryID, mp.ProductId, mp.Name, mp.Position, mp.ProductCode, mp.ButtonColor, mp.ButtonColorHex," +
-            " mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice, p.ForcedModifier, p.UseForcedModifier" +
-            "  FROM MenuProducts AS mp INNER JOIN Products AS p ON mp.ProductId=p.ProductFilter WHERE mp.CategoryID=? AND mp.SubCategoryID=? ORDER BY mp.Position", [categoryID, subCategoryID])
+            " mp.ButtonForeColor, mp.ButtonForeColorHex, p.UnitPrice, p.ForcedModifier, p.UseForcedModifier, p.ProductType, p.Taxable, tr.EffectiveRate" +
+            " FROM MenuProducts AS mp INNER JOIN Products AS p ON mp.ProductId=p.ProductFilter " + 
+            " LEFT JOIN TaxRates AS tr ON p.TaxRate=tr.TaxID " +
+            " WHERE mp.CategoryID=? AND mp.SubCategoryID=? ORDER BY mp.Position", [categoryID, subCategoryID])
             .then(function (rows) {
                 let menuProducts: MenuProduct[] = [];
                 for (var row in rows) {
@@ -302,7 +268,10 @@ export class SQLiteService {
                         ButtonForeColorHex: rows[row][9],
                         UnitPrice: rows[row][10],
                         UseModifier: rows[row][11] == "true",
-                        UseForcedModifier: rows[row][12] == "true"
+                        UseForcedModifier: rows[row][12] == "true",
+                        ProductType: rows[row][13],
+                        Taxable: rows[row][14],
+                        TaxRate: rows[row][15]
                     });
                 }
 
@@ -719,7 +688,9 @@ export class SQLiteService {
 
             db.execSQL("DROP TABLE IF EXISTS Products;").then(id => {
                 db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER," +
-                    "ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier INTEGER, UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT,PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
+                    "ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier INTEGER," + 
+                    "UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT," + 
+                    "PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER);").then(id => {
                         let headers = that.createRequestHeader();
                         that.http.get(that.apiUrl + 'GetProducts', { headers: headers })
                             .subscribe(
@@ -1135,7 +1106,7 @@ export class SQLiteService {
 
             db.execSQL("DROP TABLE IF EXISTS SystemSettings;").then(id => {
                 db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER, LoginTableLayout INTEGER" +
-                    ",AutoCategory INTEGER, CategoryName INTEGER" +
+                    ",AutoCategory INTEGER, CategoryName INTEGER, TaxExempt TEXT, SmartTax" +
                     ");").then(id => {
                         let headers = that.createRequestHeader();
                         that.http.get(that.apiUrl + 'GetSettings', { headers: headers })
@@ -1144,8 +1115,9 @@ export class SQLiteService {
                                     console.log('got Settings from API');
                                     let ss: SystemSettings = data;
                                     SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout" +
-                                        ",AutoCategory, CategoryName) VALUES (?,?,?,?,?,?)",
-                                        [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout, ss.AutoCategory, ss.CategoryName]).then(id => {
+                                        ",AutoCategory, CategoryName, TaxExempt, SmartTax) VALUES (?,?,?,?,?,?,?,?)",
+                                        [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout, 
+                                        ss.AutoCategory, ss.CategoryName, ss.TaxExempt, ss.SmartTax]).then(id => {
                                             console.log("Added SystemSettings records.");
                                             resolve("Added SystemSettings records.")
                                         },
@@ -1169,18 +1141,21 @@ export class SQLiteService {
         return promise;
     }
 
-    public getLocalSystemSettings(): Promise<SystemSettings[]> {
+    public getLocalSystemSettings(): Promise<SystemSettings> {
         let that = this;
 
-        return SQLiteService.database.get("SELECT PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout, AutoCategory, CategoryName FROM SystemSettings;")
+        return SQLiteService.database.get("SELECT PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout, " + 
+            "AutoCategory, CategoryName, TaxExempt, SmartTax FROM SystemSettings;")
             .then(function (row) {
                 let systemSettings: SystemSettings = {
                     PriKey: row[0],
                     OrderScreenLogOffTimer: row[1],
                     DineInTimerInterval: row[2],
                     LoginTableLayout: row[3],
-                    AutoCategory: row[4],
+                    AutoCategory:  row[4].toLowerCase() == 'true',
                     CategoryName: row[5],
+                    TaxExempt: row[6].toLowerCase() == 'true',
+                    SmartTax: row[7].toLowerCase() == 'true'
                 };
                 that.systemSettings = systemSettings;
                 return (systemSettings);

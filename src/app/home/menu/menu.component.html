@@ -11,10 +11,10 @@
       <Label [text]="table" style="text-align: left; margin-right: 5;width:30;"></Label> |
       <Label [text]="guests" style="text-align: right; width:40;"></Label>
     </StackLayout>
-    <ListView [items]="checkItems" id='lvItems' separatorColor="white" class="m-0" height="505" *ngIf='showDetails'>
+    <ListView [items]="order.OrderItems" id='lvItems' separatorColor="white" class="m-0" height="505" *ngIf='showDetails'>
       <ng-template let-item="item" let-i="index">
         <StackLayout class="m-b-10">
-          <StackLayout orientation="horizontal" (tap)="showModifyDialog(item, null)" (swipe)="onCheckItemSwipe($event, item)">
+          <StackLayout orientation="horizontal" (tap)="showModifyDialog(item, null)" (swipe)="onOrderItemSwipe($event, item)">
             <Label [text]="item.Qty" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.Product.Name" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.Price | currency" style="text-align: right; width:50; margin-right:5"></Label>
@@ -33,10 +33,10 @@
       </ng-template>
     </ListView>
 
-    <ListView [items]="checkItems" separatorColor="white" class="m-0" height="505" *ngIf='!showDetails'>
+    <ListView [items]="orderItems" separatorColor="white" class="m-0" height="505" *ngIf='!showDetails'>
       <ng-template let-item="item" let-i="index">
         <StackLayout class="m-b-10">
-          <StackLayout orientation="horizontal" (tap)="showModifyDialog(item,i)" (swipe)="onCheckItemSwipe($event, item)">
+          <StackLayout orientation="horizontal" (tap)="showModifyDialog(item,i)" (swipe)="onOrderItemSwipe($event, item)">
             <Label [text]="item.Qty" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.Product.Name" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.Price | currency" style="text-align: right; width:50; margin-right:5"></Label>

@@ -18,7 +18,7 @@ export enum OrderTypes {
     FastFood = 8
 }
 
-export interface CheckItem {
+export interface OrderItem {
     Product?: MenuProduct;
     Qty?: number;
     SeatNumber?: number;
@@ -29,6 +29,8 @@ export interface CheckItem {
     Refund?: boolean,
     Voided?: boolean,
     Comped?: boolean
+    IgnoreTax?: boolean,
+    ExtPrice?: number
 }
 
 export interface myOption{
@@ -36,12 +38,12 @@ export interface myOption{
 }
 
 export interface Order {
-    CheckNumber: number;
-    ServerID: number;
-    TableName: string;
-    Discount: number;
-    TaxExempt: boolean;
-    CheckItems: CheckItem[];
+    CheckNumber?: number;
+    ServerID?: number;
+    TableName?: string;
+    Discount?: number;
+    TaxExempt?: boolean;
+    OrderItems?: OrderItem[];
 }
 
 export interface FixedOption {

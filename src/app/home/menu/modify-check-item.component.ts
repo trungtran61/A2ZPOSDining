@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import { ModalDialogParams, ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
 import { Choice } from "~/app/models/products";
-import { CheckItem } from "~/app/models/orders";
+import { OrderItem } from "~/app/models/orders";
 
 @Component({
     selector: "modify-check-item",   
@@ -9,7 +9,7 @@ import { CheckItem } from "~/app/models/orders";
     templateUrl: "./modify-check-item.component.html",
     styleUrls: ['./modify-check-item.component.css']
 })
-export class ModifyCheckItemComponent implements OnInit {
+export class ModifyOrderItemComponent implements OnInit {
     modifier: string;
     buttonColor:string = 'blue'
     topRowSeats: number[] = [1,2,3,4,5];
@@ -21,18 +21,18 @@ export class ModifyCheckItemComponent implements OnInit {
     changeType: string = 'quantity';
     isTenPlus: boolean = false;
     selectedNumber: number;
-    checkItemIndex: number;
+    orderItemIndex: number;
     otherText: string = 'Other Quantity';
     isNormalChoice: boolean= true;
     enterQty: string = '';
-    checkItem: CheckItem = {};
+    orderItem: OrderItem = {};
     hasModifiers: boolean = false;
 
     changeTypeStyle: string ="color: black;background-image: linear-gradient(gray, white); border-color: black";
     changeTypeStyleSelected: string ="color: white;background-image: linear-gradient(black, gray); border-color: white";
     qtyTypeStyle: string ="color: white;background-image: linear-gradient(black, gray); border-color: white";
     seatTypeStyle: string ="color: black;background-image: linear-gradient(gray, white); border-color: black"
-    //checkItems: CheckItem[]; 
+    //orderItems: OrderItem[]; 
 
     setChoice2(digit: number)
     {
@@ -117,7 +117,7 @@ export class ModifyCheckItemComponent implements OnInit {
     }
 
     ngOnInit() { 
-        this.checkItem = this.params.context.checkItem;
-        this.hasModifiers = this.checkItem.Product.UseModifier;
+        this.orderItem = this.params.context.orderItem;
+        this.hasModifiers = this.orderItem.Product.UseModifier;
     } 
 }

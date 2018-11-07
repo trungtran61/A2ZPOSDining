@@ -6,12 +6,12 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
-import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
+import { ModifyOrderItemComponent } from "~/app/home/menu/modify-check-item.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
 import { DeprecatedDatePipe } from "@angular/common";
-import { OrderTypes, Countdown, CheckItem, Order, FixedOption } from "~/app/models/orders";
+import { OrderTypes, Countdown, OrderItem, Order, FixedOption } from "~/app/models/orders";
 import { APIService } from "~/app/services/api.service";
 import { count } from "rxjs/operators";
 import { forkJoin, from } from "rxjs";
@@ -21,6 +21,7 @@ import { nullSafeIsEquivalent } from "@angular/compiler/src/output/output_ast";
 import { MemoComponent } from "./memo.component";
 import { NullTemplateVisitor } from "@angular/compiler";
 import { ListView } from "tns-core-modules/ui/list-view/list-view";
+import { UtilityService } from "~/app/services/utility.service";
 
 @Component({
     selector: "Menu",
@@ -58,7 +59,8 @@ export class MenuComponent implements OnInit {
     userModifiers: UserModifier[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
-    checkItems: CheckItem[] = [];
+    order: Order = null;
+    //orderItems: OrderItem[] = [];
     currentSeatNumber: number = 1;
     checkTotal: number = 0;
     subTotal: number = 0;
@@ -92,7 +94,7 @@ export class MenuComponent implements OnInit {
         {Name :'OTS', Class: 'glass btnOption', Position: 5},{Name :'NO MAKE', Class: 'glass btnOption', Position: 5},{Name :'1/2', Class: 'glass btnOption', Position: 6},{Name :'TO GO', Class: 'glass btnOption', Position: 7}];
     fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];    
 
-    currentCheckItem: CheckItem = null;
+    currentOrderItem: OrderItem = null;
     currentFixedOption: FixedOption;
     currentUserModifier: UserModifier;
     userModifierActive: boolean = false; 
@@ -113,6 +115,7 @@ export class MenuComponent implements OnInit {
         private modalService: ModalDialogService,
         private viewContainerRef: ViewContainerRef,
         private ApiSvc: APIService,
+        private utilSvc: UtilityService,
         private page: Page) {
         page.actionBarHidden = true;
         // Use the component constructor to inject providers.
@@ -143,6 +146,7 @@ export class MenuComponent implements OnInit {
 
         this.getMenuTimers();       
         this.getUserModifiers();
+        this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [] };
     }
 
     loadCategories(categories: MenuCategory[]) {
@@ -347,15 +351,15 @@ export class MenuComponent implements OnInit {
                 this.showForcedModifierDialog(product, -1, null, true);
             }
             else {
-                this.addProductToCheck(product);
+                this.addProductToOrder(product);
             }
     }
 
-    showForcedModifierDialog(product: MenuProduct, checkItemIndex: number, choice, isAdding: boolean) {
+    showForcedModifierDialog(product: MenuProduct, orderItemIndex: number, choice, isAdding: boolean) {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
-            context: { productCode: product.ProductCode, currentChoices: checkItemIndex > -1 ? this.checkItems[checkItemIndex].ForcedModifiers : [] }
+            context: { productCode: product.ProductCode, currentChoices: orderItemIndex > -1 ? this.order.OrderItems[orderItemIndex].ForcedModifiers : [] }
         };
 
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
@@ -363,9 +367,9 @@ export class MenuComponent implements OnInit {
                 if (selectedChoices != null) {
                     this.currentSeatNumber++;
                     if (isAdding) {
-                        this.addProductToCheck(product);
+                        this.addProductToOrder(product);
                     }
-                    this.checkItems[this.checkItems.length - 1].ForcedModifiers = selectedChoices;                   
+                    this.order.OrderItems[this.order.OrderItems.length - 1].ForcedModifiers = selectedChoices;                   
                 }
             });
     }
@@ -382,18 +386,19 @@ export class MenuComponent implements OnInit {
         this.router.navigate(['/home/tableguests/' + this.table]);
     }
 
-    changeChoice(product: MenuProduct, checkItemIndex: number, choice: MenuChoice) {
-        this.showForcedModifierDialog(product, checkItemIndex, choice, false);
+    changeChoice(product: MenuProduct, orderItemIndex: number, choice: MenuChoice) {
+        this.showForcedModifierDialog(product, orderItemIndex, choice, false);
     }
 
-    addProductToCheck(product: MenuProduct) {        
-        this.checkItems.push({
+    addProductToOrder(product: MenuProduct) {        
+        this.order.OrderItems.push({
             Modifiers: [],
             ForcedModifiers: [],
             Qty: this.qtyEntered, 
             SeatNumber: this.currentSeatNumber, 
             Price: product.UnitPrice * this.qtyEntered,
-            Product: product
+            Product: product,
+            IgnoreTax: false            
         });
 
         this.totalPrice();
@@ -410,7 +415,7 @@ export class MenuComponent implements OnInit {
             (openProductItem: OpenProductItem) => {
                 this.showExtraFunctions = false;
                 if (openProductItem != null) {
-                    this.checkItems.push({
+                    this.order.OrderItems.push({
                         Modifiers: [], Qty: openProductItem.Quantity, SeatNumber: this.currentSeatNumber,
                         Price: openProductItem.UnitPrice * openProductItem.Quantity,
                         Product: {
@@ -442,49 +447,49 @@ export class MenuComponent implements OnInit {
                     this.showForcedModifierDialog(product, -1, null, true);
                 }
                 else {
-                    this.addProductToCheck(product);
+                    this.addProductToOrder(product);
                 }
             });
     }
 
-    showModifyDialog(checkItem: CheckItem, modifier: Modifier) {
+    showModifyDialog(orderItem: OrderItem, modifier: Modifier) {
         
-        this.currentCheckItem = checkItem;
+        this.currentOrderItem = orderItem;
 
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: false,
-            context: { checkItem: checkItem }
+            context: { orderItem: orderItem }
         };
 
-        this.modalService.showModal(ModifyCheckItemComponent, modalOptions).then(
+        this.modalService.showModal(ModifyOrderItemComponent, modalOptions).then(
             (choice: Choice) => {
                 console.log(choice.ChangeType);
                 switch (choice.ChangeType) {
                     case 'quantity':
-                        checkItem.Qty = parseFloat(choice.SelectedNumber);
-                        checkItem.Price = checkItem.Product.UnitPrice * parseFloat(choice.SelectedNumber);
+                        orderItem.Qty = parseFloat(choice.SelectedNumber);
+                        orderItem.Price = orderItem.Product.UnitPrice * parseFloat(choice.SelectedNumber);
                         this.totalPrice();
                         break;
                     case 'seat':
-                        checkItem.SeatNumber = parseInt(choice.SelectedNumber);
+                        orderItem.SeatNumber = parseInt(choice.SelectedNumber);
                         break;
                     case 'delete':
                         if (modifier == null)
-                            this.deleteCheckItem(checkItem);
+                            this.deleteOrderItem(orderItem);
                         else
-                            this.deleteModifier(checkItem, modifier);
+                            this.deleteModifier(orderItem, modifier);
                         break;
                     case 'repeat':
-                        this.checkItems.push({
-                            "Product": checkItem.Product,
+                        this.order.OrderItems.push({
+                            "Product": orderItem.Product,
                             "Modifiers": [], "Qty": 1, "SeatNumber": 1,
-                            "Price": checkItem.Product.UnitPrice
+                            "Price": orderItem.Product.UnitPrice
                         });
                         this.totalPrice();
                         break;
                     case 'modify':
-                        this.getMenuOptions(checkItem.Product);
+                        this.getMenuOptions(orderItem.Product);
                         break;
                 }
             });
@@ -549,7 +554,7 @@ export class MenuComponent implements OnInit {
             case 'NO MAKE':
             case 'TO GO':
                 {
-                    this.currentCheckItem.Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
+                    this.currentOrderItem.Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
                     break;
                 }
             default:
@@ -561,7 +566,7 @@ export class MenuComponent implements OnInit {
     }
 
     cancelOrder() {
-        if (this.checkItems.length > 0) {
+        if (this.order.OrderItems.length > 0) {
             dialogs.confirm({
                 title: "Cancel Order",
                 message: "Cancel this order?",
@@ -599,7 +604,7 @@ export class MenuComponent implements OnInit {
             DisplayPrice: price > 0 ? price : null
         };
 
-        this.currentCheckItem.Modifiers.push(modifier);           
+        this.currentOrderItem.Modifiers.push(modifier);           
         this.refreshList();
     }
 
@@ -607,7 +612,7 @@ export class MenuComponent implements OnInit {
     {
         if (userModifier.ButtonFunction == 1)
         {            
-            this.currentCheckItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null});
+            this.currentOrderItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null});
             this.refreshList();
             return;
         }
@@ -759,28 +764,28 @@ export class MenuComponent implements OnInit {
         console.log(modifier);        
     }
 
-    onCheckItemSwipe(args, checkItem: CheckItem) {
+    onOrderItemSwipe(args, orderItem: OrderItem) {
         if (args.direction == SwipeDirection.left) {
-            this.deleteCheckItem(checkItem);
+            this.deleteOrderItem(orderItem);
         }
     }
 
-    onModifierSwipe(args, checkItem: CheckItem, modifier: Modifier)
+    onModifierSwipe(args, orderItem: OrderItem, modifier: Modifier)
     {
         if (args.direction == SwipeDirection.left) {
-            this.deleteModifier(checkItem, modifier);
+            this.deleteModifier(orderItem, modifier);
         }
     }
 
-    deleteCheckItem(checkItem: CheckItem) {
-        this.checkItems = this.checkItems.filter(obj => obj !== checkItem);
+    deleteOrderItem(orderItem: OrderItem) {
+        this.order.OrderItems = this.order.OrderItems.filter(obj => obj !== orderItem);
 
-        if (checkItem.Price > 0)
+        if (orderItem.Price > 0)
             this.totalPrice();
     }
 
-    deleteModifier(checkItem: CheckItem, modifier: Modifier) {
-        checkItem.Modifiers = checkItem.Modifiers.filter(obj => obj !== modifier);
+    deleteModifier(orderItem: OrderItem, modifier: Modifier) {
+        orderItem.Modifiers = orderItem.Modifiers.filter(obj => obj !== modifier);
         this.refreshList();
 
         if (modifier.Price > 0)
@@ -790,11 +795,11 @@ export class MenuComponent implements OnInit {
     totalPrice() {
         this.subTotal = 0;
 
-        for (var i = 0; i < this.checkItems.length; i++) {
+        for (var i = 0; i < this.order.OrderItems.length; i++) {
             {
-                this.subTotal += (this.checkItems[i].Product.UnitPrice * this.checkItems[i].Qty);
+                this.subTotal += (this.order.OrderItems[i].Product.UnitPrice * this.order.OrderItems[i].Qty);
             }
-            this.tax = this.subTotal * this.TAX_RATE;
+            this.tax = this.utilSvc.getTaxTotal(this.order);
             this.checkTotal = this.subTotal + this.tax;
 
             if (this.guests >= this.MAX_GUESTS) {
@@ -804,19 +809,19 @@ export class MenuComponent implements OnInit {
         }
     }
 
-    showModifierDialog(checkItemIndex: number) {
+    showModifierDialog(orderItemIndex: number) {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
             //context: { options: options, currentOptions: currentOptions}
         };
 
-        this.modalService.showModal(ModifyCheckItemComponent, modalOptions).then(
+        this.modalService.showModal(ModifyOrderItemComponent, modalOptions).then(
             (selectedModifiers) => {
-                if (this.checkItems[checkItemIndex].Modifiers.length == 0)
-                    this.checkItems[checkItemIndex].Modifiers = selectedModifiers;
+                if (this.order.OrderItems[orderItemIndex].Modifiers.length == 0)
+                    this.order.OrderItems[orderItemIndex].Modifiers = selectedModifiers;
                 else
-                    this.checkItems[checkItemIndex].Modifiers = this.checkItems[checkItemIndex].Modifiers.concat(selectedModifiers);
+                    this.order.OrderItems[orderItemIndex].Modifiers = this.order.OrderItems[orderItemIndex].Modifiers.concat(selectedModifiers);
             });
     }
 
@@ -828,7 +833,7 @@ export class MenuComponent implements OnInit {
 
         this.modalService.showModal(MemoComponent, modalOptions).then(
             (memo: Memo) => {
-               this.currentCheckItem.Modifiers.push({Name: memo.Memo, Price: memo.Price, DisplayPrice: memo.Price > 0 ? memo.Price : null })
+               this.currentOrderItem.Modifiers.push({Name: memo.Memo, Price: memo.Price, DisplayPrice: memo.Price > 0 ? memo.Price : null })
             });
     }
 
@@ -1015,10 +1020,10 @@ export class MenuComponent implements OnInit {
     getTaxTotal(orderFilter: number, remote: boolean, grouped: boolean, order: Order, taxrates: TaxRate[]) {
         let taxTotal: number = 0;
 
-        if (order == null || order.CheckItems.length == 0)
+        if (order == null || order.OrderItems.length == 0)
             return true;
 
-        let orderDetails = order.CheckItems.filter(x => x.Tag == null);
+        let orderDetails = order.OrderItems.filter(x => x.Tag == null);
 
         let discount = 0, lineDiscount = 0, itemTotal = 0;
 
@@ -1026,7 +1031,7 @@ export class MenuComponent implements OnInit {
             let order = this.ApiSvc.GetOrder(orderFilter, false, false);
             if (order == null)
                 return false;
-            orderDetails = order.CheckItems.filter(x => x.Tag == null);
+            orderDetails = order.OrderItems.filter(x => x.Tag == null);
         }
 
         discount = order.Discount;

@@ -9,7 +9,7 @@ import { HomeComponent } from "./home.component";
 import { MyTablesComponent } from "~/app/home/mytables/my-tables.component";
 import { TableGuestsComponent } from "~/app/home/tableguests/table-guests.component";
 import { MenuComponent } from "~/app/home/menu/menu.component";
-import { ModifyCheckItemComponent } from "~/app/home/menu/modify-check-item.component";
+import { ModifyOrderItemComponent } from "~/app/home/menu/modify-check-item.component";
 import { ModifiersComponent } from "~/app/home/menu/modifiers/modifiers.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 import { TNSFontIconModule, TNSFontIconService } from "nativescript-ngx-fonticon";
@@ -36,7 +36,7 @@ TNSFontIconService.debug = true;
         MyTablesComponent,
         TableGuestsComponent,
         MenuComponent,
-        ModifyCheckItemComponent,
+        ModifyOrderItemComponent,
         ModifiersComponent,
         ForcedModifiersComponent,
         OpenProductComponent,
@@ -48,7 +48,7 @@ TNSFontIconService.debug = true;
         NO_ERRORS_SCHEMA
     ],    
     entryComponents: [
-        ModifyCheckItemComponent,
+        ModifyOrderItemComponent,
         ForcedModifiersComponent, 
         OpenProductComponent,
         PromptQtyComponent,

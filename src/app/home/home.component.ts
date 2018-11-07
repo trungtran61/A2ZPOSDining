@@ -61,14 +61,18 @@ export class HomeComponent implements OnInit {
             appSettings.setBoolean("isFirstLaunch", false);
         }
         
-        if (this.DBService.systemSettings == null)
-        {
+        //if (this.DBService.systemSettings == null)
+        //{
             this.DBService.getLocalSystemSettings().then((systemSettings) => {
-                if (systemSettings.length == 0) {
+                if (systemSettings == null) {
                     console.log("SystemSettings not loaded.")
                 }
+                else
+                {
+                    this.DBService.systemSettings = systemSettings;
+                }
             });  
-        }
+       // }
         
         //this.page.className = 'loginBG';
         //this.router.navigate(['/home/mytables'])
