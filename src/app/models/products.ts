@@ -167,7 +167,7 @@ export interface MenuChoice {
     Name?: string;
     Position?: number;
     ProductCode?: number;
-    ReportProductMix?: boolean;
+    ReportProductMix?: boolean;   
 }
 
 export interface OptionCategory {
@@ -253,9 +253,10 @@ export interface MenuTimer {
 }
 
 export interface Modifier {
-    Name: string;
-    Price: number;
+    Name?: string;
+    Price?: number;
     DisplayPrice?: number;
+    Active?: boolean;
 }
 
 export interface UserModifier {
@@ -278,10 +279,10 @@ export interface Choice {
 }
 
 export interface MenuOption {
-    ApplyCharge: boolean;
-    Charge: number;
-    Name: string;
-    Position: number;
+    ApplyCharge?: boolean;
+    Charge?: number;
+    Name?: string;
+    Position?: number;
     ProductCode?: number;
     ReportProductMix?: boolean;
 }

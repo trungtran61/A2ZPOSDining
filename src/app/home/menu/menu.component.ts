@@ -19,6 +19,8 @@ import { PromptQtyComponent } from "./prompt-qty.component";
 import { on } from "tns-core-modules/application/application";
 import { nullSafeIsEquivalent } from "@angular/compiler/src/output/output_ast";
 import { MemoComponent } from "./memo.component";
+import { NullTemplateVisitor } from "@angular/compiler";
+import { ListView } from "tns-core-modules/ui/list-view/list-view";
 
 @Component({
     selector: "Menu",
@@ -364,7 +366,7 @@ export class MenuComponent implements OnInit {
                     if (isAdding) {
                         this.addProductToCheck(product);
                     }
-                    this.checkItems[this.checkItems.length - 1].ForcedModifiers = selectedChoices;
+                    this.checkItems[this.checkItems.length - 1].ForcedModifiers = selectedChoices;                   
                 }
             });
     }
@@ -385,14 +387,16 @@ export class MenuComponent implements OnInit {
         this.showForcedModifierDialog(product, checkItemIndex, choice, false);
     }
 
-    addProductToCheck(product: MenuProduct) {
+    addProductToCheck(product: MenuProduct) {        
         this.checkItems.push({
-            Modifiers: [], 
+            Modifiers: [],
+            ForcedModifiers: [],
             Qty: this.qtyEntered, 
             SeatNumber: this.currentSeatNumber, 
             Price: product.UnitPrice * this.qtyEntered,
             Product: product
         });
+
         this.totalPrice();
     }
 
@@ -467,7 +471,7 @@ export class MenuComponent implements OnInit {
                         checkItem.SeatNumber = parseInt(choice.SelectedNumber);
                         break;
                     case 'delete':
-                        this.deleteCheckItem(checkItemIndex);
+                        this.deleteCheckItem(checkItem);
                         break;
                     case 'repeat':
                         this.checkItems.push({
@@ -544,7 +548,7 @@ export class MenuComponent implements OnInit {
             case 'NO MAKE':
             case 'TO GO':
                 {
-                    this.checkItems[this.currentCheckItemIndex].Modifiers.push({ Name: fixedOption.Name, Price: 0 });
+                    this.checkItems[this.currentCheckItemIndex].Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
                     break;
                 }
             default:
@@ -584,7 +588,7 @@ export class MenuComponent implements OnInit {
         }
         else
         {
-            this.currentFixedOption.Name + ' ' + option.Name;
+            name = this.currentFixedOption.Name + ' ' + option.Name;
             price = option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0;
         }
 
@@ -593,15 +597,17 @@ export class MenuComponent implements OnInit {
             Price: price,
             DisplayPrice: price > 0 ? price : null
         };
-        
-        this.checkItems[this.currentCheckItemIndex].Modifiers.push(modifier);
+
+        this.currentCheckItem.Modifiers.push(modifier);           
+        this.refreshList();
     }
 
     userModifierSelected(userModifier: UserModifier)
     {
         if (userModifier.ButtonFunction == 1)
-        {
-            this.checkItems[this.currentCheckItemIndex].Modifiers.push({ Name: userModifier.ItemName, Price: 0});
+        {            
+            this.currentCheckItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null});
+            this.refreshList();
             return;
         }
 
@@ -610,6 +616,12 @@ export class MenuComponent implements OnInit {
         this.currentUserModifier = userModifier;
         userModifier.Class = 'glass btnOptionActive';     
         this.userModifierActive = true;        
+    }
+
+    refreshList()
+    {
+        let listView: ListView = <ListView>this.page.getViewById("lvItems");
+        listView.refresh();
     }
 
     resetUserModifierClasses()
@@ -741,15 +753,37 @@ export class MenuComponent implements OnInit {
         });
     }
 
-    onCheckItemSwipe(args, checkItemIndex) {
+    changeModifier(modifier: Modifier)
+    {
+        console.log(modifier);        
+    }
+
+    onCheckItemSwipe(args, checkItem: CheckItem) {
         if (args.direction == SwipeDirection.left) {
-            this.deleteCheckItem(checkItemIndex);
+            this.deleteCheckItem(checkItem);
         }
     }
 
-    deleteCheckItem(checkItemIndex: number) {
-        this.checkItems.splice(checkItemIndex, 1);
-        this.totalPrice();
+    onModifierSwipe(args, checkItem: CheckItem, modifier: Modifier)
+    {
+        if (args.direction == SwipeDirection.left) {
+            this.deleteModifier(checkItem, modifier);
+        }
+    }
+
+    deleteCheckItem(checkItem: CheckItem) {
+        this.checkItems = this.checkItems.filter(obj => obj !== checkItem);
+
+        if (checkItem.Price > 0)
+            this.totalPrice();
+    }
+
+    deleteModifier(checkItem: CheckItem, modifier: Modifier) {
+        checkItem.Modifiers = checkItem.Modifiers.filter(obj => obj !== modifier);
+        this.refreshList();
+
+        if (modifier.Price > 0)
+            this.totalPrice();
     }
 
     totalPrice() {
@@ -793,7 +827,7 @@ export class MenuComponent implements OnInit {
 
         this.modalService.showModal(MemoComponent, modalOptions).then(
             (memo: Memo) => {
-               this.currentCheckItem.Modifiers.push({Name: memo.Memo, Price: memo.Price })
+               this.currentCheckItem.Modifiers.push({Name: memo.Memo, Price: memo.Price, DisplayPrice: memo.Price > 0 ? memo.Price : null })
             });
     }
 

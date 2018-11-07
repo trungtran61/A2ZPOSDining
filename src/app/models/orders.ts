@@ -31,6 +31,10 @@ export interface CheckItem {
     Comped?: boolean
 }
 
+export interface myOption{
+    Name: string;
+}
+
 export interface Order {
     CheckNumber: number;
     ServerID: number;
