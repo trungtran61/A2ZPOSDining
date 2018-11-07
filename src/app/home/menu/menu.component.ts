@@ -92,7 +92,6 @@ export class MenuComponent implements OnInit {
         {Name :'OTS', Class: 'glass btnOption', Position: 5},{Name :'NO MAKE', Class: 'glass btnOption', Position: 5},{Name :'1/2', Class: 'glass btnOption', Position: 6},{Name :'TO GO', Class: 'glass btnOption', Position: 7}];
     fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];    
 
-    currentCheckItemIndex: number = 0;
     currentCheckItem: CheckItem = null;
     currentFixedOption: FixedOption;
     currentUserModifier: UserModifier;
@@ -448,7 +447,7 @@ export class MenuComponent implements OnInit {
             });
     }
 
-    showModifyDialog(checkItem: CheckItem, checkItemIndex: number) {
+    showModifyDialog(checkItem: CheckItem, modifier: Modifier) {
         
         this.currentCheckItem = checkItem;
 
@@ -471,7 +470,10 @@ export class MenuComponent implements OnInit {
                         checkItem.SeatNumber = parseInt(choice.SelectedNumber);
                         break;
                     case 'delete':
-                        this.deleteCheckItem(checkItem);
+                        if (modifier == null)
+                            this.deleteCheckItem(checkItem);
+                        else
+                            this.deleteModifier(checkItem, modifier);
                         break;
                     case 'repeat':
                         this.checkItems.push({
@@ -482,7 +484,7 @@ export class MenuComponent implements OnInit {
                         this.totalPrice();
                         break;
                     case 'modify':
-                        this.getMenuOptions(checkItem.Product, checkItemIndex);
+                        this.getMenuOptions(checkItem.Product);
                         break;
                 }
             });
@@ -502,8 +504,7 @@ export class MenuComponent implements OnInit {
         this.showExtraFunctions = false;
     }
 
-    getMenuOptions(product: MenuProduct, itemIndex: number) {
-        this.currentCheckItemIndex = itemIndex;        
+    getMenuOptions(product: MenuProduct) {
         this.resetFixedOptionClasses();
         this.resetUserModifierClasses();
 
@@ -548,7 +549,7 @@ export class MenuComponent implements OnInit {
             case 'NO MAKE':
             case 'TO GO':
                 {
-                    this.checkItems[this.currentCheckItemIndex].Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
+                    this.currentCheckItem.Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
                     break;
                 }
             default:
