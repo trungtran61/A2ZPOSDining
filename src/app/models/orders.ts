@@ -43,6 +43,7 @@ export interface Order {
     TableName?: string;
     Discount?: number;
     TaxExempt?: boolean;
+    Gratuity?: number;
     OrderItems?: OrderItem[];
 }
 
