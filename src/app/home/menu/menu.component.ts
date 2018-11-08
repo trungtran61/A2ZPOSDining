@@ -496,6 +496,9 @@ export class MenuComponent implements OnInit {
                     case 'modify':
                         this.getMenuOptions(orderItem.Product);
                         break;
+                    case 'changechoice':
+                        this.showForcedModifierDialog(orderItem.Product, -1, null, false);
+                        break;
                 }
             });
     }
