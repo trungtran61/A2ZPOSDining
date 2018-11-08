@@ -88,17 +88,17 @@
     <Button class="glass btnCategory" [text]="item.Name" textWrap="true" *ngFor="let item of categories let i=index"
       (tap)="categorySelected(item)" [style]="categoryStyles[i]"></Button>
   </StackLayout>
-  <GridLayout row="0" col="2" *ngIf="showSubCategories" rows="60,*,*,*,*,*,*,*,*">
+  <GridLayout row="0" col="2" *ngIf="showSubCategories" rows="60,95,95,95,95,95,*,*" (swipe)="onSubCategorySwipe($event)">
     <Button class="glass" text='MAIN' textWrap="true" row='0' col='0' style='text-align: center' (tap)='displayMainCategories()'></Button>
-    <Button [class]="item.Class" [text]="item.Name" *ngFor="let item of pageSubCategories let i=index" (swipe)="onSubCategorySwipe($event)"
-      (tap)="subCategorySelected(item, i)" [row]='subCategoryRows[i]' textWrap="true"></Button>
+    <Button [class]="item.Class" [text]="item.Name" *ngFor="let item of pageSubCategories let i=index" 
+      (tap)="subCategorySelected(item, i)" [row]='item.Row' [col]='item.Col' textWrap="true"></Button>
   </GridLayout>
-  <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="3" colSpan="4" *ngIf="showSubCategories">
+  <GridLayout columns="*,*,*,*" rows="60,95,95,95,95,95,80,80" col="3" colSpan="4" *ngIf="showSubCategories" (swipe)='onProductSwipe($event)'>
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>
-    <Button class="btnProduct" [text]="item.Name" (tap)="productSelected(item, i)" (swipe)='onProductSwipe($event)'
-      textWrap="true" [style]='item.Style' *ngFor="let item of pageProducts let i=index" [col]='productCols[i]' [row]='productRows[i]'></Button>
+    <Button class="btnProduct" [text]="item.Name" (tap)="productSelected(item)" 
+      textWrap="true" [style]='item.Style'  *ngFor="let item of pageProducts let i=index" [col]='item.Col' [row]='item.Row'></Button>
     <Label [class]="item.QtyClass" [text]='item.QtyAvailable' [visibility]="item.CountdownActivated ? 'visible' : 'collapse'"
-      *ngFor="let item of pageProducts let i=index" [col]='productCols[i]' [row]='productRows[i]'></Label>
+      *ngFor="let item of pageProducts let i=index" [col]='item.Col' [row]='item.Row'></Label>
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,*,*,*,*,*,*" col="4" colSpan="4" *ngIf="showOptions">
     <FlexBoxLayout row='0' col='0' colSpan="4">

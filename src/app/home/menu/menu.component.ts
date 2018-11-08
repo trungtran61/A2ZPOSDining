@@ -33,29 +33,22 @@ export class MenuComponent implements OnInit {
     categories: MenuCategory[] = [];
     categoryStyles: string[] = [];
 
-    subCategories: MenuCategory[] = [];
-    subCategoryStyles: string[] = [];
-    subCategoryCols: number[] = [];
-    subCategoryRows: number[] = [];
-    pageSubCategories: MenuCategory[] = [];
+    subCategories: MenuSubCategory[] = [];
+    subCategoryStyles: string[] = [];  
+    pageSubCategories: MenuSubCategory[] = [];
     totalSubCategoriesPages: number = 0;
     subCategoryCurrentPage: number = 1;
     subCategoryPageSize: number = 5;
     //subCategoryClasses: string[] = [];
 
-    products: MenuProduct[] = [];
-    //productStyles: string[] = [];
-    productCols: number[] = [];
-    productRows: number[] = [];
+    products: MenuProduct[] = [];   
     pageProducts: MenuProduct[] = [];
 
     totalProductsPages: number = 0;
     productCurrentPage: number = 1;
     productPageSize: number = 20;
 
-    menuOptions: MenuOption[];
-    optionCols: number[] = [];
-    optionRows: number[] = [];
+    menuOptions: MenuOption[];  
     userModifiers: UserModifier[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
@@ -181,8 +174,7 @@ export class MenuComponent implements OnInit {
         this.showMainCategories = false;
         this.showSubCategories = true;
         this.showOptions = false;
-        let that = this;
-        this.subCategoryRows = [];
+        let that = this;        
         this.mainCategory = category.Name;
 
         this.DBService.getLocalMenuSubCategories(category.CategoryID).then((subCategories) => {
@@ -194,6 +186,12 @@ export class MenuComponent implements OnInit {
             else {
                 this.subCategoryCurrentPage = 0;
                 this.subCategories = subCategories;
+                
+                this.subCategories.forEach(function (subCategory: MenuSubCategory) {
+                    subCategory.Row = (subCategory.Position % 5) + 1;
+                    subCategory.Col = 0;
+                });
+
                 this.totalSubCategoriesPages = Math.ceil(this.subCategories.length / this.subCategoryPageSize);
                 this.getSubCategoryPage(true);
                 this.subCategorySelected(subCategories[0], 0);
@@ -227,10 +225,7 @@ export class MenuComponent implements OnInit {
         // build menu products list        
         this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
         let that = this;
-        let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
-        //subCategoryID = 50;
-        this.productRows = [];
-        this.productCols = [];
+        let categoryID: number = parseInt(localStorage.getItem("CategoryID"));       
         /*
                 Promise.all([
                     this.ApiSvc.reloadCountdowns(),
@@ -261,28 +256,35 @@ export class MenuComponent implements OnInit {
                 dialogs.alert("Menu Products not loaded.")
             }
             else {
-                this.products = products;
+                this.products = products;                
+                this.setProductAttributes();
                 this.totalProductsPages = Math.ceil(this.products[that.products.length - 1].Position / this.productPageSize);
                 this.productCurrentPage = 0;
                 this.getProductPage(true);
-                this.setProductAttributes(this.pageProducts);
+                //this.setProductAttributes(this.pageProducts);
                 this.currentSubCategory = subCategory.Name;
                 this.showProducts = true;
-                this.setActiveSubCategoryClass(subCategory);
+                this.setActiveSubCategoryClass(subCategory);                
             }
         });
     }
 
-    setProductAttributes(products: MenuProduct[]) {
+    //setProductAttributes(products: MenuProduct[]) {
+    setProductAttributes() {    
         let that = this;
 
-        products.forEach(function (product: MenuProduct) {
+         // account for current system pagesize difference 32 - 20 = 12    
+        let displacement: number = (this.productCurrentPage - 1) * 12;        
+       
+        this.products.forEach(function (product: MenuProduct) {           
+            product.Row = ((Math.floor((product.Position - 1) / 4)) % 5) + 1;
+            product.Col = (product.Position - 1) % 4;
             let lightColor: string = '#' + product.ButtonColorHex;
             //let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
             let darkColor: string = that.colorLuminance(lightColor, -0.2);
             let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
             product.Style = style;
-
+            
             product.QtyClass = '';
             product.Disabled = false;
             product.CountdownActivated = false;
@@ -529,8 +531,8 @@ export class MenuComponent implements OnInit {
             else {
                 this.menuOptions = menuOptions;
                 this.menuOptions.forEach(function (menuOption: MenuOption) {
-                    that.optionRows.push(Math.floor((menuOption.Position - 1) / 4) + 1);
-                    that.optionCols.push((menuOption.Position - 1) % 3);
+                    menuOption.Row = Math.floor((menuOption.Position - 1) / 4) + 1;
+                    menuOption.Col = (menuOption.Position - 1) % 3;
                 });
 
                 this.showOptions = true;
@@ -691,23 +693,29 @@ export class MenuComponent implements OnInit {
     }
 
     getSubCategoryPage(nextPage: boolean) {
+        
         if (nextPage)
-            this.subCategoryCurrentPage++;
+            this.subCategoryCurrentPage++;            
         else
-            this.subCategoryCurrentPage--;
+            this.subCategoryCurrentPage--;            
+        
+        let startPosition: number = (this.subCategoryCurrentPage * this.subCategoryPageSize) - this.subCategoryPageSize + 1;
 
-        let startRecord: number = (this.subCategoryCurrentPage * this.subCategoryPageSize) - this.subCategoryPageSize;
-        let endRecord: number = startRecord + this.subCategoryPageSize;
+        // find the first sub category on the next page      
+        if (this.subCategoryCurrentPage > 1)
+            startPosition = this.subCategories.find(sc => sc.Position > this.pageSubCategories[this.pageSubCategories.length-1].Position).Position;       
+        
+        let endPosition: number = startPosition + this.subCategoryPageSize;
 
-        if (endRecord > this.subCategories.length)
-            endRecord = this.subCategories.length;
+        if (endPosition > this.subCategories[this.subCategories.length - 1].Position)
+            endPosition = this.subCategories[this.subCategories.length - 1].Position;       
 
-        this.pageSubCategories = this.subCategories.slice(startRecord, endRecord);
+        //this.pageSubCategories = this.subCategories.slice(startRecord, endRecord);              
 
-        let that = this;
-        this.pageSubCategories.forEach(function (subCategory: MenuSubCategory) {
-            that.subCategoryRows.push(subCategory.Position);
-        });
+        this.pageSubCategories = this.subCategories.filter(
+            sc => sc.Position >= startPosition && sc.Position <= endPosition);     
+            
+        this.subCategorySelected(this.pageSubCategories[0], 0);          
     }
 
     onProductSwipe(args) {
@@ -716,14 +724,14 @@ export class MenuComponent implements OnInit {
 
         // at last page, can only swipe right
         if (this.productCurrentPage == this.totalProductsPages) {
-            if (args.direction == SwipeDirection.right) {
+            if (args.direction == SwipeDirection.down) {
                 this.getProductPage(false);
             }
         }
         // at first page, can only swipe left
         else
             if (this.productCurrentPage == 1) {
-                if (args.direction == SwipeDirection.left) {
+                if (args.direction == SwipeDirection.up) {
                     this.getProductPage(true);
                 }
             }
@@ -731,12 +739,12 @@ export class MenuComponent implements OnInit {
             else
                 if (this.productCurrentPage >= 1) {
                     // go to next page            
-                    if (args.direction == SwipeDirection.left) {
+                    if (args.direction == SwipeDirection.up) {
                         this.getProductPage(true);
                     }
                     else
                         // go to previous page
-                        if (args.direction == SwipeDirection.right) {
+                        if (args.direction == SwipeDirection.down) {
                             this.getProductPage(false);
                         }
                 }
@@ -749,22 +757,23 @@ export class MenuComponent implements OnInit {
         else
             this.productCurrentPage--;
 
-        let startPosition: number = (this.productCurrentPage * this.productPageSize) - this.productPageSize;
-        let endPosition: number = startPosition + this.productPageSize;
-
+        let startPosition: number = (this.productCurrentPage * this.productPageSize) - this.productPageSize + 1;
+        let endPosition: number = startPosition + this.productPageSize;      
+       
         if (endPosition > this.products[this.products.length - 1].Position)
-            endPosition = this.products[this.products.length - 1].Position;
+            endPosition = this.products[this.products.length - 1].Position;       
 
         //this.pageProducts = this.products.slice(startRecord, endRecord);
-
+        //let startTime:number  = new Date().getTime();
         this.pageProducts = this.products.filter(
             product => product.Position >= startPosition && product.Position <= endPosition);
-
-        let that = this;
+        //console.log('elapsed: ' + (new Date().getTime() - startTime).toString());    
+ /*
         this.pageProducts.forEach(function (menuProduct: MenuProduct) {
-            that.productRows.push(Math.floor((menuProduct.Position - 1) / 4) + 1);
-            that.productCols.push((menuProduct.Position - 1) % 4);
+            menuProduct.Row = Math.floor((menuProduct.Position - 1) / 4) + 1;
+            menuProduct.Col = (menuProduct.Position - 1) % 4;
         });
+        */
     }
 
     changeModifier(modifier: Modifier)

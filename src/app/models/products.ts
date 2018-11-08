@@ -18,6 +18,8 @@ export interface MenuSubCategory {
     ButtonForeColor: number;
     ButtonForeColorHex: string;
     Class?: string;
+    Row?: number;
+    Col?: number;
 }
 
 export interface MenuProduct {
@@ -45,6 +47,8 @@ export interface MenuProduct {
     Disabled?: boolean;
     QtyClass?: string;
     Style?: string;
+    Row?: number;
+    Col?: number;
 }
 
 export interface CategoryCode {
@@ -290,6 +294,8 @@ export interface MenuOption {
     Position?: number;
     ProductCode?: number;
     ReportProductMix?: boolean;
+    Row?: number;
+    Col?: number;
 }
 
 export interface MenuSubOption {

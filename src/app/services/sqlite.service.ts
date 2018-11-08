@@ -271,7 +271,10 @@ export class SQLiteService {
                         UseForcedModifier: rows[row][12] == "true",
                         ProductType: rows[row][13],
                         Taxable: rows[row][14],
-                        TaxRate: rows[row][15]
+                        TaxRate: rows[row][15],
+                        Style: '',
+                        Col: 0,
+                        Row: 0
                     });
                 }
 
