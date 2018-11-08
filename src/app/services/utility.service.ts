@@ -90,7 +90,8 @@ export class UtilityService {
         if (this.DBService.systemSettings.TaxGratuity)
             taxTotal += order.Gratuity * this.DBService.systemSettings.GratuityTaxRate;
 
-        taxTotal = parseFloat(Math.round(taxTotal).toFixed(2));
+        //taxTotal = parseFloat(Math.round((taxTotal * 100) / 100).toFixed(2));
+        //taxTotal = Math.round((taxTotal * 100) / 100);
         return taxTotal;
     }
     /*

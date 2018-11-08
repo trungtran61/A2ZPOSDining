@@ -9,7 +9,7 @@ import { HomeComponent } from "./home.component";
 import { MyTablesComponent } from "~/app/home/mytables/my-tables.component";
 import { TableGuestsComponent } from "~/app/home/tableguests/table-guests.component";
 import { MenuComponent } from "~/app/home/menu/menu.component";
-import { ModifyOrderItemComponent } from "~/app/home/menu/modify-check-item.component";
+import { ModifyOrderItemComponent } from "~/app/home/menu/modify-order-item.component";
 import { ModifiersComponent } from "~/app/home/menu/modifiers/modifiers.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 import { TNSFontIconModule, TNSFontIconService } from "nativescript-ngx-fonticon";

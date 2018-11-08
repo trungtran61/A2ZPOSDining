@@ -4,10 +4,10 @@ import { Choice } from "~/app/models/products";
 import { OrderItem } from "~/app/models/orders";
 
 @Component({
-    selector: "modify-check-item",   
+    selector: "modify-order-item",   
     moduleId: module.id,
-    templateUrl: "./modify-check-item.component.html",
-    styleUrls: ['./modify-check-item.component.css']
+    templateUrl: "./modify-order-item.component.html",
+    styleUrls: ['./modify-order-item.component.css']
 })
 export class ModifyOrderItemComponent implements OnInit {
     modifier: string;
@@ -27,6 +27,7 @@ export class ModifyOrderItemComponent implements OnInit {
     enterQty: string = '';
     orderItem: OrderItem = {};
     hasModifiers: boolean = false;
+    isForcedModifier: boolean = true;
 
     changeTypeStyle: string ="color: black;background-image: linear-gradient(gray, white); border-color: black";
     changeTypeStyleSelected: string ="color: white;background-image: linear-gradient(black, gray); border-color: white";
@@ -119,5 +120,6 @@ export class ModifyOrderItemComponent implements OnInit {
     ngOnInit() { 
         this.orderItem = this.params.context.orderItem;
         this.hasModifiers = this.orderItem.Product.UseModifier;
+        this.isForcedModifier = this.params.context.forcedModifier != null;
     } 
 }

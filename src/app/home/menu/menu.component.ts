@@ -3,10 +3,10 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo } from "~/app/models/products";
+import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
-import { ModifyOrderItemComponent } from "~/app/home/menu/modify-check-item.component";
+import { ModifyOrderItemComponent } from "~/app/home/menu/modify-order-item.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
@@ -452,14 +452,19 @@ export class MenuComponent implements OnInit {
             });
     }
 
-    showModifyDialog(orderItem: OrderItem, modifier: Modifier) {
+    showModifyDialog(orderItem: OrderItem, modifier: Modifier, forcedModifier: ForcedModifier) {
         
         this.currentOrderItem = orderItem;
+
+        let context = {orderItem: orderItem, forcedModifier : null };
+
+        if (forcedModifier != null)
+            context = {orderItem: orderItem, forcedModifier: forcedModifier }
 
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: false,
-            context: { orderItem: orderItem }
+            context: context
         };
 
         this.modalService.showModal(ModifyOrderItemComponent, modalOptions).then(
