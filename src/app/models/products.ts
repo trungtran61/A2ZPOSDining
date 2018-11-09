@@ -265,7 +265,7 @@ export interface Modifier {
     Name?: string;
     Price?: number;
     DisplayPrice?: number;
-    Active?: boolean;
+    Active?: boolean;   
 }
 
 export interface UserModifier {

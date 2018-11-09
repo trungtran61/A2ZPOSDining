@@ -21,11 +21,11 @@ export class AppComponent implements OnInit {
     }
 
     public ngOnInit() {     
-        this.DBService.getLocalSystemSettings().then((systemSettings) => {
-            if (systemSettings.length == 0) {
-                console.log("SystemSettings not loaded.")
-            }
-        });  
+       // this.DBService.getLocalSystemSettings().then((systemSettings) => {
+       //     if (systemSettings == null) {
+       //         console.log("SystemSettings not loaded.")
+       //     }
+       // });  
     }
 
     onClick() {

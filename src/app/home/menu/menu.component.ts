@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewContainerRef } from "@angular/core";
+import { Component, OnInit, ViewContainerRef, ViewChild } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
-import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
+import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
 import { ModifyOrderItemComponent } from "~/app/home/menu/modify-order-item.component";
 import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 import { Page } from "tns-core-modules/ui/page/page";
@@ -22,6 +22,7 @@ import { MemoComponent } from "./memo.component";
 import { NullTemplateVisitor } from "@angular/compiler";
 import { ListView } from "tns-core-modules/ui/list-view/list-view";
 import { UtilityService } from "~/app/services/utility.service";
+import { ObservableArray } from "tns-core-modules/data/observable-array/observable-array";
 
 @Component({
     selector: "Menu",
@@ -34,21 +35,25 @@ export class MenuComponent implements OnInit {
     categoryStyles: string[] = [];
 
     subCategories: MenuSubCategory[] = [];
-    subCategoryStyles: string[] = [];  
+    subCategoryStyles: string[] = [];
     pageSubCategories: MenuSubCategory[] = [];
     totalSubCategoriesPages: number = 0;
     subCategoryCurrentPage: number = 1;
     subCategoryPageSize: number = 5;
     //subCategoryClasses: string[] = [];
 
-    products: MenuProduct[] = [];   
+    products: MenuProduct[] = [];
     pageProducts: MenuProduct[] = [];
 
-    totalProductsPages: number = 0;
+    totalProductPages: number = 0;
     productCurrentPage: number = 1;
     productPageSize: number = 20;
 
-    menuOptions: MenuOption[];  
+    menuOptions: MenuOption[];
+    pageOptions: MenuOption[];
+    totalOptionPages: number = 0;
+    optionCurrentPage: number = 1;
+    optionPageSize: number = 20;
     userModifiers: UserModifier[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
@@ -69,6 +74,8 @@ export class MenuComponent implements OnInit {
     subCategoriesTitle: string = '';
     mainCategory: string = '';
     lockedCategoryId: number = 0;
+    currentProduct: MenuProduct;
+
 
     showMainCategories: boolean = true;
     showSubCategories: boolean = false;
@@ -83,14 +90,14 @@ export class MenuComponent implements OnInit {
 
     viewDetailsText: string = this.hideDetailsCode;
 
-    fixedOptions: FixedOption[] = [{Name :'NO', Class: 'glass btnOption', Position: 1},{Name :'EXTRA', Class: 'glass btnOption', Position: 2},{Name :'LESS', Class: 'glass btnOption', Position: 3},{Name :'ADD', Class: 'glass btnOption', Position: 4},
-        {Name :'OTS', Class: 'glass btnOption', Position: 5},{Name :'NO MAKE', Class: 'glass btnOption', Position: 5},{Name :'1/2', Class: 'glass btnOption', Position: 6},{Name :'TO GO', Class: 'glass btnOption', Position: 7}];
-    fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];    
+    fixedOptions: FixedOption[] = [{ Name: 'NO', Class: 'glass btnOption', Position: 1 }, { Name: 'EXTRA', Class: 'glass btnOption', Position: 2 }, { Name: 'LESS', Class: 'glass btnOption', Position: 3 }, { Name: 'ADD', Class: 'glass btnOption', Position: 4 },
+    { Name: 'OTS', Class: 'glass btnOption', Position: 5 }, { Name: 'NO MAKE', Class: 'glass btnOption', Position: 5 }, { Name: '1/2', Class: 'glass btnOption', Position: 6 }, { Name: 'TO GO', Class: 'glass btnOption', Position: 7 }];
+    fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
 
     currentOrderItem: OrderItem = null;
     currentFixedOption: FixedOption;
     currentUserModifier: UserModifier;
-    userModifierActive: boolean = false; 
+    userModifierActive: boolean = false;
 
     countdowns: Countdown[] = [];
     allTimers: MenuTimer[] = [];
@@ -100,7 +107,6 @@ export class MenuComponent implements OnInit {
     TIPS_PCT: number = .15;
 
     qtyEntered: number = 1;
-
     orderType: number = OrderTypes.DineIn;
 
     constructor(private router: RouterExtensions,
@@ -137,7 +143,7 @@ export class MenuComponent implements OnInit {
         }
         );
 
-        this.getMenuTimers();       
+        this.getMenuTimers();
         this.getUserModifiers();
         this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
     }
@@ -174,7 +180,7 @@ export class MenuComponent implements OnInit {
         this.showMainCategories = false;
         this.showSubCategories = true;
         this.showOptions = false;
-        let that = this;        
+        let that = this;
         this.mainCategory = category.Name;
 
         this.DBService.getLocalMenuSubCategories(category.CategoryID).then((subCategories) => {
@@ -186,13 +192,13 @@ export class MenuComponent implements OnInit {
             else {
                 this.subCategoryCurrentPage = 0;
                 this.subCategories = subCategories;
-                
+
                 this.subCategories.forEach(function (subCategory: MenuSubCategory) {
-                    subCategory.Row = (subCategory.Position % 5) + 1;
+                    subCategory.Row = ((subCategory.Position - 1) % 5) + 1;
                     subCategory.Col = 0;
                 });
 
-                this.totalSubCategoriesPages = Math.ceil(this.subCategories.length / this.subCategoryPageSize);
+                this.totalSubCategoriesPages = Math.ceil(this.subCategories[this.subCategories.length - 1].Position / this.subCategoryPageSize);
                 this.getSubCategoryPage(true);
                 this.subCategorySelected(subCategories[0], 0);
             }
@@ -210,73 +216,39 @@ export class MenuComponent implements OnInit {
         currentSubCategory.Class = 'btnSubCategoryActive';
         //this.subCategoryClasses[currentIndex] = 'btnSubCategoryActive';
     }
-    /*
-        loadCategoryStyles(categories: MenuCategory[], categoryStyles: string[]) {
-            categoryStyles = [];
-            categories.forEach(function (menuCategory: MenuCategory) {
-                let darkColor: string = menuCategory.ButtonColorHex;
-                let lightColor: string = this.colorLuminance(darkColor, 0.5);
-                let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(#" + darkColor + ", #" + lightColor + ");";
-                categoryStyles.push(style);
-            });
-        }
-    */
+
     subCategorySelected(subCategory: MenuSubCategory, currentIndex: number) {
         // build menu products list        
         this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
         let that = this;
-        let categoryID: number = parseInt(localStorage.getItem("CategoryID"));       
-        /*
-                Promise.all([
-                    this.ApiSvc.reloadCountdowns(),
-                    this.DBService.getLocalMenuProductsX(categoryID, subCategory.SubCategoryID)
-                ]).then(value =>
-                {   
-                    //let countdowns: Countdown[] = <Countdown[]>value[0];     
-                    this.products = <MenuProduct[]>value[1];
-                    //let result = products.map(p => {
-                    //    return Object.assign({}, p, countdowns.filter(cd => cd.PriKey === p.ProductID)[0]);
-                    //});
-                    console.log(value[0]);   
-                    
-                    //this.products = products;     
-                    this.totalProductsPages = Math.ceil(this.products[that.products.length - 1].Position / this.productPageSize);
-                    this.productCurrentPage = 0;
-                    this.getProductPage(true);
-                    
-                    this.loadProductStyles(this.pageProducts, that.productStyles);
-                    this.currentSubCategory = subCategory.Name;
-                    this.showProducts = true;
-                    this.setActiveSubCategoryClass(currentIndex);    
-                    
-                });
-        */
+        let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
+
         this.DBService.getLocalMenuProducts(categoryID, subCategory.SubCategoryID).then((products) => {
             if (products.length == 0) {
                 dialogs.alert("Menu Products not loaded.")
             }
             else {
-                this.products = products;                
+                this.products = products;
                 this.setProductAttributes();
-                this.totalProductsPages = Math.ceil(this.products[that.products.length - 1].Position / this.productPageSize);
+                this.totalProductPages = Math.ceil(this.products[that.products.length - 1].Position / this.productPageSize);
                 this.productCurrentPage = 0;
                 this.getProductPage(true);
                 //this.setProductAttributes(this.pageProducts);
                 this.currentSubCategory = subCategory.Name;
                 this.showProducts = true;
-                this.setActiveSubCategoryClass(subCategory);                
+                this.setActiveSubCategoryClass(subCategory);
             }
         });
     }
 
     //setProductAttributes(products: MenuProduct[]) {
-    setProductAttributes() {    
+    setProductAttributes() {
         let that = this;
 
-         // account for current system pagesize difference 32 - 20 = 12    
-        let displacement: number = (this.productCurrentPage - 1) * 12;        
-       
-        this.products.forEach(function (product: MenuProduct) {           
+        // account for current system pagesize difference 32 - 20 = 12    
+        let displacement: number = (this.productCurrentPage - 1) * 12;
+
+        this.products.forEach(function (product: MenuProduct) {
             product.Row = ((Math.floor((product.Position - 1) / 4)) % 5) + 1;
             product.Col = (product.Position - 1) % 4;
             let lightColor: string = '#' + product.ButtonColorHex;
@@ -284,7 +256,7 @@ export class MenuComponent implements OnInit {
             let darkColor: string = that.colorLuminance(lightColor, -0.2);
             let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
             product.Style = style;
-            
+
             product.QtyClass = '';
             product.Disabled = false;
             product.CountdownActivated = false;
@@ -333,6 +305,7 @@ export class MenuComponent implements OnInit {
     }
 
     productSelected(product: MenuProduct) {
+        this.currentProduct = product;
 
         if (this.showProductInfo) {
             dialogs.alert({
@@ -371,7 +344,7 @@ export class MenuComponent implements OnInit {
                     if (isAdding) {
                         this.addProductToOrder(product);
                     }
-                    this.order.OrderItems[this.order.OrderItems.length - 1].ForcedModifiers = selectedChoices;                   
+                    this.order.OrderItems[this.order.OrderItems.length - 1].ForcedModifiers = selectedChoices;
                 }
             });
     }
@@ -392,15 +365,16 @@ export class MenuComponent implements OnInit {
         this.showForcedModifierDialog(product, orderItemIndex, choice, false);
     }
 
-    addProductToOrder(product: MenuProduct) {        
+    addProductToOrder(product: MenuProduct) {
+
         this.order.OrderItems.push({
             Modifiers: [],
             ForcedModifiers: [],
-            Qty: this.qtyEntered, 
-            SeatNumber: this.currentSeatNumber, 
+            Qty: this.qtyEntered,
+            SeatNumber: this.currentSeatNumber,
             Price: product.UnitPrice * this.qtyEntered,
             Product: product,
-            IgnoreTax: false                        
+            IgnoreTax: false
         });
 
         this.totalPrice();
@@ -455,13 +429,13 @@ export class MenuComponent implements OnInit {
     }
 
     showModifyDialog(orderItem: OrderItem, modifier: Modifier, forcedModifier: ForcedModifier) {
-        
+
         this.currentOrderItem = orderItem;
 
-        let context = {orderItem: orderItem, forcedModifier : null };
+        let context = { orderItem: orderItem, forcedModifier: null };
 
         if (forcedModifier != null)
-            context = {orderItem: orderItem, forcedModifier: forcedModifier }
+            context = { orderItem: orderItem, forcedModifier: forcedModifier }
 
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
@@ -497,6 +471,9 @@ export class MenuComponent implements OnInit {
                         break;
                     case 'modify':
                         this.getMenuOptions(orderItem.Product);
+                        this.totalOptionPages = Math.ceil(this.menuOptions[this.menuOptions.length - 1].Position / this.optionPageSize);
+                        this.optionCurrentPage = 0;
+                        this.getOptionPage(true);
                         break;
                     case 'changechoice':
                         this.showForcedModifierDialog(orderItem.Product, -1, null, false);
@@ -505,7 +482,57 @@ export class MenuComponent implements OnInit {
             });
     }
 
-    resetFixedOptionClasses() {        
+    onOptionSwipe(args) {
+        if (this.totalOptionPages <= 1)
+            return;
+
+        // at last page, can only swipe right
+        if (this.optionCurrentPage == this.totalOptionPages) {
+            if (args.direction == SwipeDirection.down) {
+                this.getOptionPage(false);
+            }
+        }
+        // at first page, can only swipe left
+        else
+            if (this.optionCurrentPage == 1) {
+                if (args.direction == SwipeDirection.up) {
+                    this.getOptionPage(true);
+                }
+            }
+            // else, can swipe left or right
+            else
+                if (this.optionCurrentPage >= 1) {
+                    // go to next page            
+                    if (args.direction == SwipeDirection.up) {
+                        this.getOptionPage(true);
+                    }
+                    else
+                        // go to previous page
+                        if (args.direction == SwipeDirection.down) {
+                            this.getOptionPage(false);
+                        }
+                }
+
+    }
+
+    getOptionPage(nextPage: boolean) {
+        if (nextPage)
+            this.optionCurrentPage++;
+        else
+            this.optionCurrentPage--;
+
+        let startPosition: number = (this.optionCurrentPage * this.optionPageSize) - this.optionPageSize + 1;
+        let endPosition: number = startPosition + this.optionPageSize;
+
+        if (endPosition > this.menuOptions[this.menuOptions.length - 1].Position)
+            endPosition = this.menuOptions[this.menuOptions.length - 1].Position;
+
+        this.pageOptions = this.menuOptions.filter(
+            o => o.Position >= startPosition && o.Position <= endPosition);
+
+    }
+
+    resetFixedOptionClasses() {
         this.fixedOptions.forEach(function (fixedOption: FixedOption) {
             fixedOption.Class = 'glass btnOption';
         });
@@ -542,31 +569,34 @@ export class MenuComponent implements OnInit {
         });
     }
 
-    getUserModifiers()
-    {
+    getUserModifiers() {
         let that = this;
         this.DBService.getLocalUserModifiers().then((userModifiers) => {
             if (userModifiers.length == 0) {
                 dialogs.alert("Missing UserModifiers");
             }
             else {
-                this.userModifiers = userModifiers;              
+                this.userModifiers = userModifiers;
             }
         });
     }
 
     fixedOptionSelected(fixedOption: FixedOption) {
+
         this.resetFixedOptionClasses();
         this.resetUserModifierClasses();
-        this.userModifierActive = false; 
+        this.userModifierActive = false;
 
         switch (fixedOption.Name) {
             case 'NO MAKE':
             case 'TO GO':
-                {
-                    this.currentOrderItem.Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
-                    break;
-                }
+                let product: MenuProduct = Object.assign({}, this.currentProduct);
+                product.Name = fixedOption.Name;
+                this.currentOrderItem.Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
+                //this.currentOrderItem.oModifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
+                this.refreshList();
+                break;
+
             default:
                 {
                     this.currentFixedOption = fixedOption;
@@ -593,17 +623,15 @@ export class MenuComponent implements OnInit {
     }
 
     optionSelected(option: MenuOption) {
-      
+
         let name: string = '';
         let price: number = 0;
 
-        if (this.userModifierActive)
-        {
+        if (this.userModifierActive) {
             name = this.currentUserModifier.ItemName + ' ' + option.Name;
             price = this.currentUserModifier.StampPrice ? this.currentUserModifier.Price : option.Charge;
         }
-        else
-        {
+        else {
             name = this.currentFixedOption.Name + ' ' + option.Name;
             price = option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0;
         }
@@ -611,18 +639,17 @@ export class MenuComponent implements OnInit {
         let modifier: Modifier = {
             Name: name,
             Price: price,
-            DisplayPrice: price > 0 ? price : null
+            DisplayPrice: price > 0 ? price : null,
         };
 
-        this.currentOrderItem.Modifiers.push(modifier);           
+        //this.currentOrderItem.Modifiers[0] = modifier;        
+        this.currentOrderItem.Modifiers.push(modifier);
         this.refreshList();
     }
 
-    userModifierSelected(userModifier: UserModifier)
-    {
-        if (userModifier.ButtonFunction == 1)
-        {            
-            this.currentOrderItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null});
+    userModifierSelected(userModifier: UserModifier) {
+        if (userModifier.ButtonFunction == 1) {
+            this.currentOrderItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null });
             this.refreshList();
             return;
         }
@@ -630,18 +657,16 @@ export class MenuComponent implements OnInit {
         this.resetUserModifierClasses();
         this.resetFixedOptionClasses();
         this.currentUserModifier = userModifier;
-        userModifier.Class = 'glass btnOptionActive';     
-        this.userModifierActive = true;        
+        userModifier.Class = 'glass btnOptionActive';
+        this.userModifierActive = true;
     }
 
-    refreshList()
-    {
+    refreshList() {
         let listView: ListView = <ListView>this.page.getViewById("lvItems");
         listView.refresh();
     }
 
-    resetUserModifierClasses()
-    {
+    resetUserModifierClasses() {
         this.userModifiers.forEach(function (userModifier: UserModifier) {
             userModifier.Class = 'glass btnOption';
         });
@@ -693,37 +718,41 @@ export class MenuComponent implements OnInit {
     }
 
     getSubCategoryPage(nextPage: boolean) {
-        
+
         if (nextPage)
-            this.subCategoryCurrentPage++;            
+            this.subCategoryCurrentPage++;
         else
-            this.subCategoryCurrentPage--;            
-        
+            this.subCategoryCurrentPage--;
+
         let startPosition: number = (this.subCategoryCurrentPage * this.subCategoryPageSize) - this.subCategoryPageSize + 1;
 
         // find the first sub category on the next page      
         if (this.subCategoryCurrentPage > 1)
-            startPosition = this.subCategories.find(sc => sc.Position > this.pageSubCategories[this.pageSubCategories.length-1].Position).Position;       
-        
-        let endPosition: number = startPosition + this.subCategoryPageSize;
+            startPosition = this.subCategories.find(sc => sc.Position > this.pageSubCategories[this.pageSubCategories.length - 1].Position).Position;
+
+        let endPosition: number = startPosition + this.subCategoryPageSize - 1;
 
         if (endPosition > this.subCategories[this.subCategories.length - 1].Position)
-            endPosition = this.subCategories[this.subCategories.length - 1].Position;       
+            endPosition = this.subCategories[this.subCategories.length - 1].Position;
 
         //this.pageSubCategories = this.subCategories.slice(startRecord, endRecord);              
 
         this.pageSubCategories = this.subCategories.filter(
-            sc => sc.Position >= startPosition && sc.Position <= endPosition);     
-            
-        this.subCategorySelected(this.pageSubCategories[0], 0);          
+            sc => sc.Position >= startPosition && sc.Position <= endPosition);
+
+        // if first item is in last row - page has only 1 row    
+        if (this.pageSubCategories[0].Row >= this.subCategoryPageSize)
+            this.pageSubCategories = this.pageSubCategories.slice(0, 1);
+
+        this.subCategorySelected(this.pageSubCategories[0], 0);
     }
 
     onProductSwipe(args) {
-        if (this.totalProductsPages <= 1)
+        if (this.totalProductPages <= 1)
             return;
 
         // at last page, can only swipe right
-        if (this.productCurrentPage == this.totalProductsPages) {
+        if (this.productCurrentPage == this.totalProductPages) {
             if (args.direction == SwipeDirection.down) {
                 this.getProductPage(false);
             }
@@ -758,27 +787,26 @@ export class MenuComponent implements OnInit {
             this.productCurrentPage--;
 
         let startPosition: number = (this.productCurrentPage * this.productPageSize) - this.productPageSize + 1;
-        let endPosition: number = startPosition + this.productPageSize;      
-       
+        let endPosition: number = startPosition + this.productPageSize;
+
         if (endPosition > this.products[this.products.length - 1].Position)
-            endPosition = this.products[this.products.length - 1].Position;       
+            endPosition = this.products[this.products.length - 1].Position;
 
         //this.pageProducts = this.products.slice(startRecord, endRecord);
         //let startTime:number  = new Date().getTime();
         this.pageProducts = this.products.filter(
             product => product.Position >= startPosition && product.Position <= endPosition);
         //console.log('elapsed: ' + (new Date().getTime() - startTime).toString());    
- /*
-        this.pageProducts.forEach(function (menuProduct: MenuProduct) {
-            menuProduct.Row = Math.floor((menuProduct.Position - 1) / 4) + 1;
-            menuProduct.Col = (menuProduct.Position - 1) % 4;
-        });
-        */
+        /*
+               this.pageProducts.forEach(function (menuProduct: MenuProduct) {
+                   menuProduct.Row = Math.floor((menuProduct.Position - 1) / 4) + 1;
+                   menuProduct.Col = (menuProduct.Position - 1) % 4;
+               });
+               */
     }
 
-    changeModifier(modifier: Modifier)
-    {
-        console.log(modifier);        
+    changeModifier(modifier: Modifier) {
+        console.log(modifier);
     }
 
     onOrderItemSwipe(args, orderItem: OrderItem) {
@@ -787,11 +815,15 @@ export class MenuComponent implements OnInit {
         }
     }
 
-    onModifierSwipe(args, orderItem: OrderItem, modifier: Modifier)
-    {
+    onModifierSwipe(args, orderItem: OrderItem, modifier: Modifier) {
         if (args.direction == SwipeDirection.left) {
             this.deleteModifier(orderItem, modifier);
         }
+    }
+
+    tapped(args) {
+        console.log(args);
+        //this.refreshList();
     }
 
     deleteOrderItem(orderItem: OrderItem) {
@@ -802,6 +834,7 @@ export class MenuComponent implements OnInit {
     }
 
     deleteModifier(orderItem: OrderItem, modifier: Modifier) {
+
         orderItem.Modifiers = orderItem.Modifiers.filter(obj => obj !== modifier);
         this.refreshList();
 
@@ -837,8 +870,9 @@ export class MenuComponent implements OnInit {
             (selectedModifiers) => {
                 if (this.order.OrderItems[orderItemIndex].Modifiers.length == 0)
                     this.order.OrderItems[orderItemIndex].Modifiers = selectedModifiers;
-                else
-                    this.order.OrderItems[orderItemIndex].Modifiers = this.order.OrderItems[orderItemIndex].Modifiers.concat(selectedModifiers);
+                else {
+                    // this.order.OrderItems[orderItemIndex].Modifiers = this.order.OrderItems[orderItemIndex].Modifiers.concat(selectedModifiers);
+                }
             });
     }
 
@@ -850,7 +884,7 @@ export class MenuComponent implements OnInit {
 
         this.modalService.showModal(MemoComponent, modalOptions).then(
             (memo: Memo) => {
-               this.currentOrderItem.Modifiers.push({Name: memo.Memo, Price: memo.Price, DisplayPrice: memo.Price > 0 ? memo.Price : null })
+                this.currentOrderItem.Modifiers.push({ Name: memo.Memo, Price: memo.Price, DisplayPrice: memo.Price > 0 ? memo.Price : null })
             });
     }
 

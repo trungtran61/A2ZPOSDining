@@ -1,4 +1,6 @@
 import { MenuProduct, MenuChoice, Modifier } from "./products";
+import { Observable } from "rxjs";
+import { ObservableArray } from "tns-core-modules/data/observable-array/observable-array";
 
 export interface Countdown {
     ProductFilter?: number;
@@ -30,7 +32,8 @@ export interface OrderItem {
     Voided?: boolean,
     Comped?: boolean
     IgnoreTax?: boolean,
-    ExtPrice?: number
+    ExtPrice?: number,
+    oModifiers?: ObservableArray<Modifier>
 }
 
 export interface myOption{
@@ -44,7 +47,7 @@ export interface Order {
     Discount?: number;
     TaxExempt?: boolean;
     Gratuity?: number;
-    OrderItems?: OrderItem[];
+    OrderItems?:  OrderItem[];
 }
 
 export interface FixedOption {

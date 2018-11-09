@@ -3,7 +3,7 @@
   <ActionItem [text]="currentSubCategory" style="font-weight: bold" ios.position="right" android.position="popup"></ActionItem>
   <NavigationButton icon="res://ic_arrow_back_black_24dp" (tap)="goBack()"></NavigationButton>
 </ActionBar>
-<GridLayout rows="auto, 70" columns="*,*,*,*,*,*,*" style="font-weight: bold">
+<GridLayout rows="*, 70" columns="*,*,*,*,*,*,*" style="font-weight: bold">
   <StackLayout row="0" col="0" colSpan="2">
     <StackLayout orientation="horizontal" style="background-color: antiquewhite;">
       <Label [text]="checkNumber" style="text-align: left; margin-right: 5;width:75;"></Label> |
@@ -11,7 +11,9 @@
       <Label [text]="table" style="text-align: left; margin-right: 5;width:30;"></Label> |
       <Label [text]="guests" style="text-align: right; width:40;"></Label>
     </StackLayout>
-    <ListView [items]="order.OrderItems" id='lvItems' separatorColor="white" class="m-0" height="505" *ngIf='showDetails'>
+
+
+    <ListView [items]="order.OrderItems" id='lvItems2'  separatorColor="white" class="m-0" height="505" *ngIf='!showDetails'>
       <ng-template let-item="item" let-i="index">
         <StackLayout class="m-b-10">
           <StackLayout orientation="horizontal" (tap)="showModifyDialog(item,null,null)" (swipe)="onOrderItemSwipe($event, item)">
@@ -19,28 +21,6 @@
             <Label [text]="item.Product.Name" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.Price | currency" style="text-align: right; width:50; margin-right:5"></Label>
             <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
-          </StackLayout>
-          <StackLayout *ngFor="let choice of item.ForcedModifiers let i=index" (tap)='showModifyDialog(item,null,choice)'>
-            <Label style='margin-left: 30px;' [text]='choice.Name'></Label>            
-          </StackLayout>
-         
-          <FlexBoxLayout *ngFor="let modifier of item.Modifiers let i=index" (tap)="showModifyDialog(item,modifier,null)" (swipe)="onModifierSwipe($event, item, modifier)">
-            <Label style='margin-left: 30px;' [text]='modifier.Name'></Label>      
-            <Label style='margin-left: 30px;' [text]='modifier.DisplayPrice | currency'></Label>       
-          </FlexBoxLayout>
-          
-        </StackLayout>
-      </ng-template>
-    </ListView>
-
-    <ListView [items]="orderItems" separatorColor="white" class="m-0" height="505" *ngIf='!showDetails'>
-      <ng-template let-item="item" let-i="index">
-        <StackLayout class="m-b-10">
-          <StackLayout orientation="horizontal" (tap)="showModifyDialog(item,i)" (swipe)="onOrderItemSwipe($event, item)">
-            <Label [text]="item.Qty" style="text-align: right; margin-right: 10;width:15;"></Label>
-            <Label [text]="item.Product.Name" style="text-align: left; width:150; margin-right: 5"></Label>
-            <Label [text]="item.Price | currency" style="text-align: right; width:50; margin-right:5"></Label>
-            <Label [text]="item.SeatNumber" style="text-align: right; width:15;"></Label>
           </StackLayout>
         </StackLayout>
       </ng-template>
@@ -88,12 +68,12 @@
     <Button class="glass btnCategory" [text]="item.Name" textWrap="true" *ngFor="let item of categories let i=index"
       (tap)="categorySelected(item)" [style]="categoryStyles[i]"></Button>
   </StackLayout>
-  <GridLayout row="0" col="2" *ngIf="showSubCategories" rows="60,95,95,95,95,95,*,*" (swipe)="onSubCategorySwipe($event)">
+  <GridLayout row="0" col="2" *ngIf="showSubCategories" rows="60,98,98,98,98,98,*,*" (swipe)="onSubCategorySwipe($event)">
     <Button class="glass" text='MAIN' textWrap="true" row='0' col='0' style='text-align: center' (tap)='displayMainCategories()'></Button>
     <Button [class]="item.Class" [text]="item.Name" *ngFor="let item of pageSubCategories let i=index" 
       (tap)="subCategorySelected(item, i)" [row]='item.Row' [col]='item.Col' textWrap="true"></Button>
   </GridLayout>
-  <GridLayout columns="*,*,*,*" rows="60,95,95,95,95,95,80,80" col="3" colSpan="4" *ngIf="showSubCategories" (swipe)='onProductSwipe($event)'>
+  <GridLayout columns="*,*,*,*" rows="60,98,98,98,98,80,80" col="3" colSpan="4" *ngIf="showSubCategories" (swipe)='onProductSwipe($event)'>
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>
     <Button class="btnProduct" [text]="item.Name" (tap)="productSelected(item)" 
       textWrap="true" [style]='item.Style'  *ngFor="let item of pageProducts let i=index" [col]='item.Col' [row]='item.Row'></Button>
@@ -111,9 +91,9 @@
       </StackLayout>
       <Button class="glass" text="DONE" (tap)="doneOption()" style='background-image:linear-gradient(green, black);text-align: center; height: 118px;border-radius: 20'></Button>
     </StackLayout>
-    <Button class="glass btnMenuOption" [text]="item.Name" *ngFor="let item of pageOptions let i=index" (tap)="optionSelected(item)" (swipe)='onOptionSwipe($event)'
-    [col]='item.Col' [row]='item.Row' textWrap="true"></Button>
-  <Button class="btnMemo" width="120" text="MEMO" (tap)="showMemoDialog()" col='1' row='7'></Button>
+    <Button class="glass btnMenuOption" [text]="item.Name" *ngFor="let item of menuOptions let i=index" (tap)="optionSelected(item)"
+      [col]='item.Col' [row]='item.Row' textWrap="true"></Button>
+    <Button class="btnMemo" width="120" text="MEMO" (tap)="showMemoDialog()" col='1' row='7'></Button>
   </GridLayout>
   <StackLayout orientation="horizontal" *ngIf="showOptions" row='1' col='0' colSpan="6">
     <Button [class]="item.Class" width="120" [text]="item.ItemName" *ngFor="let item of userModifiers let i=index"
