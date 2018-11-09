@@ -558,8 +558,8 @@ export class MenuComponent implements OnInit {
             else {
                 this.menuOptions = menuOptions;
                 this.menuOptions.forEach(function (menuOption: MenuOption) {
-                    menuOption.Row = Math.floor((menuOption.Position - 1) / 4) + 1;
-                    menuOption.Col = (menuOption.Position - 1) % 3;
+                    menuOption.Row = ((Math.floor((menuOption.Position - 1) / 4)) % 5) + 1;
+                    menuOption.Col = (menuOption.Position - 1) % 4;
                 });
 
                 this.showOptions = true;
