@@ -27,6 +27,8 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 {
     background: linear-gradient(lightgray,gray);
     color: black;
+    width: 105;
+    height: 85;
 }
 
 .qtyAvailable
@@ -50,5 +52,5 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 
 .btnMemo
 {
-    background-image:linear-gradient(orange, white);text-align: center; height: 118px; border-width: 2; border-color: bisque; border-radius: 30;
+    color: gold; font-weight: bold; text-align: center; height: 118px; border-width: 2; border-color: bisque; border-radius: 30;
 }

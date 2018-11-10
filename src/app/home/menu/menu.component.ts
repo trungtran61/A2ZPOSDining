@@ -53,7 +53,7 @@ export class MenuComponent implements OnInit {
     pageOptions: MenuOption[];
     totalOptionPages: number = 0;
     optionCurrentPage: number = 1;
-    optionPageSize: number = 20;
+    optionPageSize: number = 15;
     userModifiers: UserModifier[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
@@ -175,8 +175,7 @@ export class MenuComponent implements OnInit {
     }
 
     categorySelected(category: MenuCategory) {
-        localStorage.setItem("CategoryID", category.CategoryID.toString());
-        //localStorage.setItem("CategoryID", "20");
+        //localStorage.setItem("CategoryID", category.CategoryID.toString());
         this.showMainCategories = false;
         this.showSubCategories = true;
         this.showOptions = false;
@@ -443,6 +442,7 @@ export class MenuComponent implements OnInit {
             context: context
         };
 
+        let that = this;    
         this.modalService.showModal(ModifyOrderItemComponent, modalOptions).then(
             (choice: Choice) => {
                 console.log(choice.ChangeType);
@@ -470,10 +470,7 @@ export class MenuComponent implements OnInit {
                         this.totalPrice();
                         break;
                     case 'modify':
-                        this.getMenuOptions(orderItem.Product);
-                        this.totalOptionPages = Math.ceil(this.menuOptions[this.menuOptions.length - 1].Position / this.optionPageSize);
-                        this.optionCurrentPage = 0;
-                        this.getOptionPage(true);
+                        this.getMenuOptions(orderItem.Product);                   
                         break;
                     case 'changechoice':
                         this.showForcedModifierDialog(orderItem.Product, -1, null, false);
@@ -522,7 +519,7 @@ export class MenuComponent implements OnInit {
             this.optionCurrentPage--;
 
         let startPosition: number = (this.optionCurrentPage * this.optionPageSize) - this.optionPageSize + 1;
-        let endPosition: number = startPosition + this.optionPageSize;
+        let endPosition: number = startPosition + this.optionPageSize - 1;
 
         if (endPosition > this.menuOptions[this.menuOptions.length - 1].Position)
             endPosition = this.menuOptions[this.menuOptions.length - 1].Position;
@@ -558,13 +555,16 @@ export class MenuComponent implements OnInit {
             else {
                 this.menuOptions = menuOptions;
                 this.menuOptions.forEach(function (menuOption: MenuOption) {
-                    menuOption.Row = ((Math.floor((menuOption.Position - 1) / 4)) % 5) + 1;
-                    menuOption.Col = (menuOption.Position - 1) % 4;
+                    menuOption.Row = ((Math.floor((menuOption.Position - 1) / 3)) % 5);
+                    menuOption.Col = (menuOption.Position - 1) % 3;
                 });
-
+                
+                this.totalOptionPages = Math.ceil(menuOptions[menuOptions.length - 1].Position / that.optionPageSize);
                 this.showOptions = true;
                 this.showMainCategories = false;
                 this.showSubCategories = false;
+                this.optionCurrentPage = 0;
+                this.getOptionPage(true);
             }
         });
     }
