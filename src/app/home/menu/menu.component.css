@@ -54,3 +54,7 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 {
     color: gold; font-weight: bold; text-align: center; height: 118px; border-width: 2; border-color: bisque; border-radius: 30;
 }
+.btnBottom
+{
+	width: 120; height: 70; margin-right: 20;
+}

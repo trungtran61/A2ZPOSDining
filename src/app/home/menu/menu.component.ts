@@ -31,6 +31,7 @@ import { ObservableArray } from "tns-core-modules/data/observable-array/observab
     styleUrls: ['./menu.component.css']
 })
 export class MenuComponent implements OnInit {
+    currentCategoryID: number = 0;
     categories: MenuCategory[] = [];
     categoryStyles: string[] = [];
 
@@ -175,7 +176,8 @@ export class MenuComponent implements OnInit {
     }
 
     categorySelected(category: MenuCategory) {
-        //localStorage.setItem("CategoryID", category.CategoryID.toString());
+        localStorage.setItem("CategoryID", category.CategoryID.toString());
+        this.currentCategoryID = category.CategoryID;
         this.showMainCategories = false;
         this.showSubCategories = true;
         this.showOptions = false;
@@ -220,7 +222,8 @@ export class MenuComponent implements OnInit {
         // build menu products list        
         this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
         let that = this;
-        let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
+        //let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
+        let categoryID: number = this.currentCategoryID;
 
         this.DBService.getLocalMenuProducts(categoryID, subCategory.SubCategoryID).then((products) => {
             if (products.length == 0) {
@@ -644,7 +647,7 @@ export class MenuComponent implements OnInit {
 
         //this.currentOrderItem.Modifiers[0] = modifier;        
         this.currentOrderItem.Modifiers.push(modifier);
-        this.refreshList();
+        this.refreshList();        
     }
 
     userModifierSelected(userModifier: UserModifier) {

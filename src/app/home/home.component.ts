@@ -72,7 +72,7 @@ export class HomeComponent implements OnInit {
                     this.DBService.systemSettings = systemSettings;
                 }
             });  
-       // }
+        //}
         
         //this.page.className = 'loginBG';
         //this.router.navigate(['/home/mytables'])
