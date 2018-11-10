@@ -3,20 +3,20 @@ import { NativeScriptCommonModule } from "nativescript-angular/common";
 import { NativeScriptHttpClientModule } from "nativescript-angular/http-client";
 import { platformNativeScriptDynamic } from "nativescript-angular/platform";
 import { NativeScriptFormsModule } from "nativescript-angular/forms";
+import { TNSFontIconModule, TNSFontIconService } from "nativescript-ngx-fonticon";
 
 import { HomeRoutingModule } from "./home-routing.module";
 import { HomeComponent } from "./home.component";
 import { MyTablesComponent } from "~/app/home/mytables/my-tables.component";
 import { TableGuestsComponent } from "~/app/home/tableguests/table-guests.component";
-import { MenuComponent } from "~/app/home/menu/menu.component";
-import { ModifyOrderItemComponent } from "~/app/home/menu/modify-order-item.component";
-import { ModifiersComponent } from "~/app/home/menu/modifiers/modifiers.component";
-import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
-import { TNSFontIconModule, TNSFontIconService } from "nativescript-ngx-fonticon";
-import { OpenProductComponent } from "./menu/open-product/open-product.component";
-import { PizzaComponent } from "./menu/pizza/pizza.component";
-import { PromptQtyComponent } from "./menu/prompt-qty.component";
-import { MemoComponent } from "./menu/memo.component";
+import { OrderComponent } from "./order/order.component";
+import { ModifyOrderItemComponent } from "./order/modify-order-item.component";
+import { ModifiersComponent } from "./order/modifiers/modifiers.component";
+import { ForcedModifiersComponent } from "./order/forced-modifiers/forced-modifiers.component";
+import { OpenProductComponent } from "./order/open-product/open-product.component";
+import { PizzaComponent } from "./order/pizza/pizza.component";
+import { PromptQtyComponent } from "./order/prompt-qty.component";
+import { MemoComponent } from "./order/memo.component";
 
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 TNSFontIconService.debug = true;
@@ -35,7 +35,7 @@ TNSFontIconService.debug = true;
         HomeComponent,
         MyTablesComponent,
         TableGuestsComponent,
-        MenuComponent,
+        OrderComponent,
         ModifyOrderItemComponent,
         ModifiersComponent,
         ForcedModifiersComponent,

@@ -5,8 +5,8 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
-import { ModifyOrderItemComponent } from "~/app/home/menu/modify-order-item.component";
-import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
+import { ModifyOrderItemComponent } from "~/app/home/order/modify-order-item.component";
+import { ForcedModifiersComponent } from "~/app/home/order/forced-modifiers/forced-modifiers.component";
 import { Page } from "tns-core-modules/ui/page/page";
 
 @Component({

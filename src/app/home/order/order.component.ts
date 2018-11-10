@@ -6,8 +6,6 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
-import { ModifyOrderItemComponent } from "~/app/home/menu/modify-order-item.component";
-import { ForcedModifiersComponent } from "~/app/home/menu/forced-modifiers/forced-modifiers.component";
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
 import { DeprecatedDatePipe } from "@angular/common";
@@ -23,14 +21,16 @@ import { NullTemplateVisitor } from "@angular/compiler";
 import { ListView } from "tns-core-modules/ui/list-view/list-view";
 import { UtilityService } from "~/app/services/utility.service";
 import { ObservableArray } from "tns-core-modules/data/observable-array/observable-array";
+import { ForcedModifiersComponent } from "./forced-modifiers/forced-modifiers.component";
+import { ModifyOrderItemComponent } from "./modify-order-item.component";
 
 @Component({
-    selector: "Menu",
+    selector: "order",
     moduleId: module.id,
-    templateUrl: "./menu.component.html",
-    styleUrls: ['./menu.component.css']
+    templateUrl: "./order.component.html",
+    styleUrls: ['./order.component.css']
 })
-export class MenuComponent implements OnInit {
+export class OrderComponent implements OnInit {
     currentCategoryID: number = 0;
     categories: MenuCategory[] = [];
     categoryStyles: string[] = [];

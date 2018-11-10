@@ -76,7 +76,7 @@ export class HomeComponent implements OnInit {
         
         //this.page.className = 'loginBG';
         //this.router.navigate(['/home/mytables'])
-        //this.router.navigate(['/home/menu'])
+        //this.router.navigate(['/home/order'])
         // Init your component properties here.
         //this.router.navigate(['/home/pizza']);        
     }
@@ -192,8 +192,8 @@ export class HomeComponent implements OnInit {
     }
 
     managerFunctions() {
-        //this.router.navigate(['/home/menu'])
-        //this.router.navigate(['/home/menuitems'])
+        //this.router.navigate(['/home/order'])
+        //this.router.navigate(['/home/orderitems'])
         //this.DBService.loadSystemSettings(db);
         //this.DBService.loadEmployees(db);
         //this.DBService.getLocalSystemSettings();

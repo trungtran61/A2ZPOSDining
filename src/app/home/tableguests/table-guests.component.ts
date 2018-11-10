@@ -29,13 +29,13 @@ export class TableGuestsComponent implements OnInit {
 
     setGuests(numberOfGuests: number) {
         localStorage.setItem('guests', numberOfGuests.toString());
-        this.router.navigate(['/home/menu']);       
+        this.router.navigate(['/home/order']);       
     }
 
     saveEnteredGuests()
     {
         localStorage.setItem('guests', this.guestsEntered);
-        this.router.navigate(['/home/menu'])
+        this.router.navigate(['/home/order'])
     }
 
     goBack() {
