@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewContainerRef, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewContainerRef, ViewChild, NgZone } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
@@ -60,6 +60,7 @@ export class OrderComponent implements OnInit {
     categoryCodes: CategoryCode[] = [];
     order: Order = null;
     //orderItems: OrderItem[] = [];
+    orderItems: string[] = ['item 1','item 1','item 1','item 1',];
     currentSeatNumber: number = 1;
     checkTotal: number = 0;
     subTotal: number = 0;
@@ -116,7 +117,8 @@ export class OrderComponent implements OnInit {
         private viewContainerRef: ViewContainerRef,
         private ApiSvc: APIService,
         private utilSvc: UtilityService,
-        private page: Page) {
+        private page: Page,
+        private ngZone: NgZone) {
         page.actionBarHidden = true;
         // Use the component constructor to inject providers.
 
@@ -596,8 +598,6 @@ export class OrderComponent implements OnInit {
                 let product: MenuProduct = Object.assign({}, this.currentProduct);
                 product.Name = fixedOption.Name;
                 this.currentOrderItem.Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
-                //this.currentOrderItem.oModifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
-                this.refreshList();
                 break;
 
             default:
@@ -643,17 +643,20 @@ export class OrderComponent implements OnInit {
             Name: name,
             Price: price,
             DisplayPrice: price > 0 ? price : null,
-        };
+            Style: 'color: black'
+        };        
+    
+        //this.ngZone.run(() => {
+            this.currentOrderItem.Modifiers.push(modifier);
+         //});
 
-        //this.currentOrderItem.Modifiers[0] = modifier;        
-        this.currentOrderItem.Modifiers.push(modifier);
-        this.refreshList();        
+        //this.refreshList();        
     }
 
     userModifierSelected(userModifier: UserModifier) {
         if (userModifier.ButtonFunction == 1) {
             this.currentOrderItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null });
-            this.refreshList();
+            //this.refreshList();
             return;
         }
 
@@ -663,12 +666,12 @@ export class OrderComponent implements OnInit {
         userModifier.Class = 'glass btnOptionActive';
         this.userModifierActive = true;
     }
-
+/*
     refreshList() {
         let listView: ListView = <ListView>this.page.getViewById("lvItems");
         listView.refresh();
     }
-
+*/
     resetUserModifierClasses() {
         this.userModifiers.forEach(function (userModifier: UserModifier) {
             userModifier.Class = 'glass btnOption';
@@ -839,7 +842,7 @@ export class OrderComponent implements OnInit {
     deleteModifier(orderItem: OrderItem, modifier: Modifier) {
 
         orderItem.Modifiers = orderItem.Modifiers.filter(obj => obj !== modifier);
-        this.refreshList();
+        //this.refreshList();
 
         if (modifier.Price > 0)
             this.totalPrice();
