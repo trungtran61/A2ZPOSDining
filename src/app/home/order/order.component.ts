@@ -111,8 +111,12 @@ export class OrderComponent implements OnInit {
     qtyEntered: number = 1;
     orderType: number = OrderTypes.DineIn;
 
-    canPageDown: boolean = false;
-    canPageUp: boolean = false;
+    canSubCategoryPageDown: boolean = false;
+    canSubCategoryPageUp: boolean = false;
+    canProductPageDown: boolean = false;
+    canProductPageUp: boolean = false;
+    canOptionPageDown: boolean = false;
+    canOptionPageUp: boolean = false;
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -197,7 +201,7 @@ export class OrderComponent implements OnInit {
             }
             else {
                 this.subCategoryCurrentPage = 0;
-                this.subCategories = subCategories;
+                this.subCategories = subCategories;               
 
                 this.subCategories.forEach(function (subCategory: MenuSubCategory) {
                     subCategory.Row = ((subCategory.Position - 1) % 5) + 1;
@@ -205,6 +209,9 @@ export class OrderComponent implements OnInit {
                 });
 
                 this.totalSubCategoriesPages = Math.ceil(this.subCategories[this.subCategories.length - 1].Position / this.subCategoryPageSize);
+                if (this.totalSubCategoriesPages > 1)
+                    this.canSubCategoryPageDown = true;
+
                 this.getSubCategoryPage(true);
                 this.subCategorySelected(subCategories[0], 0);
             }
@@ -235,20 +242,23 @@ export class OrderComponent implements OnInit {
                 dialogs.alert("Menu Products not loaded.")
             }
             else {
-                this.products = products;
+                this.products = products;             
+
                 this.setProductAttributes();
                 this.totalProductPages = Math.ceil(this.products[that.products.length - 1].Position / this.productPageSize);
                 this.productCurrentPage = 0;
-                this.getProductPage(true);
-                //this.setProductAttributes(this.pageProducts);
+                
+                if (this.totalProductPages > 1)
+                    this.canProductPageDown = true;
+                
+                    this.getProductPage(true);
                 this.currentSubCategory = subCategory.Name;
                 this.showProducts = true;
                 this.setActiveSubCategoryClass(subCategory);
             }
         });
     }
-
-    //setProductAttributes(products: MenuProduct[]) {
+    
     setProductAttributes() {
         let that = this;
 
@@ -535,8 +545,8 @@ export class OrderComponent implements OnInit {
         this.pageOptions = this.menuOptions.filter(
             o => o.Position >= startPosition && o.Position <= endPosition);
 
-        this.canPageUp = this.optionCurrentPage > 1;
-        this.canPageDown = this.optionCurrentPage == 1 && this.totalOptionPages > 1;    
+        this.canOptionPageUp = this.optionCurrentPage > 1;
+        this.canOptionPageDown = this.totalOptionPages > this.optionCurrentPage;    
 
     }
 
@@ -571,8 +581,9 @@ export class OrderComponent implements OnInit {
                 });
 
                 this.totalOptionPages = Math.ceil(menuOptions[menuOptions.length - 1].Position / that.optionPageSize);
+                
                 if (this.totalOptionPages > 1)
-                    this.canPageDown = true;
+                    this.canOptionPageDown = true;
 
                 this.showOptions = true;
                 this.showMainCategories = false;
@@ -750,8 +761,6 @@ export class OrderComponent implements OnInit {
         if (endPosition > this.subCategories[this.subCategories.length - 1].Position)
             endPosition = this.subCategories[this.subCategories.length - 1].Position;
 
-        //this.pageSubCategories = this.subCategories.slice(startRecord, endRecord);              
-
         this.pageSubCategories = this.subCategories.filter(
             sc => sc.Position >= startPosition && sc.Position <= endPosition);
 
@@ -760,6 +769,8 @@ export class OrderComponent implements OnInit {
             this.pageSubCategories = this.pageSubCategories.slice(0, 1);
 
         this.subCategorySelected(this.pageSubCategories[0], 0);
+        this.canSubCategoryPageUp = this.subCategoryCurrentPage > 1;
+        this.canSubCategoryPageDown = this.subCategoryCurrentPage < this.totalSubCategoriesPages;    
     }
 
     onProductSwipe(args) {
@@ -807,17 +818,11 @@ export class OrderComponent implements OnInit {
         if (endPosition > this.products[this.products.length - 1].Position)
             endPosition = this.products[this.products.length - 1].Position;
 
-        //this.pageProducts = this.products.slice(startRecord, endRecord);
-        //let startTime:number  = new Date().getTime();
         this.pageProducts = this.products.filter(
             product => product.Position >= startPosition && product.Position <= endPosition);
-        //console.log('elapsed: ' + (new Date().getTime() - startTime).toString());    
-        /*
-               this.pageProducts.forEach(function (menuProduct: MenuProduct) {
-                   menuProduct.Row = Math.floor((menuProduct.Position - 1) / 4) + 1;
-                   menuProduct.Col = (menuProduct.Position - 1) % 4;
-               });
-               */
+      
+        this.canProductPageUp = this.productCurrentPage > 1;
+        this.canProductPageDown = this.totalProductPages > this.productCurrentPage;        
     }
 
     changeModifier(modifier: Modifier) {
