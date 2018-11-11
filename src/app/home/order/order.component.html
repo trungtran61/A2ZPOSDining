@@ -90,7 +90,7 @@
     <Label [class]="item.QtyClass" [text]='item.QtyAvailable' [visibility]="item.CountdownActivated ? 'visible' : 'collapse'"
       *ngFor="let item of pageProducts let i=index" [col]='item.Col' [row]='item.Row'></Label>
   </GridLayout>
-  <GridLayout columns="*,*,*,*" rows="60,*,*" row="0" col="3" *ngIf="showOptions">
+  <GridLayout columns="*,*,*,*" rows="60,*,70" row="0" col="3" *ngIf="showOptions">
     <FlexBoxLayout row='0' col='0' colSpan="4">
       <Button text='All' class="glass"></Button>
     </FlexBoxLayout>
@@ -101,15 +101,13 @@
       </StackLayout>
       <Button class="glass" text="DONE" (tap)="doneOption()" style='background-image:linear-gradient(green, black);text-align: center; height: 118px;border-radius: 20'></Button>
     </StackLayout>
-    <GridLayout row='1' col='0' colSpan="3" rowSpan="7" rows='86,86,86,86,86' columns='auto,auto,auto,auto' (swipe)='onOptionSwipe($event)'>
+    <GridLayout row='1' col='0' colSpan="3" rowSpan="7" rows='86,86,86,86,86,90' columns='auto,auto,auto,auto' (swipe)='onOptionSwipe($event)'>
       <Button class="glass btnMenuOption" [text]="item.Name" *ngFor="let item of pageOptions let i=index" (tap)="optionSelected(item)"
         [col]='item.Col' [row]='item.Row' textWrap="true"></Button>
-    </GridLayout>
-    <StackLayout orientation="horizontal" row='2' col='0' colSpan="3">
-      <Button class="glass btnPaging fa" (tap)="optionPageUp()" text="&#xf0aa; Up" style="margin-right: 10"></Button>
-      <Button class="glass btnMemo" width="120" text="MEMO" (tap)="showMemoDialog()" style="margin-right: 10"></Button>
-      <Button class="glass btnPaging fa" (tap)="optionPageDown()" text="&#xf0ab; Down"></Button>
-    </StackLayout>
+      <Button row='5' col='0' class="glass btnPaging fa" *ngIf='canPageUp' (tap)="getOptionPage(false)" text="&#xf0aa; Up" ></Button>      
+      <Button row='5' col='2' class="glass btnPaging fa" *ngIf='canPageDown' (tap)="getOptionPage(true)" text="&#xf0ab; Down"></Button>      
+    </GridLayout>       
+    <Button row='2' col='1' class="glass btnMemo" width="120" text="MEMO" (tap)="showMemoDialog()" style="margin-right: 10"></Button>
   </GridLayout>
   <WrapLayout row="1" col="0" colSpan="4" style="margin-bottom:10" *ngIf='showOptions'>
       <Button [class]="item.Class" width="120" [text]="item.ItemName" *ngFor="let item of userModifiers let i=index"

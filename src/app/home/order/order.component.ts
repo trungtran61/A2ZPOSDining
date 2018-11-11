@@ -60,7 +60,7 @@ export class OrderComponent implements OnInit {
     categoryCodes: CategoryCode[] = [];
     order: Order = null;
     //orderItems: OrderItem[] = [];
-    orderItems: string[] = ['item 1','item 1','item 1','item 1',];
+    orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
     currentSeatNumber: number = 1;
     checkTotal: number = 0;
     subTotal: number = 0;
@@ -111,6 +111,9 @@ export class OrderComponent implements OnInit {
     qtyEntered: number = 1;
     orderType: number = OrderTypes.DineIn;
 
+    canPageDown: boolean = false;
+    canPageUp: boolean = false;
+
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
@@ -118,7 +121,7 @@ export class OrderComponent implements OnInit {
         private ApiSvc: APIService,
         private utilSvc: UtilityService,
         private page: Page,
-        private ngZone: NgZone) {
+    ) {
         page.actionBarHidden = true;
         // Use the component constructor to inject providers.
 
@@ -447,7 +450,7 @@ export class OrderComponent implements OnInit {
             context: context
         };
 
-        let that = this;    
+        let that = this;
         this.modalService.showModal(ModifyOrderItemComponent, modalOptions).then(
             (choice: Choice) => {
                 console.log(choice.ChangeType);
@@ -475,7 +478,7 @@ export class OrderComponent implements OnInit {
                         this.totalPrice();
                         break;
                     case 'modify':
-                        this.getMenuOptions(orderItem.Product);                   
+                        this.getMenuOptions(orderItem.Product);
                         break;
                     case 'changechoice':
                         this.showForcedModifierDialog(orderItem.Product, -1, null, false);
@@ -516,7 +519,7 @@ export class OrderComponent implements OnInit {
                 }
 
     }
-
+   
     getOptionPage(nextPage: boolean) {
         if (nextPage)
             this.optionCurrentPage++;
@@ -531,6 +534,9 @@ export class OrderComponent implements OnInit {
 
         this.pageOptions = this.menuOptions.filter(
             o => o.Position >= startPosition && o.Position <= endPosition);
+
+        this.canPageUp = this.optionCurrentPage > 1;
+        this.canPageDown = this.optionCurrentPage == 1 && this.totalOptionPages > 1;    
 
     }
 
@@ -563,8 +569,11 @@ export class OrderComponent implements OnInit {
                     menuOption.Row = ((Math.floor((menuOption.Position - 1) / 3)) % 5);
                     menuOption.Col = (menuOption.Position - 1) % 3;
                 });
-                
+
                 this.totalOptionPages = Math.ceil(menuOptions[menuOptions.length - 1].Position / that.optionPageSize);
+                if (this.totalOptionPages > 1)
+                    this.canPageDown = true;
+
                 this.showOptions = true;
                 this.showMainCategories = false;
                 this.showSubCategories = false;
@@ -644,11 +653,11 @@ export class OrderComponent implements OnInit {
             Price: price,
             DisplayPrice: price > 0 ? price : null,
             Style: 'color: black'
-        };        
-    
+        };
+
         //this.ngZone.run(() => {
-            this.currentOrderItem.Modifiers.push(modifier);
-         //});
+        this.currentOrderItem.Modifiers.push(modifier);
+        //});
 
         //this.refreshList();        
     }
@@ -666,12 +675,12 @@ export class OrderComponent implements OnInit {
         userModifier.Class = 'glass btnOptionActive';
         this.userModifierActive = true;
     }
-/*
-    refreshList() {
-        let listView: ListView = <ListView>this.page.getViewById("lvItems");
-        listView.refresh();
-    }
-*/
+    /*
+        refreshList() {
+            let listView: ListView = <ListView>this.page.getViewById("lvItems");
+            listView.refresh();
+        }
+    */
     resetUserModifierClasses() {
         this.userModifiers.forEach(function (userModifier: UserModifier) {
             userModifier.Class = 'glass btnOption';
