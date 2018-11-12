@@ -59,6 +59,53 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 	width: 120; height: 70; margin-right: 20;
 }
 
+.btnProduct {
+	height: 110;
+	font-size: 18;
+	font-family: sans-serif;
+    font-weight: bold;
+	border-radius: 20px;
+	border-color: #fff;
+	border-style: solid;
+	border-width: 2px;
+	margin: 3 3 3 3;
+	color: white; background-color: black;
+	word-wrap: break-word;
+}
+
+.btnCategory {
+	font-size: 25;
+	height: 120;
+	font-family: sans-serif;
+    font-weight: bold;
+	margin: 10 10 10 10;
+	word-wrap: break-word;
+}
+
+.btnSubCategory {
+	font-size: 20;
+	height: 110;
+	font-family: sans-serif;
+    font-weight: bold;
+	margin: 5 5 5 5;
+	color: white; 
+	word-wrap: break-word;
+}
+
+.btnSubCategory:active,  .btnSubCategoryActive{ 
+	font-size: 25;
+	height: 110;
+	font-family: sans-serif;
+	font-weight: bold;	
+	border-radius: 10;
+	border-color: #fff;
+	border-style: solid;
+	border-width: 2;	
+	margin: 3 3 3 3;
+	color: white; 
+	word-wrap: break-word;
+}
+
 .modifier
 {
     margin-left: 30;

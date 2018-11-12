@@ -48,13 +48,13 @@ export class OrderComponent implements OnInit {
 
     totalProductPages: number = 0;
     productCurrentPage: number = 1;
-    productPageSize: number = 20;
+    productPageSize: number = 24;
 
     menuOptions: MenuOption[];
     pageOptions: MenuOption[];
     totalOptionPages: number = 0;
     optionCurrentPage: number = 1;
-    optionPageSize: number = 15;
+    optionPageSize: number = 18;
     userModifiers: UserModifier[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
@@ -262,11 +262,8 @@ export class OrderComponent implements OnInit {
     setProductAttributes() {
         let that = this;
 
-        // account for current system pagesize difference 32 - 20 = 12    
-        let displacement: number = (this.productCurrentPage - 1) * 12;
-
         this.products.forEach(function (product: MenuProduct) {
-            product.Row = ((Math.floor((product.Position - 1) / 4)) % 5) + 1;
+            product.Row = ((Math.floor((product.Position - 1) / 4)) % 6) + 1;
             product.Col = (product.Position - 1) % 4;
             let lightColor: string = '#' + product.ButtonColorHex;
             //let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
@@ -576,7 +573,7 @@ export class OrderComponent implements OnInit {
             else {
                 this.menuOptions = menuOptions;
                 this.menuOptions.forEach(function (menuOption: MenuOption) {
-                    menuOption.Row = ((Math.floor((menuOption.Position - 1) / 3)) % 5);
+                    menuOption.Row = ((Math.floor((menuOption.Position - 1) / 3)) % 6);
                     menuOption.Col = (menuOption.Position - 1) % 3;
                 });
 
@@ -753,7 +750,7 @@ export class OrderComponent implements OnInit {
         let startPosition: number = (this.subCategoryCurrentPage * this.subCategoryPageSize) - this.subCategoryPageSize + 1;
 
         // find the first sub category on the next page      
-        if (this.subCategoryCurrentPage > 1)
+        if (this.subCategoryCurrentPage > 1 && nextPage)
             startPosition = this.subCategories.find(sc => sc.Position > this.pageSubCategories[this.pageSubCategories.length - 1].Position).Position;
 
         let endPosition: number = startPosition + this.subCategoryPageSize - 1;

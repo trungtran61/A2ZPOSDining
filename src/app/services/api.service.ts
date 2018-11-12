@@ -1,6 +1,8 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Countdown, Order } from "~/app/models/orders";
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class APIService {
@@ -39,9 +41,15 @@ export class APIService {
         return headers;
     }
 
-    GetOrder(orderFilter: number, ph1: boolean, ph2: boolean): Order
+    getOrder(orderFilter: number, ph1: boolean, ph2: boolean): Order
     {
         let order: Order;
         return order;
+    }
+
+    getCheckNumber(tableName: string, employeeID: number): Observable<any> {
+        let headers = this.createRequestHeader();
+        return this.http.get(this.apiUrl + 'getCheckNumber?Name=' + tableName + '&EmployeeID=' + employeeID,
+            { headers: headers }).pipe(map(res => res));
     }
 }
