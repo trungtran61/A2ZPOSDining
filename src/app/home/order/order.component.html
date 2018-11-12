@@ -27,8 +27,8 @@
             </StackLayout>
             <FlexBoxLayout *ngFor="let modifier of item.Modifiers let i=index" (tap)="showModifyDialog(item,modifier,null)"
               (swipe)="onModifierSwipe($event, item, modifier)">
-              <Label class='modifier' [style]='modifier.Style' [text]='modifier.Name'></Label>
-              <Label class="modifier" [style]='modifier.Style' [text]='modifier.DisplayPrice | currency'></Label>
+              <Label class='modifier' [text]='modifier.Name'></Label>
+              <Label class="modifier" [text]='modifier.DisplayPrice | currency'></Label>
             </FlexBoxLayout>
           </StackLayout>
         </StackLayout>

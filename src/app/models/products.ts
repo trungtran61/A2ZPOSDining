@@ -115,19 +115,6 @@ export interface Table {
 }
 
 
-export interface TableDetail {
-    Name: string;
-    EmployeeID: string;
-    EmployeeName: string;
-    TableColor: string;  // white, gold, gray ...
-    Sent: boolean; // UI will show check mark if this is true
-    Hold: boolean; // UI will show hold icon if this is true
-    PosX: number;
-    PosY: number;
-    Height: number;
-    Width: number;
-    Status: string[];
-}
 
 export interface ForcedModifier {
     ProductCode: number;
@@ -144,18 +131,20 @@ export interface ForcedModifier {
 export interface TableDetail {
     Checks: number;
     Covers: number;
-    EmployeeID: string;
+    EmployeeID: number;
     EmployeeName: string;
     Height: number;
     Holds: number;
     Name: string;
     OrderFilter: number;
-    OrderTime: Date;
+    OrderTime: string;
     PosX: number;
     PosY: number;
     Printed: boolean;
-    TableColor: string;
+    Status: string[];
+    TableColor: number;
     Width: number;
+    Style?: string;
 }
 
 export interface Option {
@@ -176,7 +165,7 @@ export interface MenuChoice {
     Position?: number;
     ProductCode?: number;
     ReportProductMix?: boolean;
-    SubOptions?: MenuSubOption[];   
+    SubOptions?: MenuSubOption[];
 }
 
 export interface OptionCategory {
@@ -265,7 +254,6 @@ export interface Modifier {
     Name?: string;
     Price?: number;
     DisplayPrice?: number;
-    Style?: string;   
 }
 
 export interface UserModifier {
@@ -279,7 +267,7 @@ export interface UserModifier {
     TextPosition?: number;
     FontSize?: number;
     ItemName?: string;
-    Class?: string;   
+    Class?: string;
 }
 
 export interface Choice {

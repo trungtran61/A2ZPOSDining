@@ -100,4 +100,7 @@ export class UtilityService {
             return (textBoolean.toLowerCase() == 'true');
         }
     */
+    getJSONDate(jsonDate: string): Date {
+        return new Date(parseInt(jsonDate.substr(6)))
+    }
 }

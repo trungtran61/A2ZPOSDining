@@ -907,13 +907,7 @@ export class SQLiteService {
         });
         return promise;
     }
-
-    public getTablesDetails(areaID: number, employeeID: number, serverViewAll: boolean): Observable<any> {
-        let headers = this.createRequestHeader();
-        return this.http.get(this.apiUrl + 'GetTableDetail?AreaId=' + areaID + '&EmployeeID=' + employeeID,
-            { headers: headers }).pipe(map(res => res));
-    }
-
+   
     public getLocalTables(areaID: number): Promise<Table[]> {
 
         return SQLiteService.database.all("SELECT AreaID, Name, Height, Width, PosX, PosY FROM Tables WHERE AreaID =?", [areaID])

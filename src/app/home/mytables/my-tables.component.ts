@@ -7,6 +7,7 @@ import { Area, TableDetail } from "~/app/models/products";
 import { Observable } from "rxjs";
 import { Page } from "tns-core-modules/ui/page/page";
 import { UtilityService } from "~/app/services/utility.service";
+import { APIService } from "~/app/services/api.service";
 
 @Component({
     selector: "MyTables",
@@ -26,6 +27,36 @@ export class MyTablesComponent implements OnInit {
     displayTableActionsClass: string = "sliderHide";
     employeeName:string = this.DBService.loggedInUser.FirstName;
     
+    ngOnInit(): void {
+        console.log('mytables');        
+        this.DBService.getLocalAreas().then((data) => {
+            if (data.length == 0) {
+                dialogs.alert("Areas not loaded").then(() => {
+                    console.log("Dialog closed!");
+                });
+            }
+            else {
+                this.areas = data;                
+                this.areaStyle = "margin-left: 10px; background-image: url('" + this.httpProtocol + "://" + this.areas[0].ImageURL + "'); background-repeat: no-repeat";   
+                
+                this.apiSvc.getTablesDetails(this.areas[0].AreaID, this.DBService.loggedInUser.PriKey, false).subscribe(res => {
+                    this.tables = res;     
+                    res.forEach(element => {
+                        let style:string = "text-align: center; background-color: #" +   (element.TableColor == '0' ? 'ffffff' : this.padZeroes((element.TableColor).toString(16), 6));                        
+                        element.Style = style;
+                        element.OrderTime = element.OrderTime == null ? '' : this.utilSvc.getJSONDate(element.OrderTime); //(element.OrderTime);
+                    });
+                  });               
+            }
+        });
+    }
+
+    // view total ticket time for occupied tables
+    viewStatus()
+    {
+
+    }
+
     onTableClick(table: TableDetail)
     {
         require( "nativescript-localstorage" );
@@ -68,30 +99,7 @@ export class MyTablesComponent implements OnInit {
         this.router.navigate(['/home/tableguests/'+ table.Name]);        
     }
 
-    ngOnInit(): void {
-        console.log('mytables');        
-        this.DBService.getLocalAreas().then((data) => {
-            if (data.length == 0) {
-                dialogs.alert("Areas not loaded").then(() => {
-                    console.log("Dialog closed!");
-                });
-            }
-            else {
-                this.areas = data;                
-                this.areaStyle = "margin-left: 10px; background-image: url('" + this.httpProtocol + "://" + this.areas[0].ImageURL + "'); background-repeat: no-repeat";   
-                
-                this.DBService.getTablesDetails(this.areas[0].AreaID, this.DBService.loggedInUser.PriKey, false).subscribe(res => {
-                    this.tables = res;     
-                    res.forEach(element => {
-                        let style:string = "text-align: center; background-color: #" +   (element.TableColor == '0' ? 'ffffff' : this.padZeroes((element.TableColor).toString(16), 6));                        
-                        this.tableStyles.push(style);
-                    });
-                  });               
-            }
-        });
-        
-        
-    }
+   
 
     padZeroes(num:string, size:number): string {
         let s = num;
@@ -112,8 +120,10 @@ export class MyTablesComponent implements OnInit {
         this.utilSvc.idleTimer = 0;
     }
 */
-    constructor(private router:RouterExtensions, private DBService: SQLiteService
-        ,private page: Page, private utilSvc: UtilityService) 
+    constructor(
+        private router:RouterExtensions, private DBService: SQLiteService
+        ,private page: Page, private utilSvc: UtilityService, private apiSvc: APIService
+        ) 
     {          
         page.actionBarHidden = true;
     }

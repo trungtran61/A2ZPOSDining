@@ -612,8 +612,6 @@ export class OrderComponent implements OnInit {
         switch (fixedOption.Name) {
             case 'NO MAKE':
             case 'TO GO':
-                let product: MenuProduct = Object.assign({}, this.currentProduct);
-                product.Name = fixedOption.Name;
                 this.currentOrderItem.Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
                 break;
 
@@ -659,26 +657,21 @@ export class OrderComponent implements OnInit {
         let modifier: Modifier = {
             Name: name,
             Price: price,
-            DisplayPrice: price > 0 ? price : null,
-            Style: 'color: black'
+            DisplayPrice: price > 0 ? price : null
         };
 
-        //this.ngZone.run(() => {
-        this.currentOrderItem.Modifiers.push(modifier);
-        //});
-
-        //this.refreshList();        
+        this.currentOrderItem.Modifiers.push(modifier);        
     }
 
     userModifierSelected(userModifier: UserModifier) {
-        if (userModifier.ButtonFunction == 1) {
-            this.currentOrderItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null });
-            //this.refreshList();
-            return;
-        }
-
         this.resetUserModifierClasses();
         this.resetFixedOptionClasses();
+
+        if (userModifier.ButtonFunction == 1) {
+            this.currentOrderItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null });            
+            return;
+        }
+       
         this.currentUserModifier = userModifier;
         userModifier.Class = 'glass btnOptionActive';
         this.userModifierActive = true;

@@ -52,4 +52,11 @@ export class APIService {
         return this.http.get(this.apiUrl + 'getCheckNumber?Name=' + tableName + '&EmployeeID=' + employeeID,
             { headers: headers }).pipe(map(res => res));
     }
+
+    public getTablesDetails(areaID: number, employeeID: number, serverViewAll: boolean): Observable<any> {
+        let headers = this.createRequestHeader();
+        return this.http.get(this.apiUrl + 'GetTableDetail?AreaId=' + areaID + '&EmployeeID=' + employeeID,
+            { headers: headers }).pipe(map(res => res));
+    }
+
 }
