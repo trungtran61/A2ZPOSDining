@@ -15,6 +15,7 @@ export class ForcedModifiersComponent implements OnInit {
     currentChoices: MenuChoice[] = [];        
     choiceLayers: MenuChoice[] = [];
     choiceItems: ForcedModifier[] = [];
+    subChoiceItems: ForcedModifier[] = [];
     productCode: number = parseInt(localStorage.getItem("ProductCode"));
     choiceLayerClasses: string[] = [];   
     activeLayerIndex: number = 0;
@@ -40,7 +41,7 @@ export class ForcedModifiersComponent implements OnInit {
                 this.choiceLayers = choiceLayers;
                 this.choiceLayerSelected(this.choiceLayers[0], 0);                         
             }
-            this.setActiveLayer(0);   
+            //this.setActiveLayer(0);   
         });           
     }
 
@@ -87,7 +88,15 @@ export class ForcedModifiersComponent implements OnInit {
     {
         this.showChoices = false;
         this.showSubChoices = true;
-        
+
+        this.choiceItems = [];
+    }
+
+    xchoiceSelected(choice: MenuChoice)
+    {
+        this.showChoices = false;
+        this.showSubChoices = true;
+
         // find current choice and set to new choice
         if (this.currentChoices.length > 0)
         {
