@@ -166,6 +166,8 @@ export interface MenuChoice {
     ProductCode?: number;
     ReportProductMix?: boolean;
     SubOptions?: MenuSubOption[];
+    Row?: number;
+    Col?: number;
 }
 
 export interface OptionCategory {

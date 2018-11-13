@@ -4,11 +4,21 @@
         (tap)="choiceLayerSelected(item, i)" 
         [class]="choiceLayerClasses[i]"
         ></Button>
-    </StackLayout>
-    <GridLayout rows="*,*,*,*,*,*,*,*,40" columns="*,*,*,*" col="1" >
+    </StackLayout>    
+    <GridLayout rows="100,100,100,100,100,100,80" columns="*,*,*,*,*" col="1" class="m-5" *ngIf='showChoices' >
         <Button class="glass choiceItem" [text]="item.Name" *ngFor="let item of choiceItems let i=index" 
-        (tap)="choiceSelected(item)" [col]='itemCols[i]' [row]='itemRows[i]'
+        (tap)="choiceSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true' height="94" width="150"
         ></Button>
-        <Button class="glass btnCancel" text="Cancel" (tap)="close()" row="8" col="0"></Button>
+        <Button class="glass btnSubOptions fa" [text]="subOptionsText" 
+        textWrap='true' (tap)="activateSubOptions()" row="5" col="4" height="94" width="190"></Button>
+        <Button class="glass btnCan fa" text="&#xf0e2; Cancel" (tap)="close()" row="6" col="0" style="margin-top: 10" height='60' width='100'></Button>
     </GridLayout>     
+    <GridLayout rows="100,100,100,100,100,100,80" columns="*,*,*,*,*" col="1" class="m-5" *ngIf='showSubChoices' >
+            <Button class="glass subChoiceItem" [text]="item.Name" *ngFor="let item of choiceItems let i=index" 
+            (tap)="choiceSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true' height="94" width="150"
+            ></Button>
+            <Button class="glass btnSubOptions" text="Done" 
+            (tap)="subChoiceDone()" row="5" col="4" height="94" width="190"></Button>
+            <Button class="glass btnCan fa" text="&#xf0e2; Cancel" (tap)="close()" row="6" col="0" style="margin-top: 10" height='60' width='100'></Button>
+    </GridLayout> 
 </GridLayout>

@@ -24,5 +24,19 @@
 
 .choiceItem
 {
-    width: 340px; height: 100px; color: black;background-image: linear-gradient(gold, white); margin: 2px;
+    color: black;background-image: linear-gradient(gold, white); margin: 2px;
+}
+
+.subChoiceItem
+{
+    color: black;background-image: linear-gradient(cyan, white); margin: 2px;
+}
+
+.btnSubOptions
+{
+    color: black;background-image: linear-gradient(green, white); margin: 2px;
+}
+
+.btnCan{
+	background-image:linear-gradient(red, black)
 }

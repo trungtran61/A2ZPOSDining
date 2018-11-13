@@ -16,11 +16,17 @@ export class ForcedModifiersComponent implements OnInit {
     choiceLayers: MenuChoice[] = [];
     choiceItems: ForcedModifier[] = [];
     productCode: number = parseInt(localStorage.getItem("ProductCode"));
-    choiceLayerClasses: string[] = [];
-    itemCols: number[] = [];
-    itemRows: number[] = [];
+    choiceLayerClasses: string[] = [];   
     activeLayerIndex: number = 0;
-    
+
+    subOptionsActiveText: string = String.fromCharCode(0xf00c) + ' Sub Options'
+    subOptionsInactiveText: string = 'Sub Options'
+    subOptionsText: string = this.subOptionsInactiveText;
+    subOptionsActive: boolean = false;
+
+    showChoices: boolean = true;
+    showSubChoices: boolean = false;
+
     getChoiceLayers()
     {
         let that = this;
@@ -30,12 +36,18 @@ export class ForcedModifiersComponent implements OnInit {
                 dialogs.alert("Menu Choices Layers not loaded.");
             } 
             else
-            {           
+            {  
                 this.choiceLayers = choiceLayers;
                 this.choiceLayerSelected(this.choiceLayers[0], 0);                         
             }
             this.setActiveLayer(0);   
         });           
+    }
+
+    activateSubOptions()
+    {
+        this.subOptionsActive = !this.subOptionsActive;
+        this.subOptionsText = this.subOptionsActive ? this.subOptionsActiveText : this.subOptionsInactiveText;
     }
 
     setActiveLayer(index: number)
@@ -59,9 +71,11 @@ export class ForcedModifiersComponent implements OnInit {
             }
             else {
                 this.choiceItems = items;
+                console.log(items);
                 this.choiceItems.forEach(function (menuChoice: MenuChoice) {
-                    that.itemRows.push(Math.floor((menuChoice.Position - 1) / 4) );
-                    that.itemCols.push((menuChoice.Position % 4) - 1);
+                    menuChoice.Row = Math.floor((menuChoice.Position - 1) / 4);
+                    // 4 columns so use 4
+                    menuChoice.Col =  menuChoice.Position - (menuChoice.Row * 4) - 1;
                 });
             }
         });
@@ -71,6 +85,9 @@ export class ForcedModifiersComponent implements OnInit {
 
     choiceSelected(choice: MenuChoice)
     {
+        this.showChoices = false;
+        this.showSubChoices = true;
+        
         // find current choice and set to new choice
         if (this.currentChoices.length > 0)
         {

@@ -94,10 +94,6 @@ page
 	margin: -60 0 0 -40; background-color: white; border-width: 1; border-color:darkgray; border-radius: 20; color:red;font-size: 20; padding: 2; text-align: center; width: 36; height: 36;
 }
 
-.btnCancel{
-	background-image:linear-gradient(red, black)
-}
-
 .btnOK{
 	background-image:linear-gradient(green, black)
 }
