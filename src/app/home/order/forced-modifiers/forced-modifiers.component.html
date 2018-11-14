@@ -1,18 +1,24 @@
 <GridLayout class="p-10" columns="200,*" rows="*,40" style="background-color: black">
-    <StackLayout col="0" style="background-color: white" class="p-5">
+    <StackLayout col='0' row='0' style="background-color: wheat">
         <Button [text]="item.ChoiceName" *ngFor="let item of choiceLayers let i=index" (tap)="choiceLayerSelected(item, i)"
             [class]="choiceLayerClasses[i]"></Button>
     </StackLayout>
-    <GridLayout rows="100,100,100,100,100,100,80" columns="*,*,*,*,*" class="m-5" col="1" row='0'>
-        <Button class="glass choiceItem" [text]="item.Name" *ngFor="let item of choiceItems let i=index" (tap)="choiceSelected(item)"
-            [col]='item.Col' [row]='item.Row' textWrap='true' height="94" width="150"></Button>
-       
-        <Button class="glass subChoiceItem" [text]="item.Name" *ngFor="let item of subChoiceItems let i=index" (tap)="subChoiceSelected(item)"
-                [col]='item.Col' [row]='item.Row' textWrap='true' height="94" width="150"></Button>
 
-        <Button class="glass btnSubOptions fa" [text]="subOptionsText" textWrap='true' (tap)="activateSubOptions()" row="5"
-            col="4" height="94" width="190"></Button>
-        <Button class="glass btnCan fa" text="&#xf0e2; Cancel" (tap)="close()" row="6" col="0" style="margin-top: 10"
-            height='60' width='100'></Button>
+    <GridLayout rows="100,100,100,100,100,100,80" columns="*,*,*,*,*" class="m-5" col='1' row='0'>
+        <StackLayout [visibility]="showChoices ? 'visible' : 'collapse'" >
+            <Button class="glass choiceItem" [text]="item.Name" 
+                *ngFor="let item of choiceItems let i=index" (tap)="choiceSelected(item)"
+                [col]='item.Col' [row]='item.Row' textWrap='true' height="94" width="150"></Button>
+        </StackLayout>
+        <StackLayout [visibility]="showSubChoices ? 'visible' : 'collapse'">
+            <Button class="glass subChoiceItem" [text]="item.Name" 
+                *ngFor="let item of choiceItems let i=index" (tap)="subChoiceSelected(item)"
+                [col]='item.Col' [row]='item.Row' textWrap='true' height="94" width="150"></Button>
+        </StackLayout>
     </GridLayout>
+
+    <Button class="glass btnSubOptions fa" [text]="subOptionsText" textWrap='true' (tap)="activateSubOptions()" row="5"
+        col="4" height="94" width="190"></Button>
+    <Button class="glass btnCan fa" text="&#xf0e2; Cancel" (tap)="close()" row="6" col="0" style="margin-top: 10"
+        height='60' width='100'></Button>
 </GridLayout>

@@ -6,18 +6,18 @@ import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogParams } from "nativescript-angular";
 
 @Component({
-    selector: "forced-modifiers",   
+    selector: "forced-modifiers",
     moduleId: module.id,
     templateUrl: "./forced-modifiers.component.html",
-	styleUrls: ['./forced-modifiers.component.css']
+    styleUrls: ['./forced-modifiers.component.css']
 })
 export class ForcedModifiersComponent implements OnInit {
-    currentChoices: MenuChoice[] = [];        
+    currentChoices: MenuChoice[] = [];
     choiceLayers: MenuChoice[] = [];
     choiceItems: ForcedModifier[] = [];
     subChoiceItems: ForcedModifier[] = [];
     productCode: number = parseInt(localStorage.getItem("ProductCode"));
-    choiceLayerClasses: string[] = [];   
+    choiceLayerClasses: string[] = [];
     activeLayerIndex: number = 0;
 
     subOptionsActiveText: string = String.fromCharCode(0xf00c) + ' Sub Options'
@@ -28,44 +28,39 @@ export class ForcedModifiersComponent implements OnInit {
     showChoices: boolean = true;
     showSubChoices: boolean = false;
 
-    getChoiceLayers()
-    {
+    getChoiceLayers() {
         let that = this;
 
         this.DBService.getLocalMenuChoices(this.productCode).then((choiceLayers) => {
             if (choiceLayers.length == 0) {
                 dialogs.alert("Menu Choices Layers not loaded.");
-            } 
-            else
-            {  
+            }
+            else {
                 this.choiceLayers = choiceLayers;
-                this.choiceLayerSelected(this.choiceLayers[0], 0);                         
+                this.choiceLayerSelected(this.choiceLayers[0], 0);
             }
             //this.setActiveLayer(0);   
-        });           
+        });
     }
 
-    activateSubOptions()
-    {
+    activateSubOptions() {
         this.subOptionsActive = !this.subOptionsActive;
         this.subOptionsText = this.subOptionsActive ? this.subOptionsActiveText : this.subOptionsInactiveText;
     }
 
-    setActiveLayer(index: number)
-    {
+    setActiveLayer(index: number) {
         let that = this;
-        this.choiceLayerClasses = [];   
+        this.choiceLayerClasses = [];
         this.choiceLayers.forEach(function (menuChoice: MenuChoice) {
-            that.choiceLayerClasses.push('choiceLayer');                                        
+            that.choiceLayerClasses.push('choiceLayer');
         });
 
-        this.choiceLayerClasses[index] = 'choiceLayerActive';            
+        this.choiceLayerClasses[index] = 'choiceLayerActive';
     }
 
-    choiceLayerSelected(menuChoice: MenuChoice, index: number)
-    {
+    choiceLayerSelected(menuChoice: MenuChoice, index: number) {
         let that = this;
-        
+
         this.DBService.getLocalMenuChoiceItems(menuChoice, this.productCode).then((items) => {
             if (items.length == 0) {
                 dialogs.alert("Menu Choice Items not loaded.");
@@ -76,20 +71,17 @@ export class ForcedModifiersComponent implements OnInit {
                 this.choiceItems.forEach(function (menuChoice: MenuChoice) {
                     menuChoice.Row = Math.floor((menuChoice.Position - 1) / 4);
                     // 4 columns so use 4
-                    menuChoice.Col =  menuChoice.Position - (menuChoice.Row * 4) - 1;
+                    menuChoice.Col = menuChoice.Position - (menuChoice.Row * 4) - 1;
                 });
             }
         });
-        this.activeLayerIndex = index;     
-        this.setActiveLayer(index);  
+        this.activeLayerIndex = index;
+        this.setActiveLayer(index);
     }
 
-    choiceSelected(choice: MenuChoice)
-    {
+    choiceSelected(choice: MenuChoice) {
         this.showChoices = false;
         this.showSubChoices = true;
-
-        this.choiceItems = [];
     }
 
     xchoiceSelected(choice: MenuChoice)
@@ -133,14 +125,18 @@ export class ForcedModifiersComponent implements OnInit {
 
     }
 
+    subChoiceSelected(choice: MenuChoice) {
+        return;
+    }
+
     constructor(private DBService: SQLiteService, private params: ModalDialogParams, private viewContainerRef: ViewContainerRef) { }
 
-    ngOnInit() { 
+    ngOnInit() {
         this.productCode = this.params.context.productCode;
         this.currentChoices = this.params.context.currentChoices;
-        this.getChoiceLayers();          
+        this.getChoiceLayers();
     }
- 
+
     close(currentChoices: any) {
         this.params.closeCallback(currentChoices);
     }
