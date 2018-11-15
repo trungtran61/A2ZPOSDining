@@ -589,7 +589,7 @@ export class SQLiteService {
     }
 
     public getLocalMenuChoiceItems(menuChoice: MenuChoice, productCode: number) {
-        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position, Layer FROM MenuChoices WHERE ProductCode=? AND ChoiceName=? AND Layer=? ORDER BY Position",
+        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position, Layer, ForcedChoice FROM MenuChoices WHERE ProductCode=? AND ChoiceName=? AND Layer=? ORDER BY Position",
             [productCode, menuChoice.ChoiceName, menuChoice.Layer])
             .then(function (rows) {
                 let items: MenuChoice[] = [];
@@ -599,7 +599,8 @@ export class SQLiteService {
                         Charge: rows[row][1],
                         Name: rows[row][2],
                         Position: rows[row][3],
-                        Layer: rows[row][4]
+                        Layer: rows[row][4],
+                        ForcedChoice: rows[row][5] == "true"
                     });
                 }
                 return (items);

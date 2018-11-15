@@ -79,16 +79,19 @@ export class ForcedModifiersComponent implements OnInit {
         this.setActiveLayer(index);
     }
 
-    choiceSelected(choice: MenuChoice) {
+    xchoiceSelected(choice: MenuChoice) {
         this.showChoices = false;
         this.showSubChoices = true;
     }
 
-    xchoiceSelected(choice: MenuChoice)
+    choiceSelected(choice: MenuChoice)
     {
+        if (choice.ForcedChoice)
+        {
         this.showChoices = false;
         this.showSubChoices = true;
-
+        return;
+        }
         // find current choice and set to new choice
         if (this.currentChoices.length > 0)
         {
