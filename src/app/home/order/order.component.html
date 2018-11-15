@@ -22,13 +22,21 @@
             <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
           </FlexBoxLayout>
           <StackLayout *ngIf='showDetails'>
+            <!-- forced modifiers -->
             <StackLayout *ngFor="let choice of item.ForcedModifiers let i=index" (tap)='showModifyDialog(item,null,choice)'>
               <Label style='margin-left: 30px;' [text]='choice.Name'></Label>
+               <!-- forced modifier sub options-->
+               <FlexBoxLayout *ngFor="let subOption of choice.SubOptions let i=index" (tap)="showModifyDialog(item,modifier,null)"
+               (swipe)="onModifierSwipe($event, item, modifier)">
+               <Label class='modifier' [text]='subOption.Name'></Label>
+             </FlexBoxLayout>
             </StackLayout>
+            <!-- modifiers -->
             <FlexBoxLayout *ngFor="let modifier of item.Modifiers let i=index" (tap)="showModifyDialog(item,modifier,null)"
               (swipe)="onModifierSwipe($event, item, modifier)">
               <Label class='modifier' [text]='modifier.Name'></Label>
               <Label class="modifier" [text]='modifier.DisplayPrice | currency'></Label>
+             
             </FlexBoxLayout>
           </StackLayout>
         </StackLayout>

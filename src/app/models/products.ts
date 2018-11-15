@@ -258,6 +258,7 @@ export interface Modifier {
     Name?: string;
     Price?: number;
     DisplayPrice?: number;
+    SubOptions?: Modifier[];
 }
 
 export interface UserModifier {

@@ -19,13 +19,13 @@ export class ForcedModifiersComponent implements OnInit {
     productCode: number = parseInt(localStorage.getItem("ProductCode"));
     choiceLayerClasses: string[] = [];
     activeLayerIndex: number = 0;
+    currentChoice: MenuChoice = null;
 
     subOptionsActiveText: string = String.fromCharCode(0xf00c) + ' Sub Options'
     subOptionsInactiveText: string = 'Sub Options'
     subOptionsText: string = this.subOptionsInactiveText;
     subOptionsActive: boolean = false;
 
-    showChoices: boolean = true;
     showSubChoices: boolean = false;
 
     getChoiceLayers() {
@@ -79,13 +79,12 @@ export class ForcedModifiersComponent implements OnInit {
         this.setActiveLayer(index);
     }
 
-    xchoiceSelected(choice: MenuChoice) {
-        this.showChoices = false;
-        this.showSubChoices = true;
-    }
 
     choiceSelected(choice: MenuChoice)
     {
+        this.currentChoice = choice;
+        this.currentChoice.SubOptions = [];
+       
         if (choice.ForcedChoice || this.subOptionsActive)
         {
             this.subOptionsActive = false;
@@ -102,8 +101,8 @@ export class ForcedModifiersComponent implements OnInit {
                         // 4 columns so use 4
                         item.Col = item.Position - (item.Row * 4) - 1;
                     });
-                    this.showChoices = false;
                     this.showSubChoices = true;
+                    this.currentChoice = choice;
                 }
             });
        
@@ -147,12 +146,16 @@ export class ForcedModifiersComponent implements OnInit {
         }
         
         this.setActiveLayer(this.activeLayerIndex);  
+        this.showSubChoices = false;
         this.choiceLayerSelected(this.choiceLayers[this.activeLayerIndex], this.activeLayerIndex);
 
     }
 
-    subChoiceSelected(choice: MenuChoice) {
-        return;
+    subChoiceSelected(subChoice: MenuSubOption) {
+        this.currentChoice.SubOptions.push(subChoice);
+        this.setChoice(this.currentChoice);
+        this.subOptionsActive = false;
+        
     }
 
     constructor(private DBService: SQLiteService, private params: ModalDialogParams, private viewContainerRef: ViewContainerRef) { }
