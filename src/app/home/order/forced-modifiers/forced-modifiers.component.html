@@ -9,7 +9,7 @@
             (tap)="choiceSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true' height="94" width="150"></Button>
 
         <Button class="glass subChoiceItem" [visibility]="showSubChoices ? 'visible' : 'collapse'" [text]="item.Name"
-            *ngFor="let item of choiceItems let i=index" (tap)="subChoiceSelected(item)" [col]='item.Col' [row]='item.Row'
+            *ngFor="let item of subChoiceItems let i=index" (tap)="subChoiceSelected(item)" [col]='item.Col' [row]='item.Row'
             textWrap='true' height="94" width="150"></Button>
 
     </GridLayout>

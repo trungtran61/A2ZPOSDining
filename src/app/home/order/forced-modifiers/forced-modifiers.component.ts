@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { MenuChoice, ForcedModifier } from "~/app/models/products";
+import { MenuChoice, ForcedModifier, MenuSubOption } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogParams } from "nativescript-angular";
 
@@ -15,7 +15,7 @@ export class ForcedModifiersComponent implements OnInit {
     currentChoices: MenuChoice[] = [];
     choiceLayers: MenuChoice[] = [];
     choiceItems: ForcedModifier[] = [];
-    subChoiceItems: ForcedModifier[] = [];
+    subChoiceItems: MenuSubOption[] = [];
     productCode: number = parseInt(localStorage.getItem("ProductCode"));
     choiceLayerClasses: string[] = [];
     activeLayerIndex: number = 0;
@@ -86,12 +86,35 @@ export class ForcedModifiersComponent implements OnInit {
 
     choiceSelected(choice: MenuChoice)
     {
-        if (choice.ForcedChoice)
+        if (choice.ForcedChoice || this.subOptionsActive)
         {
-        this.showChoices = false;
-        this.showSubChoices = true;
+            this.subOptionsActive = false;
+            this.DBService.getLocalMenuSubOptions(choice.ChoiceID).then((items) => {
+                if (items.length == 0) {
+                    // choice has no sub choices
+                    this.setChoice(choice);
+                }
+                else {
+                    this.subChoiceItems = items;
+                    console.log(items);
+                    this.subChoiceItems.forEach(function (item: MenuSubOption) {
+                        item.Row = Math.floor((item.Position - 1) / 4);
+                        // 4 columns so use 4
+                        item.Col = item.Position - (item.Row * 4) - 1;
+                    });
+                    this.showChoices = false;
+                    this.showSubChoices = true;
+                }
+            });
+       
         return;
         }
+
+        this.setChoice(choice);
+    }
+
+    setChoice(choice: MenuChoice)
+    {
         // find current choice and set to new choice
         if (this.currentChoices.length > 0)
         {

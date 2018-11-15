@@ -183,6 +183,8 @@ export interface MenuSubOption {
     Name: string;
     Position: number;
     ReportProductMix: boolean;
+    Row?: number;
+    Col?: number;
 }
 
 export interface ForcedModifier {

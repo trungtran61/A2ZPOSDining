@@ -430,6 +430,27 @@ export class SQLiteService {
         return promise;
     }
 
+    public getLocalMenuSubOptions(choiceID: number): Promise<MenuSubOption[]> {
+        return SQLiteService.database.all("SELECT ApplyCharge, Charge, Name, Position, Layer, ReportProductMix " + 
+            "FROM MenuSubOptions WHERE ChoiceID=? ORDER BY Position",
+            [choiceID])
+            .then(function (rows) {
+                let items: MenuSubOption[] = [];
+                for (var row in rows) {
+                    items.push({
+                        ApplyCharge: rows[row][0],
+                        Charge: rows[row][1],
+                        Name: rows[row][2],
+                        Position: rows[row][3],
+                        Layer: rows[row][4],
+                        ReportProductMix: rows[row][5],
+                        
+                    });
+                }
+                return (items);
+            });
+    }
+
     public loadOptions(db) {
 
         let that = this;
