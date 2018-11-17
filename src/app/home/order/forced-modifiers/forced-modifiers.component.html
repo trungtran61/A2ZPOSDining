@@ -1,12 +1,14 @@
 <GridLayout class="p-10" columns="200,*" rows="*,40" style="background-color: black">
     <StackLayout col='0' row='0' style="background-color: wheat">
         <StackLayout *ngFor="let item of choiceLayers" (tap)="choiceLayerSelected(item)" [class]="item.Class">
-            <Label [text]="item.Name"></Label>
+            <Label [text]="item.Name" *ngIf="item.Choice == null"></Label>
             <StackLayout *ngIf="item.Choice != null">
                 <Label [text]="item.Choice.Name"></Label>
                 <ScrollView orientation="vertical" height="450">
-                    <StackLayout *ngFor="let subOption of item.Choice.SubOptions">
-                        <Label [text]="subOption.Name"></Label>
+                    <StackLayout>
+                        <FlexBoxLayout *ngFor="let subOption of item.Choice.SubOptions">
+                            <Label [text]="subOption.Name"></Label>
+                        </FlexBoxLayout>
                     </StackLayout>
                 </ScrollView>
             </StackLayout>
