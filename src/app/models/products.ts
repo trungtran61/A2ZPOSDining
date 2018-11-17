@@ -155,6 +155,13 @@ export interface Option {
     CategoryCode: number;
 }
 
+export interface ChoiceLayer {
+    Layer?: number;
+    Name?: string;
+    Choice?: MenuChoice;
+    Class?: string;  
+}
+
 export interface MenuChoice {
     Charge?: number;
     ChoiceID?: number;
@@ -167,7 +174,8 @@ export interface MenuChoice {
     ReportProductMix?: boolean;
     SubOptions?: MenuSubOption[];
     Row?: number;
-    Col?: number;
+    Col?: number;  
+    Class?: string;  
 }
 
 export interface OptionCategory {
@@ -185,6 +193,7 @@ export interface MenuSubOption {
     ReportProductMix: boolean;
     Row?: number;
     Col?: number;
+    Selected?: boolean;
 }
 
 export interface ForcedModifier {

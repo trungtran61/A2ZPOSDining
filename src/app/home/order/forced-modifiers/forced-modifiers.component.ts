@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { MenuChoice, ForcedModifier, MenuSubOption } from "~/app/models/products";
+import { MenuChoice, ForcedModifier, MenuSubOption, ChoiceLayer } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogParams } from "nativescript-angular";
 
@@ -13,11 +13,10 @@ import { ModalDialogParams } from "nativescript-angular";
 })
 export class ForcedModifiersComponent implements OnInit {
     currentChoices: MenuChoice[] = [];
-    choiceLayers: MenuChoice[] = [];
+    choiceLayers: ChoiceLayer[] = [];
     choiceItems: ForcedModifier[] = [];
     subChoiceItems: MenuSubOption[] = [];
     productCode: number = parseInt(localStorage.getItem("ProductCode"));
-    choiceLayerClasses: string[] = [];
     activeLayerIndex: number = 0;
     currentChoice: MenuChoice = null;
 
@@ -31,13 +30,13 @@ export class ForcedModifiersComponent implements OnInit {
     getChoiceLayers() {
         let that = this;
 
-        this.DBService.getLocalMenuChoices(this.productCode).then((choiceLayers) => {
+        this.DBService.getLocalChoiceLayers(this.productCode).then((choiceLayers) => {
             if (choiceLayers.length == 0) {
                 dialogs.alert("Menu Choices Layers not loaded.");
             }
             else {
                 this.choiceLayers = choiceLayers;
-                this.choiceLayerSelected(this.choiceLayers[0], 0);
+                this.choiceLayerSelected(this.choiceLayers[0]);
             }
             //this.setActiveLayer(0);   
         });
@@ -48,20 +47,18 @@ export class ForcedModifiersComponent implements OnInit {
         this.subOptionsText = this.subOptionsActive ? this.subOptionsActiveText : this.subOptionsInactiveText;
     }
 
-    setActiveLayer(index: number) {
-        let that = this;
-        this.choiceLayerClasses = [];
-        this.choiceLayers.forEach(function (menuChoice: MenuChoice) {
-            that.choiceLayerClasses.push('choiceLayer');
+    setActiveLayer(choiceLayer: ChoiceLayer) {
+        this.choiceLayers.forEach(function (choiceLayer: ChoiceLayer) {
+             choiceLayer.Class= 'choiceLayer';
         });
 
-        this.choiceLayerClasses[index] = 'choiceLayerActive';
+        choiceLayer.Class = 'choiceLayerActive';
     }
 
-    choiceLayerSelected(menuChoice: MenuChoice, index: number) {
+    choiceLayerSelected(choiceLayer: ChoiceLayer) {
         let that = this;
 
-        this.DBService.getLocalMenuChoiceItems(menuChoice, this.productCode).then((items) => {
+        this.DBService.getLocalMenuChoiceItems(choiceLayer, this.productCode).then((items) => {
             if (items.length == 0) {
                 dialogs.alert("Menu Choice Items not loaded.");
             }
@@ -73,17 +70,16 @@ export class ForcedModifiersComponent implements OnInit {
                     // 4 columns so use 4
                     menuChoice.Col = menuChoice.Position - (menuChoice.Row * 4) - 1;
                 });
+                this.setActiveLayer(choiceLayer);
             }
-        });
-        this.activeLayerIndex = index;
-        this.setActiveLayer(index);
+        });        
     }
-
 
     choiceSelected(choice: MenuChoice)
     {
         this.currentChoice = choice;
         this.currentChoice.SubOptions = [];
+        this.choiceLayers[this.activeLayerIndex].Choice = choice; 
        
         if (choice.ForcedChoice || this.subOptionsActive)
         {
@@ -100,6 +96,7 @@ export class ForcedModifiersComponent implements OnInit {
                         item.Row = Math.floor((item.Position - 1) / 4);
                         // 4 columns so use 4
                         item.Col = item.Position - (item.Row * 4) - 1;
+                        item.Selected = false;
                     });
                     this.showSubChoices = true;
                     this.currentChoice = choice;
@@ -145,17 +142,29 @@ export class ForcedModifiersComponent implements OnInit {
             this.activeLayerIndex = 0;
         }
         
-        this.setActiveLayer(this.activeLayerIndex);  
+        this.setActiveLayer(choice);  
         this.showSubChoices = false;
-        this.choiceLayerSelected(this.choiceLayers[this.activeLayerIndex], this.activeLayerIndex);
+        this.choiceLayerSelected(this.choiceLayers[this.activeLayerIndex]);
 
     }
 
     subChoiceSelected(subChoice: MenuSubOption) {
-        this.currentChoice.SubOptions.push(subChoice);
-        this.setChoice(this.currentChoice);
-        this.subOptionsActive = false;
+        subChoice.Selected = !subChoice.Selected;
+
+        if (subChoice.Selected)
+            this.currentChoice.SubOptions.push(subChoice);
+        else
+            this.currentChoice.SubOptions = this.currentChoice.SubOptions.filter(obj => obj !== subChoice);           
         
+    }
+
+    doneSubOptions(subChoice: MenuSubOption) {
+        this.setChoice(this.currentChoice);
+        this.subOptionsActive = false;        
+    }
+
+    close(currentChoices: any) {
+        this.params.closeCallback(currentChoices);
     }
 
     constructor(private DBService: SQLiteService, private params: ModalDialogParams, private viewContainerRef: ViewContainerRef) { }
@@ -164,10 +173,5 @@ export class ForcedModifiersComponent implements OnInit {
         this.productCode = this.params.context.productCode;
         this.currentChoices = this.params.context.currentChoices;
         this.getChoiceLayers();
-    }
-
-    close(currentChoices: any) {
-        this.params.closeCallback(currentChoices);
-    }
-
+    }   
 }

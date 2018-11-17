@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Employee } from "~/app/models/employees";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, ProductGroup, MenuTimer, MenuOption, TaxRate, UserModifier } from "~/app/models/products";
+import { CategoryCode, Product, ProductCategory, Area, Table, MenuCategory, MenuSubCategory, MenuProduct, TableDetail, Option, MenuChoice, OptionCategory, MenuSubOption, ProductGroup, MenuTimer, MenuOption, TaxRate, UserModifier, ChoiceLayer } from "~/app/models/products";
 import { Observable, throwError } from 'rxjs';
 import { map, count } from 'rxjs/operators';
 import { forkJoin } from "rxjs";
@@ -593,14 +593,14 @@ export class SQLiteService {
         return promise;
     }
 
-    public getLocalMenuChoices(productCode: number) {
+    public getLocalChoiceLayers(productCode: number) {
         return SQLiteService.database.all("SELECT DISTINCT ChoiceName, Layer FROM MenuChoices WHERE ProductCode=?", [productCode])
             .then(function (rows) {
-                let choices: MenuChoice[] = [];
+                let choices: ChoiceLayer[] = [];
                 for (var row in rows) {
                     choices.push(
                         {
-                            ChoiceName: rows[row][0],
+                            Name: rows[row][0],
                             Layer: rows[row][1]
                         }
                     );
@@ -609,9 +609,9 @@ export class SQLiteService {
             });
     }
 
-    public getLocalMenuChoiceItems(menuChoice: MenuChoice, productCode: number) {
+    public getLocalMenuChoiceItems(choiceLayer: ChoiceLayer, productCode: number) {
         return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position, Layer, ForcedChoice FROM MenuChoices WHERE ProductCode=? AND ChoiceName=? AND Layer=? ORDER BY Position",
-            [productCode, menuChoice.ChoiceName, menuChoice.Layer])
+            [productCode, choiceLayer.Name, choiceLayer.Layer])
             .then(function (rows) {
                 let items: MenuChoice[] = [];
                 for (var row in rows) {
