@@ -103,4 +103,8 @@ export class UtilityService {
     getJSONDate(jsonDate: string): Date {
         return new Date(parseInt(jsonDate.substr(6)))
     }
+
+    padLeft(text:string, padChar:string, size:number): string {
+        return (String(padChar).repeat(size) + text).substr( (size * -1), size) ;
+    }
 }

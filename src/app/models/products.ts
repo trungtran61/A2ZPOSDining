@@ -145,6 +145,8 @@ export interface TableDetail {
     TableColor: number;
     Width: number;
     Style?: string;
+    ElapsedTime?: string;
+    Opacity?: string;
 }
 
 export interface Option {

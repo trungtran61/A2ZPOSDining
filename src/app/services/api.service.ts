@@ -53,9 +53,12 @@ export class APIService {
             { headers: headers }).pipe(map(res => res));
     }
 
-    public getTablesDetails(areaID: number, employeeID: number, serverViewAll: boolean): Observable<any> {
+    public getTablesDetails(areaID: number, employeeID: number, clockInType: number, serverViewAll: boolean): Observable<any> {
         let headers = this.createRequestHeader();
-        return this.http.get(this.apiUrl + 'GetTableDetail?AreaId=' + areaID + '&EmployeeID=' + employeeID,
+        return this.http.get(this.apiUrl + 'GetTableDetail?AreaId=' + areaID + 
+            '&EmployeeID=' + employeeID +
+            '&ClockInType=' + clockInType +
+            '&ServerViewAll=' + serverViewAll,
             { headers: headers }).pipe(map(res => res));
     }
 

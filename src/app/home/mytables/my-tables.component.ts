@@ -8,6 +8,7 @@ import { Observable } from "rxjs";
 import { Page } from "tns-core-modules/ui/page/page";
 import { UtilityService } from "~/app/services/utility.service";
 import { APIService } from "~/app/services/api.service";
+import { min } from "rxjs/operators";
 
 @Component({
     selector: "MyTables",
@@ -16,19 +17,29 @@ import { APIService } from "~/app/services/api.service";
     styleUrls: ['./my-tables.component.css']
 })
 
-export class MyTablesComponent implements OnInit {    
+export class MyTablesComponent implements OnInit {
     areas: Area[] = [];
-    tables: Observable<TableDetail[]>;   
-    areaStyle: string = "";   
+    //tables: Observable<TableDetail[]>;   
+    tables: TableDetail[];
+    areaStyle: string = "";
     tableStyles: string[] = [];
     activeTable: string = "";
     httpProtocol: string = "http";
     displayTableActions: boolean = false;
     displayTableActionsClass: string = "sliderHide";
-    employeeName:string = this.DBService.loggedInUser.FirstName;
-    
+    employeeName: string = this.DBService.loggedInUser.FirstName;
+    oneHour: number = 1000 * 60 * 60; // in milliseconds
+    oneMinute: number = 1000 * 60; // in milliseconds
+    showStatus: boolean = false;
+    showInfo: boolean = false;
+    showStaff: boolean = false;
+    showGuests: boolean = false;
+
     ngOnInit(): void {
-        console.log('mytables');        
+        this.getTablesInfo();
+    }
+
+    getTablesInfo() {
         this.DBService.getLocalAreas().then((data) => {
             if (data.length == 0) {
                 dialogs.alert("Areas not loaded").then(() => {
@@ -36,95 +47,121 @@ export class MyTablesComponent implements OnInit {
                 });
             }
             else {
-                this.areas = data;                
-                this.areaStyle = "margin-left: 10px; background-image: url('" + this.httpProtocol + "://" + this.areas[0].ImageURL + "'); background-repeat: no-repeat";   
-                
-                this.apiSvc.getTablesDetails(this.areas[0].AreaID, this.DBService.loggedInUser.PriKey, false).subscribe(res => {
-                    this.tables = res;     
-                    res.forEach(element => {
-                        let style:string = "text-align: center; background-color: #" +   (element.TableColor == '0' ? 'ffffff' : this.padZeroes((element.TableColor).toString(16), 6));                        
-                        element.Style = style;
-                        element.OrderTime = element.OrderTime == null ? '' : this.utilSvc.getJSONDate(element.OrderTime); //(element.OrderTime);
+                this.areas = data;
+                this.areaStyle = "margin-left: 10px; background-image: url('" + this.httpProtocol + "://" + this.areas[0].ImageURL + "'); background-repeat: no-repeat";
+
+                this.apiSvc.getTablesDetails(this.areas[0].AreaID, 
+                    this.DBService.loggedInUser.PriKey, 
+                    this.DBService.loggedInUser.AccessType, 
+                    this.DBService.systemSettings.ServerViewAll).subscribe(res => {
+                    this.tables = res;
+                    res.forEach(table => {
+                        let style: string = "text-align: center; background-color: #" + (table.TableColor == '0' ? 'ffffff' :
+                            this.utilSvc.padLeft((table.TableColor).toString(16), '0', 6));
+                        table.Style = style;
+                        table.Opacity = '1';
+                        table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);
                     });
-                  });               
+                });
             }
         });
     }
 
-    // view total ticket time for occupied tables
-    viewStatus()
-    {
+    viewInfo(showStaff: boolean, showStatus: boolean, showGuests: boolean) {
+        this.showStaff = showStaff;
+        this.showStatus = showStatus;
+        this.showGuests = showGuests;
 
+        let now = new Date().getTime();
+
+        this.tables.forEach(table => {
+            if (Date.parse(table.OrderTime)) {
+                table.Opacity = '0.5'
+                if (this.showStatus) {
+                    let elapsedTime: number = Math.ceil((now - new Date(table.OrderTime).getTime()) / (this.oneMinute));
+                    let hours = Math.floor(elapsedTime / 60);
+                    let minutes = elapsedTime % 60;
+                    table.ElapsedTime = hours.toString() + ':' + this.utilSvc.padLeft(minutes.toString(), '0', 2);
+                }
+            }
+        });
     }
 
-    onTableClick(table: TableDetail)
-    {
-        require( "nativescript-localstorage" );
+    viewStatus() {
+        this.viewInfo(false, true, false);
+    }
+
+    viewStaff() {
+        this.viewInfo(true, false, false);
+    }
+
+    viewGuests() {
+        this.viewInfo(false, false, true);
+    }
+
+    onTableClick(table: TableDetail) {
+        require("nativescript-localstorage");
         // table is open, go get number of guests
-        if (table.Status.indexOf('Open') > -1)
-        {
-            localStorage.setItem('table', table.Name); 
-            this.router.navigate(['/home/tableguests/'+ table.Name]);    
+        if (table.Status.indexOf('Open') > -1) {
+            localStorage.setItem('table', table.Name);
+            this.router.navigate(['/home/tableguests/' + table.Name]);
         }
 
         // table is active (occupied and enabled)
-        if (table.Status.indexOf('Enabled') > -1)
-        {
+        if (table.Status.indexOf('Enabled') > -1) {
             // table actions menu is displayed and same table selected
-            if (this.displayTableActions && localStorage.getItem('table') == table.Name) 
-            {
+            if (this.displayTableActions && localStorage.getItem('table') == table.Name) {
                 this.displayTableActions = false;
-                this.displayTableActionsClass = 'sliderHide';   
+                this.displayTableActionsClass = 'sliderHide';
                 return;
             }
 
             // different table selected
-            this.displayTableActions = true; 
+            this.displayTableActions = true;
             this.displayTableActionsClass = 'slideLeft';
-            localStorage.setItem('table', table.Name); 
+            localStorage.setItem('table', table.Name);
             return;
         }
 
         // not your table
-        if (table.Status.indexOf('Disabled') > -1)
-        {
+        if (table.Status.indexOf('Disabled') > -1) {
             dialogs.alert("Not your table!");
-        }        
-        
+        }
+
     }
 
-    setNumberOfGuests(table: TableDetail)
-    {       
-        localStorage.setItem('table', table.Name); 
-        this.router.navigate(['/home/tableguests/'+ table.Name]);        
+    setNumberOfGuests(table: TableDetail) {
+        localStorage.setItem('table', table.Name);
+        this.router.navigate(['/home/tableguests/' + table.Name]);
     }
 
-   
-
-    padZeroes(num:string, size:number): string {
-        let s = num;
-        while (s.length < size) s = "0" + s;
-        return s;
+    info() {
+        this.showInfo = true;
     }
 
-    logOut()
-    {
-        //this.DBService.dropTables();
+    startOver() {
+        this.getTablesInfo();
+        this.showInfo = false;
+        this.showStatus = false;
+        this.showGuests = false;
+        this.showStaff = false;
+    }
+
+    logOut() {
         this.DBService.logoff().subscribe(res => {
-            this.router.navigate(['/home/']);              
+            this.router.navigate(['/home/']);
         });
     }
-/*
-    pageTap()
-    {
-        this.utilSvc.idleTimer = 0;
-    }
-*/
+    /*
+        pageTap()
+        {
+            this.utilSvc.idleTimer = 0;
+        }
+    */
     constructor(
-        private router:RouterExtensions, private DBService: SQLiteService
-        ,private page: Page, private utilSvc: UtilityService, private apiSvc: APIService
-        ) 
-    {          
+        private router: RouterExtensions, private DBService: SQLiteService
+        , private page: Page, private utilSvc: UtilityService, private apiSvc: APIService
+    ) {
         page.actionBarHidden = true;
     }
 }
