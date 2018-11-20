@@ -21,8 +21,7 @@ export class MyTablesComponent implements OnInit {
     areas: Area[] = [];
     //tables: Observable<TableDetail[]>;   
     tables: TableDetail[];
-    areaStyle: string = "";
-    tableStyles: string[] = [];
+    areaStyle: string = "";    
     activeTable: string = "";
     httpProtocol: string = "http";
     displayTableActions: boolean = false;
@@ -56,9 +55,26 @@ export class MyTablesComponent implements OnInit {
                     this.DBService.systemSettings.ServerViewAll).subscribe(res => {
                     this.tables = res;
                     res.forEach(table => {
-                        let style: string = "text-align: center; background-color: #" + (table.TableColor == '0' ? 'ffffff' :
-                            this.utilSvc.padLeft((table.TableColor).toString(16), '0', 6));
-                        table.Style = style;
+                        let tableClass: string = 'tableOpen';
+                        if (table.Status.indexOf('Disabled') > -1)
+                        {
+                           tableClass = 'tableDisabled';      
+                        }
+                        else
+                        if (table.Status.indexOf('Open') > -1)
+                        {
+                            tableClass = 'tableOpen'; 
+                        }
+                        else
+                        if (table.Status.indexOf('Occupied') > -1)
+                        {
+                            tableClass = 'tableOccupied'; 
+                        }
+
+                        table.Class = 'table ' + tableClass;
+                        //let style: string = "text-align: center; background-color: #" + (table.TableColor == '0' ? 'ffffff' :
+                        //       this.utilSvc.padLeft((table.TableColor).toString(16), '0', 6));
+                        //table.Style = style;
                         table.Opacity = '1';
                         table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);
                     });

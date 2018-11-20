@@ -134,7 +134,7 @@ export interface TableDetail {
     EmployeeID: number;
     EmployeeName: string;
     Height: number;
-    Holds: number;
+    Holds: boolean;
     Name: string;
     OrderFilter: number;
     OrderTime: string;
@@ -144,7 +144,7 @@ export interface TableDetail {
     Status: string[];
     TableColor: number;
     Width: number;
-    Style?: string;
+    Class?: string;
     ElapsedTime?: string;
     Opacity?: string;
 }

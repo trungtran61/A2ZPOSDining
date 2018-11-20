@@ -1,18 +1,26 @@
 <AbsoluteLayout [style]="areaStyle" (tap)='utilSvc.resetIdleTImer()'>
   <Label [text]="employeeName" left="10" top="10" width="100" [height]="20" style="color:white; font-weight: bold"></Label>
-  <!-- table names -->
-  <Label [text]="table.Name" [left]="table.PosX" [top]="table.PosY" [width]="table.Width" [height]="table.Height" class='table'
-    [style]="table.Style" *ngFor="let table of tables" (tap)="onTableClick(table)" [opacity]='table.Opacity'></Label>
-  <!-- table elapsed times -->
-  <Label [text]="table.ElapsedTime" [visibility]="showStatus ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
-    [top]="table.PosY+2" style='color: white' *ngFor="let table of tables"></Label>
-  <!-- table number of guests -->
-  <Label [text]="table.Covers" [visibility]="showGuests ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
-    [top]="table.PosY+2" style='color: white' *ngFor="let table of tables"></Label>
-  <!-- table staff -->
-  <Label [text]="table.EmployeeName" [visibility]="showStaff ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
-    [top]="table.PosY+2" style='color: white' *ngFor="let table of tables"></Label>
-  <button class="glass btnLogout" left="0" top="690" text='Log Out' (tap)='logOut()' ></button>
+  <StackLayout [left]="table.PosX" [top]="table.PosY" [class]="table.Class" *ngFor="let table of tables" [width]="table.Width"
+    [height]="table.Height">
+    <!-- table names -->
+    <Label [text]="table.Name" (tap)="onTableClick(table)" [opacity]='table.Opacity'></Label>
+    <!-- elapsed times -->
+    <Label [text]="table.ElapsedTime" [visibility]="showStatus ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
+      [top]="table.PosY+2" style='color: black'></Label>
+    <!-- number of guests -->
+    <Label [text]="table.Covers" [visibility]="showGuests ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
+      [top]="table.PosY+2" style='color: white'></Label>
+    <!-- staff -->
+    <Label [text]="table.EmployeeName" [visibility]="showStaff ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
+      [top]="table.PosY+2" style='color: white'></Label>
+    <!-- receipt printed -->
+    <Label class="fa" text="&#xf00c;" [visibility]="table.Printed ? 'visible' : 'collapse'" 
+      [style]="'color: green;margin-top:-20' + ';margin-left:' + (table.Width - 20).toString() "></Label>
+    <!-- hold -->
+    <Label class="blink" text="H" [visibility]="table.Holds ? 'visible' : 'collapse'" 
+      [style]="'color: red;margin-top:0' + ';margin-left:' + (table.Width - 20).toString() "></Label>
+  </StackLayout>
+  <button class="glass btnLogout" left="0" top="690" text='Log Out' (tap)='logOut()'></button>
   <button class="glass btnInfo" left="120" top="690" text='Guests' text-wrap="true" (tap)='viewGuests()' *ngIf='showInfo'></button>
   <button class="glass btnInfo" left="240" top="690" text='Status' text-wrap="true" (tap)='viewStatus()' *ngIf='showInfo'></button>
   <button class="glass btnInfo" left="360" top="690" text='Staff' text-wrap="true" (tap)='viewStaff()' *ngIf='showInfo'></button>
@@ -31,7 +39,7 @@
   </StackLayout>
   <ScrollView orientation="horizontal" left="650" top="690" width="120">
     <StackLayout orientation="horizontal">
-      <Label [text]="area.Name" class="area" *ngFor="let area of areas" ></Label>
+      <Label [text]="area.Name" class="area" *ngFor="let area of areas"></Label>
     </StackLayout>
   </ScrollView>
 </AbsoluteLayout>

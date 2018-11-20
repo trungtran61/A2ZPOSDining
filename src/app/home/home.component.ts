@@ -21,7 +21,7 @@ var Sqlite = require("nativescript-sqlite");
     styleUrls: ['./home.component.css']
 })
 
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
 
     employees: Employee[];
     employeeId: string = "";
@@ -43,24 +43,7 @@ export class HomeComponent implements OnInit {
 
     ngOnInit(): void {
 
-        if (appSettings.getBoolean("isFirstLaunch", true)) {
-            this.isLoading = true;
-            console.log('First Launch');
-            (new Sqlite("FullServiceDining.db")).then(db => {
-                console.log("DB Created");
-                Promise.all([
-                    this.loadLocalDataBase(db)
-                ]).then
-                {
-                    this.isLoading = false;
-                    this.showLogos();
-                };
-            }, error => {
-                console.log("OPEN DB ERROR", error);
-            });
-            appSettings.setBoolean("isFirstLaunch", false);
-        }
-        
+       
         //if (this.DBService.systemSettings == null)
         //{
             this.DBService.getLocalSystemSettings().then((systemSettings) => {
@@ -79,6 +62,26 @@ export class HomeComponent implements OnInit {
         //this.router.navigate(['/home/order'])
         // Init your component properties here.
         //this.router.navigate(['/home/pizza']);        
+    }
+
+    ngAfterViewInit(): void {
+        if (appSettings.getBoolean("isFirstLaunch", true)) {
+            this.isLoading = true;
+            console.log('First Launch');
+            (new Sqlite("FullServiceDining.db")).then(db => {
+                console.log("DB Created");
+                Promise.all([
+                    this.loadLocalDataBase(db)
+                ]).then
+                {
+                    this.isLoading = false;
+                    this.showLogos();
+                };
+            }, error => {
+                console.log("OPEN DB ERROR", error);
+            });
+            appSettings.setBoolean("isFirstLaunch", false);
+        }        
     }
 
     showLogos()
@@ -199,7 +202,7 @@ export class HomeComponent implements OnInit {
         //this.DBService.getLocalSystemSettings();
         //this.DBService.getAllEmployees();
         this.loadLocalDataBase(null);
-    }
+    }    
 
     loadTables() {
         this.DBService.getTableInfo('MenuProducts'); // .createTables(db);

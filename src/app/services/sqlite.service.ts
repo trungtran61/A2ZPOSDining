@@ -1125,7 +1125,7 @@ export class SQLiteService {
 
             db.execSQL("DROP TABLE IF EXISTS SystemSettings;").then(id => {
                 db.execSQL("CREATE TABLE IF NOT EXISTS SystemSettings (PriKey, OrderScreenLogOffTimer INTEGER, DineInTimerInterval INTEGER, LoginTableLayout INTEGER" +
-                    ",AutoCategory INTEGER, CategoryName INTEGER, TaxExempt TEXT, SmartTax TEXT, TaxGratuity TEXT, GratuityTaxRate REAL" +
+                    ",AutoCategory INTEGER, CategoryName INTEGER, TaxExempt TEXT, SmartTax TEXT, TaxGratuity TEXT, GratuityTaxRate REAL, ServerViewAll TEXT" +
                     ");").then(id => {
                         let headers = that.createRequestHeader();
                         that.http.get(that.apiUrl + 'GetSettings', { headers: headers })
@@ -1134,9 +1134,9 @@ export class SQLiteService {
                                     console.log('got Settings from API');
                                     let ss: SystemSettings = data;
                                     SQLiteService.database.execSQL("INSERT INTO SystemSettings (PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout" +
-                                        ",AutoCategory, CategoryName, TaxExempt, SmartTax, TaxGratuity, GratuityTaxRate) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                                        ",AutoCategory, CategoryName, TaxExempt, SmartTax, TaxGratuity, GratuityTaxRate, ServerViewAll) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                                         [ss.PriKey, ss.OrderScreenLogOffTimer, ss.DineInTimerInterval, ss.LoginTableLayout, 
-                                        ss.AutoCategory, ss.CategoryName, ss.TaxExempt, ss.SmartTax, ss.TaxGratuity, ss.GratuityTaxRate]).then(id => {
+                                        ss.AutoCategory, ss.CategoryName, ss.TaxExempt, ss.SmartTax, ss.TaxGratuity, ss.GratuityTaxRate, ss.ServerViewAll]).then(id => {
                                             console.log("Added SystemSettings records.");
                                             resolve("Added SystemSettings records.")
                                         },
@@ -1164,7 +1164,7 @@ export class SQLiteService {
         let that = this;
 
         return SQLiteService.database.get("SELECT PriKey, OrderScreenLogOffTimer, DineInTimerInterval, LoginTableLayout, " + 
-            "AutoCategory, CategoryName, TaxExempt, SmartTax,TaxGratuity, GratuityTaxRate FROM SystemSettings;")
+            "AutoCategory, CategoryName, TaxExempt, SmartTax,TaxGratuity, GratuityTaxRate, ServerViewAll FROM SystemSettings;")
             .then(function (row) {
                 let systemSettings: SystemSettings = {
                     PriKey: row[0],
@@ -1176,7 +1176,8 @@ export class SQLiteService {
                     TaxExempt: row[6].toLowerCase() == 'true',
                     SmartTax: row[7].toLowerCase() == 'true',
                     TaxGratuity: row[8].toLowerCase() == 'true',
-                    GratuityTaxRate: row[9]
+                    GratuityTaxRate: row[9],
+                    ServerViewAll: row[10].toLowerCase() == 'true'
                 };
                 that.systemSettings = systemSettings;
                 return (systemSettings);
