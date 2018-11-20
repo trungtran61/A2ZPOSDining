@@ -3,7 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import { SQLiteService } from "~/app/services/sqlite.service";
-import { Area, TableDetail } from "~/app/models/products";
+import { Area, TableDetail, OccupiedCount } from "~/app/models/products";
 import { Observable } from "rxjs";
 import { Page } from "tns-core-modules/ui/page/page";
 import { UtilityService } from "~/app/services/utility.service";
@@ -19,6 +19,7 @@ import { min } from "rxjs/operators";
 
 export class MyTablesComponent implements OnInit {
     areas: Area[] = [];
+    occupiedCounts: OccupiedCount[] = [];
     //tables: Observable<TableDetail[]>;   
     tables: TableDetail[];
     areaStyle: string = "";    
@@ -166,6 +167,18 @@ export class MyTablesComponent implements OnInit {
     logOut() {
         this.DBService.logoff().subscribe(res => {
             this.router.navigate(['/home/']);
+        });
+    }
+
+    openTable(table: TableDetail)
+    {
+
+    }
+
+    showAreas()
+    {
+        this.apiSvc.getOccupiedTables().subscribe(res => {
+            this.occupiedCounts = res;            
         });
     }
     /*

@@ -62,4 +62,9 @@ export class APIService {
             { headers: headers }).pipe(map(res => res));
     }
 
+    public getOccupiedTables(): Observable<any> {
+        let headers = this.createRequestHeader();
+        return this.http.get(this.apiUrl + 'GetOccupiedTables',
+            { headers: headers }).pipe(map(res => res));
+    }
 }
