@@ -3,29 +3,32 @@
   <StackLayout [left]="table.PosX" [top]="table.PosY" [class]="table.Class" *ngFor="let table of tables" [width]="table.Width"
     [height]="table.Height">
     <!-- table names -->
-    <Label [text]="table.Name" (tap)="onTableClick(table)" [opacity]='table.Opacity'></Label>
+    <Label [text]="table.Name" (tap)="onTableClick(table)" [opacity]='table.Opacity' style='margin-top:10'></Label>
+  </StackLayout>
+  <StackLayout [left]="table.PosX" [top]="table.PosY" *ngFor="let table of tables" >
     <!-- elapsed times -->
-    <Label [text]="table.ElapsedTime" [visibility]="showStatus ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
-      [top]="table.PosY+2" style='color: black'></Label>
+    <Label [text]="table.ElapsedTime" [visibility]="showStatus ? 'visible' : 'collapse'" class="infoText"></Label>
     <!-- number of guests -->
     <Label [text]="table.Covers" [visibility]="showGuests ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
-      [top]="table.PosY+2" style='color: white'></Label>
+      [top]="table.PosY+2" class="infoText"></Label>
     <!-- staff -->
     <Label [text]="table.EmployeeName" [visibility]="showStaff ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
-      [top]="table.PosY+2" style='color: white'></Label>
+      [top]="table.PosY+2" class="infoText"></Label>
+  </StackLayout>
+  <StackLayout [left]="table.PosX" [top]="table.PosY" *ngFor="let table of tables" >
     <!-- receipt printed -->
     <Label class="fa" text="&#xf00c;" [visibility]="table.Printed ? 'visible' : 'collapse'" 
-      [style]="'color: green;margin-top:-20' + ';margin-left:' + (table.Width - 20).toString() "></Label>
+      [style]="'color: green;margin-left:' + (table.Width - 20).toString() "></Label>
     <!-- hold -->
     <Label class="blink" text="H" [visibility]="table.Holds ? 'visible' : 'collapse'" 
-      [style]="'color: red;margin-top:0' + ';margin-left:' + (table.Width - 20).toString() "></Label>
+      [style]="'color: red;margin-left:' + (table.Width - 20).toString() "></Label>
   </StackLayout>
   <button class="glass btnLogout" left="0" top="690" text='Log Out' (tap)='logOut()'></button>
-  <button class="glass btnInfo" left="120" top="690" text='Guests' text-wrap="true" (tap)='viewGuests()' *ngIf='showInfo'></button>
-  <button class="glass btnInfo" left="240" top="690" text='Status' text-wrap="true" (tap)='viewStatus()' *ngIf='showInfo'></button>
-  <button class="glass btnInfo" left="360" top="690" text='Staff' text-wrap="true" (tap)='viewStaff()' *ngIf='showInfo'></button>
-  <button class="glass btnInfo" left="360" top="690" text='Info' (tap)='info()' *ngIf='!showInfo'></button>
-  <button class="glass btnInfo" left="500" top="690" text='Start Over' (tap)='startOver()'></button>
+  <button class="glass btnInfo fa" left="120" top="690" text='&#xf0c0; Guests' text-wrap="true" (tap)='viewGuests()' *ngIf='showInfo'></button>
+  <button class="glass btnInfo fa" left="240" top="690" text='&#xf017; Status' text-wrap="true" (tap)='viewStatus()' *ngIf='showInfo'></button>
+  <button class="glass btnInfo fa" left="360" top="690" text='&#xf183; Staff' text-wrap="true" (tap)='viewStaff()' *ngIf='showInfo'></button>
+  <button class="glass btnInfo fa" left="360" top="690" text='&#xf05a; Info' (tap)='info()' *ngIf='!showInfo'></button>
+  <button class="glass btnInfo fa" left="500" top="690" text='&#xf021; Start Over' (tap)='startOver()'></button>
   <StackLayout *ngIf='displayTableActions' left="850" top="0">
     <Image src='res://images/TableLayout/Open' (tap)='openTable()' height="82"></Image>
     <Image src='res://images/TableLayout/Close' (tap)='closeTable()' height="82"></Image>

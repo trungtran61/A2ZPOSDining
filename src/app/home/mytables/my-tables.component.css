@@ -85,3 +85,8 @@
       opacity: 0;
     }
   }
+
+  .infoText
+  {
+    color: black; background-color: lightgray; border-radius: 5;
+  }

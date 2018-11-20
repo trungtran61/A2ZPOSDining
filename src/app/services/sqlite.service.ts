@@ -779,15 +779,15 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS Areas;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER PRIMARY KEY, Name TEXT, Position INTEGER);").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS Areas (AreaID INTEGER PRIMARY KEY, Name TEXT, Position INTEGER, ImageURL TEXT);").then(id => {
                     let headers = that.createRequestHeader();
                     that.http.get(that.apiUrl + 'GetAreas2', { headers: headers })
                         .subscribe(
                             data => {
                                 let areas = <Area[]>data;
                                 areas.forEach(function (area: Area) {
-                                    SQLiteService.database.execSQL("INSERT INTO Areas (AreaID, Name, Position) VALUES (?,?,?)",
-                                        [area.AreaID, area.Name, area.Position]).then(id => {
+                                    SQLiteService.database.execSQL("INSERT INTO Areas (AreaID, Name, Position, ImageURL) VALUES (?,?,?,?)",
+                                        [area.AreaID, area.Name, area.Position, area.ImageURL]).then(id => {
                                             resolve("Added Areas records.")
                                         },
                                             err => {
@@ -809,7 +809,7 @@ export class SQLiteService {
     }
 
     public getLocalAreas(): Promise<Area[]> {
-        let sql: string = "SELECT * FROM Areas;"
+        let sql: string = "SELECT AreaID, Name, Position, ImageURL FROM Areas;"
         return SQLiteService.database.all(sql)
             .then(function (rows) {
                 console.log("SELECT * FROM Areas;");
