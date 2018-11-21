@@ -3,7 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import { SQLiteService } from "~/app/services/sqlite.service";
-import { Area, TableDetail, OccupiedCount } from "~/app/models/products";
+import { Area, TableDetail } from "~/app/models/products";
 import { Observable } from "rxjs";
 import { Page } from "tns-core-modules/ui/page/page";
 import { UtilityService } from "~/app/services/utility.service";
@@ -19,10 +19,9 @@ import { min } from "rxjs/operators";
 
 export class MyTablesComponent implements OnInit {
     areas: Area[] = [];
-    occupiedCounts: OccupiedCount[] = [];
     //tables: Observable<TableDetail[]>;   
     tables: TableDetail[];
-    areaStyle: string = "";    
+    areaStyle: string = "";
     activeTable: string = "";
     httpProtocol: string = "http";
     displayTableActions: boolean = false;
@@ -34,6 +33,7 @@ export class MyTablesComponent implements OnInit {
     showInfo: boolean = false;
     showStaff: boolean = false;
     showGuests: boolean = false;
+    showAreas: boolean = false;
 
     ngOnInit(): void {
         this.getTablesInfo();
@@ -50,36 +50,33 @@ export class MyTablesComponent implements OnInit {
                 this.areas = data;
                 this.areaStyle = "margin-left: 10px; background-image: url('" + this.httpProtocol + "://" + this.areas[0].ImageURL + "'); background-repeat: no-repeat";
 
-                this.apiSvc.getTablesDetails(this.areas[0].AreaID, 
-                    this.DBService.loggedInUser.PriKey, 
-                    this.DBService.loggedInUser.AccessType, 
+                this.apiSvc.getTablesDetails(this.areas[0].AreaID,
+                    this.DBService.loggedInUser.PriKey,
+                    this.DBService.loggedInUser.AccessType,
                     this.DBService.systemSettings.ServerViewAll).subscribe(res => {
-                    this.tables = res;
-                    res.forEach(table => {
-                        let tableClass: string = 'tableOpen';
-                        if (table.Status.indexOf('Disabled') > -1)
-                        {
-                           tableClass = 'tableDisabled';      
-                        }
-                        else
-                        if (table.Status.indexOf('Open') > -1)
-                        {
-                            tableClass = 'tableOpen'; 
-                        }
-                        else
-                        if (table.Status.indexOf('Occupied') > -1)
-                        {
-                            tableClass = 'tableOccupied'; 
-                        }
+                        this.tables = res;
+                        res.forEach(table => {
+                            let tableClass: string = 'tableOpen';
+                            if (table.Status.indexOf('Disabled') > -1) {
+                                tableClass = 'tableDisabled';
+                            }
+                            else
+                                if (table.Status.indexOf('Open') > -1) {
+                                    tableClass = 'tableOpen';
+                                }
+                                else
+                                    if (table.Status.indexOf('Occupied') > -1) {
+                                        tableClass = 'tableOccupied';
+                                    }
 
-                        table.Class = 'table ' + tableClass;
-                        //let style: string = "text-align: center; background-color: #" + (table.TableColor == '0' ? 'ffffff' :
-                        //       this.utilSvc.padLeft((table.TableColor).toString(16), '0', 6));
-                        //table.Style = style;
-                        table.Opacity = '1';
-                        table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);
+                            table.Class = 'table ' + tableClass;
+                            //let style: string = "text-align: center; background-color: #" + (table.TableColor == '0' ? 'ffffff' :
+                            //       this.utilSvc.padLeft((table.TableColor).toString(16), '0', 6));
+                            //table.Style = style;
+                            table.Opacity = '1';
+                            table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);
+                        });
                     });
-                });
             }
         });
     }
@@ -170,16 +167,19 @@ export class MyTablesComponent implements OnInit {
         });
     }
 
-    openTable(table: TableDetail)
-    {
+    openTable(table: TableDetail) {
 
     }
 
-    showAreas()
-    {
-        this.apiSvc.getOccupiedTables().subscribe(res => {
-            this.occupiedCounts = res;            
-        });
+    viewAreas() {
+        this.showAreas = !this.showAreas;
+        if (this.showAreas) {
+            this.apiSvc.getOccupiedTables().subscribe(areas => {
+                areas.forEach(area => {
+                    this.areas.find(x => x.AreaID == area.AreaID).OccupiedTables = area.Count;
+                });
+            });
+        }
     }
     /*
         pageTap()

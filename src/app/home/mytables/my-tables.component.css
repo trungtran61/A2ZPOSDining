@@ -37,9 +37,9 @@
     color: gold;
     border-color: gold;
     border-width: 2;
-    border-radius: 30;
-    height: 50;
-    width: 120;
+    border-radius: 10;
+    height: 60;
+    width: 80;
     font-weight: bold;
     text-align: center;
 }

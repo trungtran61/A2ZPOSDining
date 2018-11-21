@@ -1,35 +1,34 @@
 <AbsoluteLayout [style]="areaStyle" (tap)='utilSvc.resetIdleTImer()'>
   <Label [text]="employeeName" left="10" top="10" width="100" [height]="20" style="color:white; font-weight: bold"></Label>
-  <StackLayout [left]="table.PosX" [top]="table.PosY" [class]="table.Class" (tap)="onTableClick(table)" 
-    *ngFor="let table of tables" [width]="table.Width" [height]="table.Height">
+  <StackLayout [left]="table.PosX" [top]="table.PosY" [class]="table.Class" (tap)="onTableClick(table)" *ngFor="let table of tables"
+    [width]="table.Width" [height]="table.Height">
     <!-- table names -->
     <Label [text]="table.Name" [opacity]='table.Opacity' style='margin-top:10'></Label>
   </StackLayout>
-  <StackLayout [left]="table.PosX" [top]="table.PosY" *ngFor="let table of tables" >
+  <StackLayout [left]="table.PosX" [top]="table.PosY" *ngFor="let table of tables">
     <!-- elapsed times -->
     <Label [text]="table.ElapsedTime" [visibility]="showStatus ? 'visible' : 'collapse'" class="infoText"></Label>
     <!-- number of guests -->
-    <Label [text]="table.Covers" [visibility]="showGuests ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
-      [top]="table.PosY+2" class="infoText"></Label>
+    <Label [text]="table.Covers" [visibility]="showGuests ? 'visible' : 'collapse'" class="infoText"></Label>
     <!-- staff -->
-    <Label [text]="table.EmployeeName" [visibility]="showStaff ? 'visible' : 'collapse'" [left]="table.PosX+table.Width-35"
-      [top]="table.PosY+2" class="infoText"></Label>
+    <Label [text]="table.EmployeeName" [visibility]="showStaff ? 'visible' : 'collapse'" class="infoText"></Label>
   </StackLayout>
-  <StackLayout [left]="table.PosX" [top]="table.PosY" *ngFor="let table of tables" >
+  <StackLayout [left]="table.PosX" [top]="table.PosY" *ngFor="let table of tables">
     <!-- receipt printed -->
-    <Label class="fa" text="&#xf00c;" [visibility]="table.Printed ? 'visible' : 'collapse'" 
-      [style]="'color: green;margin-left:' + (table.Width - 20).toString() "></Label>
+    <Label class="fa" text="&#xf00c;" [visibility]="table.Printed ? 'visible' : 'collapse'" [style]="'color: green;margin-left:' + (table.Width - 20).toString() "></Label>
     <!-- hold -->
-    <Label class="blink" text="H" [visibility]="table.Holds ? 'visible' : 'collapse'" 
-      [style]="'color: red;margin-left:' + (table.Width - 20).toString() "></Label>
+    <Label class="blink" text="H" [visibility]="table.Holds ? 'visible' : 'collapse'" [style]="'color: red;margin-left:' + (table.Width - 20).toString() "></Label>
   </StackLayout>
   <button class="glass btnLogout" left="0" top="690" text='Log Out' (tap)='logOut()'></button>
-  <button class="glass btnInfo fa" left="120" top="690" text='&#xf0c0; Guests' text-wrap="true" (tap)='viewGuests()' *ngIf='showInfo'></button>
-  <button class="glass btnInfo fa" left="240" top="690" text='&#xf017; Status' text-wrap="true" (tap)='viewStatus()' *ngIf='showInfo'></button>
-  <button class="glass btnInfo fa" left="360" top="690" text='&#xf183; Staff' text-wrap="true" (tap)='viewStaff()' *ngIf='showInfo'></button>
+  <button class="glass btnInfo fa" left="120" top="690" text='&#xf0c0; Guests' text-wrap="true" (tap)='viewGuests()'
+    *ngIf='showInfo'></button>
+  <button class="glass btnInfo fa" left="240" top="690" text='&#xf017; Status' text-wrap="true" (tap)='viewStatus()'
+    *ngIf='showInfo'></button>
+  <button class="glass btnInfo fa" left="360" top="690" text='&#xf183; Staff' text-wrap="true" (tap)='viewStaff()'
+    *ngIf='showInfo'></button>
   <button class="glass btnInfo fa" left="360" top="690" text='&#xf05a; Info' (tap)='info()' *ngIf='!showInfo'></button>
   <button class="glass btnInfo fa" left="500" top="690" text='&#xf021; Start Over' (tap)='startOver()'></button>
-  <button class="glass btnInfo fa" left="500" top="690" text='&#xf279; Area' (tap)='viewAreas()'></button>
+  <button class="glass btnInfo fa" left="630" top="690" text='&#xf279; Area' (tap)='viewAreas()'></button>
   <StackLayout *ngIf='displayTableActions' left="850" top="0">
     <Image src='res://images/TableLayout/Open' (tap)='openTable()' height="82"></Image>
     <Image src='res://images/TableLayout/Close' (tap)='closeTable()' height="82"></Image>
@@ -41,7 +40,12 @@
     <Image src='res://images/TableLayout/PrintKitchen' (tap)='closeTable()' height="64"></Image>
     <Image src='res://images/TableLayout/PrintReceipt' (tap)='closeTable()' height="64"></Image>
   </StackLayout>
-  <StackLayout orientation="horizontal" *ngIf='showAreas' left="850" top="0">
-      <Label [text]="area.Name" class="area" *ngFor="let area of areas" (tap)='showAreas()'></Label>
-  </StackLayout>  
+
+  <StackLayout *ngFor="let area of areas let i=index" (tap)='viewTables(area)' [left]="605 + (82 * i)" top="635" [visibility]="showAreas ? 'visible' : 'collapse'">
+    <Label [text]="area.OccupiedTables" style='border-radius: 2;color:gold; border-width:2;border-color:gold;background-color: red'></Label>
+  </StackLayout>
+  <StackLayout *ngFor="let area of areas let i=index" (tap)='viewTables(area)' [left]="602 + (82 * i)" top="630" [visibility]="showAreas ? 'visible' : 'collapse'">
+    <Label [text]="area.Name" class='area' textWrap="true" left="605" top="595"></Label>
+  </StackLayout>
+
 </AbsoluteLayout>

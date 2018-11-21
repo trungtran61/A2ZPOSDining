@@ -105,11 +105,6 @@ export interface Area {
     OccupiedTables?: number;
 }
 
-export interface OccupiedCount {
-    AreaID: number;
-    Count: number;
-}
-
 export interface Table {
     AreaID: number;
     Name: string;
