@@ -26,6 +26,9 @@
     *ngIf='showInfo'></button>
   <button class="glass btnInfo fa" left="360" top="690" text='&#xf183; Staff' text-wrap="true" (tap)='viewStaff()'
     *ngIf='showInfo'></button>
+  <Image src="res://images/TableLayout/ViewClosedChecks" left="140" top="690" (tap)='viewClosedChecks()' *ngIf='!showInfo'></Image> 
+  <Image src="res://images/TableLayout/MyChecks" left="200" top="690" (tap)='viewMyChecks()' *ngIf='!showInfo'></Image>
+  <Image src="res://images/TableLayout/ViewDetail" left="260" top="690" (tap)='viewCheckDetail()' *ngIf='!showInfo'></Image>
   <button class="glass btnInfo fa" left="360" top="690" text='&#xf05a; Info' (tap)='info()' *ngIf='!showInfo'></button>
   <button class="glass btnInfo fa" left="500" top="690" text='&#xf021; Start Over' (tap)='startOver()'></button>
   <button class="glass btnInfo fa" left="630" top="690" text='&#xf279; Area' (tap)='viewAreas()'></button>

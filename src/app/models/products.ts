@@ -115,6 +115,15 @@ export interface Table {
     TableType?: number;
 }
 
+export interface Check {
+    AreaID: number;
+    Name: string;
+    Height: number;
+    Width: number;
+    PosX: number;
+    PosY: number;
+    TableType?: number;
+}
 
 
 export interface ForcedModifier {

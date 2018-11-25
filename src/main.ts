@@ -1,90 +1,27 @@
-// this import should be first in order to load some required settings (like globals and reflect-metadata)
 import { platformNativeScriptDynamic } from "nativescript-angular/platform";
+import { AppOptions } from "nativescript-angular/platform-common";
 
 import { AppModule } from "./app/app.module";
+import "./livesync-navigation";
 
-import { on as applicationOn, launchEvent, suspendEvent, resumeEvent, exitEvent, lowMemoryEvent, uncaughtErrorEvent, ApplicationEventData, ios, run } from "tns-core-modules/application";
+let options: AppOptions = {};
+if (module['hot']) {
+    const hmrUpdate = require("nativescript-dev-webpack/hmr").hmrUpdate;
 
-applicationOn(launchEvent, (args: ApplicationEventData) => {
-    if (args.android) {
-        // For Android applications, args.android is an android.content.Intent class.
-        console.log("Launched Android application with the following intent: " + args.android + ".");
-    } else if (args.ios !== undefined) {
-        // For iOS applications, args.ios is NSDictionary (launchOptions).
-        console.log("Launched iOS a2Z app with options: " + args.ios);
+    options.hmrOptions = {
+        moduleTypeFactory: () => AppModule,
+        livesyncCallback: (platformReboot) => {
+            console.log("HMR: Sync...")
+            hmrUpdate();
+            setTimeout(platformReboot, 0);
+        },
     }
-});
+    hmrUpdate();
 
-applicationOn(suspendEvent, (args: ApplicationEventData) => {
-    if (args.android) {
-        // For Android applications, args.android is an android activity class.
-        console.log("Activity: " + args.android);
-    } else if (args.ios) {
-        // For iOS applications, args.ios is UIApplication.
-        console.log("A2Z suspend UIApplication: " + args.ios);
-    }
-});
-
-applicationOn(resumeEvent, (args: ApplicationEventData) => {
-    if (args.android) {
-        // For Android applications, args.android is an android activity class.
-        console.log("Activity: " + args.android);
-    } else if (args.ios) {
-        // For iOS applications, args.ios is UIApplication.
-        console.log("A2Z resume UIApplication: " + args.ios);
-    }
-});
-
-applicationOn(exitEvent, (args: ApplicationEventData) => {
-    if (args.android) {
-        // For Android applications, args.android is an android activity class.
-        console.log("Activity: " + args.android);
-    } else if (args.ios) {
-        // For iOS applications, args.ios is UIApplication.
-        console.log("A2Z Exit UIApplication: " + args.ios);
-    }
-});
-
-applicationOn(lowMemoryEvent, (args: ApplicationEventData) => {
-    if (args.android) {
-        // For Android applications, args.android is an android activity class.
-        console.log("Activity: " + args.android);
-    } else if (args.ios) {
-        // For iOS applications, args.ios is UIApplication.
-        console.log("A2Z low memory UIApplication: " + args.ios);
-    }
-});
-
-applicationOn(uncaughtErrorEvent, (args: ApplicationEventData) => {
-    if (args.android) {
-        // For Android applications, args.android is an NativeScriptError.
-        console.log("NativeScriptError: " + args.android);
-    } else if (args.ios) {
-        // For iOS applications, args.ios is NativeScriptError.
-        console.log("A2Z error NativeScriptError: " + args.ios);
-    }
-});
-
-class myDelegate extends UIResponder implements UIApplicationDelegate {
-    public static ObjCProtocols = [UIApplicationDelegate];
-    
-    updateUserActivityState(activity: NSUserActivity)
-    {
-        //console.log("trung updated");
-        return true;
-    }
-
-    applicationDidFinishLaunchingWithOptions(application: UIApplication, launchOptions: NSDictionary<any, any>): boolean {
-        console.log("applicationWillFinishLaunchingWithOptions: " + launchOptions)
-
-        return true;
-    }
-/*
-    applicationDidBecomeActive(application: UIApplication): void {
-        console.log("applicationDidBecomeActive: " + application)
-    }
-    */
+    // Path to your app module.
+	// You might have to change it if your module is in a different place.
+    module['hot'].accept(["./app/app.module"]);
 }
-ios.delegate = myDelegate;
 
-platformNativeScriptDynamic().bootstrapModule(AppModule);
+// !!! Don't forget to pass the options when creating the platform
+platformNativeScriptDynamic(options).bootstrapModule(AppModule);

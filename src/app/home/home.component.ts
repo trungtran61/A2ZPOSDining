@@ -58,7 +58,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         //}
         
         //this.page.className = 'loginBG';
-        //this.router.navigate(['/home/mytables'])
+        //this.router.navigate(['/home/area'])
         //this.router.navigate(['/home/order'])
         // Init your component properties here.
         //this.router.navigate(['/home/pizza']);        
@@ -136,11 +136,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
                             this.DBService.loggedInUser.FirstName = data.FirstName;
                             //this.utilSvc.startTimer();                            
-                            this.zone.run(() => this.router.navigate(['/home/mytables']));
+                            this.zone.run(() => this.router.navigate(['/home/area']));
                         }
                     });
                     //localStorage.setItem("loggedInUser", JSON.stringify(this.loggedInUser));
-                    //this.router.navigate(['/home/mytables']);                          
+                    //this.router.navigate(['/home/area']);                          
                     break;
                 case -3:
                     //dialogs.alert("Employee already logged in.");    

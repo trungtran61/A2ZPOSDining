@@ -7,7 +7,7 @@ import { TNSFontIconModule, TNSFontIconService } from "nativescript-ngx-fonticon
 
 import { HomeRoutingModule } from "./home-routing.module";
 import { HomeComponent } from "./home.component";
-import { MyTablesComponent } from "~/app/home/mytables/my-tables.component";
+import { AreaComponent } from "~/app/home/area/area.component";
 import { TableGuestsComponent } from "~/app/home/tableguests/table-guests.component";
 import { OrderComponent } from "./order/order.component";
 import { ModifyOrderItemComponent } from "./order/modify-order-item.component";
@@ -17,6 +17,7 @@ import { OpenProductComponent } from "./order/open-product/open-product.componen
 import { PizzaComponent } from "./order/pizza/pizza.component";
 import { PromptQtyComponent } from "./order/prompt-qty.component";
 import { MemoComponent } from "./order/memo.component";
+import { MyChecksComponent } from "./my-checks/my-checks.component";
 
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 TNSFontIconService.debug = true;
@@ -33,7 +34,7 @@ TNSFontIconService.debug = true;
     ],
     declarations: [
         HomeComponent,
-        MyTablesComponent,
+        AreaComponent,
         TableGuestsComponent,
         OrderComponent,
         ModifyOrderItemComponent,
@@ -42,7 +43,8 @@ TNSFontIconService.debug = true;
         OpenProductComponent,
         PizzaComponent,
         PromptQtyComponent,
-        MemoComponent            
+        MemoComponent,
+        MyChecksComponent            
     ],
     schemas: [
         NO_ERRORS_SCHEMA

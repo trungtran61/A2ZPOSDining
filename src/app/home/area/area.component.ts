@@ -11,13 +11,13 @@ import { APIService } from "~/app/services/api.service";
 import { min } from "rxjs/operators";
 
 @Component({
-    selector: "MyTables",
+    selector: "area",
     moduleId: module.id,
-    templateUrl: "./my-tables.component.html",
-    styleUrls: ['./my-tables.component.css']
+    templateUrl: "./area.component.html",
+    styleUrls: ['./area.component.css']
 })
 
-export class MyTablesComponent implements OnInit {
+export class AreaComponent implements OnInit {
     areas: Area[] = [];
     //tables: Observable<TableDetail[]>;   
     tables: TableDetail[];

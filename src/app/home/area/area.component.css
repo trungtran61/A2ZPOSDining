@@ -86,7 +86,22 @@
     }
   }
 
-  .infoText
-  {
+.infoText
+{
     color: black; background-color: lightgray; border-radius: 5;
-  }
+}
+.viewClosedChecks
+{
+    background-image: url("res://images/TableLayout/ViewClosedChecks"); 
+    background-repeat: no-repeat;
+}
+.viewMyChecks
+{
+    background-image: url("res://images/TableLayout/MyChecks"); 
+    background-repeat: no-repeat;
+}
+.viewCheckDetail
+{
+    background-image: url("res://images/TableLayout/ViewDetail"); 
+    background-repeat: no-repeat;
+}
