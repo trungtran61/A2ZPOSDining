@@ -35,6 +35,14 @@ page
 	text-align: center;
 }
 
+.dateTime
+{
+	font-size: 16;
+	font-weight: bold;
+	color: gold;
+	text-align: right;
+}
+
 .btn {
     font-size: 18;
 }

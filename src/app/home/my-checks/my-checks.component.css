@@ -1,0 +1,30 @@
+.btnGreenSquare
+{
+	width:110;height: 100; color: white;background-image: linear-gradient(black, green);
+}
+
+.btnBlackSquare
+{
+	width:110;height: 100; color: white;background-image: linear-gradient(black, gray);
+}
+
+.btnDeliveryStatus
+{
+	width:100;height: 100; color: gold;background-image: linear-gradient(silver, gray); border-radius: 200;
+}
+
+.btnViewDelayOrders
+{
+	width:100;height: 100; color: white;background-color: black; border-radius: 200;
+}
+
+.btnCashOut
+{
+	width:130;height: 80; color: black;background-image: linear-gradient(white, green); border-radius: 50;
+}
+
+.btnStartOver
+{
+    width:110;height: 80; color: gold;
+}
+

@@ -181,6 +181,21 @@ export class AreaComponent implements OnInit {
             });
         }
     }
+
+    viewClosedChecks()
+    {
+        this.router.navigate(['/home/mychecks']);
+    }
+
+    viewMyChecks()
+    {
+
+    }
+
+    viewCheckDetail()
+    {
+
+    }
     /*
         pageTap()
         {

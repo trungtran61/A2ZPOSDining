@@ -25,6 +25,11 @@ export class MyChecksComponent implements OnInit {
             this.currentDateTime = new Date(); 
      }, 1000);
     }
+
+    cancel()
+    {
+        this.router.back();
+    }
     
     constructor(
         private router: RouterExtensions, private DBService: SQLiteService
