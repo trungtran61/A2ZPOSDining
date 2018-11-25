@@ -23,7 +23,7 @@
         </FlexBoxLayout>
         <StackLayout row='0' col='1'>
             <Button text='&#xf021; Start Over' class='glass btnStartOver fa' textWrap='true' (tap)='startOver()'></Button>
-            <label text='USER: SYSTEM' style='color: gold; text-align: center; margin-top:5'></label>
+            <label [text]='userName' style='color: gold; text-align: center; margin-top:5'></label>
         </StackLayout>
         <FlexBoxLayout justifyContent='flex-end' row='0' col='2'>
             <Button text='Cash Out' class='glass btnCashOut' (tap)='cashOut()' style='margin: 10 10 5 0'></Button>

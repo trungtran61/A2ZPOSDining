@@ -1,28 +1,25 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, NgZone } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
+
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes, MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier } from "~/app/models/products";
+import {
+    CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes,
+    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail
+} from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
-import { DeprecatedDatePipe } from "@angular/common";
-import { OrderTypes, Countdown, OrderItem, Order, FixedOption } from "~/app/models/orders";
+import { OrderTypes, Countdown, OrderItem, Order, FixedOption, OrderHeader, OrderDetail, OrderResponse } from "~/app/models/orders";
 import { APIService } from "~/app/services/api.service";
-import { count } from "rxjs/operators";
-import { forkJoin, from } from "rxjs";
 import { PromptQtyComponent } from "./prompt-qty.component";
-import { on } from "tns-core-modules/application/application";
-import { nullSafeIsEquivalent } from "@angular/compiler/src/output/output_ast";
 import { MemoComponent } from "./memo.component";
-import { NullTemplateVisitor } from "@angular/compiler";
-import { ListView } from "tns-core-modules/ui/list-view/list-view";
 import { UtilityService } from "~/app/services/utility.service";
-import { ObservableArray } from "tns-core-modules/data/observable-array/observable-array";
 import { ForcedModifiersComponent } from "./forced-modifiers/forced-modifiers.component";
 import { ModifyOrderItemComponent } from "./modify-order-item.component";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
     selector: "order",
@@ -59,6 +56,7 @@ export class OrderComponent implements OnInit {
 
     categoryCodes: CategoryCode[] = [];
     order: Order = null;
+    orderResponse: OrderResponse = null;
     //orderItems: OrderItem[] = [];
     orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
     currentSeatNumber: number = 1;
@@ -122,9 +120,10 @@ export class OrderComponent implements OnInit {
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
         private viewContainerRef: ViewContainerRef,
-        private ApiSvc: APIService,
+        private apiSvc: APIService,
         private utilSvc: UtilityService,
         private page: Page,
+        private route: ActivatedRoute
     ) {
         page.actionBarHidden = true;
         // Use the component constructor to inject providers.
@@ -138,7 +137,7 @@ export class OrderComponent implements OnInit {
         this.server = localStorage.getItem('server');
         this.checkTitle = this.checkNumber + ' ' + this.server + ' ' + this.table + ' ' + this.guests;             
         */
-        this.ApiSvc.reloadCountdowns().then(result => {
+        this.apiSvc.reloadCountdowns().then(result => {
             this.countdowns = <Countdown[]>result;
             if (this.showMainCategories) {
                 this.DBService.getLocalMenuCategories().then((categories) => {
@@ -155,7 +154,31 @@ export class OrderComponent implements OnInit {
 
         this.getMenuTimers();
         this.getUserModifiers();
+
+        this.route.queryParams.subscribe(params => {
+            if (params['action']) {
+                let action: string = params['action'];
+
+                if (action == 'openTable') {
+                    let table: TableDetail = JSON.parse(localStorage.getItem('currentTable'));
+                    this.getFullOrder(table.OrderFilter);
+                }
+            }
+            else {
+                this.createNewOrder();
+            }
+        });
+    }
+
+    createNewOrder() {
         this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
+    }
+
+    getFullOrder(orderFilter: number) {
+        this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
+        this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
+            this.orderResponse = orderResponse;
+        });
     }
 
     loadCategories(categories: MenuCategory[]) {
@@ -201,7 +224,7 @@ export class OrderComponent implements OnInit {
             }
             else {
                 this.subCategoryCurrentPage = 0;
-                this.subCategories = subCategories;               
+                this.subCategories = subCategories;
 
                 this.subCategories.forEach(function (subCategory: MenuSubCategory) {
                     subCategory.Row = ((subCategory.Position - 1) % 5) + 1;
@@ -242,23 +265,23 @@ export class OrderComponent implements OnInit {
                 dialogs.alert("Menu Products not loaded.")
             }
             else {
-                this.products = products;             
+                this.products = products;
 
                 this.setProductAttributes();
                 this.totalProductPages = Math.ceil(this.products[that.products.length - 1].Position / this.productPageSize);
                 this.productCurrentPage = 0;
-                
+
                 if (this.totalProductPages > 1)
                     this.canProductPageDown = true;
-                
-                    this.getProductPage(true);
+
+                this.getProductPage(true);
                 this.currentSubCategory = subCategory.Name;
                 this.showProducts = true;
                 this.setActiveSubCategoryClass(subCategory);
             }
         });
     }
-    
+
     setProductAttributes() {
         let that = this;
 
@@ -526,7 +549,7 @@ export class OrderComponent implements OnInit {
                 }
 
     }
-   
+
     getOptionPage(nextPage: boolean) {
         if (nextPage)
             this.optionCurrentPage++;
@@ -543,7 +566,7 @@ export class OrderComponent implements OnInit {
             o => o.Position >= startPosition && o.Position <= endPosition);
 
         this.canOptionPageUp = this.optionCurrentPage > 1;
-        this.canOptionPageDown = this.totalOptionPages > this.optionCurrentPage;    
+        this.canOptionPageDown = this.totalOptionPages > this.optionCurrentPage;
 
     }
 
@@ -578,7 +601,7 @@ export class OrderComponent implements OnInit {
                 });
 
                 this.totalOptionPages = Math.ceil(menuOptions[menuOptions.length - 1].Position / that.optionPageSize);
-                
+
                 if (this.totalOptionPages > 1)
                     this.canOptionPageDown = true;
 
@@ -660,7 +683,7 @@ export class OrderComponent implements OnInit {
             DisplayPrice: price > 0 ? price : null
         };
 
-        this.currentOrderItem.Modifiers.push(modifier);        
+        this.currentOrderItem.Modifiers.push(modifier);
     }
 
     userModifierSelected(userModifier: UserModifier) {
@@ -668,10 +691,10 @@ export class OrderComponent implements OnInit {
         this.resetFixedOptionClasses();
 
         if (userModifier.ButtonFunction == 1) {
-            this.currentOrderItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null });            
+            this.currentOrderItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null });
             return;
         }
-       
+
         this.currentUserModifier = userModifier;
         userModifier.Class = 'glass btnOptionActive';
         this.userModifierActive = true;
@@ -760,7 +783,7 @@ export class OrderComponent implements OnInit {
 
         this.subCategorySelected(this.pageSubCategories[0], 0);
         this.canSubCategoryPageUp = this.subCategoryCurrentPage > 1;
-        this.canSubCategoryPageDown = this.subCategoryCurrentPage < this.totalSubCategoriesPages;    
+        this.canSubCategoryPageDown = this.subCategoryCurrentPage < this.totalSubCategoriesPages;
     }
 
     onProductSwipe(args) {
@@ -810,9 +833,9 @@ export class OrderComponent implements OnInit {
 
         this.pageProducts = this.products.filter(
             product => product.Position >= startPosition && product.Position <= endPosition);
-      
+
         this.canProductPageUp = this.productCurrentPage > 1;
-        this.canProductPageDown = this.totalProductPages > this.productCurrentPage;        
+        this.canProductPageDown = this.totalProductPages > this.productCurrentPage;
     }
 
     changeModifier(modifier: Modifier) {

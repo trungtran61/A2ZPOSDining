@@ -19,6 +19,7 @@ export class MyChecksComponent implements OnInit {
     checks: Check[] = [];
     myChecksText: string = 'Checks';
     currentDateTime: Date;
+    userName: string = 'USER: ' + 'SYSTEM';
 
     ngOnInit(): void {
         setInterval( () => { 

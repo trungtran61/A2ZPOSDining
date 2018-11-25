@@ -1,5 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
+import { NavigationExtras} from "@angular/router";
+
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import { SQLiteService } from "~/app/services/sqlite.service";
@@ -74,7 +76,7 @@ export class AreaComponent implements OnInit {
                             //       this.utilSvc.padLeft((table.TableColor).toString(16), '0', 6));
                             //table.Style = style;
                             table.Opacity = '1';
-                            table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);
+                            table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);                            
                         });
                     });
             }
@@ -115,12 +117,15 @@ export class AreaComponent implements OnInit {
 
     onTableClick(table: TableDetail) {
         require("nativescript-localstorage");
+        
         // table is open, go get number of guests
         if (table.Status.indexOf('Open') > -1) {
-            localStorage.setItem('table', table.Name);
+            localStorage.setItem('table', table.Name);           
             this.router.navigate(['/home/tableguests/' + table.Name]);
         }
 
+        localStorage.setItem('currentTable', JSON.stringify(table));
+        
         // table is active (occupied and enabled)
         if (table.Status.indexOf('Enabled') > -1) {
             // table actions menu is displayed and same table selected
@@ -167,8 +172,13 @@ export class AreaComponent implements OnInit {
         });
     }
 
-    openTable(table: TableDetail) {
-
+    openTable() {
+        let navigationExtras: NavigationExtras = {
+            queryParams: {
+                "action": "openTable"                
+            }
+        };
+        this.router.navigate(["home/order"], navigationExtras);
     }
 
     viewAreas() {
@@ -203,8 +213,8 @@ export class AreaComponent implements OnInit {
         }
     */
     constructor(
-        private router: RouterExtensions, private DBService: SQLiteService
-        , private page: Page, private utilSvc: UtilityService, private apiSvc: APIService
+        private router: RouterExtensions, private DBService: SQLiteService,
+        private page: Page, private utilSvc: UtilityService, private apiSvc: APIService        
     ) {
         page.actionBarHidden = true;
     }

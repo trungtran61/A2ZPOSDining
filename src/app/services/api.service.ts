@@ -47,6 +47,18 @@ export class APIService {
         return order;
     }
 
+    getFullOrder(orderFilter: number): Observable<any>
+    {
+        let headers = this.createRequestHeader();
+        return this.http.get(this.apiUrl + 'GetFullOrder?OrderFilter=' + orderFilter,
+            { headers: headers })
+            .pipe(map(res => 
+                {
+                console.log(res) 
+                }
+                ));
+    }
+
     getCheckNumber(tableName: string, employeeID: number): Observable<any> {
         let headers = this.createRequestHeader();
         return this.http.get(this.apiUrl + 'getCheckNumber?Name=' + tableName + '&EmployeeID=' + employeeID,
