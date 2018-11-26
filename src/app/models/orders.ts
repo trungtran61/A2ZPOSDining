@@ -217,7 +217,7 @@ export interface OrderDetail {
 }
 
 export interface OrderResponse {
-    Order: Order;
-    OrderDetails: OrderDetail[];
+    Order: OrderHeader;
+    OrderDetail: OrderDetail[];
     Payments: any[];
 }

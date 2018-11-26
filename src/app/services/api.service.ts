@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Countdown, Order } from "~/app/models/orders";
+import { Countdown, Order, OrderResponse } from "~/app/models/orders";
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -8,14 +8,14 @@ import { map } from 'rxjs/operators';
 export class APIService {
 
     private apiUrl = "http://a2zpos.azurewebsites.net/DBService.svc/";
-    
+
     public constructor(private http: HttpClient) {
     }
-    
+
     public reloadCountdowns() {
         let that = this;
         let headers = this.createRequestHeader();
-        let promise = new Promise(function (resolve, reject) {           
+        let promise = new Promise(function (resolve, reject) {
             that.http.get(that.apiUrl + 'GetProductCountdowns', { headers: headers })
                 .subscribe(
                     data => {
@@ -25,7 +25,7 @@ export class APIService {
                     err => {
                         reject("Error occurred while retrieving Countdowns from API.");
                     }
-                );                
+                );
         });
 
         return promise;
@@ -41,22 +41,36 @@ export class APIService {
         return headers;
     }
 
-    getOrder(orderFilter: number, ph1: boolean, ph2: boolean): Order
-    {
+    getOrder(orderFilter: number, ph1: boolean, ph2: boolean): Order {
         let order: Order;
         return order;
     }
 
-    getFullOrder(orderFilter: number): Observable<any>
-    {
+    getFullOrder(orderFilter: number): Observable<any> {
         let headers = this.createRequestHeader();
         return this.http.get(this.apiUrl + 'GetFullOrder?OrderFilter=' + orderFilter,
+           { headers: headers });
+
+        /*
+        return this.http.get(this.apiUrl + 'GetFullOrder?OrderFilter=' + orderFilter,
             { headers: headers })
-            .pipe(map(res => 
-                {
-                console.log(res) 
-                }
-                ));
+            .pipe(map(res => res));
+            */
+    }
+
+    getFullOrderP(orderFilter: number): Promise<any> {
+        let promise = new Promise((resolve, reject) => {
+            let headers = this.createRequestHeader();
+            this.http.get(this.apiUrl + 'GetFullOrder?OrderFilter=' + orderFilter,
+                { headers: headers })
+                .toPromise()
+                .then(
+                    res => { // Success
+                        resolve();
+                    }
+                );
+        });
+        return promise;
     }
 
     getCheckNumber(tableName: string, employeeID: number): Observable<any> {
@@ -67,7 +81,7 @@ export class APIService {
 
     public getTablesDetails(areaID: number, employeeID: number, clockInType: number, serverViewAll: boolean): Observable<any> {
         let headers = this.createRequestHeader();
-        return this.http.get(this.apiUrl + 'GetTableDetail?AreaId=' + areaID + 
+        return this.http.get(this.apiUrl + 'GetTableDetail?AreaId=' + areaID +
             '&EmployeeID=' + employeeID +
             '&ClockInType=' + clockInType +
             '&ServerViewAll=' + serverViewAll,

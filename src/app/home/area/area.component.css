@@ -76,6 +76,11 @@
     text-align: center; background-color: gold;
 }
 
+.currentTable
+{
+    text-align: center; background-color: gold; border-width: 2; border-color: red;
+}
+
 .blink {
     animation: blinker 1s linear infinite;
   }

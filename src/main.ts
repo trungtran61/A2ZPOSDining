@@ -2,7 +2,7 @@ import { platformNativeScriptDynamic } from "nativescript-angular/platform";
 import { AppOptions } from "nativescript-angular/platform-common";
 
 import { AppModule } from "./app/app.module";
-import "./livesync-navigation";
+//import "./livesync-navigation";
 
 let options: AppOptions = {};
 if (module['hot']) {
@@ -24,4 +24,5 @@ if (module['hot']) {
 }
 
 // !!! Don't forget to pass the options when creating the platform
-platformNativeScriptDynamic(options).bootstrapModule(AppModule);
+//platformNativeScriptDynamic(options).bootstrapModule(AppModule);
+platformNativeScriptDynamic().bootstrapModule(AppModule);

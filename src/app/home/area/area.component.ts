@@ -115,9 +115,34 @@ export class AreaComponent implements OnInit {
         this.viewInfo(false, false, true);
     }
 
+    resetOccupiedTablesClass()
+    {
+        this.tables.forEach(table => {
+            let tableClass: string = 'tableOpen';
+            
+            if (table.Status.indexOf('Disabled') > -1) {
+                tableClass = 'tableDisabled';
+            }
+            else
+                if (table.Status.indexOf('Open') > -1) {
+                    tableClass = 'tableOpen';
+                }
+                else
+                    if (table.Status.indexOf('Occupied') > -1) {
+                        tableClass = 'tableOccupied';
+                    }
+
+            table.Class = 'table ' + tableClass;                      
+        });
+    }
+
     onTableClick(table: TableDetail) {
         require("nativescript-localstorage");
-        
+
+        this.resetOccupiedTablesClass();
+
+        table.Class += ' currentTable';
+
         // table is open, go get number of guests
         if (table.Status.indexOf('Open') > -1) {
             localStorage.setItem('table', table.Name);           

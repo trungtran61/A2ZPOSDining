@@ -24,7 +24,7 @@ import { ActivatedRoute } from "@angular/router";
 @Component({
     selector: "order",
     moduleId: module.id,
-    templateUrl: "./order.component.html",
+    templateUrl: "./order.component.1.html",
     styleUrls: ['./order.component.css']
 })
 export class OrderComponent implements OnInit {
@@ -57,8 +57,8 @@ export class OrderComponent implements OnInit {
     categoryCodes: CategoryCode[] = [];
     order: Order = null;
     orderResponse: OrderResponse = null;
-    //orderItems: OrderItem[] = [];
-    orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
+    orderItems: OrderDetail[] = [];
+    //orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
     currentSeatNumber: number = 1;
     checkTotal: number = 0;
     subTotal: number = 0;
@@ -67,15 +67,15 @@ export class OrderComponent implements OnInit {
     tips: number = 0;
     guests: number = 0;
     table: string = '';
-    server: string = 'Trung';
-    checkNumber: string = 'CK#1';
+    server: string = '';
+    checkNumber: number = 0;
     checkTitle: string = '';
     currentSubCategory: string = '';
     subCategoriesTitle: string = '';
     mainCategory: string = '';
     lockedCategoryId: number = 0;
     currentProduct: MenuProduct;
-
+    ticketNumber: number = 0;
 
     showMainCategories: boolean = true;
     showSubCategories: boolean = false;
@@ -168,16 +168,24 @@ export class OrderComponent implements OnInit {
                 this.createNewOrder();
             }
         });
+
     }
 
     createNewOrder() {
         this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
     }
 
-    getFullOrder(orderFilter: number) {
+    getFullOrder(orderFilter: number) {       
         this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
-            this.orderResponse = orderResponse;
+            this.orderResponse = orderResponse;            
+            this.orderItems = orderResponse.OrderDetail;
+            this.ticketNumber = this.orderResponse.Order.OrderID;
+            this.checkNumber = this.orderResponse.Order.CheckNumber;
+            this.table = this.orderResponse.Order.TableNumber;
+            this.DBService.getLocalEmployee(this.orderResponse.Order.EmployeeID).then(employee => this.server = employee.FirstName);
+            this.guests = this.orderResponse.Order.NumberGuests;
+            this.totalPrice();            
         });
     }
 
@@ -876,6 +884,23 @@ export class OrderComponent implements OnInit {
     }
 
     totalPrice() {
+        this.subTotal = 0;
+
+        for (var i = 0; i < this.orderResponse.OrderDetail.length; i++) {
+            {
+                this.subTotal += this.orderResponse.OrderDetail[i].ExtPrice;
+            }
+            this.tax = this.utilSvc.getTaxTotal(this.order);
+            this.checkTotal = this.subTotal + this.tax;
+
+            if (this.guests >= this.MAX_GUESTS) {
+                this.tips = this.subTotal * this.TIPS_PCT;
+                this.checkTotal += this.tips;
+            }
+        }
+    }
+    
+    totalPriceX() {
         this.subTotal = 0;
 
         for (var i = 0; i < this.order.OrderItems.length; i++) {

@@ -11,6 +11,7 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 import { Page } from "tns-core-modules/ui/page/page";
 import { Logos } from "../models/settings";
 import { UtilityService } from "../services/utility.service";
+import { APIService } from "../services/api.service";
 
 var Sqlite = require("nativescript-sqlite");
 
@@ -36,8 +37,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
     isLoading: boolean = false;
 
     constructor(private router: RouterExtensions, private DBService: SQLiteService,
-        private zone: NgZone, private page: Page, private utilSvc: UtilityService
-    ) {
+        private zone: NgZone, private page: Page, private utilSvc: UtilityService,
+        private apiSvc: APIService
+    ) 
+    {
         page.actionBarHidden = true;
     }
 
@@ -201,7 +204,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
         //this.DBService.loadEmployees(db);
         //this.DBService.getLocalSystemSettings();
         //this.DBService.getAllEmployees();
-        this.loadLocalDataBase(null);
+        this.apiSvc.getFullOrder(188183).subscribe(orderResponse => {
+            console.log(orderResponse);            
+        });
+        
+        //this.loadLocalDataBase(null);
     }    
 
     loadTables() {

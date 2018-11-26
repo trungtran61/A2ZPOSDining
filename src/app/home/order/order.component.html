@@ -14,11 +14,6 @@
      <!-- order items  -->
     <ScrollView style="background-color: white" height="550" orientation="vertical">
       <StackLayout>
-          <StackLayout *ngFor="let item of orderResponse.OrderDetails let i=index">
-              <FlexBoxLayout (tap)="showModifyDialog(item,null,null)" (swipe)="onOrderItemSwipe($event, item)">
-                <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>                
-              </FlexBoxLayout>
-          </StackLayout>
         <StackLayout *ngFor="let item of order.OrderItems let i=index">
           <FlexBoxLayout (tap)="showModifyDialog(item,null,null)" (swipe)="onOrderItemSwipe($event, item)">
             <Label [text]="item.Qty" style="text-align: right; margin-right: 10;width:15;"></Label>
