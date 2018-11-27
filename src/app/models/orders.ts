@@ -8,7 +8,7 @@ export interface Countdown {
     QuantityChange?: number;
 }
 
-export enum OrderTypes {
+export enum OrderType {
     DineIn = 0,
     Here = 1,
     ToGo = 2,
@@ -18,6 +18,13 @@ export enum OrderTypes {
     PickUp = 6,
     Delivery = 7,
     FastFood = 8
+}
+
+export enum ItemType {
+    Product = 1,   
+    Option = 2,
+    Choice = 4,
+    SubOption = 5
 }
 
 export interface OrderItem {
@@ -154,66 +161,66 @@ export interface OrderHeader {
 }
 
 export interface OrderDetail {
-    PriKey: number;
-    FilterNumber: number;
-    OrderFilter: number;
-    ProductFilter: number;
-    ProductCode: number;
-    IndexData: number;
-    ProductName: string;
-    Quantity?: number;
-    UnitPrice?: number;
-    ExtPrice?: number;
-    PrintCode: string;
-    Printed: string;
-    tag?: any;
-    Voided?: any;
-    Taxable: number;
-    CategoryCode: number;
-    ProductGroup: number;
-    Comped: boolean;
-    DeleteID?: any;
-    CompID?: any;
-    CouponCode: number;
-    Reprint: number;
-    PrintName: string;
-    SubCategory?: any;
-    EmployeeID: number;
-    PrintCode1: string;
-    SeatNumber: string;
-    DeleteReason?: any;
-    CompTime?: any;
-    CompTimeRecall?: any;
-    DeleteTime?: any;
-    CompIDRecall?: any;
-    CompServerID?: any;
-    CompServerIDRecall?: any;
-    DeleteServerID?: any;
-    IndexDataOption?: number;
-    Side?: any;
-    OptionCode?: number;
-    Pizza: boolean;
-    Toppings: number;
-    Refund: boolean;
-    RefundReason?: any;
-    CompReason?: any;
-    HappyHour: boolean;
-    ItemType: number;
-    PriceLevel: number;
-    OrderTime: Date;
-    ClientName: string;
-    ExcludeFromInventory: boolean;
-    ProductType: number;
-    TaxRate: number;
-    CouponID?: any;
-    ItemDiscountID?: any;
-    ItemDiscountReason?: any;
-    Paid: boolean;
-    PaymentType?: any;
-    PaymentLink?: any;
-    IgnoreTax: boolean;
-    SplitQuantity?: any;
-    IndexDataSub?: number;
+    PriKey?:number;
+    FilterNumber?:number;
+    OrderFilter?:number;
+    ProductFilter?:number;
+    ProductCode?:number;
+    IndexData?:number;
+    ProductName?:string;
+    Quantity?:number;
+    UnitPrice?:number;
+    ExtPrice?:number;
+    PrintCode?:string;
+    Printed?:string;
+    tag?:any;
+    Voided?:any;
+    Taxable?:number;
+    CategoryCode?:number;
+    ProductGroup?:number;
+    Comped?:boolean;
+    DeleteID?:any;
+    CompID?:any;
+    CouponCode?:number;
+    Reprint?:number;
+    PrintName?:string;
+    SubCategory?:any;
+    EmployeeID?:number;
+    PrintCode1?:string;
+    SeatNumber?:string;
+    DeleteReason?:any;
+    CompTime?:any;
+    CompTimeRecall?:any;
+    DeleteTime?:any;
+    CompIDRecall?:any;
+    CompServerID?:any;
+    CompServerIDRecall?:any;
+    DeleteServerID?:any;
+    IndexDataOption?:number;
+    Side?:any;
+    OptionCode?:number;
+    Pizza?:boolean;
+    Toppings?:number;
+    Refund?:boolean;
+    RefundReason?:any;
+    CompReason?:any;
+    HappyHour?:boolean;
+    ItemType?: ItemType;
+    PriceLevel?:number;
+    OrderTime?:Date;
+    ClientName?:string;
+    ExcludeFromInventory?:boolean;
+    ProductType?:number;
+    TaxRate?:number;
+    CouponID?:any;
+    ItemDiscountID?:any;
+    ItemDiscountReason?:any;
+    Paid?:boolean;
+    PaymentType?:any;
+    PaymentLink?:any;
+    IgnoreTax?:boolean;
+    SplitQuantity?:any;
+    IndexDataSub?:number;
 }
 
 export interface OrderResponse {

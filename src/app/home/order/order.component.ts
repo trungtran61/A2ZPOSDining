@@ -12,7 +12,7 @@ import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
-import { OrderTypes, Countdown, OrderItem, Order, FixedOption, OrderHeader, OrderDetail, OrderResponse } from "~/app/models/orders";
+import { OrderType, Countdown, OrderItem, Order, FixedOption, OrderHeader, OrderDetail, OrderResponse, ItemType } from "~/app/models/orders";
 import { APIService } from "~/app/services/api.service";
 import { PromptQtyComponent } from "./prompt-qty.component";
 import { MemoComponent } from "./memo.component";
@@ -94,7 +94,7 @@ export class OrderComponent implements OnInit {
     { Name: 'OTS', Class: 'glass btnOption', Position: 5 }, { Name: 'NO MAKE', Class: 'glass btnOption', Position: 5 }, { Name: '1/2', Class: 'glass btnOption', Position: 6 }, { Name: 'TO GO', Class: 'glass btnOption', Position: 7 }];
     fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
 
-    currentOrderItem: OrderItem = null;
+    currentOrderItem: OrderDetail = null;
     currentFixedOption: FixedOption;
     currentUserModifier: UserModifier;
     userModifierActive: boolean = false;
@@ -107,7 +107,7 @@ export class OrderComponent implements OnInit {
     TIPS_PCT: number = .15;
 
     qtyEntered: number = 1;
-    orderType: number = OrderTypes.DineIn;
+    orderType: number = OrderType.DineIn;
 
     canSubCategoryPageDown: boolean = false;
     canSubCategoryPageUp: boolean = false;
@@ -115,6 +115,8 @@ export class OrderComponent implements OnInit {
     canProductPageUp: boolean = false;
     canOptionPageDown: boolean = false;
     canOptionPageUp: boolean = false;
+
+    isExistingOrder: boolean = false;
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -162,6 +164,7 @@ export class OrderComponent implements OnInit {
                 if (action == 'openTable') {
                     let table: TableDetail = JSON.parse(localStorage.getItem('currentTable'));
                     this.getFullOrder(table.OrderFilter);
+                    this.isExistingOrder = true;
                 }
             }
             else {
@@ -394,6 +397,22 @@ export class OrderComponent implements OnInit {
             });
     }
 
+    showForcedModifierDialogOrderItem(orderItem: OrderDetail) {
+        const modalOptions: ModalDialogOptions = {
+            viewContainerRef: this.viewContainerRef,
+            fullscreen: true,
+            context: { productCode: orderItem.ProductCode, orderItem }
+        };
+
+        this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
+            (selectedChoices) => {
+                if (selectedChoices != null) {
+                    this.currentSeatNumber++;                   
+                    this.order.OrderItems[this.order.OrderItems.length - 1].ForcedModifiers = selectedChoices;
+                }
+            });
+    }
+
     productInfo() {
         this.showProductInfo = !this.showProductInfo;
         if (this.showProductInfo)
@@ -411,7 +430,7 @@ export class OrderComponent implements OnInit {
     }
 
     addProductToOrder(product: MenuProduct) {
-
+/*
         this.order.OrderItems.push({
             Modifiers: [],
             ForcedModifiers: [],
@@ -421,8 +440,10 @@ export class OrderComponent implements OnInit {
             Product: product,
             IgnoreTax: false
         });
-
-        this.totalPrice();
+*/
+        this.addItemToOrder(
+                1,product.Name,product.UnitPrice,ItemType.Product            
+        );        
     }
 
     showOpenProduct() {
@@ -436,6 +457,7 @@ export class OrderComponent implements OnInit {
             (openProductItem: OpenProductItem) => {
                 this.showExtraFunctions = false;
                 if (openProductItem != null) {
+/*
                     this.order.OrderItems.push({
                         Modifiers: [], Qty: openProductItem.Quantity, SeatNumber: this.currentSeatNumber,
                         Price: openProductItem.UnitPrice * openProductItem.Quantity,
@@ -445,7 +467,17 @@ export class OrderComponent implements OnInit {
                             UseModifier: false,
                             UseForcedModifier: false
                         }
-                    });
+*/
+                    this.orderItems.push(
+                        {
+                            Quantity: 1,
+                            SeatNumber: this.currentSeatNumber.toString(),
+                            ExtPrice: openProductItem.UnitPrice * this.qtyEntered,
+                            UnitPrice: openProductItem.UnitPrice,
+                            PrintName: openProductItem.ProductName,
+                            ProductName: openProductItem.ProductName,
+                            ItemType: ItemType.Product
+                        });                                            
                     this.totalPrice();
                 }
             });
@@ -473,14 +505,11 @@ export class OrderComponent implements OnInit {
             });
     }
 
-    showModifyDialog(orderItem: OrderItem, modifier: Modifier, forcedModifier: ForcedModifier) {
+    showModifyDialog(orderItem: OrderDetail) {
 
         this.currentOrderItem = orderItem;
 
-        let context = { orderItem: orderItem, forcedModifier: null };
-
-        if (forcedModifier != null)
-            context = { orderItem: orderItem, forcedModifier: forcedModifier }
+        let context = { orderItem: orderItem };
 
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
@@ -494,32 +523,41 @@ export class OrderComponent implements OnInit {
                 console.log(choice.ChangeType);
                 switch (choice.ChangeType) {
                     case 'quantity':
-                        orderItem.Qty = parseFloat(choice.SelectedNumber);
-                        orderItem.Price = orderItem.Product.UnitPrice * parseFloat(choice.SelectedNumber);
+                        orderItem.Quantity = parseFloat(choice.SelectedNumber);
+                        orderItem.ExtPrice = orderItem.UnitPrice * parseFloat(choice.SelectedNumber);
                         this.totalPrice();
                         break;
                     case 'seat':
-                        orderItem.SeatNumber = parseInt(choice.SelectedNumber);
+                        orderItem.SeatNumber = choice.SelectedNumber;
                         break;
                     case 'delete':
-                        if (modifier == null)
-                            this.deleteOrderItem(orderItem);
-                        else
-                            this.deleteModifier(orderItem, modifier);
+                        this.deleteOrderItem(orderItem);                        
                         break;
                     case 'repeat':
+                    /*
                         this.order.OrderItems.push({
                             "Product": orderItem.Product,
                             "Modifiers": [], "Qty": 1, "SeatNumber": 1,
                             "Price": orderItem.Product.UnitPrice
                         });
-                        this.totalPrice();
+                        */
+                       this.orderItems.push(
+                        {
+                            Quantity: 1,
+                            SeatNumber: this.currentSeatNumber.toString(),
+                            ExtPrice: orderItem.ExtPrice,
+                            UnitPrice: orderItem.UnitPrice,
+                            PrintName: orderItem.PrintName,
+                            ProductName: orderItem.ProductName,
+                            ItemType: ItemType.Product
+                        }
+                    );
                         break;
                     case 'modify':
-                        this.getMenuOptions(orderItem.Product);
+                        this.getMenuOptions(orderItem.ProductCode);
                         break;
                     case 'changechoice':
-                        this.showForcedModifierDialog(orderItem.Product, -1, null, false);
+                        this.showForcedModifierDialogOrderItem(orderItem);
                         break;
                 }
             });
@@ -592,12 +630,12 @@ export class OrderComponent implements OnInit {
         this.showExtraFunctions = false;
     }
 
-    getMenuOptions(product: MenuProduct) {
+    getMenuOptions(productCode: number) {
         this.resetFixedOptionClasses();
         this.resetUserModifierClasses();
 
         let that = this;
-        this.DBService.getLocalMenuOptions(product.ProductCode).then((menuOptions) => {
+        this.DBService.getLocalMenuOptions(productCode).then((menuOptions) => {
             if (menuOptions.length == 0) {
                 dialogs.alert("Missing Menu Options");
             }
@@ -643,7 +681,18 @@ export class OrderComponent implements OnInit {
         switch (fixedOption.Name) {
             case 'NO MAKE':
             case 'TO GO':
-                this.currentOrderItem.Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
+                //this.currentOrderItem.Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
+                this.orderItems.push(
+                    {
+                        Quantity: 0,
+                        SeatNumber: this.currentSeatNumber.toString(),
+                        ExtPrice: 0,
+                        UnitPrice: 0,
+                        PrintName: fixedOption.Name,
+                        ProductName: fixedOption.Name,
+                        ItemType: ItemType.Product
+                    }
+                );
                 break;
 
             default:
@@ -691,7 +740,34 @@ export class OrderComponent implements OnInit {
             DisplayPrice: price > 0 ? price : null
         };
 
-        this.currentOrderItem.Modifiers.push(modifier);
+        //this.currentOrderItem.Modifiers.push(modifier);
+        this.orderItems.push(
+            {
+                Quantity: 0,
+                SeatNumber: this.currentSeatNumber.toString(),
+                ExtPrice: 0,
+                UnitPrice: modifier.Price,
+                PrintName: modifier.Name,
+                ProductName: modifier.Name,
+                ItemType: ItemType.Option
+            }
+        );
+    }
+
+    addItemToOrder(qty: number, name: string, unitPrice: number, itemType: ItemType)
+    {
+        this.orderItems.push(
+            {
+                Quantity: itemType == ItemType.Product? qty : null,
+                SeatNumber: this.currentSeatNumber.toString(),
+                ExtPrice: itemType == ItemType.Product? qty * unitPrice : null,
+                UnitPrice: unitPrice,
+                PrintName: name,
+                ProductName: name,
+                ItemType: itemType
+            }
+        );
+        this.totalPrice();
     }
 
     userModifierSelected(userModifier: UserModifier) {
@@ -699,7 +775,14 @@ export class OrderComponent implements OnInit {
         this.resetFixedOptionClasses();
 
         if (userModifier.ButtonFunction == 1) {
-            this.currentOrderItem.Modifiers.push({ Name: userModifier.ItemName, Price: 0, DisplayPrice: null });
+            this.addItemToOrder
+            (                
+                    this.currentOrderItem.Quantity,                    
+                    userModifier.ItemName,
+                    userModifier.Price,                    
+                    ItemType.Option                
+            );
+            
             return;
         }
 
@@ -719,8 +802,7 @@ export class OrderComponent implements OnInit {
         });
     }
 
-    showHideDetails() {
-        //console.log('whoo');
+    showHideDetails() {        
         this.showDetails = !this.showDetails;
         this.viewDetailsText = this.showDetails ? this.hideDetailsCode : this.viewDetailsCode;
     }
@@ -846,43 +928,19 @@ export class OrderComponent implements OnInit {
         this.canProductPageDown = this.totalProductPages > this.productCurrentPage;
     }
 
-    changeModifier(modifier: Modifier) {
-        console.log(modifier);
-    }
-
-    onOrderItemSwipe(args, orderItem: OrderItem) {
+    onOrderItemSwipe(args, orderItem: OrderDetail) {
         if (args.direction == SwipeDirection.left) {
             this.deleteOrderItem(orderItem);
         }
     }
 
-    onModifierSwipe(args, orderItem: OrderItem, modifier: Modifier) {
-        if (args.direction == SwipeDirection.left) {
-            this.deleteModifier(orderItem, modifier);
-        }
-    }
+    deleteOrderItem(orderItem: OrderDetail) {
+        this.orderItems = this.orderItems.filter(obj => obj !== orderItem);
 
-    tapped(args) {
-        console.log(args);
-        //this.refreshList();
-    }
-
-    deleteOrderItem(orderItem: OrderItem) {
-        this.order.OrderItems = this.order.OrderItems.filter(obj => obj !== orderItem);
-
-        if (orderItem.Price > 0)
+        if (orderItem.ExtPrice > 0)
             this.totalPrice();
     }
-
-    deleteModifier(orderItem: OrderItem, modifier: Modifier) {
-
-        orderItem.Modifiers = orderItem.Modifiers.filter(obj => obj !== modifier);
-        //this.refreshList();
-
-        if (modifier.Price > 0)
-            this.totalPrice();
-    }
-
+    
     totalPrice() {
         this.subTotal = 0;
 
@@ -942,7 +1000,8 @@ export class OrderComponent implements OnInit {
 
         this.modalService.showModal(MemoComponent, modalOptions).then(
             (memo: Memo) => {
-                this.currentOrderItem.Modifiers.push({ Name: memo.Memo, Price: memo.Price, DisplayPrice: memo.Price > 0 ? memo.Price : null })
+                //this.currentOrderItem.Modifiers.push({ Name: memo.Memo, Price: memo.Price, DisplayPrice: memo.Price > 0 ? memo.Price : null })
+                this.addItemToOrder(0, memo.Memo, memo.Price, ItemType.Option);
             });
     }
 
@@ -1077,30 +1136,30 @@ export class OrderComponent implements OnInit {
                     case MenuTimerTypes.Default:
                         this.lockedCategoryId = timer.DefaultCategory;
                         switch (this.orderType) {
-                            case OrderTypes.DineIn:
+                            case OrderType.DineIn:
                                 if (!timer.TableService)
                                     checkMenuTimer = false;
                                 break;
-                            case OrderTypes.Here:
-                            case OrderTypes.ToGo:
+                            case OrderType.Here:
+                            case OrderType.ToGo:
                                 if (!timer.WalkIn)
                                     checkMenuTimer = false;
                                 break;
-                            case OrderTypes.TakeOut:
+                            case OrderType.TakeOut:
                                 if (!timer.TakeOut)
                                     checkMenuTimer = false;
                                 break;
-                            case OrderTypes.BarQuickSale:
-                            case OrderTypes.BarTab:
+                            case OrderType.BarQuickSale:
+                            case OrderType.BarTab:
                                 if (!timer.Bar)
                                     checkMenuTimer = false;
                                 break;
-                            case OrderTypes.PickUp:
-                            case OrderTypes.Delivery:
+                            case OrderType.PickUp:
+                            case OrderType.Delivery:
                                 if (!timer.PhoneIn)
                                     checkMenuTimer = false;
                                 break;
-                            case OrderTypes.FastFood:
+                            case OrderType.FastFood:
                                 if (!timer.QuickSale)
                                     checkMenuTimer = false;
                                 break;
