@@ -944,9 +944,9 @@ export class OrderComponent implements OnInit {
     totalPrice() {
         this.subTotal = 0;
 
-        for (var i = 0; i < this.orderResponse.OrderDetail.length; i++) {
+        for (var i = 0; i < this.orderItems.length; i++) {
             {
-                this.subTotal += this.orderResponse.OrderDetail[i].ExtPrice;
+                this.subTotal += this.orderItems[i].ExtPrice;
             }
             this.tax = this.utilSvc.getTaxTotal(this.order);
             this.checkTotal = this.subTotal + this.tax;
@@ -958,23 +958,6 @@ export class OrderComponent implements OnInit {
         }
     }
     
-    totalPriceX() {
-        this.subTotal = 0;
-
-        for (var i = 0; i < this.order.OrderItems.length; i++) {
-            {
-                this.subTotal += (this.order.OrderItems[i].Product.UnitPrice * this.order.OrderItems[i].Qty);
-            }
-            this.tax = this.utilSvc.getTaxTotal(this.order);
-            this.checkTotal = this.subTotal + this.tax;
-
-            if (this.guests >= this.MAX_GUESTS) {
-                this.tips = this.subTotal * this.TIPS_PCT;
-                this.checkTotal += this.tips;
-            }
-        }
-    }
-
     showModifierDialog(orderItemIndex: number) {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
