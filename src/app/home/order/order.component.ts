@@ -20,6 +20,7 @@ import { UtilityService } from "~/app/services/utility.service";
 import { ForcedModifiersComponent } from "./forced-modifiers/forced-modifiers.component";
 import { ModifyOrderItemComponent } from "./modify-order-item.component";
 import { ActivatedRoute } from "@angular/router";
+import { NullViewportScroller } from "@angular/common/src/viewport_scroller";
 
 @Component({
     selector: "order",
@@ -197,7 +198,7 @@ export class OrderComponent implements OnInit {
         this.categories = categories;
         this.categories.forEach(function (menuCategory: MenuCategory) {
             let lightColor: string = '#' + menuCategory.ButtonColorHex;
-            let darkColor: string = that.colorLuminance(lightColor, -.3);
+            let darkColor: string = that.utilSvc.colorLuminance(lightColor, -.3);
             let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
             that.categoryStyles.push(style);
         });
@@ -301,7 +302,7 @@ export class OrderComponent implements OnInit {
             product.Col = (product.Position - 1) % 4;
             let lightColor: string = '#' + product.ButtonColorHex;
             //let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
-            let darkColor: string = that.colorLuminance(lightColor, -0.2);
+            let darkColor: string = that.utilSvc.colorLuminance(lightColor, -0.2);
             let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
             product.Style = style;
 
@@ -324,33 +325,7 @@ export class OrderComponent implements OnInit {
                 product.Disabled = product.QtyAvailable == 0;
             }
         });
-    }
-
-    /*
-   ColorLuminance("#69c", 0);		// returns "#6699cc"
-   ColorLuminance("6699CC", 0.2);	// "#7ab8f5" - 20% lighter
-   ColorLuminance("69C", -0.5);	// "#334d66" - 50% darker
-   */
-
-    colorLuminance(hex, lum) {
-
-        // validate hex string
-        hex = String(hex).replace(/[^0-9a-f]/gi, '');
-        if (hex.length < 6) {
-            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-        }
-        lum = lum || 0;
-
-        // convert to decimal and change luminosity
-        var rgb = "#", c, i;
-        for (i = 0; i < 3; i++) {
-            c = parseInt(hex.substr(i * 2, 2), 16);
-            c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
-            rgb += ("00" + c).substr(c.length);
-        }
-
-        return rgb;
-    }
+    }   
 
     productSelected(product: MenuProduct) {
         this.currentProduct = product;
@@ -430,17 +405,6 @@ export class OrderComponent implements OnInit {
     }
 
     addProductToOrder(product: MenuProduct) {
-/*
-        this.order.OrderItems.push({
-            Modifiers: [],
-            ForcedModifiers: [],
-            Qty: this.qtyEntered,
-            SeatNumber: this.currentSeatNumber,
-            Price: product.UnitPrice * this.qtyEntered,
-            Product: product,
-            IgnoreTax: false
-        });
-*/
         this.addItemToOrder(
                 1,product.Name,product.UnitPrice,ItemType.Product            
         );        
@@ -457,17 +421,6 @@ export class OrderComponent implements OnInit {
             (openProductItem: OpenProductItem) => {
                 this.showExtraFunctions = false;
                 if (openProductItem != null) {
-/*
-                    this.order.OrderItems.push({
-                        Modifiers: [], Qty: openProductItem.Quantity, SeatNumber: this.currentSeatNumber,
-                        Price: openProductItem.UnitPrice * openProductItem.Quantity,
-                        Product: {
-                            Name: openProductItem.ProductName,
-                            UnitPrice: openProductItem.UnitPrice,
-                            UseModifier: false,
-                            UseForcedModifier: false
-                        }
-*/
                     this.orderItems.push(
                         {
                             Quantity: 1,
@@ -509,7 +462,7 @@ export class OrderComponent implements OnInit {
 
         this.currentOrderItem = orderItem;
 
-        let context = { orderItem: orderItem };
+        let context = { orderItem: orderItem, isForcedModifier: orderItem.ItemType == ItemType.Choice };
 
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
@@ -534,24 +487,7 @@ export class OrderComponent implements OnInit {
                         this.deleteOrderItem(orderItem);                        
                         break;
                     case 'repeat':
-                    /*
-                        this.order.OrderItems.push({
-                            "Product": orderItem.Product,
-                            "Modifiers": [], "Qty": 1, "SeatNumber": 1,
-                            "Price": orderItem.Product.UnitPrice
-                        });
-                        */
-                       this.orderItems.push(
-                        {
-                            Quantity: 1,
-                            SeatNumber: this.currentSeatNumber.toString(),
-                            ExtPrice: orderItem.ExtPrice,
-                            UnitPrice: orderItem.UnitPrice,
-                            PrintName: orderItem.PrintName,
-                            ProductName: orderItem.ProductName,
-                            ItemType: ItemType.Product
-                        }
-                    );
+                        this.repeatOrderItem(orderItem);                                         
                         break;
                     case 'modify':
                         this.getMenuOptions(orderItem.ProductCode);
@@ -754,8 +690,17 @@ export class OrderComponent implements OnInit {
         );
     }
 
-    addItemToOrder(qty: number, name: string, unitPrice: number, itemType: ItemType)
+    getMaxIndexData():number
     {
+        return Math.max.apply(Math, this.orderItems
+            .filter(oi => oi.ItemType == ItemType.Product)
+            .map(function(oi) { return oi.IndexData; }));
+    }
+
+    addItemToOrder(qty: number, name: string, unitPrice: number, itemType: ItemType)
+    {        
+        let maxIndexData:number = this.getMaxIndexData();
+        
         this.orderItems.push(
             {
                 Quantity: itemType == ItemType.Product? qty : null,
@@ -764,7 +709,8 @@ export class OrderComponent implements OnInit {
                 UnitPrice: unitPrice,
                 PrintName: name,
                 ProductName: name,
-                ItemType: itemType
+                ItemType: itemType,
+                IndexData: maxIndexData + 1
             }
         );
         this.totalPrice();
@@ -935,12 +881,35 @@ export class OrderComponent implements OnInit {
     }
 
     deleteOrderItem(orderItem: OrderDetail) {
-        this.orderItems = this.orderItems.filter(obj => obj !== orderItem);
-
+        this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
+        
         if (orderItem.ExtPrice > 0)
             this.totalPrice();
     }
     
+    repeatOrderItem(orderItem: OrderDetail)
+    {
+        let itemsToCopy = this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData);
+        let maxIndexData:number = this.getMaxIndexData();
+        let that = this;
+        
+        itemsToCopy.forEach(function (orderItem: OrderDetail) {
+            that.orderItems.push(
+            {
+                Quantity: orderItem.ItemType == ItemType.Product ? 1 : null,
+                SeatNumber: that.currentSeatNumber.toString(),
+                ExtPrice: orderItem.ExtPrice,
+                UnitPrice: orderItem.UnitPrice,
+                PrintName: orderItem.PrintName,
+                ProductName: orderItem.ProductName,
+                ItemType: orderItem.ItemType,
+                IndexData: maxIndexData + 1
+            }
+            );
+            console.log(that.orderItems.length);
+        });
+    }
+
     totalPrice() {
         this.subTotal = 0;
 

@@ -3,7 +3,7 @@
         <GridLayout rows="*" columns="*,*,*,*" row="0" col="0" *ngIf='isNormalChoice'>
             <StackLayout orientation="horizontal" colSpan="4" class="panel">
                 <Button text="Modify" class="glass" style="margin-left: 21px;width: 250px;height: 100px;color: orange;background-image: linear-gradient(#0a4e3d, lightgreen);"
-                    (tap)="doAction('modify')"></Button>
+                    (tap)="doAction('modify')" *ngIf='!orderItem.OrderFilter'></Button>
                 <Button class="glass fa" text="&#xf00d; Delete" *ngIf='!isForcedModifier' 
                     style="color: gold;margin-left: 21px;width: 250px;height: 100px;background-image: linear-gradient(darkred,red);"
                     (tap)="doAction('delete')"></Button>
@@ -19,7 +19,7 @@
             <Label [text]="enterQty" row="1" col="0" style="text-align: center;color:white; font-weight: bold; font-size: 25px"></Label>
             <Button text="Back" class="glass" (tap)="backSpace()" row="1" col="1"></Button>
         </GridLayout>
-        <GridLayout rows="*,*,*,*" columns="*,*,*" row="1" col="0" *ngIf='isNormalChoice' class="panel">
+        <GridLayout rows="*,*,*,*" columns="*,*,*" row="1" col="0" *ngIf='isNormalChoice && !orderItem.OrderFilter' class="panel">
             <Button text="1" class="glass" (tap)="setChoice(1)" row="0" col="0"></Button>
             <Button text="2" class="glass" (tap)="setChoice(2)" row="0" col="1"></Button>
             <Button text="3" class="glass" (tap)="setChoice(3)" row="0" col="2"></Button>
@@ -49,8 +49,8 @@
             <Button text="Enter" class="glass" (tap)="setOtherChoice()" row="3" col="2"></Button>
         </GridLayout>
         <GridLayout rows="*,*,*,*" columns="*" row="1" col="1">
-            <Button text="Qty" class="glass" (tap)="setChangeType('quantity')" row="0" [style]="qtyTypeStyle"></Button>
-            <Button text="Seat" class="glass" (tap)="setChangeType('seat')" row="1" [style]="seatTypeStyle"></Button>
+            <Button *ngIf='!orderItem.OrderFilter' text="Qty" class="glass" (tap)="setChangeType('quantity')" row="0" [style]="qtyTypeStyle"></Button>
+            <Button *ngIf='!orderItem.OrderFilter' text="Seat" class="glass" (tap)="setChangeType('seat')" row="1" [style]="seatTypeStyle"></Button>
             <Label text="" row="2"></Label>
             <Button text="Hide" class="glass" style="background-image: linear-gradient(darkred,red);" (tap)="doAction('hide')" row="3"></Button>
         </GridLayout>        

@@ -39,8 +39,7 @@ export interface OrderItem {
     Voided?: boolean,
     Comped?: boolean
     IgnoreTax?: boolean,
-    ExtPrice?: number,
-    oModifiers?: ObservableArray<Modifier>
+    ExtPrice?: number    
 }
 
 export interface myOption{
@@ -221,6 +220,7 @@ export interface OrderDetail {
     IgnoreTax?:boolean;
     SplitQuantity?:any;
     IndexDataSub?:number;
+    UseModifier?:boolean;
 }
 
 export interface OrderResponse {

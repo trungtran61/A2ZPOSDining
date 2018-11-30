@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import { ModalDialogParams, ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
 import { Choice } from "~/app/models/products";
-import { OrderItem } from "~/app/models/orders";
+import { OrderDetail } from "~/app/models/orders";
 
 @Component({
     selector: "modify-order-item",   
@@ -25,8 +25,7 @@ export class ModifyOrderItemComponent implements OnInit {
     otherText: string = 'Other Quantity';
     isNormalChoice: boolean= true;
     enterQty: string = '';
-    orderItem: OrderItem = {};
-    hasModifiers: boolean = false;
+    orderItem: OrderDetail = {};
     isForcedModifier: boolean = true;
 
     changeTypeStyle: string ="color: black;background-image: linear-gradient(gray, white); border-color: black";
@@ -119,7 +118,6 @@ export class ModifyOrderItemComponent implements OnInit {
 
     ngOnInit() { 
         this.orderItem = this.params.context.orderItem;
-        this.hasModifiers = this.orderItem.Product.UseModifier;
         this.isForcedModifier = this.params.context.forcedModifier != null;
     } 
 }

@@ -3,7 +3,7 @@ import { AppOptions } from "nativescript-angular/platform-common";
 
 import { AppModule } from "./app/app.module";
 //import "./livesync-navigation";
-
+/*
 let options: AppOptions = {};
 if (module['hot']) {
     const hmrUpdate = require("nativescript-dev-webpack/hmr").hmrUpdate;
@@ -22,7 +22,7 @@ if (module['hot']) {
 	// You might have to change it if your module is in a different place.
     module['hot'].accept(["./app/app.module"]);
 }
-
+*/
 // !!! Don't forget to pass the options when creating the platform
 //platformNativeScriptDynamic(options).bootstrapModule(AppModule);
 platformNativeScriptDynamic().bootstrapModule(AppModule);
