@@ -118,7 +118,7 @@ export class OrderComponent implements OnInit {
     canOptionPageUp: boolean = false;
 
     isExistingOrder: boolean = false;
-
+    
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
@@ -406,7 +406,7 @@ export class OrderComponent implements OnInit {
 
     addProductToOrder(product: MenuProduct) {
         this.addItemToOrder(
-                1,product.Name,product.UnitPrice,ItemType.Product            
+                1,product.Name,product.UnitPrice,ItemType.Product, product.ProductCode            
         );        
     }
 
@@ -617,18 +617,15 @@ export class OrderComponent implements OnInit {
         switch (fixedOption.Name) {
             case 'NO MAKE':
             case 'TO GO':
-                //this.currentOrderItem.Modifiers.push({ Name: fixedOption.Name, Price: 0, DisplayPrice: null });
-                this.orderItems.push(
-                    {
-                        Quantity: 0,
-                        SeatNumber: this.currentSeatNumber.toString(),
-                        ExtPrice: 0,
-                        UnitPrice: 0,
-                        PrintName: fixedOption.Name,
-                        ProductName: fixedOption.Name,
-                        ItemType: ItemType.Product
-                    }
-                );
+            this.addItemToOrder
+            (                
+                    0,                    
+                    fixedOption.Name,
+                    0,                    
+                    ItemType.Option,
+                    this.currentProduct.ProductCode                
+            );
+                
                 break;
 
             default:
@@ -677,17 +674,15 @@ export class OrderComponent implements OnInit {
         };
 
         //this.currentOrderItem.Modifiers.push(modifier);
-        this.orderItems.push(
-            {
-                Quantity: 0,
-                SeatNumber: this.currentSeatNumber.toString(),
-                ExtPrice: 0,
-                UnitPrice: modifier.Price,
-                PrintName: modifier.Name,
-                ProductName: modifier.Name,
-                ItemType: ItemType.Option
-            }
+        this.addItemToOrder
+        (                
+                0,                    
+                modifier.Name,
+                modifier.Price,                    
+                ItemType.Option,
+                this.currentProduct.ProductCode                
         );
+        
     }
 
     getMaxIndexData():number
@@ -697,22 +692,46 @@ export class OrderComponent implements OnInit {
             .map(function(oi) { return oi.IndexData; }));
     }
 
-    addItemToOrder(qty: number, name: string, unitPrice: number, itemType: ItemType)
+    addItemToOrder(qty: number, name: string, unitPrice: number, itemType: ItemType, productCode: number)
     {        
-        let maxIndexData:number = this.getMaxIndexData();
-        
-        this.orderItems.push(
-            {
-                Quantity: itemType == ItemType.Product? qty : null,
+        let indexData: number = 0;
+
+        if (itemType == ItemType.Product)
+        {   //adding a product
+            indexData = this.getMaxIndexData() + 1;
+            this.orderItems.push(
+                {
+                    Quantity: itemType == ItemType.Product? qty : null,
+                    SeatNumber: this.currentSeatNumber.toString(),
+                    ExtPrice: itemType == ItemType.Product? qty * unitPrice : null,
+                    UnitPrice: unitPrice,
+                    PrintName: name,
+                    ProductName: name,
+                    ItemType: itemType,
+                    IndexData: indexData,
+                    ProductCode: productCode
+                }
+            );
+        }
+        else
+        {   // adding product modifier
+            indexData = this.currentOrderItem.IndexData;
+            let lastIndex: number = this.orderItems.map(oi => 
+                oi.IndexData === indexData).lastIndexOf(true);    
+            let orderItem: OrderDetail =  {
+                Quantity: null,
                 SeatNumber: this.currentSeatNumber.toString(),
-                ExtPrice: itemType == ItemType.Product? qty * unitPrice : null,
+                ExtPrice: null,
                 UnitPrice: unitPrice,
                 PrintName: name,
                 ProductName: name,
                 ItemType: itemType,
-                IndexData: maxIndexData + 1
-            }
-        );
+                IndexData: indexData,
+                ProductCode: productCode
+            }   
+            this.orderItems.splice(lastIndex+1, 0, orderItem);
+        }
+
         this.totalPrice();
     }
 
@@ -726,7 +745,8 @@ export class OrderComponent implements OnInit {
                     this.currentOrderItem.Quantity,                    
                     userModifier.ItemName,
                     userModifier.Price,                    
-                    ItemType.Option                
+                    ItemType.Option,
+                    this.currentProduct.ProductCode                
             );
             
             return;
@@ -903,7 +923,8 @@ export class OrderComponent implements OnInit {
                 PrintName: orderItem.PrintName,
                 ProductName: orderItem.ProductName,
                 ItemType: orderItem.ItemType,
-                IndexData: maxIndexData + 1
+                IndexData: maxIndexData + 1,
+                ProductCode: orderItem.ProductCode
             }
             );
             console.log(that.orderItems.length);
@@ -953,7 +974,7 @@ export class OrderComponent implements OnInit {
         this.modalService.showModal(MemoComponent, modalOptions).then(
             (memo: Memo) => {
                 //this.currentOrderItem.Modifiers.push({ Name: memo.Memo, Price: memo.Price, DisplayPrice: memo.Price > 0 ? memo.Price : null })
-                this.addItemToOrder(0, memo.Memo, memo.Price, ItemType.Option);
+                this.addItemToOrder(0, memo.Memo, memo.Price, ItemType.Option, this.currentProduct.ProductCode );
             });
     }
 
