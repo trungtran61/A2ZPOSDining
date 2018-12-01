@@ -687,6 +687,9 @@ export class OrderComponent implements OnInit {
 
     getMaxIndexData():number
     {
+        if (this.orderItems.length == 0)
+            return 0;
+
         return Math.max.apply(Math, this.orderItems
             .filter(oi => oi.ItemType == ItemType.Product)
             .map(function(oi) { return oi.IndexData; }));
