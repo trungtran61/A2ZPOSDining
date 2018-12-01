@@ -6,7 +6,7 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import {
     CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes,
-    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail
+    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail, MenuSubOption
 } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
@@ -360,14 +360,22 @@ export class OrderComponent implements OnInit {
             context: { productCode: product.ProductCode, currentChoices: orderItemIndex > -1 ? this.order.OrderItems[orderItemIndex].ForcedModifiers : [] }
         };
 
+        let that= this;
+
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
-            (selectedChoices) => {
+            (selectedChoices: ForcedModifier[]) => {
                 if (selectedChoices != null) {
                     this.currentSeatNumber++;
                     if (isAdding) {
                         this.addProductToOrder(product);
                     }
-                    this.order.OrderItems[this.order.OrderItems.length - 1].ForcedModifiers = selectedChoices;
+                    //this.order.OrderItems[this.order.OrderItems.length - 1].ForcedModifiers = selectedChoices;
+                    selectedChoices.forEach(function (mc: MenuChoice) {
+                        that.addItemToOrder(0, mc.Name, mc.Charge, ItemType.Choice, product.ProductCode);
+                        mc.SubOptions.forEach(function (so: MenuSubOption) {
+                            that.addItemToOrder(0, so.Name, so.Charge, ItemType.SubOption, product.ProductCode);
+                        });
+                    });
                 }
             });
     }
@@ -378,13 +386,16 @@ export class OrderComponent implements OnInit {
             fullscreen: true,
             context: { productCode: orderItem.ProductCode, orderItem }
         };
-
+        let that= this;
+        
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
             (selectedChoices) => {
-                if (selectedChoices != null) {
-                    this.currentSeatNumber++;                   
-                    this.order.OrderItems[this.order.OrderItems.length - 1].ForcedModifiers = selectedChoices;
-                }
+                selectedChoices.forEach(function (mc: MenuChoice) {
+                    that.addItemToOrder(0, mc.ChoiceName, mc.Charge, ItemType.Choice, that.currentOrderItem.ProductCode);
+                    mc.SubOptions.forEach(function (so: MenuSubOption) {
+                        that.addItemToOrder(0, so.Name, so.Charge, ItemType.SubOption, that.currentOrderItem.ProductCode);
+                    });
+                });
             });
     }
 
