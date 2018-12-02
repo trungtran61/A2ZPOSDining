@@ -601,7 +601,8 @@ export class SQLiteService {
                     choices.push(
                         {
                             Name: rows[row][0],
-                            Layer: rows[row][1]
+                            Layer: rows[row][1],
+                            ChoiceMade: false
                         }
                     );
                 }

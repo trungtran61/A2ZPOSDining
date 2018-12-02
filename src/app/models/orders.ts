@@ -221,6 +221,7 @@ export interface OrderDetail {
     SplitQuantity?:any;
     IndexDataSub?:number;
     UseModifier?:boolean;
+    MarginLeft?:number;
 }
 
 export interface OrderResponse {

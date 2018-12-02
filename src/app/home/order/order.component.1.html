@@ -29,7 +29,7 @@
         <StackLayout *ngFor="let item of orderItems">
           <FlexBoxLayout (tap)="showModifyDialog(item,null,null)" (swipe)="onOrderItemSwipe($event, item)">
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
-            <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
+            <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5" [paddingLeft]='item.MarginLeft'></Label>
             <Label [text]="item.ExtPrice | currency" style="text-align: right; width:50; margin-right:5"></Label>
             <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
           </FlexBoxLayout>

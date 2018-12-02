@@ -171,7 +171,8 @@ export interface ChoiceLayer {
     Layer?: number;
     Name?: string;
     Choice?: MenuChoice;
-    Class?: string;  
+    Class?: string; 
+    ChoiceMade?: boolean; 
 }
 
 export interface MenuChoice {

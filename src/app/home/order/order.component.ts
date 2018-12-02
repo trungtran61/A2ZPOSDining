@@ -118,7 +118,7 @@ export class OrderComponent implements OnInit {
     canOptionPageUp: boolean = false;
 
     isExistingOrder: boolean = false;
-    
+
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
@@ -179,17 +179,17 @@ export class OrderComponent implements OnInit {
         this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
     }
 
-    getFullOrder(orderFilter: number) {       
+    getFullOrder(orderFilter: number) {
         this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
-            this.orderResponse = orderResponse;            
+            this.orderResponse = orderResponse;
             this.orderItems = orderResponse.OrderDetail;
             this.ticketNumber = this.orderResponse.Order.OrderID;
             this.checkNumber = this.orderResponse.Order.CheckNumber;
             this.table = this.orderResponse.Order.TableNumber;
             this.DBService.getLocalEmployee(this.orderResponse.Order.EmployeeID).then(employee => this.server = employee.FirstName);
             this.guests = this.orderResponse.Order.NumberGuests;
-            this.totalPrice();            
+            this.totalPrice();
         });
     }
 
@@ -325,7 +325,7 @@ export class OrderComponent implements OnInit {
                 product.Disabled = product.QtyAvailable == 0;
             }
         });
-    }   
+    }
 
     productSelected(product: MenuProduct) {
         this.currentProduct = product;
@@ -360,7 +360,7 @@ export class OrderComponent implements OnInit {
             context: { productCode: product.ProductCode, currentChoices: orderItemIndex > -1 ? this.order.OrderItems[orderItemIndex].ForcedModifiers : [] }
         };
 
-        let that= this;
+        let that = this;
 
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
             (selectedChoices: ForcedModifier[]) => {
@@ -368,12 +368,15 @@ export class OrderComponent implements OnInit {
                     this.currentSeatNumber++;
                     if (isAdding) {
                         this.addProductToOrder(product);
+                        console.log('added product');
                     }
                     //this.order.OrderItems[this.order.OrderItems.length - 1].ForcedModifiers = selectedChoices;
                     selectedChoices.forEach(function (mc: MenuChoice) {
                         that.addItemToOrder(0, mc.Name, mc.Charge, ItemType.Choice, product.ProductCode);
+                        console.log('added choice');
                         mc.SubOptions.forEach(function (so: MenuSubOption) {
                             that.addItemToOrder(0, so.Name, so.Charge, ItemType.SubOption, product.ProductCode);
+                            console.log('added suboption');
                         });
                     });
                 }
@@ -386,8 +389,8 @@ export class OrderComponent implements OnInit {
             fullscreen: true,
             context: { productCode: orderItem.ProductCode, orderItem }
         };
-        let that= this;
-        
+        let that = this;
+
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
             (selectedChoices) => {
                 selectedChoices.forEach(function (mc: MenuChoice) {
@@ -417,8 +420,8 @@ export class OrderComponent implements OnInit {
 
     addProductToOrder(product: MenuProduct) {
         this.addItemToOrder(
-                1,product.Name,product.UnitPrice,ItemType.Product, product.ProductCode            
-        );        
+            1, product.Name, product.UnitPrice, ItemType.Product, product.ProductCode
+        );
     }
 
     showOpenProduct() {
@@ -428,21 +431,12 @@ export class OrderComponent implements OnInit {
             //context: { options: options, currentOptions: currentOptions}
         };
 
+        let that = this;
         this.modalService.showModal(OpenProductComponent, modalOptions).then(
             (openProductItem: OpenProductItem) => {
                 this.showExtraFunctions = false;
                 if (openProductItem != null) {
-                    this.orderItems.push(
-                        {
-                            Quantity: 1,
-                            SeatNumber: this.currentSeatNumber.toString(),
-                            ExtPrice: openProductItem.UnitPrice * this.qtyEntered,
-                            UnitPrice: openProductItem.UnitPrice,
-                            PrintName: openProductItem.ProductName,
-                            ProductName: openProductItem.ProductName,
-                            ItemType: ItemType.Product
-                        });                                            
-                    this.totalPrice();
+                    that.addItemToOrder(1, openProductItem.ProductName, openProductItem.UnitPrice, ItemType.Product, 0)
                 }
             });
     }
@@ -495,10 +489,10 @@ export class OrderComponent implements OnInit {
                         orderItem.SeatNumber = choice.SelectedNumber;
                         break;
                     case 'delete':
-                        this.deleteOrderItem(orderItem);                        
+                        this.deleteOrderItem(orderItem);
                         break;
                     case 'repeat':
-                        this.repeatOrderItem(orderItem);                                         
+                        this.repeatOrderItem(orderItem);
                         break;
                     case 'modify':
                         this.getMenuOptions(orderItem.ProductCode);
@@ -628,15 +622,15 @@ export class OrderComponent implements OnInit {
         switch (fixedOption.Name) {
             case 'NO MAKE':
             case 'TO GO':
-            this.addItemToOrder
-            (                
-                    0,                    
+                this.addItemToOrder
+                    (
+                    0,
                     fixedOption.Name,
-                    0,                    
+                    0,
                     ItemType.Option,
-                    this.currentProduct.ProductCode                
-            );
-                
+                    this.currentProduct.ProductCode
+                    );
+
                 break;
 
             default:
@@ -686,53 +680,67 @@ export class OrderComponent implements OnInit {
 
         //this.currentOrderItem.Modifiers.push(modifier);
         this.addItemToOrder
-        (                
-                0,                    
-                modifier.Name,
-                modifier.Price,                    
-                ItemType.Option,
-                this.currentProduct.ProductCode                
-        );
-        
+            (
+            0,
+            modifier.Name,
+            modifier.Price,
+            ItemType.Option,
+            this.currentProduct.ProductCode
+            );
+
     }
 
-    getMaxIndexData():number
-    {
+    getMaxIndexData(): number {
         if (this.orderItems.length == 0)
             return 0;
 
         return Math.max.apply(Math, this.orderItems
             .filter(oi => oi.ItemType == ItemType.Product)
-            .map(function(oi) { return oi.IndexData; }));
+            .map(function (oi) { return oi.IndexData; }));
     }
 
-    addItemToOrder(qty: number, name: string, unitPrice: number, itemType: ItemType, productCode: number)
-    {        
-        let indexData: number = 0;
-
-        if (itemType == ItemType.Product)
-        {   //adding a product
-            indexData = this.getMaxIndexData() + 1;
-            this.orderItems.push(
-                {
-                    Quantity: itemType == ItemType.Product? qty : null,
-                    SeatNumber: this.currentSeatNumber.toString(),
-                    ExtPrice: itemType == ItemType.Product? qty * unitPrice : null,
-                    UnitPrice: unitPrice,
-                    PrintName: name,
-                    ProductName: name,
-                    ItemType: itemType,
-                    IndexData: indexData,
-                    ProductCode: productCode
-                }
-            );
+    getLeftMargin(itemType: ItemType) : number
+    {
+        let marginLeft: number = 0;
+        switch (itemType) {
+            case ItemType.Option:
+            case ItemType.Choice:
+                marginLeft = 5;
+                break;
+            case ItemType.SubOption:
+                marginLeft = 10;
+                break;
         }
-        else
-        {   // adding product modifier
+
+        return marginLeft;
+    }
+
+    addItemToOrder(qty: number, name: string, unitPrice: number, itemType: ItemType, productCode: number) {
+        let indexData: number = 0;
+        let marginLeft: number = this.getLeftMargin(itemType);
+
+        if (itemType == ItemType.Product) {   //adding a product
+            indexData = this.getMaxIndexData() + 1;
+            let orderItem: OrderDetail = {
+                Quantity: itemType == ItemType.Product ? qty : null,
+                SeatNumber: this.currentSeatNumber.toString(),
+                ExtPrice: itemType == ItemType.Product ? qty * unitPrice : null,
+                UnitPrice: unitPrice,
+                PrintName: name,
+                ProductName: name,
+                ItemType: itemType,
+                IndexData: indexData,
+                ProductCode: productCode,
+                MarginLeft: 0
+            }
+            this.orderItems.push(orderItem);
+            this.currentOrderItem = orderItem;
+        }
+        else {   // adding product modifier
             indexData = this.currentOrderItem.IndexData;
-            let lastIndex: number = this.orderItems.map(oi => 
-                oi.IndexData === indexData).lastIndexOf(true);    
-            let orderItem: OrderDetail =  {
+            let lastIndex: number = this.orderItems.map(oi =>
+                oi.IndexData === indexData).lastIndexOf(true);
+            let orderItem: OrderDetail = {
                 Quantity: null,
                 SeatNumber: this.currentSeatNumber.toString(),
                 ExtPrice: null,
@@ -741,9 +749,10 @@ export class OrderComponent implements OnInit {
                 ProductName: name,
                 ItemType: itemType,
                 IndexData: indexData,
-                ProductCode: productCode
-            }   
-            this.orderItems.splice(lastIndex+1, 0, orderItem);
+                ProductCode: productCode,
+                MarginLeft: marginLeft
+            }
+            this.orderItems.splice(lastIndex + 1, 0, orderItem);
         }
 
         this.totalPrice();
@@ -755,14 +764,14 @@ export class OrderComponent implements OnInit {
 
         if (userModifier.ButtonFunction == 1) {
             this.addItemToOrder
-            (                
-                    this.currentOrderItem.Quantity,                    
-                    userModifier.ItemName,
-                    userModifier.Price,                    
-                    ItemType.Option,
-                    this.currentProduct.ProductCode                
-            );
-            
+                (
+                this.currentOrderItem.Quantity,
+                userModifier.ItemName,
+                userModifier.Price,
+                ItemType.Option,
+                this.currentProduct.ProductCode
+                );
+
             return;
         }
 
@@ -782,7 +791,7 @@ export class OrderComponent implements OnInit {
         });
     }
 
-    showHideDetails() {        
+    showHideDetails() {
         this.showDetails = !this.showDetails;
         this.viewDetailsText = this.showDetails ? this.hideDetailsCode : this.viewDetailsCode;
     }
@@ -916,32 +925,35 @@ export class OrderComponent implements OnInit {
 
     deleteOrderItem(orderItem: OrderDetail) {
         this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
-        
+
         if (orderItem.ExtPrice > 0)
             this.totalPrice();
     }
-    
-    repeatOrderItem(orderItem: OrderDetail)
-    {
+
+    repeatOrderItem(orderItem: OrderDetail) {
         let itemsToCopy = this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData);
-        let maxIndexData:number = this.getMaxIndexData();
+        let maxIndexData: number = this.getMaxIndexData();
         let that = this;
-        
+
         itemsToCopy.forEach(function (orderItem: OrderDetail) {
+            //that.addItemToOrder(orderItem.ItemType == ItemType.Product ? 1 : null,
+             //   orderItem.ProductName, orderItem.UnitPrice, orderItem.ItemType, orderItem.ProductCode)
+            
             that.orderItems.push(
-            {
-                Quantity: orderItem.ItemType == ItemType.Product ? 1 : null,
-                SeatNumber: that.currentSeatNumber.toString(),
-                ExtPrice: orderItem.ExtPrice,
-                UnitPrice: orderItem.UnitPrice,
-                PrintName: orderItem.PrintName,
-                ProductName: orderItem.ProductName,
-                ItemType: orderItem.ItemType,
-                IndexData: maxIndexData + 1,
-                ProductCode: orderItem.ProductCode
-            }
+                {
+                    Quantity: orderItem.ItemType == ItemType.Product ? 1 : null,
+                    SeatNumber: that.currentSeatNumber.toString(),
+                    ExtPrice: orderItem.ExtPrice,
+                    UnitPrice: orderItem.UnitPrice,
+                    PrintName: orderItem.PrintName,
+                    ProductName: orderItem.ProductName,
+                    ItemType: orderItem.ItemType,
+                    IndexData: maxIndexData + 1,
+                    ProductCode: orderItem.ProductCode,
+                    MarginLeft: that.getLeftMargin(orderItem.ItemType)
+                }
             );
-            console.log(that.orderItems.length);
+           
         });
     }
 
@@ -961,7 +973,7 @@ export class OrderComponent implements OnInit {
             }
         }
     }
-    
+
     showModifierDialog(orderItemIndex: number) {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
@@ -988,7 +1000,7 @@ export class OrderComponent implements OnInit {
         this.modalService.showModal(MemoComponent, modalOptions).then(
             (memo: Memo) => {
                 //this.currentOrderItem.Modifiers.push({ Name: memo.Memo, Price: memo.Price, DisplayPrice: memo.Price > 0 ? memo.Price : null })
-                this.addItemToOrder(0, memo.Memo, memo.Price, ItemType.Option, this.currentProduct.ProductCode );
+                this.addItemToOrder(0, memo.Memo, memo.Price, ItemType.Option, this.currentProduct.ProductCode);
             });
     }
 

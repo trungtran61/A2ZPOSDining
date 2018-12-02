@@ -17,7 +17,7 @@ export class ForcedModifiersComponent implements OnInit {
     choiceItems: ForcedModifier[] = [];
     subChoiceItems: MenuSubOption[] = [];
     productCode: number = parseInt(localStorage.getItem("ProductCode"));
-    activeLayerIndex: number = 0;
+    activeLayer: ChoiceLayer = {};
     currentChoice: MenuChoice = null;
 
     subOptionsActiveText: string = String.fromCharCode(0xf00c) + ' Sub Options'
@@ -26,6 +26,7 @@ export class ForcedModifiersComponent implements OnInit {
     subOptionsActive: boolean = false;
 
     showSubChoices: boolean = false;
+    changingChoices: boolean = false;
 
     getChoiceLayers() {
         let that = this;
@@ -51,11 +52,16 @@ export class ForcedModifiersComponent implements OnInit {
         this.choiceLayers.forEach(function (choiceLayer: ChoiceLayer) {
              choiceLayer.Class= 'choiceLayer';
         });
-
-        choiceLayer.Class = 'choiceLayerActive';
+        this.activeLayer = choiceLayer;
+        choiceLayer.Class = 'choiceLayerActive';       
+        this.showSubChoices = false; 
     }
 
     choiceLayerSelected(choiceLayer: ChoiceLayer) {
+        // if new layer selected, set choice for previous layer
+        if (this.currentChoice != null)
+            this.setChoice(this.currentChoice);
+
         let that = this;
 
         this.DBService.getLocalMenuChoiceItems(choiceLayer, this.productCode).then((items) => {
@@ -63,13 +69,12 @@ export class ForcedModifiersComponent implements OnInit {
                 dialogs.alert("Menu Choice Items not loaded.");
             }
             else {
-                this.choiceItems = items;
-                console.log(items);
+                this.choiceItems = items;                
                 this.choiceItems.forEach(function (menuChoice: MenuChoice) {
                     menuChoice.Row = Math.floor((menuChoice.Position - 1) / 4);
                     // 4 columns so use 4
                     menuChoice.Col = menuChoice.Position - (menuChoice.Row * 4) - 1;
-                });
+                });                
                 this.setActiveLayer(choiceLayer);
             }
         });        
@@ -79,8 +84,8 @@ export class ForcedModifiersComponent implements OnInit {
     {
         this.currentChoice = choice;
         this.currentChoice.SubOptions = [];
-        this.choiceLayers[this.activeLayerIndex].Choice = choice; 
-       
+        this.activeLayer.Choice = choice;                
+             
         if (choice.ForcedChoice || this.subOptionsActive)
         {
             this.subOptionsActive = false;
@@ -89,9 +94,8 @@ export class ForcedModifiersComponent implements OnInit {
                     // choice has no sub choices
                     this.setChoice(choice);
                 }
-                else {
-                    this.subChoiceItems = items;
-                    console.log(items);
+                else {                    
+                    this.subChoiceItems = items;                    
                     this.subChoiceItems.forEach(function (item: MenuSubOption) {
                         item.Row = Math.floor((item.Position - 1) / 4);
                         // 4 columns so use 4
@@ -101,12 +105,12 @@ export class ForcedModifiersComponent implements OnInit {
                     this.showSubChoices = true;
                     this.currentChoice = choice;
                 }
-            });
-       
-        return;
+            });       
         }
-
-        this.setChoice(choice);
+        else
+        {
+            this.setChoice(choice);
+        }               
     }
 
     setChoice(choice: MenuChoice)
@@ -128,31 +132,36 @@ export class ForcedModifiersComponent implements OnInit {
         {
             this.currentChoices.push(choice)
         }         
+        // reset current choice
+        this.currentChoice = null;
+        
+        if (this.changingChoices)
+            return;
+
+        this.activeLayer.ChoiceMade = true;
 
         // all layers choice made?
-        if (this.currentChoices.length == this.choiceLayers.length)
+        let firstUnselectedLayer: ChoiceLayer = this.choiceLayers.find(cl => cl.ChoiceMade == false);
+
+        if (firstUnselectedLayer == null)
         {
             this.close(this.currentChoices);
+        }                
+        else
+        {        
+            this.showSubChoices = false;
+            this.choiceLayerSelected(firstUnselectedLayer);
         }
-
-        this.activeLayerIndex++;
-
-        if (this.activeLayerIndex >= this.choiceLayers.length)
-        {                        
-            this.activeLayerIndex = 0;
-        }
-        
-        this.setActiveLayer(choice);  
-        this.showSubChoices = false;
-        this.choiceLayerSelected(this.choiceLayers[this.activeLayerIndex]);
-
     }
 
     subChoiceSelected(subChoice: MenuSubOption) {
         subChoice.Selected = !subChoice.Selected;
 
         if (subChoice.Selected)
+        {
             this.currentChoice.SubOptions.push(subChoice);
+            this.activeLayer.ChoiceMade = true;
+        }
         else
             this.currentChoice.SubOptions = this.currentChoice.SubOptions.filter(obj => obj !== subChoice);           
         
@@ -160,7 +169,11 @@ export class ForcedModifiersComponent implements OnInit {
 
     doneSubOptions(subChoice: MenuSubOption) {
         this.setChoice(this.currentChoice);
-        this.subOptionsActive = false;        
+        this.subOptionsActive = false;
+        let choiceLayer: ChoiceLayer = this.choiceLayers.find(choiceLayer => choiceLayer.Layer != this.activeLayer.Layer)    
+        
+        this.setActiveLayer(choiceLayer);  
+        this.choiceLayerSelected(this.activeLayer);      
     }
 
     close(currentChoices: any) {
