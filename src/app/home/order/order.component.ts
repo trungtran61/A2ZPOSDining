@@ -358,27 +358,29 @@ export class OrderComponent implements OnInit {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
             context: { productCode: product.ProductCode, 
+                indexData: this.getMaxIndexData() + 1,
                 currentChoices: orderItemIndex > -1 ? this.order.OrderItems[orderItemIndex].ForcedModifiers : [] }
         };
 
         let that = this;
 
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
-            (selectedChoices: ForcedModifier[]) => {
-                if (selectedChoices != null) {
+            (selectedItems: OrderDetail[]) => {
+                if (selectedItems != null) {
                     this.currentSeatNumber++;
                     if (isAdding) {
-                        this.addProductToOrder(product);
-                        console.log('added product');
+                        this.addProductToOrder(product);                        
                     }
                     //this.order.OrderItems[this.order.OrderItems.length - 1].ForcedModifiers = selectedChoices;
-                    selectedChoices.forEach(function (mc: MenuChoice) {
-                        that.addItemToOrder(0, mc.Name, mc.Charge, ItemType.ForcedChoice, product.ProductCode, mc.Layer);
-                        console.log('added choice');
-                        mc.SubOptions.forEach(function (so: MenuSubOption) {
+                    selectedItems.forEach(function (od: OrderDetail) {
+                        that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType, 
+                            that.currentOrderItem.ProductCode, od.IndexDataSub);
+                        /*
+                        od.SubOptions.forEach(function (so: MenuSubOption) {
                             that.addItemToOrder(0, so.Name, so.Charge, ItemType.SubOption, product.ProductCode, so.Layer);
                             console.log('added suboption');
                         });
+                        */
                     });
                 }
             });
@@ -396,18 +398,17 @@ export class OrderComponent implements OnInit {
         let that = this;
 
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
-            (selectedChoices) => {
+            (selectedItems) => {
+                if (selectedItems != null)
+                {
                 // remove current choices
-                this.orderItems = this.orderItems.filter(oi => oi.ItemType != ItemType.ForcedChoice );
+                this.orderItems = this.orderItems.filter(oi => oi.ItemType != ItemType.ForcedChoice && oi.ItemType != ItemType.SubOption );
 
-                selectedChoices.forEach(function (mc: MenuChoice) {
-                    that.addItemToOrder(0, mc.ChoiceName, mc.Charge, ItemType.ForcedChoice, 
-                        that.currentOrderItem.ProductCode, null);
-                    mc.SubOptions.forEach(function (so: MenuSubOption) {
-                        that.addItemToOrder(0, so.Name, so.Charge, ItemType.SubOption, 
-                            that.currentOrderItem.ProductCode, null);
+                selectedItems.forEach(function (od: OrderDetail) {
+                    that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType, 
+                        that.currentOrderItem.ProductCode, od.IndexDataSub);                        
                     });
-                });
+                }
             });
     }
 

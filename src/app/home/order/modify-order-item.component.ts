@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import { ModalDialogParams, ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
 import { Choice } from "~/app/models/products";
-import { OrderDetail } from "~/app/models/orders";
+import { OrderDetail, ItemType } from "~/app/models/orders";
 
 @Component({
     selector: "modify-order-item",   
@@ -118,6 +118,7 @@ export class ModifyOrderItemComponent implements OnInit {
 
     ngOnInit() { 
         this.orderItem = this.params.context.orderItem;
-        this.isForcedModifier = this.params.context.isForcedModifier != null;
+        this.isForcedModifier = this.params.context.orderItem.ItemType == ItemType.ForcedChoice ||  
+            this.params.context.orderItem.ItemType == ItemType.SubOption ;
     } 
 }

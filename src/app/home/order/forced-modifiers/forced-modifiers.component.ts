@@ -5,6 +5,7 @@ import { MenuChoice, ForcedModifier, MenuSubOption, ChoiceLayer } from "~/app/mo
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogParams } from "nativescript-angular";
 import { OrderDetail, ItemType } from "~/app/models/orders";
+import { isNull } from "@angular/compiler/src/output/output_ast";
 
 @Component({
     selector: "forced-modifiers",
@@ -13,7 +14,7 @@ import { OrderDetail, ItemType } from "~/app/models/orders";
     styleUrls: ['./forced-modifiers.component.css']
 })
 export class ForcedModifiersComponent implements OnInit {
-    currentChoices: MenuChoice[] = [];
+    currentChoices: OrderDetail[] = [];
     choiceLayers: ChoiceLayer[] = [];
     choiceItems: ForcedModifier[] = [];
     subChoiceItems: MenuSubOption[] = [];
@@ -26,6 +27,9 @@ export class ForcedModifiersComponent implements OnInit {
     subOptionsInactiveText: string = 'Sub Options'
     subOptionsText: string = this.subOptionsInactiveText;
     subOptionsActive: boolean = false;
+
+    selectedSubOptions: MenuSubOption[] = [];
+    indexData: number = 0;
 
     showSubChoices: boolean = false;
     changingChoices: boolean = false;
@@ -54,6 +58,13 @@ export class ForcedModifiersComponent implements OnInit {
                                 choice.SubOptions.push(
                                     {
                                         Name: od.ProductName
+                                    }
+                                )
+
+                                that.selectedSubOptions.push(
+                                    {
+                                        Name: od.ProductName,
+                                        Layer: cl.Layer
                                     }
                                 )
                                 });
@@ -107,9 +118,16 @@ export class ForcedModifiersComponent implements OnInit {
 
     choiceSelected(choice: MenuChoice)
     {
+        // if changing choices - check if choice made is not one of the current choice, if so remove the layer's previous choice
+        if (this.orderItems != null && this.currentChoices.find (cc => cc.IndexDataSub == choice.Layer && cc.ProductName == choice.Name) == null)
+        {
+            this.currentChoices = this.currentChoices.filter( cc => cc.IndexDataSub != choice.Layer)
+        }
+
         this.currentChoice = choice;
         this.currentChoice.SubOptions = [];
-        this.activeLayer.Choice = choice;                
+        this.activeLayer.Choice = choice;            
+        let that = this;    
              
         if (choice.ForcedChoice || this.subOptionsActive)
         {
@@ -126,6 +144,11 @@ export class ForcedModifiersComponent implements OnInit {
                         // 4 columns so use 4
                         item.Col = item.Position - (item.Row * 4) - 1;
                         item.Selected = false;
+
+                        if (that.orderItems != null && that.orderItems.find(oi => oi.IndexDataSub == choice.Layer && oi.ProductName == choice.Name) != null)
+                        {
+                            item.Selected = that.selectedSubOptions.find(so => so.Layer == item.Layer && so.Name == item.Name) != null;
+                        }
                     });
                     this.showSubChoices = true;
                     this.currentChoice = choice;
@@ -141,22 +164,30 @@ export class ForcedModifiersComponent implements OnInit {
     setChoice(choice: MenuChoice)
     {
         // find current choice and set to new choice
+        let that = this;
+
+        let orderItem: OrderDetail  =  {
+                ProductName : choice.Name,
+                IndexDataSub : choice.Layer,
+                IndexData: this.indexData,
+                ItemType: ItemType.ForcedChoice
+           };
+
+        // replace current layer's choice with new choice
         if (this.currentChoices.length > 0)
-        {
-           let _choice  =  this.currentChoices.find(x => x.Layer == choice.Layer);
-            if (_choice != null)
-            {
-                _choice.Name = choice.Name;
-            }
-            else
-            {
-                this.currentChoices.push(choice)
-            }
-        }
-        else
-        {
-            this.currentChoices.push(choice)
-        }         
+            this.currentChoices = this.currentChoices.filter(cc=> cc.IndexDataSub != choice.Layer);
+
+        this.currentChoices.push(orderItem);
+        choice.SubOptions.forEach( so => {
+            let orderSubItem: OrderDetail  =  {
+                ProductName : so.Name,
+                IndexDataSub : so.Layer,
+                IndexData: that.indexData,
+                ItemType: ItemType.SubOption
+        };
+        this.currentChoices.push(orderSubItem);
+        } );          
+        
         // reset current choice
         this.currentChoice = null;
         
@@ -205,16 +236,23 @@ export class ForcedModifiersComponent implements OnInit {
         this.params.closeCallback(currentChoices);
     }
 
+    cancel() {
+        this.params.closeCallback(null);
+    }
+    
     constructor(private DBService: SQLiteService, private params: ModalDialogParams, private viewContainerRef: ViewContainerRef) { }
 
     ngOnInit() {
         this.productCode = this.params.context.productCode;
         this.currentChoices = this.params.context.currentChoices;
         this.orderItems = this.params.context.orderItems;
+        this.indexData = this.params.context.indexData;
 
         if (this.orderItems != null)
+        {
             this.productCode = this.orderItems[0].ProductCode;
-            
+            this.indexData = this.orderItems[0].IndexData;
+        }    
         this.getChoiceLayers();
     }   
 }
