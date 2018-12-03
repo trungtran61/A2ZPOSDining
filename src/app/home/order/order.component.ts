@@ -371,16 +371,10 @@ export class OrderComponent implements OnInit {
                     if (isAdding) {
                         this.addProductToOrder(product);                        
                     }
-                    //this.order.OrderItems[this.order.OrderItems.length - 1].ForcedModifiers = selectedChoices;
+                    
                     selectedItems.forEach(function (od: OrderDetail) {
                         that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType, 
-                            that.currentOrderItem.ProductCode, od.IndexDataSub);
-                        /*
-                        od.SubOptions.forEach(function (so: MenuSubOption) {
-                            that.addItemToOrder(0, so.Name, so.Charge, ItemType.SubOption, product.ProductCode, so.Layer);
-                            console.log('added suboption');
-                        });
-                        */
+                            that.currentOrderItem.ProductCode, od.IndexDataSub);                       
                     });
                 }
             });
