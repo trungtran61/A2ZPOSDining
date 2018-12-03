@@ -23,8 +23,10 @@ export enum OrderType {
 export enum ItemType {
     Product = 1,   
     Option = 2,
-    Choice = 4,
-    SubOption = 5
+    Choice = 3,
+    ForcedChoice = 4,
+    SubOption = 5,
+    Discount = 6
 }
 
 export interface OrderItem {

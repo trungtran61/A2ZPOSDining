@@ -4,6 +4,7 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 import { MenuChoice, ForcedModifier, MenuSubOption, ChoiceLayer } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogParams } from "nativescript-angular";
+import { OrderDetail } from "~/app/models/orders";
 
 @Component({
     selector: "forced-modifiers",
@@ -19,6 +20,7 @@ export class ForcedModifiersComponent implements OnInit {
     productCode: number = parseInt(localStorage.getItem("ProductCode"));
     activeLayer: ChoiceLayer = {};
     currentChoice: MenuChoice = null;
+    orderItem: OrderDetail;
 
     subOptionsActiveText: string = String.fromCharCode(0xf00c) + ' Sub Options'
     subOptionsInactiveText: string = 'Sub Options'
@@ -185,6 +187,11 @@ export class ForcedModifiersComponent implements OnInit {
     ngOnInit() {
         this.productCode = this.params.context.productCode;
         this.currentChoices = this.params.context.currentChoices;
+        this.orderItem = this.params.context.orderItem;
+
+        if (this.orderItem != null)
+            this.productCode = this.orderItem.ProductCode;
+            
         this.getChoiceLayers();
     }   
 }
