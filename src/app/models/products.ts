@@ -171,6 +171,7 @@ export interface ChoiceLayer {
     Layer?: number;
     Name?: string;
     Choice?: MenuChoice;
+    ChoiceName?: string;
     Class?: string; 
     ChoiceMade?: boolean; 
 }
@@ -197,13 +198,13 @@ export interface OptionCategory {
 }
 
 export interface MenuSubOption {
-    ApplyCharge: boolean;
-    Charge: number;
+    ApplyCharge?: boolean;
+    Charge?: number;
     ChoiceID?: number;
-    Layer: number;
-    Name: string;
-    Position: number;
-    ReportProductMix: boolean;
+    Layer?: number;
+    Name?: string;
+    Position?: number;
+    ReportProductMix?: boolean;
     Row?: number;
     Col?: number;
     Selected?: boolean;
@@ -314,13 +315,13 @@ export interface MenuOption {
 }
 
 export interface MenuSubOption {
-    ApplyCharge: boolean;
-    Charge: number;
+    ApplyCharge?: boolean;
+    Charge?: number;
     ChoiceID?: number;
-    Layer: number;
-    Name: string;
-    Position: number;
-    ReportProductMix: boolean;
+    Layer?: number;
+    Name?: string;
+    Position?: number;
+    ReportProductMix?: boolean;
 }
 
 export interface TaxRate {

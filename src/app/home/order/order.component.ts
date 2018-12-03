@@ -388,7 +388,7 @@ export class OrderComponent implements OnInit {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
-            context: { orderItem: orderItem,
+            context: { orderItems: this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData),
                 currentChoices: this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData && 
                     (oi.ItemType == ItemType.ForcedChoice ||
                     oi.ItemType == ItemType.SubOption)) }

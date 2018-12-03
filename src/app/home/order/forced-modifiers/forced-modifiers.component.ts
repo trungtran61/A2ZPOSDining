@@ -4,7 +4,7 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 import { MenuChoice, ForcedModifier, MenuSubOption, ChoiceLayer } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogParams } from "nativescript-angular";
-import { OrderDetail } from "~/app/models/orders";
+import { OrderDetail, ItemType } from "~/app/models/orders";
 
 @Component({
     selector: "forced-modifiers",
@@ -20,7 +20,7 @@ export class ForcedModifiersComponent implements OnInit {
     productCode: number = parseInt(localStorage.getItem("ProductCode"));
     activeLayer: ChoiceLayer = {};
     currentChoice: MenuChoice = null;
-    orderItem: OrderDetail;
+    orderItems: OrderDetail[];
 
     subOptionsActiveText: string = String.fromCharCode(0xf00c) + ' Sub Options'
     subOptionsInactiveText: string = 'Sub Options'
@@ -39,6 +39,29 @@ export class ForcedModifiersComponent implements OnInit {
             }
             else {
                 this.choiceLayers = choiceLayers;
+
+                if (this.orderItems != null)
+                {
+                    this.choiceLayers.forEach(cl => 
+                        {
+                            let choice: MenuChoice = {
+                                Name: this.orderItems.find(oi => oi.IndexDataSub == cl.Layer && oi.ItemType == ItemType.ForcedChoice).ProductName,
+                                SubOptions: []
+                            }
+                            let subOptions = this.orderItems.filter(oi => oi.IndexDataSub == cl.Layer && oi.ItemType == ItemType.SubOption)
+                            
+                            subOptions.forEach(function (od: OrderDetail) {                                
+                                choice.SubOptions.push(
+                                    {
+                                        Name: od.ProductName
+                                    }
+                                )
+                                });
+
+                            cl.Choice = choice;
+                        }
+                        );                    
+                }
                 this.choiceLayerSelected(this.choiceLayers[0]);
             }
             //this.setActiveLayer(0);   
@@ -187,10 +210,10 @@ export class ForcedModifiersComponent implements OnInit {
     ngOnInit() {
         this.productCode = this.params.context.productCode;
         this.currentChoices = this.params.context.currentChoices;
-        this.orderItem = this.params.context.orderItem;
+        this.orderItems = this.params.context.orderItems;
 
-        if (this.orderItem != null)
-            this.productCode = this.orderItem.ProductCode;
+        if (this.orderItems != null)
+            this.productCode = this.orderItems[0].ProductCode;
             
         this.getChoiceLayers();
     }   
