@@ -921,7 +921,15 @@ export class OrderComponent implements OnInit {
     }
 
     deleteOrderItem(orderItem: OrderDetail) {
-        this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
+        // if item is product, delete product and all associated modifiers
+        if (orderItem.ItemType == ItemType.Product)
+            this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
+        else
+            if (orderItem.ItemType == ItemType.SubOption)
+            {
+                //let itemToDelete: OrderDetail = this.orderItems.find(obj => obj.IndexData == orderItem.IndexData && obj.IndexDataSub == orderItem.IndexDataSub && obj.ItemType == Ite,);
+                this.orderItems = this.orderItems.filter(obj => obj !== orderItem);
+            }
 
         if (orderItem.ExtPrice > 0)
             this.totalPrice();

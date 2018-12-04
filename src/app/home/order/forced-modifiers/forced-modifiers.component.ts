@@ -144,11 +144,12 @@ export class ForcedModifiersComponent implements OnInit {
                         // 4 columns so use 4
                         item.Col = item.Position - (item.Row * 4) - 1;
                         item.Selected = false;
-
+                        /* commented out - don't need to recall suboptions
                         if (that.orderItems != null && that.orderItems.find(oi => oi.IndexDataSub == choice.Layer && oi.ProductName == choice.Name) != null)
                         {
                             item.Selected = that.selectedSubOptions.find(so => so.Layer == item.Layer && so.Name == item.Name) != null;
                         }
+                        */
                     });
                     this.showSubChoices = true;
                     this.currentChoice = choice;
@@ -201,7 +202,7 @@ export class ForcedModifiersComponent implements OnInit {
 
         if (firstUnselectedLayer == null)
         {
-            this.close(this.currentChoices);
+            this.close();
         }                
         else
         {        
@@ -232,8 +233,16 @@ export class ForcedModifiersComponent implements OnInit {
         this.choiceLayerSelected(this.activeLayer);      
     }
 
-    close(currentChoices: any) {
-        this.params.closeCallback(currentChoices);
+    close() {
+        this.params.closeCallback(this.currentChoices);
+    }
+
+    accept()
+    {
+        if (this.currentChoice != null)
+            this.setChoice(this.currentChoice);
+        
+        this.close();    
     }
 
     cancel() {
