@@ -155,7 +155,7 @@ export class OrderComponent implements OnInit {
         }
         );
 
-        this.getMenuTimers();
+        //this.getMenuTimers();
         this.getUserModifiers();
 
         this.route.queryParams.subscribe(params => {
@@ -924,11 +924,9 @@ export class OrderComponent implements OnInit {
         // if item is product, delete product and all associated modifiers
         if (orderItem.ItemType == ItemType.Product)
             this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
-        else
-            if (orderItem.ItemType == ItemType.SubOption)
+        else            
             {
-                //let itemToDelete: OrderDetail = this.orderItems.find(obj => obj.IndexData == orderItem.IndexData && obj.IndexDataSub == orderItem.IndexDataSub && obj.ItemType == Ite,);
-                this.orderItems = this.orderItems.filter(obj => obj !== orderItem);
+            this.orderItems = this.orderItems.filter(obj => obj !== orderItem);
             }
 
         if (orderItem.ExtPrice > 0)
@@ -967,7 +965,8 @@ export class OrderComponent implements OnInit {
 
         for (var i = 0; i < this.orderItems.length; i++) {
             {
-                this.subTotal += this.orderItems[i].ExtPrice;
+                if (this.orderItems[i].ExtPrice != null)
+                    this.subTotal += this.orderItems[i].ExtPrice;
             }
             this.tax = this.utilSvc.getTaxTotal(this.order);
             this.checkTotal = this.subTotal + this.tax;
