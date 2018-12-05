@@ -179,6 +179,14 @@ page
 	placeholder-color: gray;
 }
 
+.textEntryLongActive
+{
+	border-radius: 6; border-color: gray; border-width: 1; background-color: white; 
+	font-size: 20; font-weight: bold; padding-left: 5; width: 600; margin-right: 20; height:60;
+	color: black;
+	placeholder-color: gray;
+}
+
 .disabledTextColor
 {
 	color: gray;

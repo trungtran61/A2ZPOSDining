@@ -65,8 +65,14 @@ export class ReasonComponent implements OnInit {
    
     acceptReason(reason: string)
     {
-        this.params.closeCallback(reason);
+        if (reason != '')
+            this.params.closeCallback(reason);
     }   
+
+    keyPressed(event)
+    {
+        console.log(event);
+    }
 
     cancel()
     {

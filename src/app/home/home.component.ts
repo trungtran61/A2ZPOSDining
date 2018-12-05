@@ -41,12 +41,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
         private apiSvc: APIService
     ) 
     {
-        page.actionBarHidden = true;
+        page.actionBarHidden = true;        
     }
 
-    ngOnInit(): void {
-
-       
+    ngOnInit(): void {       
         //if (this.DBService.systemSettings == null)
         //{
             this.DBService.getLocalSystemSettings().then((systemSettings) => {
@@ -64,10 +62,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
         //this.router.navigate(['/home/area'])
         //this.router.navigate(['/home/order'])
         // Init your component properties here.
-        //this.router.navigate(['/home/pizza']);        
+        //this.router.navigate(['/home/pizza']);  
+        this.utilSvc.setTopBarStyle();          
     }
 
-    ngAfterViewInit(): void {
+    ngAfterViewInit(): void {        
+
         if (appSettings.getBoolean("isFirstLaunch", true)) {
             this.isLoading = true;
             console.log('First Launch');
@@ -104,11 +104,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
             }
         });
         this.logInLogo = 'http://' + localStorage.getItem('LoginLogo');
-        console.log(this.logInLogo);        
+        console.log(this.logInLogo);                
     }
 
     addDigit(digit: string) {
-        this.employeeId += digit;
+        this.employeeId += digit;        
     }
 
     clearInput() {

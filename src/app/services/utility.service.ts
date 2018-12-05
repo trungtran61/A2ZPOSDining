@@ -3,6 +3,9 @@ import { interval, Observable } from 'rxjs'
 import { RouterExtensions } from "nativescript-angular";
 import { SQLiteService } from "./sqlite.service";
 import { Order, OrderItem } from "../models/orders";
+import { EventData } from "tns-core-modules/data/observable";
+import { topmost } from "tns-core-modules/ui/frame";
+import { isIOS } from "tns-core-modules/platform";
 
 @Injectable()
 export class UtilityService {
@@ -133,4 +136,12 @@ export class UtilityService {
     padLeft(text:string, padChar:string, size:number): string {
         return (String(padChar).repeat(size) + text).substr( (size * -1), size) ;
     }
+
+    public setTopBarStyle(){
+     if (isIOS) {
+        let navigationBar = topmost().ios.controller.navigationBar;
+        navigationBar.barStyle = UIBarStyle.Black;
+    }
+}
+
 }

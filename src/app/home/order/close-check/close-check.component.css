@@ -1,0 +1,112 @@
+.table-check
+{
+    background-color: antiquewhite;
+}
+
+.check-label
+{
+    width: 300px;  margin-left: 5;
+}
+
+.check-amount
+{
+    text-align: right;    width: 200px;      margin-right: 5;
+}
+
+.bgImage
+{
+background: url('https://www.nativescript.org/images/default-source/Blogs/ns-logo_share_600x315.png');
+}
+ 
+.nextSeat
+{
+    margin: -25 0 0 -65;  color:red;font-size: 18; padding: 0; text-align: center; width: 30; height: 30;
+}
+
+.btnMenuOption
+{
+    background: linear-gradient(lightgray,gray);
+    color: black;
+    width: 105;
+    height: 85;
+}
+
+.qtyAvailable
+{
+    margin: 75 0 0 -105;  color:darkblue;font-size: 18; padding: 0; text-align: center; width: 30; height: 30; 
+}
+.qtyLow
+{
+    margin: 75 0 0 -105;  color:red;font-size: 18; padding: 0; text-align: center; width: 30; height: 30; background-color: white; border-radius: 20;
+}
+
+.btnOptionActive
+{
+    background-image:linear-gradient(red, black);text-align: center; height: 118px;
+}
+
+.btnOption
+{
+    text-align: center;height: 118px;
+}
+
+.btnMemo
+{
+    color: gold; font-weight: bold; text-align: center; height: 118px; border-width: 2; border-color: bisque; border-radius: 30;
+}
+.btnBottom
+{
+	width: 120; height: 70; margin-right: 20;
+}
+
+.btnProduct {
+	height: 110;
+	font-size: 18;
+	font-family: sans-serif;
+    font-weight: bold;
+	border-radius: 20px;
+	border-color: #fff;
+	border-style: solid;
+	border-width: 2px;
+	margin: 3 3 3 3;
+	color: white; background-color: black;
+	word-wrap: break-word;
+}
+
+.btnCategory {
+	font-size: 25;
+	height: 120;
+	font-family: sans-serif;
+    font-weight: bold;
+	margin: 10 10 10 10;
+	word-wrap: break-word;
+}
+
+.btnSubCategory {
+	font-size: 20;
+	height: 110;
+	font-family: sans-serif;
+    font-weight: bold;
+	margin: 5 5 5 5;
+	color: white; 
+	word-wrap: break-word;
+}
+
+.btnSubCategory:active,  .btnSubCategoryActive{ 
+	font-size: 25;
+	height: 110;
+	font-family: sans-serif;
+	font-weight: bold;	
+	border-radius: 10;
+	border-color: #fff;
+	border-style: solid;
+	border-width: 2;	
+	margin: 3 3 3 3;
+	color: white; 
+	word-wrap: break-word;
+}
+
+.modifier
+{
+    margin-left: 30;
+}
