@@ -178,3 +178,13 @@ page
 	color: black;
 	placeholder-color: gray;
 }
+
+.disabledTextColor
+{
+	color: gray;
+}
+
+.enabledTextColor
+{
+	color: black;
+}

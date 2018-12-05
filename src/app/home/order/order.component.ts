@@ -118,6 +118,7 @@ export class OrderComponent implements OnInit {
     canOptionPageUp: boolean = false;
 
     isExistingOrder: boolean = false;
+    textColorClass: string = 'enabledTextColor';
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -166,6 +167,7 @@ export class OrderComponent implements OnInit {
                     let table: TableDetail = JSON.parse(localStorage.getItem('currentTable'));
                     this.getFullOrder(table.OrderFilter);
                     this.isExistingOrder = true;
+                    this.textColorClass = 'disabledTextColor';
                 }
             }
             else {
@@ -627,8 +629,9 @@ export class OrderComponent implements OnInit {
         switch (fixedOption.Name) {
             case 'NO MAKE':
             case 'TO GO':
+                let maxIndexDataSub: number = this.getMaxIndexDataSub(this.currentOrderItem.IndexData);
                 this.addItemToOrder
-                    (0,fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, null
+                    (0,fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1
                     );
 
                 break;
@@ -680,7 +683,8 @@ export class OrderComponent implements OnInit {
 
         //this.currentOrderItem.Modifiers.push(modifier);
         this.addItemToOrder
-            (0,modifier.Name, modifier.Price, ItemType.Option, this.currentProduct.ProductCode, null );
+            (0,modifier.Name, modifier.Price, ItemType.Option, this.currentProduct.ProductCode, 
+                this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1 );
  }
 
     getMaxIndexData(): number {
@@ -690,6 +694,15 @@ export class OrderComponent implements OnInit {
         return Math.max.apply(Math, this.orderItems
             .filter(oi => oi.ItemType == ItemType.Product)
             .map(function (oi) { return oi.IndexData; }));
+    }
+
+    getMaxIndexDataSub(indexData: number): number {
+        if (this.orderItems.filter( oi => oi.IndexData == indexData && oi.ItemType == ItemType.Option).length == 0)
+            return 0;
+
+        return Math.max.apply(Math, this.orderItems
+            .filter(oi => oi.IndexData == indexData && oi.ItemType == ItemType.Option)
+            .map(function (oi) { return oi.IndexDataSub; }));
     }
 
     getLeftMargin(itemType: ItemType) : number
@@ -924,9 +937,14 @@ export class OrderComponent implements OnInit {
         // if item is product, delete product and all associated modifiers
         if (orderItem.ItemType == ItemType.Product)
             this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
-        else            
+        else       
+            if (orderItem.ItemType == ItemType.SubOption)     
             {
-            this.orderItems = this.orderItems.filter(obj => obj !== orderItem);
+                this.orderItems = this.orderItems.filter(obj => obj !== orderItem );
+            }
+            else
+            {
+            this.orderItems = this.orderItems.filter(obj => obj.IndexDataSub !== orderItem.IndexDataSub );
             }
 
         if (orderItem.ExtPrice > 0)
