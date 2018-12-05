@@ -38,6 +38,7 @@ export class ReasonComponent implements OnInit {
                 let i: number = 1;
                 this.reasons.forEach(reason =>
                     {
+                        reason.Class = 'glass' 
                         reason.Row = (Math.floor((i - 1) / 3));
                         reason.Col = (i - 1) % 3;     
                         i++;
@@ -46,9 +47,15 @@ export class ReasonComponent implements OnInit {
         });
     }
 
-    setReason(reason: Reason)
+    setActiveReason(reason: Reason)
     {
         this.reason = reason.Reason;
+
+        this.reasons.forEach( reason => {
+            reason.Class = 'glass'            
+        });
+
+        reason.Class = 'glass activeReason';
     }
 
     showOtherReason()

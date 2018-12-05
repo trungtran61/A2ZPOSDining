@@ -237,4 +237,5 @@ export interface Reason {
     Reason?: string;
     Row?: number;
     Col?: number;
+    Class?: string;
 }

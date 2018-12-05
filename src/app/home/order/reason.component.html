@@ -1,8 +1,8 @@
 <StackLayout class='page'>
     <GridLayout rows='60 * 60' class='pageHeader' *ngIf='!isOtherReason'>
         <label text='Choose a Reason' row='0' class="title"></label>
-        <GridLayout columns="* * *" rows="150 150 150 150 150" row='1'>
-            <Button class='glass' [text]='reason.Reason' (tap)='setReason(reason)' [row]='reason.Row' [col]='reason.Col'
+        <GridLayout columns="* * *" rows="120 120 120 120 120" row='1'>
+            <Button [class]='reason.Class' [text]='reason.Reason' (tap)='setActiveReason(reason)' [row]='reason.Row' [col]='reason.Col'
                 *ngFor='let reason of reasons'></Button>
         </GridLayout>
         <FlexBoxLayout row='2'>
