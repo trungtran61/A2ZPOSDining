@@ -1,0 +1,31 @@
+<StackLayout class='page'>
+    <GridLayout rows='20 * 20' class='page' *ngIf='!otherReason'>
+        <label text='Choose a Reason' row='0'></label>
+        <GridLayout columns="* * *" rows="150 150 150 150 150" row='1'>
+            <Button class='glass' [text]='reason.Reason' (tap)='setReason()' [row]='reason.Row' [col]='reason.Col'
+                *ngFor='let reason of reasons'></Button>
+        </GridLayout>
+        <FlexBoxLayout row='2'>
+            <Button class='glass btnCancel fa' text='Cancel' (tap)='cancel()'></Button>
+            <Button class='glass' text='Other' (tap)='otherReason()'></Button>
+        </FlexBoxLayout>
+    </GridLayout>
+
+    <StackLayout rows="120 auto" *ngIf='otherReason'>
+        <StackLayout orientation="horizontal" row='0' colSpan="2">
+                <TextField id='otherReason' hint="Enter Memo" [text]='otherReason' [(ngModel)]='otherReason' required #otherReasonModel='ngModel'
+                    autocorrect="true" [class]="memoClass" >
+                </TextField>
+                <Label class="validation" [visibility]="otherReasonModel.valid ? 'collapse' : 'visible'" text="Reason is required"></Label>            
+        </StackLayout>
+
+        <FlexBoxLayout>
+            <Button class='glass btnCancel' text='Cancel' (tap)='cancel()' height="60" width="120"></Button>
+        </FlexBoxLayout>
+
+        <FlexBoxLayout justifyContent="flex-end" row='1' col='1'>
+            <Button class='glass btnOK' text='OK' (tap)='setOtherReason()' height="60" width="120"></Button>
+        </FlexBoxLayout>
+
+    </StackLayout>
+</StackLayout>

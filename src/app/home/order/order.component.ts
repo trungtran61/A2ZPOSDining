@@ -25,7 +25,7 @@ import { NullViewportScroller } from "@angular/common/src/viewport_scroller";
 @Component({
     selector: "order",
     moduleId: module.id,
-    templateUrl: "./order.component.1.html",
+    templateUrl: "./order.component.html",
     styleUrls: ['./order.component.css']
 })
 export class OrderComponent implements OnInit {
@@ -934,6 +934,12 @@ export class OrderComponent implements OnInit {
     }
 
     deleteOrderItem(orderItem: OrderDetail) {
+        if (orderItem.OrderFilter)
+        {
+            this.showReasonDialog(orderItem);
+        }
+        else
+        {
         // if item is product, delete product and all associated modifiers
         if (orderItem.ItemType == ItemType.Product)
             this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
@@ -949,6 +955,7 @@ export class OrderComponent implements OnInit {
 
         if (orderItem.ExtPrice > 0)
             this.totalPrice();
+        }
     }
 
     repeatOrderItem(orderItem: OrderDetail) {
@@ -1010,6 +1017,19 @@ export class OrderComponent implements OnInit {
                 else {
                     // this.order.OrderItems[orderItemIndex].Modifiers = this.order.OrderItems[orderItemIndex].Modifiers.concat(selectedModifiers);
                 }
+            });
+    }
+
+    showReasonDialog(orderItem: OrderDetail)
+    {
+        const modalOptions: ModalDialogOptions = {
+            viewContainerRef: this.viewContainerRef,
+            fullscreen: true,
+            //context: { options: options, currentOptions: currentOptions}
+        };
+
+        this.modalService.showModal(ModifyOrderItemComponent, modalOptions).then(
+            (selectedModifiers) => {               
             });
     }
 

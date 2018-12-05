@@ -184,7 +184,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
             this.DBService.loadMenuTimers(db),
             this.DBService.loadOptions(db),
             this.DBService.loadTaxRates(db),
-            this.DBService.loadUserModifiers(db)             
+            this.DBService.loadUserModifiers(db),
+            this.DBService.loadReasons(db)                 
         ])
             .subscribe(results => {
                 console.log(results);
@@ -204,11 +205,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
         //this.DBService.loadEmployees(db);
         //this.DBService.getLocalSystemSettings();
         //this.DBService.getAllEmployees();
-        this.apiSvc.getFullOrder(188183).subscribe(orderResponse => {
-            console.log(orderResponse);            
-        });
+        //this.apiSvc.getFullOrder(188183).subscribe(orderResponse => {
+        //    console.log(orderResponse);            
+        //});
         
-        //this.loadLocalDataBase(null);
+        this.loadLocalDataBase(null);
     }    
 
     loadTables() {

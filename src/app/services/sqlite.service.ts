@@ -8,7 +8,7 @@ import { forkJoin } from "rxjs";
 import { catchError } from 'rxjs/operators';
 import { SystemSettings, Logos } from "~/app/models/settings";
 import { APIService } from "./api.service";
-import { Countdown } from "~/app/models/orders";
+import { Countdown, Reason } from "~/app/models/orders";
 import { UtilityService } from "./utility.service";
 
 var Sqlite = require("nativescript-sqlite");
@@ -1247,12 +1247,12 @@ export class SQLiteService {
                     that.http.get(that.apiUrl + 'GetTaxRates', { headers: headers })
                         .subscribe(
                             data => {
-                                let taxRates = <TaxRate[]>data;
-                                taxRates.forEach(function (taxRate: TaxRate) {
+                                let reasons = <TaxRate[]>data;
+                                reasons.forEach(function (reason: TaxRate) {
                                     SQLiteService.database.execSQL(
                                         "INSERT INTO TaxRates (TaxID,Name,RateType,EffectiveRate,Disabled,DateEntered) VALUES (?,?,?,?,?,?)",
-                                        [taxRate.TaxID, taxRate.Name, taxRate.RateType, taxRate.EffectiveRate,
-                                        taxRate.Disabled, that.converTimestampToDate(taxRate.DateEntered)]).then(id => {
+                                        [reason.TaxID, reason.Name, reason.RateType, reason.EffectiveRate,
+                                        reason.Disabled, that.converTimestampToDate(reason.DateEntered)]).then(id => {
                                             resolve("Added TaxRates records.")
                                         },
                                             err => {
@@ -1372,6 +1372,59 @@ export class SQLiteService {
             console.log("Result set is:", resultSet);
         });
     }
+
+    public loadReasons(db) {
+
+        let that = this;
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+
+            db.execSQL("DROP TABLE IF EXISTS Reasons;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS Reasons (PriKey INTEGER PRIMARY KEY, Reason TEXT);").then(id => {
+                    let headers = that.createRequestHeader();
+                    that.http.get(that.apiUrl + 'GetReasons', { headers: headers })
+                        .subscribe(
+                            data => {
+                                let reasons = <Reason[]>data;
+                                reasons.forEach(function (reason: Reason) {
+                                    SQLiteService.database.execSQL("INSERT INTO Reasons (PriKey, Reason) VALUES (?,?)",
+                                        [reason.PriKey, reason.Reason]).then(id => {
+                                            resolve("Added Reasons records.")
+                                        },
+                                            err => {
+                                                reject("Failed to add Reasons records.")
+                                            }
+                                        );
+                                });
+                            },
+                            err => {
+                                reject("Error occurred while retrieving Reasons from API.");
+                            }
+                        );
+                }, error => {
+                    reject("CREATE TABLE Reasons ERROR" + error);
+                });
+            });
+        });
+        return promise;
+    }
+
+    public getLocalReasons(): Promise<Reason[]> {
+        return SQLiteService.database.all("SELECT PriKey, Reason FROM Reasons")
+            .then(function (rows) {
+                let reasons: Reason[] = [];
+                for (var row in rows) {
+                    reasons.push({
+                        PriKey: rows[row][0],
+                        Reason: rows[row][1]
+                    });
+                }
+                return (reasons);
+            });
+    }
+
 
     public dropTables() {
         SQLiteService.database.execSQL('DROP TABLE IF EXISTS MenuCategories;').then(function (resultSet) {

@@ -231,3 +231,8 @@ export interface OrderResponse {
     OrderDetail: OrderDetail[];
     Payments: any[];
 }
+
+export interface Reason {
+    PriKey?: number;
+    Reason?: string;
+}
