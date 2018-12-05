@@ -235,4 +235,6 @@ export interface OrderResponse {
 export interface Reason {
     PriKey?: number;
     Reason?: string;
+    Row?: number;
+    Col?: number;
 }

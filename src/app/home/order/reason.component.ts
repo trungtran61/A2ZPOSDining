@@ -4,9 +4,8 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { Page } from "tns-core-modules/ui/page/page";
-import { UtilityService } from "~/app/services/utility.service";
-import { APIService } from "~/app/services/api.service";
-import { Reason } from "~/app/models/orders";
+import { Reason, OrderDetail } from "~/app/models/orders";
+import { ModalDialogParams } from "nativescript-angular/modal-dialog";
 
 @Component({
     selector: "reason",
@@ -17,8 +16,13 @@ import { Reason } from "~/app/models/orders";
 
 export class ReasonComponent implements OnInit {
     reasons: Reason[] = [];
+    //orderItem: OrderDetail;
+    reason: string;
+    otherReason: string;
+    isOtherReason: boolean = false;
     
     ngOnInit(): void {
+        //this.orderItem = this.params.context.orderItem;        
         this.getReasons();
     }
 
@@ -30,14 +34,39 @@ export class ReasonComponent implements OnInit {
                 });
             }
             else {
-                this.reasons = data;                
+                this.reasons = data; 
+                let i: number = 1;
+                this.reasons.forEach(reason =>
+                    {
+                        reason.Row = (Math.floor((i - 1) / 3));
+                        reason.Col = (i - 1) % 3;     
+                        i++;
+                    });                         
             }
         });
     }
+
+    setReason(reason: Reason)
+    {
+        this.reason = reason.Reason;
+    }
+
+    showOtherReason()
+    {
+        this.isOtherReason = true;
+    }
    
-    constructor(
-        private DBService: SQLiteService, private page: Page, private utilSvc: UtilityService, private apiSvc: APIService        
-    ) 
+    acceptReason(reason: string)
+    {
+        this.params.closeCallback(reason);
+    }   
+
+    cancel()
+    {
+        this.params.closeCallback(null);
+    }   
+
+    constructor ( private DBService: SQLiteService, private page: Page, private params: ModalDialogParams ) 
     {
         page.actionBarHidden = true;
     }

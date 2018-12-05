@@ -21,6 +21,7 @@ import { ForcedModifiersComponent } from "./forced-modifiers/forced-modifiers.co
 import { ModifyOrderItemComponent } from "./modify-order-item.component";
 import { ActivatedRoute } from "@angular/router";
 import { NullViewportScroller } from "@angular/common/src/viewport_scroller";
+import { ReasonComponent } from "./reason.component";
 
 @Component({
     selector: "order",
@@ -1022,14 +1023,20 @@ export class OrderComponent implements OnInit {
 
     showReasonDialog(orderItem: OrderDetail)
     {
+        // get the product Order
+        //let _orderItem: OrderDetail = this.orderItems.find( oi => oi.ItemType == ItemType.Product && oi.IndexData == orderItem.IndexData)
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
-            fullscreen: true,
-            //context: { options: options, currentOptions: currentOptions}
+            fullscreen: true
         };
 
-        this.modalService.showModal(ModifyOrderItemComponent, modalOptions).then(
-            (selectedModifiers) => {               
+        this.modalService.showModal(ReasonComponent, modalOptions).then(
+            (reason: string) => {     
+                // delete product from order if reason given          
+                if (reason != null)
+                {
+                    this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
+                }
             });
     }
 

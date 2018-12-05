@@ -1412,7 +1412,7 @@ export class SQLiteService {
     }
 
     public getLocalReasons(): Promise<Reason[]> {
-        return SQLiteService.database.all("SELECT PriKey, Reason FROM Reasons")
+        return SQLiteService.database.all("SELECT PriKey, Reason FROM Reasons ORDER BY Reason")
             .then(function (rows) {
                 let reasons: Reason[] = [];
                 for (var row in rows) {

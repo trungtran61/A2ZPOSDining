@@ -18,6 +18,7 @@ import { PizzaComponent } from "./order/pizza/pizza.component";
 import { PromptQtyComponent } from "./order/prompt-qty.component";
 import { MemoComponent } from "./order/memo.component";
 import { MyChecksComponent } from "./my-checks/my-checks.component";
+import { ReasonComponent } from "./order/reason.component";
 
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 TNSFontIconService.debug = true;
@@ -44,7 +45,8 @@ TNSFontIconService.debug = true;
         PizzaComponent,
         PromptQtyComponent,
         MemoComponent,
-        MyChecksComponent            
+        MyChecksComponent,
+        ReasonComponent            
     ],
     schemas: [
         NO_ERRORS_SCHEMA
@@ -54,7 +56,8 @@ TNSFontIconService.debug = true;
         ForcedModifiersComponent, 
         OpenProductComponent,
         PromptQtyComponent,
-        MemoComponent
+        MemoComponent,
+        ReasonComponent
     ]  
 })
 export class HomeModule { }

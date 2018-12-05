@@ -249,7 +249,7 @@ export class ForcedModifiersComponent implements OnInit {
         this.params.closeCallback(null);
     }
     
-    constructor(private DBService: SQLiteService, private params: ModalDialogParams, private viewContainerRef: ViewContainerRef) { }
+    constructor(private DBService: SQLiteService, private params: ModalDialogParams) { }
 
     ngOnInit() {
         this.productCode = this.params.context.productCode;
