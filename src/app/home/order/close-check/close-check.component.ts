@@ -3,14 +3,11 @@ import { RouterExtensions } from "nativescript-angular/router";
 
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import {
-    CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes,
-    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail, MenuSubOption
-} from "~/app/models/products";
+import { TableDetail } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
-import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
+import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { Page } from "tns-core-modules/ui/page/page";
-import { OrderType, Countdown, OrderItem, Order, FixedOption, OrderHeader, OrderDetail, OrderResponse, ItemType } from "~/app/models/orders";
+import { Order, OrderDetail, OrderResponse } from "~/app/models/orders";
 import { APIService } from "~/app/services/api.service";
 import { UtilityService } from "~/app/services/utility.service";
 import { ActivatedRoute } from "@angular/router";
@@ -23,11 +20,10 @@ import { ReasonComponent } from "./../reason.component";
     styleUrls: ['./close-check.component.css']
 })
 export class CloseCheckComponent implements OnInit {
-    categoryCodes: CategoryCode[] = [];
     order: Order = null;
     orderResponse: OrderResponse = null;
     orderItems: OrderDetail[] = [];
-    
+
     currentSeatNumber: number = 1;
     checkTotal: number = 0;
     subTotal: number = 0;
@@ -40,9 +36,13 @@ export class CloseCheckComponent implements OnInit {
     checkNumber: number = 0;
     checkTitle: string = '';
     ticketNumber: number = 0;
+    showingItemFunctions: boolean = false;
+    showingTicketFunctions: boolean = true;
+    seats: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
     MAX_GUESTS: number = 6;
     TIPS_PCT: number = .15;
-    
+
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
@@ -52,14 +52,28 @@ export class CloseCheckComponent implements OnInit {
         private page: Page,
         private route: ActivatedRoute
     ) {
-        page.actionBarHidden = true;        
+        page.actionBarHidden = true;
     }
 
     ngOnInit(): void {
         let table: TableDetail = JSON.parse(localStorage.getItem('currentTable'));
-        this.getFullOrder(table.OrderFilter);        
+        this.getFullOrder(table.OrderFilter);
     }
-    
+
+    assignSeat(seat: number) {
+
+    }
+
+    showItemFunctions(item: OrderDetail) {
+        this.showingItemFunctions = true;
+        this.showingTicketFunctions = false;
+    }
+
+    cancelItemFunctions() {
+        this.showingItemFunctions = false;
+        this.showingTicketFunctions = true;
+    }
+
     getFullOrder(orderFilter: number) {
         this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
@@ -72,7 +86,28 @@ export class CloseCheckComponent implements OnInit {
             this.guests = this.orderResponse.Order.NumberGuests;
             this.totalPrice();
         });
-    }   
+    }
+
+    printReceipt() { }
+    itemDollarDiscount() { }
+    itemPctDiscount() { }
+    itemComp() { } deleteItem() { }
+    otherSeat() { }
+    dollarTip() { }
+    pctTip() { }
+    credit() { }
+    specialDiscount() { }
+    dollarDiscount() { }
+    pctDiscount() { }
+    compAll() { }
+    splitEven(){}
+    cashPayment(){}
+    chargePayment(){}
+    checkPayment(){}
+    giftCard(){}
+    certificate(){}
+    housePayment(){}
+    otherPayment(){}    
 
     totalPrice() {
         this.subTotal = 0;
@@ -91,17 +126,16 @@ export class CloseCheckComponent implements OnInit {
             }
         }
     }
-    
-    showReasonDialog()
-    {
+
+    showReasonDialog() {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true
         };
 
         this.modalService.showModal(ReasonComponent, modalOptions).then(
-            (reason: string) => {     
-        
+            (reason: string) => {
+
             });
     }
 }

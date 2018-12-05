@@ -1,7 +1,7 @@
 <ActionBar android:title="Title">
   <ActionItem [text]="checkTitle" ios.position="left"></ActionItem>
 </ActionBar>
-<GridLayout rows="auto, 75" columns="260,150,150,200">
+<GridLayout rows="auto, 100" columns="260 200 200 *">
   <StackLayout row="0" col="0">
     <!-- order header -->
     <StackLayout style="background-color: antiquewhite;" orientation="horizontal">
@@ -29,7 +29,7 @@
     <ScrollView style="background-color: white" height="550" orientation="vertical">
       <StackLayout>
         <StackLayout *ngFor="let item of orderItems">
-          <FlexBoxLayout (tap)="showModifyDialog(item,null,null)" (swipe)="onOrderItemSwipe($event, item)" [class]="textColorClass">
+          <FlexBoxLayout (tap)="showItemFunctions(item)" [class]="textColorClass">
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.ExtPrice | currency" style="text-align: right; width:50; margin-right:5"></Label>
@@ -68,13 +68,13 @@
     <Button class="glass btnBottom fa" (tap)="printReceipt()" horizontalAlignment='right' textWrap="true" text="&#xf05a; Print Receipt Save"></Button>
   </GridLayout>
   <!-- item functions -->
-  <GridLayout rows='60 60 60 60 60 60 60 60 60 60 60 60' columns='80 200' row="0" col="1" *ngIf="showItemFunctions">
+  <GridLayout rows='60 60 60 60 60 60 60 60 60 60 60 60' columns='80 200' row="0" col="1" *ngIf="showingItemFunctions">
     <Label text="Item Functions" row='0' col='0' colSpan="2"></Label>
     <Button class="glass round" [text]="seat" textWrap="true" *ngFor="let seat of seats" col='0' [row]='seat + 1' (tap)="assignSeat(seat)"></Button>
     <StackLayout row='1' col='1' colSpan="10">
-      <Button class="glass" text="$ Discount" textWrap="true" (tap)="dollarDiscount()"></Button>
-      <Button class="glass" text="% Discount" textWrap="true" (tap)="dollarDiscount()"></Button>
-      <Button class="glass" text="&#xf06b; Comp Item" textWrap="true" (tap)="dollarDiscount()"></Button>
+      <Button class="glass" text="$ Discount" textWrap="true" (tap)="itemDollarDiscount()"></Button>
+      <Button class="glass" text="% Discount" textWrap="true" (tap)="itemPctDiscount()"></Button>
+      <Button class="glass" text="&#xf06b; Comp Item" textWrap="true" (tap)="itemComp()"></Button>
       <Button class="glass btnCancel fa" text="&#xf2ed; Delete" textWrap="true" (tap)="deleteItem()"></Button>
     </StackLayout>
     <GridLayout row="11" col="0" colSpan="2">
@@ -83,20 +83,27 @@
     </GridLayout>
   </GridLayout>
   <!-- ticket functions -->
-  <StackLayout row="0" col="1" colSpan="2" *ngIf="showTicketFunctions">
-    <Button class="glass" [text]="item.Name" textWrap="true" *ngFor="let item of categories let i=index" (tap)="categorySelected(item)"
-      [style]="categoryStyles[i]"></Button>
-  </StackLayout>
+  <GridLayout row="0" col="1" colSpan="2" columns='200 200' rows='60 100 100 100 100' *ngIf="showingTicketFunctions">
+      <Label text="Ticket Functions" row='0' col='0' colSpan="2"></Label>
+      <Button class="glass" text="$ Gratuity" textWrap="true" (tap)="dollarTip()" row='1' col='0'></Button>
+      <Button class="glass" text="% Gratuity" textWrap="true" (tap)="pctTip()" row='1' col='1'></Button>
+      <Button class="glass" text="Credit" textWrap="true" (tap)="credit()" row='2' col='0'></Button>
+      <Button class="glass" text="Special Discount" textWrap="true" (tap)="specialDiscount()" row='2' col='1'></Button>
+      <Button class="glass" text="$ Discount" textWrap="true" (tap)="dollarDiscount()" row='3' col='0'></Button>
+      <Button class="glass" text="% Discount" textWrap="true" tap)="pctDiscount()" row='3' col='1'></Button>
+      <Button class="glass" text="Comp All Item" textWrap="true" (tap)="compAll()" horizontalAlignment='center' row='4'
+        col='0' colSpan="2"></Button>
+    </GridLayout>
   <!-- payment options -->
-  <GridLayout row="0" col="3" colSpan="2" columns='200 200' rows='60 100 100 100 100'>
-    <Label text="Ticket Functions" row='0' col='0' colSpan="2"></Label>
-    <Button class="glass" text="$ Gratuity" textWrap="true" (tap)="dollarTip()" row='1' col='0'></Button>
-    <Button class="glass" text="% Gratuity" textWrap="true" (tap)="pctTip()" row='1' col='1'></Button>
-    <Button class="glass" text="Credit" textWrap="true" (tap)="credit()" row='2' col='0'></Button>
-    <Button class="glass" text="Special Discount" textWrap="true" (tap)="specialDiscount()" row='2' col='1'></Button>
-    <Button class="glass" text="$ Discount" textWrap="true" (tap)="dollarDiscount()" row='3' col='0'></Button>
-    <Button class="glass" text="% Discount" textWrap="true" tap)="pctDiscount()" row='3' col='1'></Button>
-    <Button class="glass" text="Comp All Item" textWrap="true" (tap)="dollarTip()" horizontalAlignment='center' row='4'
-      col='0' colSpan="2"></Button>
+  <GridLayout row="0" col="3" columns='100 100' rows='70 70 70 70 70 70' horizontalAlignment="right">      
+    <Button class="glass" text="SPLIT Evenly" textWrap="true" (tap)="splitEven()" row='0' col='0'></Button>
+    <Button class="glass" text="SPLIT Seat" textWrap="true" (tap)="splitSeat()" row='0' col='1'></Button>
+    <Button class="glass" text="Cash" (tap)="cashPayment()" row='1' col='0' colSpan="2"></Button>
+    <Button class="glass" text="Charge" (tap)="chargePayment()" row='2' col='0' colSpan="2"></Button>
+    <Button class="glass" text="Check" (tap)="checkPayment()" row='3' col='0'></Button>
+    <Button class="glass" text="Gift Card" textWrap="true" (tap)="giftCard()" row='3' col='1'></Button>
+    <Button class="glass" text="Certificate" (tap)="certificate()" row='4' col='0'></Button>
+    <Button class="glass" text="House" textWrap="true" (tap)="housePayment()" row='4' col='1'></Button>
+    <Button class="glass" text="Other" textWrap="true" tap)="otherPayment()" row='5' col='1'></Button>    
   </GridLayout>
 </GridLayout>

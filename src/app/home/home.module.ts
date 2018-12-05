@@ -19,6 +19,7 @@ import { PromptQtyComponent } from "./order/prompt-qty.component";
 import { MemoComponent } from "./order/memo.component";
 import { MyChecksComponent } from "./my-checks/my-checks.component";
 import { ReasonComponent } from "./order/reason.component";
+import { CloseCheckComponent } from "./order/close-check/close-check.component";
 
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 TNSFontIconService.debug = true;
@@ -46,7 +47,8 @@ TNSFontIconService.debug = true;
         PromptQtyComponent,
         MemoComponent,
         MyChecksComponent,
-        ReasonComponent            
+        ReasonComponent,
+        CloseCheckComponent            
     ],
     schemas: [
         NO_ERRORS_SCHEMA

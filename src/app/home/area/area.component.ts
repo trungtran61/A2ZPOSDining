@@ -206,6 +206,15 @@ export class AreaComponent implements OnInit {
         this.router.navigate(["home/order"], navigationExtras);
     }
 
+    closeTable() {
+        let navigationExtras: NavigationExtras = {
+            queryParams: {
+                "action": "closeTable"                
+            }
+        };
+        this.router.navigate(["home/closeCheck"], navigationExtras);
+    }
+
     viewAreas() {
         this.showAreas = !this.showAreas;
         if (this.showAreas) {
