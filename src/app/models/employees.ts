@@ -3,6 +3,8 @@ export interface Employee {
     EmployeeID?: string;
     FirstName?: string;   
     AccessType?: AccessType;    
+    ClockInType?: number;
+    Module?: number;
 }
 
 export interface LoginResponse {

@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Countdown, Order, OrderResponse } from "~/app/models/orders";
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AccessType } from "../models/employees";
 
 @Injectable()
 export class APIService {
@@ -79,7 +80,7 @@ export class APIService {
             { headers: headers }).pipe(map(res => res));
     }
 
-    public getTablesDetails(areaID: number, employeeID: number, clockInType: number, serverViewAll: boolean): Observable<any> {
+    getTablesDetails(areaID: number, employeeID: number, clockInType: number, serverViewAll: boolean): Observable<any> {
         let headers = this.createRequestHeader();
         return this.http.get(this.apiUrl + 'GetTableDetail?AreaId=' + areaID +
             '&EmployeeID=' + employeeID +
@@ -88,9 +89,18 @@ export class APIService {
             { headers: headers }).pipe(map(res => res));
     }
 
-    public getOccupiedTables(): Observable<any> {
+    getOccupiedTables(): Observable<any> {
         let headers = this.createRequestHeader();
         return this.http.get(this.apiUrl + 'GetOccupiedTables',
+            { headers: headers }).pipe(map(res => res));
+    }
+
+    getGroupedChecks(employeeID: number, accessType: AccessType, closed: boolean): Observable<any>
+    {
+        //http://a2zpos.azurewebsites.net/DBService.svc/GetGroupedChecks?employeeID=105&module=1&closed=false&multiicheck=false&name=
+        let headers = this.createRequestHeader();
+        return this.http.get(this.apiUrl + 'GetGroupedChecks?employeeID=' + employeeID + 
+            '&module=1&closed=' + closed + '&multicheck=false&name=',
             { headers: headers }).pipe(map(res => res));
     }
 }

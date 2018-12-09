@@ -226,16 +226,16 @@ export class AreaComponent implements OnInit {
         }
     }
 
-    viewClosedChecks()
+    viewChecks(closed: boolean)
     {
-        this.router.navigate(['/home/mychecks']);
+        let navigationExtras: NavigationExtras = {
+            queryParams: {
+                "closed": closed                
+            }
+        };
+        this.router.navigate(['/home/mychecks'], navigationExtras);
     }
-
-    viewMyChecks()
-    {
-
-    }
-
+    
     viewCheckDetail()
     {
 

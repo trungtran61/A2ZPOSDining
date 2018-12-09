@@ -1,16 +1,27 @@
 <GridLayout rows='25 * 105' columns='780 *'>
-    <Label [text]='myChecksText' row='0' col='0' class='pageHeader'></Label>
+    <Label [text]='myChecksHeader' row='0' col='0' class='pageHeader'></Label>
     <Label [text]="currentDateTime | date:'EEE, MMM d yyyy h:mm:ss aa'" row='0' col='1' class='dateTime'></Label>
     <!-- checks -->
-    <GridLayout rows='auto auto auto auto' columns='auto auto auto auto' row='1' col='0'>
-
+    <GridLayout row='1' col='0' rows='170 170 170 170' columns='170 170 170 170'>
+        <StackLayout *ngFor='let check of checks' [row]='check.Row' [col]='check.Col'
+            style='background-color: white; margin: 10; width: 160; height: 160; border-radius: 4' >
+            <Label [text]='check.Name' style='font-weight: bold; font-size: 20; color: black; text-align: center'></Label>
+            <Label *ngIf='closedChecks != "true"' [text]='check.ElapsedTime' 
+                style='font-weight: bold; font-size: 20; color:yellow; background-color: black;padding: 3'></Label>
+            <Label *ngIf='closedChecks == "true"' [text]='check.TotalOrders' 
+                style='font-weight: bold; font-size: 20; color:yellow; background-color: black;padding: 3; text-align: center'></Label>    
+            <Label *ngIf='check.NumberGuests > 1 && closedChecks != "true"' [text]='check.NumberGuests' 
+                style='text-align: center;font-weight: bold; font-size: 40; color:red;'></Label>
+            <Label [text]='check.FirstName' style='font-weight: bold; font-size: 20; color:blue;'></Label>
+        </StackLayout>
     </GridLayout>
     <!-- right panel buttons -->
-    <GridLayout rows='110 110 110 110 110' columns='120 110' row='1' col='1'>
-        <Button text='Table' class='glass btnGreenSquare' (tap)='cancel()' row='0' col='0'></Button>
+    <GridLayout rows='110 110 110 110 110' columns='120 110' row='1' col='1'>        
+        <Button *ngFor='let item of orderTypeDetails' [text]='item.Name' class='glass btnGreenSquare' 
+            (tap)='orderTypeSelected(item.OrderType)' 
+            [row]='item.Row' [col]='item.Col'></Button>
         <Button text='Filter By' class='glass btnBlackSquare' (tap)='cancel()' row='0' col='1'></Button>
-        <Button text='Take Out' class='glass btnGreenSquare' (tap)='cancel()' row='1' col='0'></Button>
-        <Button text='View All Checks' textWrap='true' class='glass btnBlackSquare' (tap)='cancel()' row='1' col='1'></Button>
+        <Button [text]='viewChecksText' textWrap='true' class='glass btnBlackSquare' (tap)="viewChecks()" row='1' col='1'></Button>
         <Button text='Employee A > Z' class='glass btnBlackSquare' textWrap='true' (tap)='cancel()' row='2' col='1'></Button>
         <Button text='Delivery Status' class='glass btnDeliveryStatus' textWrap='true' (tap)='cancel()' row='3' col='1'></Button>
         <Button text='View Delay Orders' class='btnViewDelayOrders' textWrap='true' (tap)='cancel()' row='4' col='1'></Button>

@@ -116,13 +116,23 @@ export interface Table {
 }
 
 export interface Check {
-    AreaID: number;
-    Name: string;
-    Height: number;
-    Width: number;
-    PosX: number;
-    PosY: number;
-    TableType?: number;
+    TotalOrders?: number;
+    Name?: string;
+    SendToRegister?: boolean;
+    EmployeeID?: number;
+    FirstName?: string;
+    CheckTime?: string;
+    CurrentDate?: string;
+    TransType?: number;
+    CheckNumber?: number;
+    OrderFilter?: number;
+    NumberGuests?: number;
+    TotalHolds?: number;
+    TotalPrinted?: number;
+    OLOOrderID?: number; 
+    ElapsedTime?: string;
+    Row?: number;
+    Col?: number;
 }
 
 

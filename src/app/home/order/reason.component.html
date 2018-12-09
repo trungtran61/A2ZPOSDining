@@ -20,7 +20,7 @@
         <GridLayout rows="100 auto auto" columns="*">
             <TextField id='otherReason' horizontalAlignment="center" hint="Enter Reason" [text]='otherReason' row='1'
                 [(ngModel)]='otherReason' required #otherReasonModel='ngModel' autocorrect="true" class='textEntryLongActive'
-                (returnPress)="acceptReason(otherReason)" (keyPress)="keyPressed($event)">
+                (returnPress)="acceptReason(otherReason)" (keyPress)="keyPressed($event)" returnKeyType='done' >
             </TextField>
             <Label class="validation" horizontalAlignment="center" row='2' [visibility]="otherReasonModel.valid ? 'collapse' : 'visible'"
                 text="Reason is required"></Label>

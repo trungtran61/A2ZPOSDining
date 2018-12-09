@@ -1,10 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ApplicationEventData } from "tns-core-modules/application/application";
-import  { topmost } from "tns-core-modules/ui/frame";
-import  { isIOS } from "tns-core-modules/platform";
-
+//import { SocketIO } from "nativescript-socketio/socketio";
 //import * as appSettings from "application-settings";
 
 var Sqlite = require("nativescript-sqlite");
@@ -16,31 +14,31 @@ var Sqlite = require("nativescript-sqlite");
 })
 
 
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
-    loadingStyle: string = 'display:none';    
+    loadingStyle: string = 'display:none';
 
-    public constructor(private DBService: SQLiteService) {
+    public constructor(private DBService: SQLiteService, 
+        //private socketIO: SocketIO
+        ) {
     }
 
-    public ngOnInit() {     
-       // this.DBService.getLocalSystemSettings().then((systemSettings) => {
-       //     if (systemSettings == null) {
-       //         console.log("SystemSettings not loaded.")
-       //     }
-       // });  
-       const iqKeyboard = IQKeyboardManager.sharedManager();
+    ngOnInit() {
+        // this.DBService.getLocalSystemSettings().then((systemSettings) => {
+        //     if (systemSettings == null) {
+        //         console.log("SystemSettings not loaded.")
+        //     }
+        // });  
+        const iqKeyboard = IQKeyboardManager.sharedManager();
         iqKeyboard.overrideKeyboardAppearance = true;
         iqKeyboard.keyboardAppearance = UIKeyboardAppearance.Dark;
-       
-    if (isIOS)
-    {
-        topmost().ios.controller.navigationBar.barStyle = UIBarStyle.Black;
-    }
+        iqKeyboard.shouldResignOnTouchOutside = true;
+
+        //this.socketIO.connect();
     }
 
-    onClick() {
-        console.log('clicked');
+    ngOnDestroy() {
+        //this.socketIO.disconnect();
     }
 
 }

@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewContainerRef, ViewChild, NgZone } from "@angular/core";
+import { Component, OnInit, ViewContainerRef, OnDestroy, NgZone } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 
 import { SwipeDirection } from "ui/gestures";
 import * as dialogs from "tns-core-modules/ui/dialogs";
+//import { SocketIO } from "nativescript-socketio";
 
 import {
     CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes,
@@ -29,7 +30,10 @@ import { ReasonComponent } from "./reason.component";
     templateUrl: "./order.component.html",
     styleUrls: ['./order.component.css']
 })
-export class OrderComponent implements OnInit {
+
+export class OrderComponent implements OnInit, OnDestroy {
+    private printerSocket: any;
+
     currentCategoryID: number = 0;
     categories: MenuCategory[] = [];
     categoryStyles: string[] = [];
@@ -120,6 +124,8 @@ export class OrderComponent implements OnInit {
 
     isExistingOrder: boolean = false;
     textColorClass: string = 'enabledTextColor';
+   
+    printerPort: string = '192.168.8.131:9100';
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -128,11 +134,12 @@ export class OrderComponent implements OnInit {
         private apiSvc: APIService,
         private utilSvc: UtilityService,
         private page: Page,
-        private route: ActivatedRoute
-    ) {
-        page.actionBarHidden = true;
-        // Use the component constructor to inject providers.
-
+        private route: ActivatedRoute,
+        //private socketIO: SocketIO       
+    ) 
+    {
+        page.actionBarHidden = true;        
+        //this.printerSocket = new WebSocket("ws://" + this.printerPort, []);
     }
 
     ngOnInit(): void {
@@ -157,7 +164,7 @@ export class OrderComponent implements OnInit {
         }
         );
 
-        //this.getMenuTimers();
+        this.getMenuTimers();
         this.getUserModifiers();
 
         this.route.queryParams.subscribe(params => {
@@ -175,7 +182,13 @@ export class OrderComponent implements OnInit {
                 this.createNewOrder();
             }
         });
-
+        const SocketIO = require("nativescript-socket.io")
+        SocketIO.connect(this.printerPort);
+        //SocketIO.disconnect();
+        //SocketIO.emit('0x1B@trung', {
+        //    username: '0x1B@tran',
+        //  });
+        //this.socketIO.connect();
     }
 
     createNewOrder() {
@@ -352,6 +365,7 @@ export class OrderComponent implements OnInit {
                 this.showForcedModifierDialog(product, -1, null, true);
             }
             else {
+                //this.checkMenuTimer(product.)
                 this.addProductToOrder(product);
             }
     }
@@ -410,6 +424,7 @@ export class OrderComponent implements OnInit {
     }
 
     productInfo() {
+        console.log('product info');
         this.showProductInfo = !this.showProductInfo;
         if (this.showProductInfo)
             this.productInfoClass = 'glass btnBottom btnOK fa';
@@ -1053,6 +1068,21 @@ export class OrderComponent implements OnInit {
             });
     }
 
+    sendCheck()
+    {
+        //var printController = UIPrintInteractionController;
+        //console.log(printController.printingAvailable);
+        //this.printReceipt();
+        //this.utilSvc.sendToPrinter('hello', {'username': 'trung'});
+        //this.printerSocket.send('hello');
+        //this.socketIO.emit("test", { test: "test" });
+    }
+
+    printReceipt()
+    {
+    
+    }
+
     getMenuTimers() {
         let timers: MenuTimer[] = [];
 
@@ -1189,7 +1219,7 @@ export class OrderComponent implements OnInit {
                                     checkMenuTimer = false;
                                 break;
                             case OrderType.Here:
-                            case OrderType.ToGo:
+                            case OrderType.TakeOut:
                                 if (!timer.WalkIn)
                                     checkMenuTimer = false;
                                 break;
@@ -1231,5 +1261,9 @@ export class OrderComponent implements OnInit {
         });
 
         return checkMenuTimer;
+    }
+    
+    public ngOnDestroy() {
+        const SocketIO = require("nativescript-socket.io")        
     }
 }

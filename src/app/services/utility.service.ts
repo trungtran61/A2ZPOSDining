@@ -1,18 +1,30 @@
-import { Injectable } from "@angular/core";
+import { Injectable, NgZone } from "@angular/core";
 import { interval, Observable } from 'rxjs'
 import { RouterExtensions } from "nativescript-angular";
 import { SQLiteService } from "./sqlite.service";
 import { Order, OrderItem } from "../models/orders";
-import { EventData } from "tns-core-modules/data/observable";
+//import { EventData } from "tns-core-modules/data/observable";
 import { topmost } from "tns-core-modules/ui/frame";
 import { isIOS } from "tns-core-modules/platform";
+//import { SocketIO } from "nativescript-socketio/socketio";
+//require("nativescript-websockets");
 
 @Injectable()
 export class UtilityService {
     timeoutInSecs: number = 15;
     idleTimer: number;
+    public socket: any;
 
-    public constructor(private router: RouterExtensions, private DBService: SQLiteService) {
+    public constructor(private router: RouterExtensions, 
+        private DBService: SQLiteService, 
+        //private socketIO: SocketIO
+        ) 
+    {
+        
+    }
+
+    public print(message: string) {
+        this.socket.send(message);        
     }
 
     startTimer() {
@@ -33,6 +45,14 @@ export class UtilityService {
         this.idleTimer = 0;
     }
 
+    sendToPrinter(eventName: string, payload: any)
+    {
+        /*
+        this.socketIO.emit('hello', {
+            username: 'someone',
+          });
+          */
+    }
      /*
    ColorLuminance("#69c", 0);		// returns "#6699cc"
    ColorLuminance("6699CC", 0.2);	// "#7ab8f5" - 20% lighter

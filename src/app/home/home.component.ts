@@ -12,6 +12,8 @@ import { Page } from "tns-core-modules/ui/page/page";
 import { Logos } from "../models/settings";
 import { UtilityService } from "../services/utility.service";
 import { APIService } from "../services/api.service";
+import { topmost } from "tns-core-modules/ui/frame";
+import { isIOS } from "tns-core-modules/platform";
 
 var Sqlite = require("nativescript-sqlite");
 
@@ -36,37 +38,40 @@ export class HomeComponent implements OnInit, AfterViewInit {
     logInLogo: string = '';
     isLoading: boolean = false;
 
+    printerPort: string = '192.168.0.125';
+
     constructor(private router: RouterExtensions, private DBService: SQLiteService,
         private zone: NgZone, private page: Page, private utilSvc: UtilityService,
         private apiSvc: APIService
-    ) 
-    {
-        page.actionBarHidden = true;        
+    ) {
+        page.actionBarHidden = true;
     }
 
-    ngOnInit(): void {       
+    ngOnInit(): void {
+        if (isIOS) {
+            topmost().ios.controller.navigationBar.barStyle = UIBarStyle.Black;
+        }
         //if (this.DBService.systemSettings == null)
         //{
-            this.DBService.getLocalSystemSettings().then((systemSettings) => {
-                if (systemSettings == null) {
-                    console.log("SystemSettings not loaded.")
-                }
-                else
-                {
-                    this.DBService.systemSettings = systemSettings;
-                }
-            });  
+        this.DBService.getLocalSystemSettings().then((systemSettings) => {
+            if (systemSettings == null) {
+                console.log("SystemSettings not loaded.")
+            }
+            else {
+                this.DBService.systemSettings = systemSettings;
+            }
+        });
         //}
-        
+
         //this.page.className = 'loginBG';
         //this.router.navigate(['/home/area'])
         //this.router.navigate(['/home/order'])
         // Init your component properties here.
         //this.router.navigate(['/home/pizza']);  
-        this.utilSvc.setTopBarStyle();          
+        this.utilSvc.setTopBarStyle();
     }
 
-    ngAfterViewInit(): void {        
+    ngAfterViewInit(): void {
 
         if (appSettings.getBoolean("isFirstLaunch", true)) {
             this.isLoading = true;
@@ -84,11 +89,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
                 console.log("OPEN DB ERROR", error);
             });
             appSettings.setBoolean("isFirstLaunch", false);
-        }        
+        }
     }
 
-    showLogos()
-    {
+    showLogos() {
         require("nativescript-localstorage");
         this.logInLogo = localStorage.getItem('LoginLogo');
 
@@ -104,11 +108,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
             }
         });
         this.logInLogo = 'http://' + localStorage.getItem('LoginLogo');
-        console.log(this.logInLogo);                
+        console.log(this.logInLogo);
     }
 
     addDigit(digit: string) {
-        this.employeeId += digit;        
+        this.employeeId += digit;
     }
 
     clearInput() {
@@ -123,6 +127,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
         }
 
         this.DBService.login(this.employeeId).subscribe(res => {
+            this.DBService.loggedInUser.Module = 1;
+            this.DBService.loggedInUser.ClockInType = 1;
             switch (res.AccessType) {
                 case 0:
                 case 1:
@@ -161,9 +167,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
         });
     }
 
-    loadLocalDataBase(db)
-    {
-        this.isLoading = true;        
+    loadLocalDataBase(db) {
+        this.isLoading = true;
         forkJoin([
             this.DBService.loadSystemSettings(db),
             this.DBService.loadLogos(db),
@@ -173,29 +178,29 @@ export class HomeComponent implements OnInit, AfterViewInit {
             this.DBService.loadCategoryCodes(db),
             this.DBService.loadProducts(db),
             this.DBService.loadTables(db),
-            this.DBService.loadMenuCategories(db),            
+            this.DBService.loadMenuCategories(db),
             this.DBService.loadMenuProducts(db),
-            this.DBService.loadMenuSubCategories(db),                        
-            this.DBService.loadMenuChoices(db),            
-            this.DBService.loadMenuOptions(db),              
-            this.DBService.loadMenuSubOptions(db),            
+            this.DBService.loadMenuSubCategories(db),
+            this.DBService.loadMenuChoices(db),
+            this.DBService.loadMenuOptions(db),
+            this.DBService.loadMenuSubOptions(db),
             this.DBService.loadOptionCategories(db),
-            this.DBService.loadProductCategories(db),                                    
+            this.DBService.loadProductCategories(db),
             this.DBService.loadMenuTimers(db),
             this.DBService.loadOptions(db),
             this.DBService.loadTaxRates(db),
             this.DBService.loadUserModifiers(db),
-            this.DBService.loadReasons(db)                 
+            this.DBService.loadReasons(db)
         ])
             .subscribe(results => {
                 console.log(results);
                 this.isLoading = false;
-            },            
-            err => {
-                this.isLoading = false;
-                dialogs.alert(err);
-            // Do stuff whith your error
-            });        
+            },
+                err => {
+                    this.isLoading = false;
+                    dialogs.alert(err);
+                    // Do stuff whith your error
+                });
     }
 
     managerFunctions() {
@@ -208,9 +213,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
         //this.apiSvc.getFullOrder(188183).subscribe(orderResponse => {
         //    console.log(orderResponse);            
         //});
-        
+
         this.loadLocalDataBase(null);
-    }    
+    }
 
     loadTables() {
         this.DBService.getTableInfo('MenuProducts'); // .createTables(db);
@@ -219,7 +224,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     dropTables() {
         this.DBService.getTableInfo('MenuCategories'); // .createTables(db);
     }
- 
+
     shutDown() {
         dialogs.confirm({
             title: "Shutdown",

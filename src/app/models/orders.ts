@@ -9,15 +9,17 @@ export interface Countdown {
 }
 
 export enum OrderType {
-    DineIn = 0,
-    Here = 1,
-    ToGo = 2,
-    TakeOut = 3,
-    BarQuickSale = 4,
-    BarTab = 5,
-    PickUp = 6,
-    Delivery = 7,
-    FastFood = 8
+    DineIn = 1,
+    TakeOut = 2,
+    BarQuickSale = 3,
+    BarTab = 4,    
+    PhoneIn = 5,
+    FastFood = 6,    
+    Delivery = 7,    
+    Walkin = 8,
+    DriveThru = 9,
+    Here = 10,
+    PickUp = 11
 }
 
 export enum ItemType {
@@ -27,6 +29,13 @@ export enum ItemType {
     ForcedChoice = 4,
     SubOption = 5,
     Discount = 6
+}
+
+export interface OrderTypeDetail {
+    Name: string,
+    OrderType: OrderType,
+    Row?: number,
+    Col?: number
 }
 
 export interface OrderItem {

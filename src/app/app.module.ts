@@ -1,6 +1,7 @@
 import { NgModule, NgModuleFactoryLoader, NO_ERRORS_SCHEMA } from "@angular/core";
 import { NativeScriptModule } from "nativescript-angular/nativescript.module";
 import { HttpClientModule } from "@angular/common/http";
+//import { SocketIOModule } from "nativescript-socketio/angular";
 
 //import { TNSFontIconModule, TNSFontIconService } from 'nativescript-ngx-fonticon';
 //import { BadgeButtonModule } from "nativescript-badge-button";
@@ -23,7 +24,7 @@ import { OrderService } from "./services/order.service";
         NativeScriptModule,
         AppRoutingModule,
         HttpClientModule,
-       
+        //SocketIOModule.forRoot('192.168.8.131')
        // BadgeButtonModule              
     ],
     declarations: [
