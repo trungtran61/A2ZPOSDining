@@ -22,7 +22,7 @@
             [row]='item.Row' [col]='item.Col'></Button>
         <Button text='Filter By' class='glass btnBlackSquare' (tap)='cancel()' row='0' col='1'></Button>
         <Button [text]='viewChecksText' textWrap='true' class='glass btnBlackSquare' (tap)="viewChecks()" row='1' col='1'></Button>
-        <Button text='Employee A > Z' class='glass btnBlackSquare' textWrap='true' (tap)='cancel()' row='2' col='1'></Button>
+        <Button [text]='employeeOrderText' class='glass btnBlackSquare' textWrap='true' (tap)='orderByEmployee()' row='2' col='1'></Button>
         <Button text='Delivery Status' class='glass btnDeliveryStatus' textWrap='true' (tap)='cancel()' row='3' col='1'></Button>
         <Button text='View Delay Orders' class='btnViewDelayOrders' textWrap='true' (tap)='cancel()' row='4' col='1'></Button>
     </GridLayout>

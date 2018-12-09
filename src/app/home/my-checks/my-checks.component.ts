@@ -20,6 +20,9 @@ import { ActivatedRoute, NavigationExtras } from "@angular/router";
 
 export class MyChecksComponent implements OnInit {
     viewChecksText: string = ''
+    employeeOrderText: string = 'Employee A > Z';
+    employeeOrderASC: boolean = true;
+
     checks: Check[] = [];
     myChecksHeader: string = 'Checks';
     currentDateTime: Date;
@@ -28,7 +31,7 @@ export class MyChecksComponent implements OnInit {
 
     userName: string = '';
     orderTypeDetails: OrderTypeDetail[] = [];
-    closedChecks: boolean = false;
+    closedChecks: boolean = false;    
 
     ngOnInit(): void {
         // this is for the date/time display at top right corner
@@ -67,7 +70,9 @@ export class MyChecksComponent implements OnInit {
             let i: number = 1;  
 
             this.checks.forEach( check => {
-                let elapsedTime: number = Math.ceil(( new Date(check.CurrentDate).getTime() - new Date(check.CheckTime).getTime()) / (this.oneMinute));
+                let currentTime: number = this.utilSvc.getJSONDate(check.CurrentDate).getTime();    
+                let checkTime: number = this.utilSvc.getJSONDate(check.CheckTime).getTime();    
+                let elapsedTime: number = Math.ceil(( currentTime - checkTime) / (this.oneMinute));
                 let hours = Math.floor(elapsedTime / 60);
                 let minutes = elapsedTime % 60;
                 check.ElapsedTime = hours.toString() + ':' + this.utilSvc.padLeft(minutes.toString(), '0', 2);
@@ -117,6 +122,30 @@ export class MyChecksComponent implements OnInit {
                 );
                 break;
         }
+    }
+
+    orderByEmployee()
+    {
+        this.employeeOrderASC = !this.employeeOrderASC;
+
+        if (this.employeeOrderASC)
+            {
+                this.checks.sort((leftSide, rightSide): number => {
+                    if (leftSide.FirstName < rightSide.FirstName) return -1;
+                    if (leftSide.FirstName > rightSide.FirstName) return 1;
+                    return 0;
+                });
+            }
+         else
+         {
+            this.checks.sort((leftSide, rightSide): number => {
+                if (leftSide.FirstName > rightSide.FirstName) return -1;
+                if (leftSide.FirstName < rightSide.FirstName) return 1;
+                return 0;
+            });
+         } 
+         
+         this.employeeOrderText = this.employeeOrderASC ? 'Employee A > Z': 'Employee Z > A';
     }
 
     orderTypeSelected(orderType : OrderType)
