@@ -17,10 +17,10 @@
     </GridLayout>
     <!-- right panel buttons -->
     <GridLayout rows='110 110 110 110 110' columns='120 110' row='1' col='1'>        
-        <Button *ngFor='let item of orderTypeDetails' [text]='item.Name' class='glass btnGreenSquare' 
+        <Button *ngFor='let item of orderTypeDetails' [text]='item.Name' [class]='item.Class' 
             (tap)='orderTypeSelected(item.OrderType)' 
             [row]='item.Row' [col]='item.Col'></Button>
-        <Button text='Filter By' class='glass btnBlackSquare' (tap)='cancel()' row='0' col='1'></Button>
+        <Button text='Filter By' [class]='filterByClass' (tap)='filterByClicked()' row='0' col='1'></Button>
         <Button [text]='viewChecksText' textWrap='true' class='glass btnBlackSquare' (tap)="viewChecks()" row='1' col='1'></Button>
         <Button [text]='employeeOrderText' class='glass btnBlackSquare' textWrap='true' (tap)='orderByEmployee()' row='2' col='1'></Button>
         <Button text='Delivery Status' class='glass btnDeliveryStatus' textWrap='true' (tap)='cancel()' row='3' col='1'></Button>

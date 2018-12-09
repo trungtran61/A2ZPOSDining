@@ -196,3 +196,9 @@ page
 {
 	color: black;
 }
+
+.thickRedBorder
+{
+	border-width: 4;
+	border-color: red;
+}

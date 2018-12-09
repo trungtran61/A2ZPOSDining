@@ -31,7 +31,10 @@ export class MyChecksComponent implements OnInit {
 
     userName: string = '';
     orderTypeDetails: OrderTypeDetail[] = [];
-    closedChecks: boolean = false;    
+    closedChecks: boolean = false;
+
+    filterByClass: string = 'glass btnBlackSquare';
+    filterOn: boolean = false;
 
     ngOnInit(): void {
         // this is for the date/time display at top right corner
@@ -57,30 +60,29 @@ export class MyChecksComponent implements OnInit {
 
     }
 
-    getGroupedChecks()
-    {
+    getGroupedChecks() {
         if (this.closedChecks)
             this.viewChecksText = 'View All Checks';
         else
             this.viewChecksText = 'View Closed Checks';
 
-        this.apiSvc.getGroupedChecks(this.DBService.loggedInUser.AccessType == AccessType.Manager ? 0 : this.DBService.loggedInUser.PriKey, 
+        this.apiSvc.getGroupedChecks(this.DBService.loggedInUser.AccessType == AccessType.Manager ? 0 : this.DBService.loggedInUser.PriKey,
             this.DBService.loggedInUser.AccessType, this.closedChecks).subscribe(checks => {
-            this.checks = checks;
-            let i: number = 1;  
+                this.checks = checks;
+                let i: number = 1;
 
-            this.checks.forEach( check => {
-                let currentTime: number = this.utilSvc.getJSONDate(check.CurrentDate).getTime();    
-                let checkTime: number = this.utilSvc.getJSONDate(check.CheckTime).getTime();    
-                let elapsedTime: number = Math.ceil(( currentTime - checkTime) / (this.oneMinute));
-                let hours = Math.floor(elapsedTime / 60);
-                let minutes = elapsedTime % 60;
-                check.ElapsedTime = hours.toString() + ':' + this.utilSvc.padLeft(minutes.toString(), '0', 2);
-                check.Row = (Math.floor((i - 1) / 4));
-                check.Col = (i - 1) % 4;     
-                i++;
-            })
-        });
+                this.checks.forEach(check => {
+                    let currentTime: number = this.utilSvc.getJSONDate(check.CurrentDate).getTime();
+                    let checkTime: number = this.utilSvc.getJSONDate(check.CheckTime).getTime();
+                    let elapsedTime: number = Math.ceil((currentTime - checkTime) / (this.oneMinute));
+                    let hours = Math.floor(elapsedTime / 60);
+                    let minutes = elapsedTime % 60;
+                    check.ElapsedTime = hours.toString() + ':' + this.utilSvc.padLeft(minutes.toString(), '0', 2);
+                    check.Row = (Math.floor((i - 1) / 4));
+                    check.Col = (i - 1) % 4;
+                    i++;
+                })
+            });
     }
 
     loadOrderTypeDetails() {
@@ -108,10 +110,10 @@ export class MyChecksComponent implements OnInit {
             case 3:
                 this.orderTypeDetails.push(
                     {
-                        Name: 'Phone In', OrderType: OrderType.PhoneIn, Col: 0, Row: 0
+                        Name: 'Phone In', OrderType: OrderType.PickUp, Col: 0, Row: 0
                     },
                     {
-                        Name: 'Walk In', OrderType: OrderType.Walkin, Col: 0, Row: 1
+                        Name: 'Walk In', OrderType: OrderType.WalkIn, Col: 0, Row: 1
                     },
                     {
                         Name: 'Drive Thru', OrderType: OrderType.DriveThru, Col: 0, Row: 2
@@ -122,43 +124,70 @@ export class MyChecksComponent implements OnInit {
                 );
                 break;
         }
+
+        this.orderTypeDetails.forEach( otd => otd.Class = 'glass btnGreenSquare');
     }
 
-    orderByEmployee()
-    {
+    orderByEmployee() {
+        let that = this;
         this.employeeOrderASC = !this.employeeOrderASC;
 
-        if (this.employeeOrderASC)
-            {
-                this.checks.sort((leftSide, rightSide): number => {
-                    if (leftSide.FirstName < rightSide.FirstName) return -1;
-                    if (leftSide.FirstName > rightSide.FirstName) return 1;
-                    return 0;
-                });
-            }
-         else
-         {
-            this.checks.sort((leftSide, rightSide): number => {
-                if (leftSide.FirstName > rightSide.FirstName) return -1;
-                if (leftSide.FirstName < rightSide.FirstName) return 1;
+        if (this.employeeOrderASC) {
+            this.checks.sort(function (a, b) {
+                var nameA = a.FirstName.toLowerCase(), nameB = b.FirstName.toLowerCase()
+                if (nameA < nameB) //sort string ascending
+                    return -1;
+                if (nameA > nameB)
+                    return 1;
                 return 0;
-            });
-         } 
-         
-         this.employeeOrderText = this.employeeOrderASC ? 'Employee A > Z': 'Employee Z > A';
+            })
+        }
+        else {
+            this.checks.sort(function (a, b) {
+                var nameA = a.FirstName.toLowerCase(), nameB = b.FirstName.toLowerCase()
+                if (nameA > nameB) //sort string descending
+                    return -1;
+                if (nameA < nameB)
+                    return 1;
+                return 0;
+            })
+        }
+
+        this.employeeOrderText = this.employeeOrderASC ? 'Employee A > Z' : 'Employee Z > A';
     }
 
-    orderTypeSelected(orderType : OrderType)
-    {
+    orderTypeSelected(orderType: OrderType) {
 
+    }
+
+    filterByClicked()
+    {
+        this.toggleFiltering();
+    }
+
+    toggleFiltering()
+    {
+        this.filterOn = !this.filterOn;
+
+        if (this.filterOn)
+        {
+        this.filterByClass = 'glass btnBlackSquare thickRedBorder';
+        this.orderTypeDetails.forEach( otd => otd.Class = 'glass btnBrownSquare');
+        }
+        else
+        {
+            this.filterByClass = 'glass btnBlackSquare';
+            this.orderTypeDetails.forEach( otd => otd.Class = 'glass btnGreenSquare');
+            }
     }
 
     cancel() {
         this.router.back();
     }
 
-    viewChecks()
-    {
+    viewChecks() {
+        this.toggleFiltering();
+        
         this.closedChecks = !this.closedChecks;
         this.getGroupedChecks();
     }
@@ -170,7 +199,7 @@ export class MyChecksComponent implements OnInit {
     ) {
         page.actionBarHidden = true;
         this.route.queryParams.subscribe(params => {
-            this.closedChecks = params['closed'];                  
+            this.closedChecks = params['closed'];
         });
     }
 }

@@ -8,7 +8,7 @@ export interface Countdown {
     QuantityChange?: number;
 }
 
-export enum OrderType {
+export enum FunctionType {
     DineIn = 1,
     TakeOut = 2,
     BarQuickSale = 3,
@@ -16,11 +16,25 @@ export enum OrderType {
     PhoneIn = 5,
     FastFood = 6,    
     Delivery = 7,    
-    Walkin = 8,
-    DriveThru = 9,
-    Here = 10,
-    PickUp = 11
+    WalkIn = 8,
+    DriveThru = 9
 }
+
+export enum OrderType
+    {
+        DineIn = 1,
+        BarTab = 2,
+        BarQuickSale = 3,
+        TakeOut = 4,
+        Delivery = 5,
+        PickUp = 6,
+        Here = 7,
+        ToGo = 8,
+        DriveThru = 9,
+        FastFood = 10,
+        Waste = 11,
+        WalkIn = 12
+    }
 
 export enum ItemType {
     Product = 1,   
@@ -35,7 +49,8 @@ export interface OrderTypeDetail {
     Name: string,
     OrderType: OrderType,
     Row?: number,
-    Col?: number
+    Col?: number,
+    Class?: string
 }
 
 export interface OrderItem {
