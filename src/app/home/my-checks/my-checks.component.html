@@ -12,13 +12,15 @@
                 style='font-weight: bold; font-size: 20; color:yellow; background-color: black;padding: 3; text-align: center'></Label>    
             <Label *ngIf='check.NumberGuests > 1 && closedChecks != "true"' [text]='check.NumberGuests' 
                 style='text-align: center;font-weight: bold; font-size: 40; color:red;'></Label>
+            <Label *ngIf='check.NumberGuests == 1 && closedChecks != "true"' text='0' 
+                    style='text-align: center;font-weight: bold; font-size: 40; color:white;'></Label>    
             <Label [text]='check.FirstName' style='font-weight: bold; font-size: 20; color:blue;'></Label>
         </StackLayout>
     </GridLayout>
     <!-- right panel buttons -->
     <GridLayout rows='110 110 110 110 110' columns='120 110' row='1' col='1'>        
-        <Button *ngFor='let item of orderTypeDetails' [text]='item.Name' [class]='item.Class' 
-            (tap)='orderTypeSelected(item.OrderType)' 
+        <Button *ngFor='let item of functionTypeDetails' [text]='item.Name' [class]='item.Class' 
+            (tap)='functionTypeSelected(item)' 
             [row]='item.Row' [col]='item.Col'></Button>
         <Button text='Filter By' [class]='filterByClass' (tap)='filterByClicked()' row='0' col='1'></Button>
         <Button [text]='viewChecksText' textWrap='true' class='glass btnBlackSquare' (tap)="viewChecks()" row='1' col='1'></Button>

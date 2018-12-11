@@ -9,10 +9,10 @@ export interface Countdown {
 }
 
 export enum FunctionType {
-    DineIn = 1,
-    TakeOut = 2,
-    BarQuickSale = 3,
-    BarTab = 4,    
+    DineIn = 1,    
+    BarQuickSale = 2,
+    BarTab = 3,
+    TakeOut = 4,    
     PhoneIn = 5,
     FastFood = 6,    
     Delivery = 7,    
@@ -44,10 +44,18 @@ export enum ItemType {
     SubOption = 5,
     Discount = 6
 }
-
+/*
 export interface OrderTypeDetail {
     Name: string,
     OrderType: OrderType,
+    Row?: number,
+    Col?: number,
+    Class?: string
+}
+*/
+export interface FunctionTypeDetail {
+    Name: string,
+    FunctionType: FunctionType,
     Row?: number,
     Col?: number,
     Class?: string

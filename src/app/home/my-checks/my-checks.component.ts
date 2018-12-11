@@ -7,7 +7,7 @@ import { Area, TableDetail, Check } from "~/app/models/products";
 import { Page } from "tns-core-modules/ui/page/page";
 import { UtilityService } from "~/app/services/utility.service";
 import { APIService } from "~/app/services/api.service";
-import { OrderTypeDetail, OrderType } from "~/app/models/orders";
+import { FunctionTypeDetail, FunctionType } from "~/app/models/orders";
 import { AccessType } from "~/app/models/employees";
 import { ActivatedRoute, NavigationExtras } from "@angular/router";
 
@@ -30,11 +30,12 @@ export class MyChecksComponent implements OnInit {
     oneMinute: number = 1000 * 60; // in milliseconds
 
     userName: string = '';
-    orderTypeDetails: OrderTypeDetail[] = [];
+    functionTypeDetails: FunctionTypeDetail[] = [];
     closedChecks: boolean = false;
 
     filterByClass: string = 'glass btnBlackSquare';
     filterOn: boolean = false;
+    filter: FunctionType;
 
     ngOnInit(): void {
         // this is for the date/time display at top right corner
@@ -56,25 +57,27 @@ export class MyChecksComponent implements OnInit {
 
         this.userName = 'USER: ' + this.DBService.loggedInUser.FirstName;
 
-        this.loadOrderTypeDetails();
+        this.loadFunctionTypeDetails();
 
     }
 
     getGroupedChecks() {
-        if (this.closedChecks)
-            this.viewChecksText = 'View All Checks';
-        else
-            this.viewChecksText = 'View Closed Checks';
+        this.viewChecksText = this.closedChecks ? 'View All Checks' : 'View Closed Checks';
 
         this.apiSvc.getGroupedChecks(this.DBService.loggedInUser.AccessType == AccessType.Manager ? 0 : this.DBService.loggedInUser.PriKey,
             this.DBService.loggedInUser.AccessType, this.closedChecks).subscribe(checks => {
                 this.checks = checks;
+                if (this.filterOn && this.filter != null) {
+                    this.checks = this.checks.filter(c => c.TransType == this.filter)
+                }
+
                 let i: number = 1;
+                let now = new Date().getTime();
 
                 this.checks.forEach(check => {
-                    let currentTime: number = this.utilSvc.getJSONDate(check.CurrentDate).getTime();
+                    //let currentTime: number = this.utilSvc.getJSONDate(check.CurrentDate).getTime();
                     let checkTime: number = this.utilSvc.getJSONDate(check.CheckTime).getTime();
-                    let elapsedTime: number = Math.ceil((currentTime - checkTime) / (this.oneMinute));
+                    let elapsedTime: number = Math.ceil((now - checkTime) / (this.oneMinute));
                     let hours = Math.floor(elapsedTime / 60);
                     let minutes = elapsedTime % 60;
                     check.ElapsedTime = hours.toString() + ':' + this.utilSvc.padLeft(minutes.toString(), '0', 2);
@@ -85,47 +88,47 @@ export class MyChecksComponent implements OnInit {
             });
     }
 
-    loadOrderTypeDetails() {
+    loadFunctionTypeDetails() {
         switch (this.DBService.loggedInUser.Module) {
             case 1:
-                this.orderTypeDetails.push(
+                this.functionTypeDetails.push(
                     {
-                        Name: 'Table', OrderType: OrderType.DineIn, Col: 0, Row: 0
+                        Name: 'Table', FunctionType: FunctionType.DineIn, Col: 0, Row: 0
                     },
                     {
-                        Name: 'Take Out', OrderType: OrderType.TakeOut, Col: 0, Row: 1
+                        Name: 'Take Out', FunctionType: FunctionType.TakeOut, Col: 0, Row: 1
                     }
                 );
                 break;
             case 2:
-                this.orderTypeDetails.push(
+                this.functionTypeDetails.push(
                     {
-                        Name: 'Quick Sale', OrderType: OrderType.BarQuickSale, Col: 0, Row: 0
+                        Name: 'Quick Sale', FunctionType: FunctionType.BarQuickSale, Col: 0, Row: 0
                     },
                     {
-                        Name: 'Bar Tab', OrderType: OrderType.BarTab, Col: 0, Row: 1
+                        Name: 'Bar Tab', FunctionType: FunctionType.BarTab, Col: 0, Row: 1
                     }
                 );
                 break;
             case 3:
-                this.orderTypeDetails.push(
+                this.functionTypeDetails.push(
                     {
-                        Name: 'Phone In', OrderType: OrderType.PickUp, Col: 0, Row: 0
+                        Name: 'Phone In', FunctionType: FunctionType.PhoneIn, Col: 0, Row: 0
                     },
                     {
-                        Name: 'Walk In', OrderType: OrderType.WalkIn, Col: 0, Row: 1
+                        Name: 'Walk In', FunctionType: FunctionType.WalkIn, Col: 0, Row: 1
                     },
                     {
-                        Name: 'Drive Thru', OrderType: OrderType.DriveThru, Col: 0, Row: 2
+                        Name: 'Drive Thru', FunctionType: FunctionType.DriveThru, Col: 0, Row: 2
                     },
                     {
-                        Name: 'Quick Sale', OrderType: OrderType.FastFood, Col: 0, Row: 3
+                        Name: 'Quick Sale', FunctionType: FunctionType.FastFood, Col: 0, Row: 3
                     }
                 );
                 break;
         }
 
-        this.orderTypeDetails.forEach( otd => otd.Class = 'glass btnGreenSquare');
+        this.functionTypeDetails.forEach(otd => otd.Class = 'glass btnGreenSquare');
     }
 
     orderByEmployee() {
@@ -156,29 +159,38 @@ export class MyChecksComponent implements OnInit {
         this.employeeOrderText = this.employeeOrderASC ? 'Employee A > Z' : 'Employee Z > A';
     }
 
-    orderTypeSelected(orderType: OrderType) {
+    functionTypeSelected(functionTypeDetail: FunctionTypeDetail) {
 
+        if (this.filterOn) {
+            this.functionTypeDetails.forEach(ftd => ftd.Class = ftd.Class = 'glass btnBrownSquare');
+            functionTypeDetail.Class += ' thickRedBorder';
+            this.filter = functionTypeDetail.FunctionType;
+            this.getGroupedChecks();
+        }
     }
 
-    filterByClicked()
-    {
+    filterByClicked() {
         this.toggleFiltering();
     }
 
-    toggleFiltering()
-    {
+    resetFilters() {
+        this.filterByClass = 'glass btnBlackSquare';
+        this.functionTypeDetails.forEach(ftd => ftd.Class = ftd.Class = 'glass btnGreenSquare');
+        this.filterOn = false;
+    }
+
+    toggleFiltering() {
         this.filterOn = !this.filterOn;
 
-        if (this.filterOn)
-        {
-        this.filterByClass = 'glass btnBlackSquare thickRedBorder';
-        this.orderTypeDetails.forEach( otd => otd.Class = 'glass btnBrownSquare');
+        if (this.filterOn) {
+            this.filterByClass = 'glass btnBlackSquare thickRedBorder';
+            this.functionTypeDetails.forEach(otd => otd.Class = 'glass btnBrownSquare');
         }
-        else
-        {
+        else {
             this.filterByClass = 'glass btnBlackSquare';
-            this.orderTypeDetails.forEach( otd => otd.Class = 'glass btnGreenSquare');
-            }
+            this.functionTypeDetails.forEach(otd => otd.Class = 'glass btnGreenSquare');
+        }
+        this.getGroupedChecks();
     }
 
     cancel() {
@@ -186,8 +198,8 @@ export class MyChecksComponent implements OnInit {
     }
 
     viewChecks() {
-        this.toggleFiltering();
-        
+        //this.toggleFiltering();
+        this.resetFilters();
         this.closedChecks = !this.closedChecks;
         this.getGroupedChecks();
     }
@@ -198,8 +210,9 @@ export class MyChecksComponent implements OnInit {
         private route: ActivatedRoute
     ) {
         page.actionBarHidden = true;
+
         this.route.queryParams.subscribe(params => {
-            this.closedChecks = params['closed'];
+            this.closedChecks = params['closed'] == 'true' ? true : false;
         });
     }
 }
