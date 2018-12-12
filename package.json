@@ -27,7 +27,6 @@
     "nativescript-iqkeyboardmanager": "^1.3.0",
     "nativescript-localstorage": "^2.0.0",
     "nativescript-ngx-fonticon": "^4.2.0",
-    "nativescript-socket.io": "^0.9.0",
     "nativescript-sqlite": "^2.2.3",
     "nativescript-star-printer": "^3.0.1",
     "nativescript-theme-core": "~1.0.4",

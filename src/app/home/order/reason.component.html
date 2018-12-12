@@ -1,5 +1,5 @@
 <StackLayout class='page'>
-    <GridLayout rows='60 * 100' class='pageHeader' *ngIf='!isOtherReason' >
+    <GridLayout rows='60 * 100' class='pageHeader' [visibility]="isOtherReason ? 'collapse' : 'visible'" >
         <label text='Choose a Reason' row='0' class="title"></label>
         <GridLayout columns="* * *" rows="110 110 110 110 110" row='1' style='border-width: 1; border-color: gray; border-radius: 10; padding: 10; margin: 5'>
             <Button [class]='reason.Class' [text]='reason.Reason' (tap)='setActiveReason(reason)' [row]='reason.Row'
@@ -16,9 +16,9 @@
         </GridLayout>
     </GridLayout>
 
-    <StackLayout rows="120 auto" *ngIf='isOtherReason'>
+    <StackLayout rows="120 auto"  [visibility]="isOtherReason ? 'visible' : 'collapse'">
         <GridLayout rows="100 auto auto" columns="*">
-            <TextField id='otherReason' horizontalAlignment="center" hint="Enter Reason" [text]='otherReason' row='1'
+            <TextField #vcReason horizontalAlignment="center" hint="Enter Reason" [text]='otherReason' row='1'
                 [(ngModel)]='otherReason' required #otherReasonModel='ngModel' autocorrect="true" class='textEntryLongActive'
                 (returnPress)="acceptReason(otherReason)" (keyPress)="keyPressed($event)" returnKeyType='done' >
             </TextField>

@@ -1,7 +1,7 @@
 <GridLayout columns="*,*" rows="120,auto" class="p-30 page">
     <StackLayout orientation="horizontal" row='0' colSpan="2">
         <StackLayout>
-            <TextField id='memo' hint="Enter Memo" [text]='memo' [(ngModel)]='memo' required #memoModel='ngModel' autocorrect="true"
+            <TextField id='memo' #vcMemo hint="Enter Memo" [text]='memo' [(ngModel)]='memo' required #memoModel='ngModel' autocorrect="true"
                 [class]="memoClass" (tap)='activateMemo()'>
             </TextField>
             <Label class="validation" [visibility]="memoModel.valid ? 'collapse' : 'visible'" text="Memo is required"></Label>

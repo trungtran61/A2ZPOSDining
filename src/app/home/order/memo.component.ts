@@ -13,7 +13,7 @@ import { Page } from "tns-core-modules/ui/page/page";
     styleUrls: []
 })
 export class MemoComponent implements OnInit, AfterViewInit {
-    @ViewChild("memoModel") memoModel: ElementRef;
+    @ViewChild("vcMemo") vcMemo: ElementRef;
     memo: string = '';
     price: number;
     pageTitle: string = 'Enter Memo';
@@ -55,15 +55,7 @@ export class MemoComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        /*
-        setTimeout(() => {
-            this.memoModel.nativeElement.focus();
-        }, 600);
-        */
-        setTimeout(() => {
-            let focusTextField: TextField = <TextField>this.page.getViewById("memo");
-            focusTextField.focus();
-        }, 600);
+        this.vcMemo.nativeElement.focus();
     }
 
 }

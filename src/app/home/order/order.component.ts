@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewContainerRef, OnDestroy, NgZone } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
-
 import { SwipeDirection } from "ui/gestures";
+
 import * as dialogs from "tns-core-modules/ui/dialogs";
 //import { SocketIO } from "nativescript-socketio";
 
@@ -125,7 +125,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     isExistingOrder: boolean = false;
     textColorClass: string = 'enabledTextColor';
    
-    printerPort: string = '192.168.8.131:9100';
+    printerPort: string = '192.168.0.125:9100';
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -139,6 +139,11 @@ export class OrderComponent implements OnInit, OnDestroy {
     ) 
     {
         page.actionBarHidden = true;        
+        /*
+        if (isIOS) {
+                topmost().ios.controller.navigationBar.barStyle = 1;
+        }
+        */
         //this.printerSocket = new WebSocket("ws://" + this.printerPort, []);
     }
 

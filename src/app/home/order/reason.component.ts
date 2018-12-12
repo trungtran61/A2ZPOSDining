@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
@@ -15,6 +15,7 @@ import { ModalDialogParams } from "nativescript-angular/modal-dialog";
 })
 
 export class ReasonComponent implements OnInit {
+    @ViewChild('vcReason') vcReason: ElementRef; 
     reasons: Reason[] = [];
     //orderItem: OrderDetail;
     reason: string;
@@ -60,6 +61,7 @@ export class ReasonComponent implements OnInit {
 
     showOtherReason()
     {
+        this.vcReason.nativeElement.focus();
         this.isOtherReason = true;
     }
    

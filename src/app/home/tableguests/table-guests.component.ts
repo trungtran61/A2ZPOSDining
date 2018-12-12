@@ -1,8 +1,7 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
-//import { ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
-//import { ForcedModifiersComponent } from "../menu/forced-modifiers/forced-modifiers.component";
-//import { OtherQtyComponent } from "../menu/other-qty.component";
+import { Page } from "tns-core-modules/ui/page/page";
+import { TextField } from "tns-core-modules/ui/text-field/text-field";
 
 @Component({
     selector: "TableGuests",
@@ -11,6 +10,7 @@ import { RouterExtensions } from "nativescript-angular/router";
     styleUrls: ['./table-guests.component.css']
 })
 export class TableGuestsComponent implements OnInit {
+    @ViewChild('guests') guests: ElementRef; 
     tableGuestsTitle: string = 'Choose the number of guests for table ';
     normalStyle: string = "color: black;background-image: linear-gradient(gold, yellow);";
     activeStyle: string = "color: black;background-image: linear-gradient(darkred, red);";
@@ -19,7 +19,7 @@ export class TableGuestsComponent implements OnInit {
     digitRows: number[] = [];
     digitCols: number[] = [];
     isNormalChoice: boolean = true;
-    guestsEntered: string = '';
+    guestsEntered: string = '';    
 
     setNormalStyle() {        
         for (let i = 0; i < this.styles.length; i++) {
@@ -56,6 +56,7 @@ export class TableGuestsComponent implements OnInit {
     
     otherQty()
     {
+        /*
         this.digitRows = []; 
         this.digitCols = []; 
         let that = this;
@@ -63,7 +64,9 @@ export class TableGuestsComponent implements OnInit {
             that.digitRows.push(Math.floor((digit -1 ) / 3)+1);
             that.digitCols.push((digit - 1) % 3);
         });
-       this.isNormalChoice = false;
+        */    
+        this.guests.nativeElement.focus();
+        this.isNormalChoice = false;
     }
 
     ngOnInit(): void {
@@ -73,9 +76,11 @@ export class TableGuestsComponent implements OnInit {
             that.digitRows.push(Math.floor((digit -1 ) / 3));
             that.digitCols.push((digit - 1) % 3);
         });
+       
     }
 
-    constructor(private router: RouterExtensions) {        
+    constructor(private router: RouterExtensions, private page: Page) {       
+        page.actionBarHidden = true;  
     }
 
 }
