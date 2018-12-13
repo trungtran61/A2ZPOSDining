@@ -111,9 +111,9 @@ export class OrderComponent implements OnInit, OnDestroy {
     TAX_RATE: number = .08;
     MAX_GUESTS: number = 6;
     TIPS_PCT: number = .15;
-
+  
     qtyEntered: number = 1;
-    orderType: number = OrderType.DineIn;
+    orderType: number = OrderType.DineIn; 
 
     canSubCategoryPageDown: boolean = false;
     canSubCategoryPageUp: boolean = false;
@@ -303,7 +303,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             let lightColor: string = '#' + product.ButtonColorHex;
             //let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
             let darkColor: string = that.utilSvc.colorLuminance(lightColor, -0.2);
-            let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
+            let style: string = "margin-top:5; color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
             product.Style = style;
 
             product.QtyClass = '';
@@ -1079,14 +1079,14 @@ export class OrderComponent implements OnInit, OnDestroy {
                 }
 
                 let isCategoryLocked: boolean = false;
-                isCategoryLocked = this.checkMenuTimer(MenuTimerType.Locked, OverrideType.Type2, 1, false);
+                isCategoryLocked = this.checkMenuTimer(MenuTimerType.Locked, OverrideType.Type2, 0, false);
 
                 if (isCategoryLocked) {
                     this.currentCategoryID = this.lockedCategoryId;
                     this.showMainCategories = false;
                 }
 
-                isCategoryLocked = this.checkMenuTimer(MenuTimerType.Locked, OverrideType.Type0, 1, false);
+                isCategoryLocked = this.checkMenuTimer(MenuTimerType.Locked, OverrideType.Type0, 0, false);
 
                 if (isCategoryLocked) {
                     this.currentCategoryID = this.lockedCategoryId;
@@ -1126,6 +1126,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         let totalCategory: number = 0;
         let timers: MenuTimer[] = [];
         let _category = this.lockedCategoryId;
+        let that = this;
 
         if (timerType == MenuTimerType.Undefined) {
             timers = this.allTimers.filter(x => x.Enabled == true);
@@ -1171,27 +1172,27 @@ export class OrderComponent implements OnInit, OnDestroy {
                 timers = timers.filter(x => x.Sun == true)
                 break;
         }
-
+  
         //timers.forEach(function (timer: MenuTimer) {});
         timers.forEach(function (timer: MenuTimer) {
             // start time is later than end time 
             let date1: Date = new Date();
             let date2: Date = new Date();
             let now: Date = new Date();
-
-            if (parseInt(timer.StartTime) > parseInt(timer.EndTime)) {
+           
+            if (parseInt(timer.StartTime.replace(':','')) > parseInt(timer.EndTime.replace(':',''))) {
                 if (now.getHours() <= parseInt(timer.EndTime.substr(0, 2))) {
-                    date1 = this.convertToDate(this.AddDays(now, -1).toDateString(), timer.StartTime);
-                    date2 = this.convertToDate(now.toDateString(), timer.EndTime);
+                    date1 = that.convertToDate(that.addDays(now, -1).toDateString(), timer.StartTime);
+                    date2 = that.convertToDate(now.toDateString(), timer.EndTime);
                 }
                 else {
-                    date1 = this.convertToDate(now.toDateString(), timer.StartTime);
-                    date2 = this.convertToDate(this.AddDays(now, 1).toDateString(), timer.EndTime);
+                    date1 = that.convertToDate(now.toDateString(), timer.StartTime);
+                    date2 = that.convertToDate(that.addDays(now, 1).toDateString(), timer.EndTime);
                 }
             }
             else {
-                date1 = this.convertToDate(now.toDateString(), timer.StartTime);
-                date2 = this.convertToDate(now.toDateString(), timer.EndTime);
+                date1 = that.convertToDate(now.toDateString(), timer.StartTime);
+                date2 = that.convertToDate(now.toDateString(), timer.EndTime);
             }
 
             if (now > date1 && now <= date2) {
@@ -1207,7 +1208,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                                     if (!timer.OverRideCategoryBar)
                                         checkMenuTimer = false;
                                     else {
-                                        this.lockedCategoryId = timer.CategoryToLock;
+                                        that.lockedCategoryId = timer.CategoryToLock;
                                         checkMenuTimer = true;
                                     }
 
@@ -1216,7 +1217,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                                     if (!timer.OverRideCategoryDineIn)
                                         checkMenuTimer = false;
                                     else {
-                                        this.lockedCategoryId = timer.CategoryToLock;
+                                        that.lockedCategoryId = timer.CategoryToLock;
                                         checkMenuTimer = true;
                                     }
 
@@ -1227,8 +1228,8 @@ export class OrderComponent implements OnInit, OnDestroy {
                         else
                             return true;
                     case MenuTimerType.Default:
-                        this.lockedCategoryId = timer.DefaultCategory;
-                        switch (this.orderType) {
+                        that.lockedCategoryId = timer.DefaultCategory;
+                        switch (that.orderType) {
                             case OrderType.DineIn:
                                 if (!timer.TableService)
                                     checkMenuTimer = false;
@@ -1263,7 +1264,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             else {
                 if (timerType == MenuTimerType.Locked) {
                     if (checkLocked) {
-                        if (this.lockedCategoryId != timer.CategoryToLock)
+                        if (that.lockedCategoryId != timer.CategoryToLock)
                             checkMenuTimer = true;
                         else {
                             checkMenuTimer = false;

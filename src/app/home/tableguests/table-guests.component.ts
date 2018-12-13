@@ -82,7 +82,7 @@ export class TableGuestsComponent implements OnInit {
     }
 
     constructor(private router: RouterExtensions, private page: Page) {       
-        page.actionBarHidden = true;  
+        //page.actionBarHidden = true;  
     }
 
 }

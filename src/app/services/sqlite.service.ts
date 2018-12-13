@@ -1021,8 +1021,8 @@ export class SQLiteService {
                                         SQLiteService.database.execSQL("INSERT INTO MenuTimers (PriKey,Name,Enabled,HappyHourType,PriceLevel,StartTime,EndTime,CategoryToLock" +
                                             ",OverRideCategoryBar,OverRideCategoryDineIn,Mon,Tue,Wed,Thu,Fri,Sat,Sun" +
                                             ",TableService,WalkIn,TakeOut,Bar,PhoneIn,QuickSale,DefaultCategory) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                                            [menuTimer.PriKey, menuTimer.Name, menuTimer.Enabled, menuTimer.HappyHourType, menuTimer.PriceLevel, that.converTimestampToDate(menuTimer.StartTime),
-                                            that.converTimestampToDate(menuTimer.EndTime), menuTimer.CategoryToLock
+                                            [menuTimer.PriKey, menuTimer.Name, menuTimer.Enabled, menuTimer.HappyHourType, menuTimer.PriceLevel, menuTimer.StartTime,
+                                                menuTimer.EndTime, menuTimer.CategoryToLock
                                                 , menuTimer.OverRideCategoryBar, menuTimer.OverRideCategoryDineIn, menuTimer.Mon, menuTimer.Tue, menuTimer.Wed, menuTimer.Thu, menuTimer.Fri, menuTimer.Sat, menuTimer.Sun
                                                 , menuTimer.TableService, menuTimer.WalkIn, menuTimer.TakeOut, menuTimer.Bar, menuTimer.PhoneIn, menuTimer.QuickSale, menuTimer.DefaultCategory]).then(id => {
                                                     resolve("Added MenuTimers records.")
@@ -1065,12 +1065,25 @@ export class SQLiteService {
                 for (var row in rows) {
                     timers.push(
                         {
-                            PriKey: rows[row][0],Name: rows[row][1],Enabled: rows[row][2], HappyHourType: rows[row][3],
-                            PriceLevel: rows[row][4],StartTime: rows[row][5],EndTime: rows[row][6],CategoryToLock: rows[row][7],
+                            PriKey: rows[row][0],Name: rows[row][1],
+                            Enabled: rows[row][2].toLowerCase() == 'true',
+                            HappyHourType: rows[row][3],
+                            PriceLevel: rows[row][4],
+                            StartTime: '10:00', // rows[row][5],
+                            EndTime: '16:15', //rows[row][6],
+                            CategoryToLock: rows[row][7],
                             OverRideCategoryBar: rows[row][8], OverRideCategoryDineIn: rows[row][9],
-                            Mon: rows[row][10],Tue: rows[row][11],Wed: rows[row][12],Thu: rows[row][12],Fri: rows[row][13],Sat: rows[row][14],Sun: rows[row][15],
-                            TableService: rows[row][16],WalkIn: rows[row][17],TakeOut: rows[row][18],Bar: rows[row][19],PhoneIn: rows[row][20],
-                            QuickSale: rows[row][21],DefaultCategory: rows[row][22]
+                            Mon: rows[row][10].toLowerCase() == 'true',Tue: rows[row][11].toLowerCase() == 'true',
+                            Wed: rows[row][12].toLowerCase() == 'true',Thu: rows[row][12].toLowerCase() == 'true',
+                            Fri: rows[row][13].toLowerCase() == 'true',Sat: rows[row][14].toLowerCase() == 'true',
+                            Sun: rows[row][15].toLowerCase() == 'true',
+                            TableService: rows[row][16].toLowerCase() == 'true',
+                            WalkIn: rows[row][17].toLowerCase() == 'true',
+                            TakeOut: rows[row][18].toLowerCase() == 'true',
+                            Bar: rows[row][19].toLowerCase() == 'true',
+                            PhoneIn: rows[row][20].toLowerCase() == 'true',
+                            QuickSale: rows[row][21].toLowerCase() == 'true',
+                            DefaultCategory: rows[row][22]
                         }
                     );
                 }
