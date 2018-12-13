@@ -109,7 +109,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     allTimers: MenuTimer[] = [];
 
     TAX_RATE: number = .08;
-    MAX_GUESTS: number = 6;
+    MAX_GUESTS: number = 6; 
     TIPS_PCT: number = .15;
   
     qtyEntered: number = 1;
@@ -135,6 +135,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         private utilSvc: UtilityService,
         private page: Page,
         private route: ActivatedRoute,
+        private zone: NgZone,
         //private socketIO: SocketIO       
     ) {
         page.actionBarHidden = true;
@@ -157,7 +158,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.countdowns = <Countdown[]>result;
         }
         );
-
+  
         this.getMenuTimers();
         this.getUserModifiers();
 
@@ -631,9 +632,10 @@ export class OrderComponent implements OnInit, OnDestroy {
         switch (fixedOption.Name) {
             case 'NO MAKE':
             case 'TO GO':
-                let maxIndexDataSub: number = this.getMaxIndexDataSub(this.currentOrderItem.IndexData);
+                
                 this.addItemToOrder
-                    (0, fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1
+                    (
+                    0, fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1
                     );
 
                 break;
@@ -646,8 +648,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
     }
 
-    cancelOrder() {
-        if (this.order.OrderItems.length > 0) {
+    cancelOrder() { 
+        if (this.orderItems.length > 0) {
             dialogs.confirm({
                 title: "Cancel Order",
                 message: "Cancel this order?",
@@ -655,11 +657,13 @@ export class OrderComponent implements OnInit, OnDestroy {
                 cancelButtonText: "No"
             }).then(isCanceling => {
                 if (isCanceling)
-                    this.router.back();
+                    //this.router.back();
+                    this.zone.run(() => this.router.navigate(['/home/area']));                    
             });
         }
         else {
-            this.router.back();
+            //this.router.back();            
+            this.zone.run(() => this.router.navigate(['/home/area']));
         }
     }
 
