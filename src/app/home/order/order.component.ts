@@ -6,8 +6,8 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 //import { SocketIO } from "nativescript-socketio";
 
 import {
-    CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem, MenuTimerTypes,
-    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail, MenuSubOption
+    CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem,
+    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail, MenuSubOption, MenuTimerType, OverrideType
 } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
@@ -124,7 +124,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     isExistingOrder: boolean = false;
     textColorClass: string = 'enabledTextColor';
-   
+
     printerPort: string = '192.168.0.125:9100';
 
     constructor(private router: RouterExtensions,
@@ -136,9 +136,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         private page: Page,
         private route: ActivatedRoute,
         //private socketIO: SocketIO       
-    ) 
-    {
-        page.actionBarHidden = true;        
+    ) {
+        page.actionBarHidden = true;
         /*
         if (isIOS) {
                 topmost().ios.controller.navigationBar.barStyle = 1;
@@ -156,16 +155,6 @@ export class OrderComponent implements OnInit, OnDestroy {
         */
         this.apiSvc.reloadCountdowns().then(result => {
             this.countdowns = <Countdown[]>result;
-            if (this.showMainCategories) {
-                this.DBService.getLocalMenuCategories().then((categories) => {
-                    if (categories.length == 0) {
-                        dialogs.alert("Main Categories not loaded.");
-                    }
-                    else {
-                        this.loadCategories(categories);
-                    }
-                });
-            }
         }
         );
 
@@ -187,13 +176,8 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.createNewOrder();
             }
         });
-        const SocketIO = require("nativescript-socket.io")
-        SocketIO.connect(this.printerPort);
-        //SocketIO.disconnect();
-        //SocketIO.emit('0x1B@trung', {
-        //    username: '0x1B@tran',
-        //  });
-        //this.socketIO.connect();
+
+        this.apiSvc.postToPrint('hero');
     }
 
     createNewOrder() {
@@ -223,11 +207,6 @@ export class OrderComponent implements OnInit, OnDestroy {
             let style: string = "color: #" + menuCategory.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
             that.categoryStyles.push(style);
         });
-
-        // CategoryName is actually CategoryID
-        if (this.DBService.systemSettings.AutoCategory) {
-            this.categorySelected(this.categories.find(x => x.CategoryID == this.DBService.systemSettings.CategoryName));
-        }
     }
 
     nextSeat() {
@@ -370,7 +349,6 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.showForcedModifierDialog(product, -1, null, true);
             }
             else {
-                //this.checkMenuTimer(product.)
                 this.addProductToOrder(product);
             }
     }
@@ -379,9 +357,11 @@ export class OrderComponent implements OnInit, OnDestroy {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
-            context: { productCode: product.ProductCode, 
+            context: {
+                productCode: product.ProductCode,
                 indexData: this.getMaxIndexData() + 1,
-                currentChoices: orderItemIndex > -1 ? this.order.OrderItems[orderItemIndex].ForcedModifiers : [] }
+                currentChoices: orderItemIndex > -1 ? this.order.OrderItems[orderItemIndex].ForcedModifiers : []
+            }
         };
 
         let that = this;
@@ -391,12 +371,12 @@ export class OrderComponent implements OnInit, OnDestroy {
                 if (selectedItems != null) {
                     this.currentSeatNumber++;
                     if (isAdding) {
-                        this.addProductToOrder(product);                        
+                        this.addProductToOrder(product);
                     }
-                    
+
                     selectedItems.forEach(function (od: OrderDetail) {
-                        that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType, 
-                            that.currentOrderItem.ProductCode, od.IndexDataSub);                       
+                        that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType,
+                            that.currentOrderItem.ProductCode, od.IndexDataSub);
                     });
                 }
             });
@@ -406,23 +386,24 @@ export class OrderComponent implements OnInit, OnDestroy {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
-            context: { orderItems: this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData),
-                currentChoices: this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData && 
+            context: {
+                orderItems: this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData),
+                currentChoices: this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData &&
                     (oi.ItemType == ItemType.ForcedChoice ||
-                    oi.ItemType == ItemType.SubOption)) }
+                        oi.ItemType == ItemType.SubOption))
+            }
         };
         let that = this;
 
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
             (selectedItems) => {
-                if (selectedItems != null)
-                {
-                // remove current choices
-                this.orderItems = this.orderItems.filter(oi => oi.ItemType != ItemType.ForcedChoice && oi.ItemType != ItemType.SubOption );
+                if (selectedItems != null) {
+                    // remove current choices
+                    this.orderItems = this.orderItems.filter(oi => oi.ItemType != ItemType.ForcedChoice && oi.ItemType != ItemType.SubOption);
 
-                selectedItems.forEach(function (od: OrderDetail) {
-                    that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType, 
-                        that.currentOrderItem.ProductCode, od.IndexDataSub);                        
+                    selectedItems.forEach(function (od: OrderDetail) {
+                        that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType,
+                            that.currentOrderItem.ProductCode, od.IndexDataSub);
                     });
                 }
             });
@@ -463,7 +444,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             (openProductItem: OpenProductItem) => {
                 this.showExtraFunctions = false;
                 if (openProductItem != null) {
-                    that.addItemToOrder(1, openProductItem.ProductName, 
+                    that.addItemToOrder(1, openProductItem.ProductName,
                         openProductItem.UnitPrice, ItemType.Product, 0, null)
                 }
             });
@@ -652,7 +633,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             case 'TO GO':
                 let maxIndexDataSub: number = this.getMaxIndexDataSub(this.currentOrderItem.IndexData);
                 this.addItemToOrder
-                    (0,fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1
+                    (0, fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1
                     );
 
                 break;
@@ -704,9 +685,9 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         //this.currentOrderItem.Modifiers.push(modifier);
         this.addItemToOrder
-            (0,modifier.Name, modifier.Price, ItemType.Option, this.currentProduct.ProductCode, 
-                this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1 );
- }
+            (0, modifier.Name, modifier.Price, ItemType.Option, this.currentProduct.ProductCode,
+            this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1);
+    }
 
     getMaxIndexData(): number {
         if (this.orderItems.length == 0)
@@ -718,7 +699,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     getMaxIndexDataSub(indexData: number): number {
-        if (this.orderItems.filter( oi => oi.IndexData == indexData && oi.ItemType == ItemType.Option).length == 0)
+        if (this.orderItems.filter(oi => oi.IndexData == indexData && oi.ItemType == ItemType.Option).length == 0)
             return 0;
 
         return Math.max.apply(Math, this.orderItems
@@ -726,8 +707,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             .map(function (oi) { return oi.IndexDataSub; }));
     }
 
-    getLeftMargin(itemType: ItemType) : number
-    {
+    getLeftMargin(itemType: ItemType): number {
         let marginLeft: number = 0;
         switch (itemType) {
             case ItemType.Option:
@@ -743,7 +723,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         return marginLeft;
     }
 
-    addItemToOrder(qty: number, name: string, unitPrice: number, 
+    addItemToOrder(qty: number, name: string, unitPrice: number,
         itemType: ItemType, productCode: number, indexDataSub: number) {
         let indexData: number = 0;
         let marginLeft: number = this.getLeftMargin(itemType);
@@ -955,27 +935,23 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     deleteOrderItem(orderItem: OrderDetail) {
-        if (orderItem.OrderFilter)
-        {
+        if (orderItem.OrderFilter) {
             this.showReasonDialog(orderItem);
         }
-        else
-        {
-        // if item is product, delete product and all associated modifiers
-        if (orderItem.ItemType == ItemType.Product)
-            this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
-        else       
-            if (orderItem.ItemType == ItemType.SubOption)     
-            {
-                this.orderItems = this.orderItems.filter(obj => obj !== orderItem );
-            }
+        else {
+            // if item is product, delete product and all associated modifiers
+            if (orderItem.ItemType == ItemType.Product)
+                this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
             else
-            {
-            this.orderItems = this.orderItems.filter(obj => obj.IndexDataSub !== orderItem.IndexDataSub );
-            }
+                if (orderItem.ItemType == ItemType.SubOption) {
+                    this.orderItems = this.orderItems.filter(obj => obj !== orderItem);
+                }
+                else {
+                    this.orderItems = this.orderItems.filter(obj => obj.IndexDataSub !== orderItem.IndexDataSub);
+                }
 
-        if (orderItem.ExtPrice > 0)
-            this.totalPrice();
+            if (orderItem.ExtPrice > 0)
+                this.totalPrice();
         }
     }
 
@@ -986,8 +962,8 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         itemsToCopy.forEach(function (orderItem: OrderDetail) {
             //that.addItemToOrder(orderItem.ItemType == ItemType.Product ? 1 : null,
-             //   orderItem.ProductName, orderItem.UnitPrice, orderItem.ItemType, orderItem.ProductCode)
-            
+            //   orderItem.ProductName, orderItem.UnitPrice, orderItem.ItemType, orderItem.ProductCode)
+
             that.orderItems.push(
                 {
                     Quantity: orderItem.ItemType == ItemType.Product ? 1 : null,
@@ -1002,7 +978,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     MarginLeft: that.getLeftMargin(orderItem.ItemType)
                 }
             );
-           
+
         });
     }
 
@@ -1041,8 +1017,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             });
     }
 
-    showReasonDialog(orderItem: OrderDetail)
-    {
+    showReasonDialog(orderItem: OrderDetail) {
         // get the product Order
         //let _orderItem: OrderDetail = this.orderItems.find( oi => oi.ItemType == ItemType.Product && oi.IndexData == orderItem.IndexData)
         const modalOptions: ModalDialogOptions = {
@@ -1051,10 +1026,9 @@ export class OrderComponent implements OnInit, OnDestroy {
         };
 
         this.modalService.showModal(ReasonComponent, modalOptions).then(
-            (reason: string) => {     
+            (reason: string) => {
                 // delete product from order if reason given          
-                if (reason != null)
-                {
+                if (reason != null) {
                     this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
                 }
             });
@@ -1073,8 +1047,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             });
     }
 
-    sendCheck()
-    {
+    sendCheck() {
         //var printController = UIPrintInteractionController;
         //console.log(printController.printingAvailable);
         //this.printReceipt();
@@ -1083,12 +1056,12 @@ export class OrderComponent implements OnInit, OnDestroy {
         //this.socketIO.emit("test", { test: "test" });
     }
 
-    printReceipt()
-    {
-    
+    printReceipt() {
+                         
     }
 
     getMenuTimers() {
+        this.lockedCategoryId = 0;
         let timers: MenuTimer[] = [];
 
         let that = this;
@@ -1098,6 +1071,43 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
             else {
                 this.allTimers = menuTimers;
+
+                if (this.DBService.systemSettings.AutoCategory) {
+                    // CategoryName is actually CategoryID
+                    this.currentCategoryID = this.DBService.systemSettings.CategoryName;
+                    this.showMainCategories = false;
+                }
+
+                let isCategoryLocked: boolean = false;
+                isCategoryLocked = this.checkMenuTimer(MenuTimerType.Locked, OverrideType.Type2, 1, false);
+
+                if (isCategoryLocked) {
+                    this.currentCategoryID = this.lockedCategoryId;
+                    this.showMainCategories = false;
+                }
+
+                isCategoryLocked = this.checkMenuTimer(MenuTimerType.Locked, OverrideType.Type0, 1, false);
+
+                if (isCategoryLocked) {
+                    this.currentCategoryID = this.lockedCategoryId;
+                }
+
+                if (this.currentCategoryID == 0) {
+                    this.showMainCategories = true;
+                }
+                else {
+                    this.showMainCategories = true;
+                }
+
+                this.DBService.getLocalMenuCategories().then((categories) => {
+                    if (categories.length == 0) {
+                        dialogs.alert("Main Categories not loaded.");
+                    }
+                    else {
+                        this.loadCategories(categories);
+                        this.categorySelected(this.categories.find(x => x.CategoryID == this.currentCategoryID));
+                    }
+                });
             }
         });
     }
@@ -1110,18 +1120,18 @@ export class OrderComponent implements OnInit, OnDestroy {
         return new Date(date.getTime() + (daysToAdd * (1000 * 60 * 60 * 24)));
     }
 
-    checkMenuTimer(timerType: MenuTimerTypes, overrideType: number, priceLevel: number, checkLocked: boolean): boolean {
+    checkMenuTimer(timerType: MenuTimerType, overrideType: number, priceLevel: number, checkLocked: boolean): boolean {
         let checkMenuTimer: boolean = false;
         priceLevel = 0;
         let totalCategory: number = 0;
         let timers: MenuTimer[] = [];
         let _category = this.lockedCategoryId;
 
-        if (timerType == MenuTimerTypes.Undefined) {
+        if (timerType == MenuTimerType.Undefined) {
             timers = this.allTimers.filter(x => x.Enabled == true);
 
         }
-        else if (timerType == MenuTimerTypes.Locked) {
+        else if (timerType == MenuTimerType.Locked) {
             if (!checkLocked)
                 timers = this.allTimers.filter(x => x.HappyHourType == timerType && x.Enabled == true);
             else {
@@ -1186,11 +1196,11 @@ export class OrderComponent implements OnInit, OnDestroy {
 
             if (now > date1 && now <= date2) {
                 switch (timerType) {
-                    case MenuTimerTypes.Price:
+                    case MenuTimerType.Price:
                         priceLevel = timer.PriceLevel;
                         checkMenuTimer = true;
                         break;
-                    case MenuTimerTypes.Locked:
+                    case MenuTimerType.Locked:
                         if (!checkLocked) {
                             switch (overrideType) {
                                 case 1:
@@ -1216,7 +1226,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         }
                         else
                             return true;
-                    case MenuTimerTypes.Default:
+                    case MenuTimerType.Default:
                         this.lockedCategoryId = timer.DefaultCategory;
                         switch (this.orderType) {
                             case OrderType.DineIn:
@@ -1251,7 +1261,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 }
             }
             else {
-                if (timerType == MenuTimerTypes.Locked) {
+                if (timerType == MenuTimerType.Locked) {
                     if (checkLocked) {
                         if (this.lockedCategoryId != timer.CategoryToLock)
                             checkMenuTimer = true;
@@ -1267,8 +1277,8 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         return checkMenuTimer;
     }
-    
+
     public ngOnDestroy() {
-        const SocketIO = require("nativescript-socket.io")        
+        const SocketIO = require("nativescript-socket.io")
     }
 }

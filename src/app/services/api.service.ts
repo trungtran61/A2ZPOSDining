@@ -103,4 +103,16 @@ export class APIService {
             '&module=1&closed=' + closed + '&multicheck=false&name=',
             { headers: headers }).pipe(map(res => res));
     }
+
+    postToPrint(text: string)
+    {
+        let httpOptions = {
+            headers: new HttpHeaders({
+              'Content-Type':  'text/plain',
+              'Authorization': 'my-auth-token'
+            })
+          };
+        this.http.post<string>('192.168.0.125:9100', text, httpOptions);             
+          
+    }
 }

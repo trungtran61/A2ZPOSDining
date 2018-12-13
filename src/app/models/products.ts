@@ -253,11 +253,18 @@ export interface Memo {
     Price: number;
 }
 
-export enum MenuTimerTypes {
+export enum MenuTimerType {
     Undefined = 0,
     Price = 1,
     Locked = 2,
-    Default = 3,
+    Default = 3
+}
+
+export enum OverrideType {
+    Type0 = 0,
+    Type1 = 1,
+    Type2 = 2,
+    Type3 = 3
 }
 
 export interface MenuTimer {
@@ -322,6 +329,7 @@ export interface MenuOption {
     ReportProductMix?: boolean;
     Row?: number;
     Col?: number;
+    CategoryCode?: number;
 }
 
 export interface MenuSubOption {

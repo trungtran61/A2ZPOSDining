@@ -39,7 +39,9 @@ export class TableGuestsComponent implements OnInit {
     }
 
     goBack() {
-        this.router.back();
+        this.router.navigate(['/home/area'])
+       
+        //this.router.back();
     }
 
     addDigit(digit: string)

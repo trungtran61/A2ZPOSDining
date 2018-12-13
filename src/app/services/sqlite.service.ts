@@ -375,7 +375,8 @@ export class SQLiteService {
     }
 
     public getLocalMenuOptions(productCode: number): Promise<MenuOption[]> {
-        return SQLiteService.database.all("SELECT ApplyCharge, Charge, Name, Position FROM MenuOptions WHERE ProductCode=? ORDER BY Position",
+        return SQLiteService.database.all("SELECT ApplyCharge, Charge, Name, Position FROM MenuOptions " +
+            "INNER JOIN Options WHERE ProductCode=? ORDER BY Position",
             [productCode])
             .then(function (rows) {
                 let items: MenuOption[] = [];
@@ -1056,13 +1057,20 @@ export class SQLiteService {
 
     public getLocalMenuTimers() {
 
-        return SQLiteService.database.all("SELECT * FROM MenuTimer")
+        return SQLiteService.database.all("SELECT PriKey,Name,Enabled,HappyHourType,PriceLevel,StartTime,EndTime,CategoryToLock" +
+        ",OverRideCategoryBar,OverRideCategoryDineIn,Mon,Tue,Wed,Thu,Fri,Sat,Sun" +
+        ",TableService,WalkIn,TakeOut,Bar,PhoneIn,QuickSale,DefaultCategory FROM MenuTimers")
             .then(function (rows) {
                 let timers: MenuTimer[] = [];
                 for (var row in rows) {
                     timers.push(
                         {
-                            Name: rows[row][0]
+                            PriKey: rows[row][0],Name: rows[row][1],Enabled: rows[row][2], HappyHourType: rows[row][3],
+                            PriceLevel: rows[row][4],StartTime: rows[row][5],EndTime: rows[row][6],CategoryToLock: rows[row][7],
+                            OverRideCategoryBar: rows[row][8], OverRideCategoryDineIn: rows[row][9],
+                            Mon: rows[row][10],Tue: rows[row][11],Wed: rows[row][12],Thu: rows[row][12],Fri: rows[row][13],Sat: rows[row][14],Sun: rows[row][15],
+                            TableService: rows[row][16],WalkIn: rows[row][17],TakeOut: rows[row][18],Bar: rows[row][19],PhoneIn: rows[row][20],
+                            QuickSale: rows[row][21],DefaultCategory: rows[row][22]
                         }
                     );
                 }

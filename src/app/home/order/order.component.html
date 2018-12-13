@@ -2,34 +2,39 @@
   <ActionItem [text]="checkTitle" ios.position="left"></ActionItem>
   <ActionItem [text]="currentSubCategory" style="font-weight: bold" ios.position="right" android.position="popup"></ActionItem>
 </ActionBar>
-<GridLayout rows="auto, 75" columns="260,150,20,*">
+<GridLayout rows="670 85" columns="260 150 20 *">
   <StackLayout row="0" col="0">
     <!-- order header -->
-    <StackLayout style="background-color: antiquewhite;" orientation="horizontal">
-      <FlexBoxLayout *ngIf='ticketNumber'>
-        <Label text="Ticket #" style="text-align: left; width:75;"></Label> |
-        <Label [text]="ticketNumber" style="text-align: left; margin-right: 5;width:75;"></Label> |
-      </FlexBoxLayout>
-      <FlexBoxLayout>
-        <Label text="Check #" style="text-align: left; width:75;"></Label> |
-        <Label [text]="checkNumber" style="text-align: left; margin-right: 5;width:75;"></Label> |
-      </FlexBoxLayout>
-    </StackLayout>
-    <GridLayout style="background-color: antiquewhite;" columns='* * *' borderTopWidth='1' borderColor='gray' borderLeftWidth='0' borderRightWidth='0'>
-          <Label [text]="table" style="text-align: left; width:30;" col='0' borderRightWidth='1' borderLeftWidth='0' borderLeftColor='antiquewhite' borderRightColor='gray'></Label>|            
-          <Label [text]="server" style="text-align: left; width:140;" col='1' borderRightWidth='1' borderLeftWidth='0' borderRightColor='gray'></Label>        
+    <GridLayout style="background-color: antiquewhite;" rows='40'>
+      <StackLayout orientation="horizontal">
+        <FlexBoxLayout *ngIf='ticketNumber'>
+          <Label text="Ticket #" style="text-align: left; width:75;"></Label> |
+          <Label [text]="ticketNumber" style="text-align: left; margin-right: 5;width:75;"></Label> |
+        </FlexBoxLayout>
+        <FlexBoxLayout>
+          <Label text="Check #" style="text-align: left; width:75;"></Label> |
+          <Label [text]="checkNumber" style="text-align: left; margin-right: 5;width:75;"></Label> |
+        </FlexBoxLayout>
+      </StackLayout>
+    </GridLayout>
+    <GridLayout rows='40' style="background-color: antiquewhite;" columns='* * *' borderTopWidth='1' borderColor='gray'
+      borderLeftWidth='0' borderRightWidth='0'>
+      <Label [text]="table" style="text-align: left; width:30;" col='0' borderRightWidth='1' borderLeftWidth='0'
+        borderLeftColor='antiquewhite' borderRightColor='gray'></Label>|
+      <Label [text]="server" style="text-align: left; width:140;" col='1' borderRightWidth='1' borderLeftWidth='0'
+        borderRightColor='gray'></Label>
       <StackLayout col='2' orientation="horizontal">
-          <Label text="Guests: " style="text-align: left;"></Label>
-          <Label [text]="guests"></Label>
+        <Label text="Guests: " style="text-align: left;"></Label>
+        <Label [text]="guests"></Label>
       </StackLayout>
     </GridLayout>
     <!-- order items  -->
-    <ScrollView style="background-color: white" height="550" orientation="vertical">
+    <ScrollView style="background-color: white" height="500" orientation="vertical">
       <StackLayout *ngIf='showDetails'>
         <StackLayout *ngFor="let item of orderItems">
           <FlexBoxLayout (tap)="showModifyDialog(item,null,null)" (swipe)="onOrderItemSwipe($event, item)" [class]="textColorClass">
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
-            <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5" ></Label>
+            <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.ExtPrice | currency" style="text-align: right; width:50; margin-right:5"></Label>
             <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
           </FlexBoxLayout>
@@ -82,14 +87,12 @@
     <Button [class]="productInfoClass" (tap)="productInfo()" textWrap="true" text="&#xf05a; Product Info"></Button>
   </WrapLayout>
   <!-- bottom navigation for extra functions -->
-  <FlexBoxLayout row="1" col="0" justifyContent="flex-start" *ngIf='showExtraFunctions' style="margin-bottom:5">
-    <Button row="1" col="0" class="glass btnBottom btnCancel" text="Close" (tap)="closeExtraFunctions()"></Button>
-  </FlexBoxLayout>
-  <FlexBoxLayout row="1" col="3" justifyContent="flex-end" *ngIf='showExtraFunctions' style="margin-bottom:5">
-    <Button class="glass btnBottom" text="Open Product" textWrap="true" (tap)="showOpenProduct()"></Button>
-    <Button class="glass btnBottom" text="Change # of Guests" (tap)="changeGuestsNumber()" textWrap="true"></Button>
-    <Button class="glass btnBottom btnOK" text="Tender" (tap)="tender()" textWrap="true"></Button>
-  </FlexBoxLayout>
+  <GridLayout rows='60' row="1" col="0" colSpan="4" columns='100 400 100 100 *' *ngIf='showExtraFunctions'>
+    <Button class="glass btnBottom btnCancel" text="Close" (tap)="closeExtraFunctions()" col='0' horizontalAlignment="left"></Button>  
+    <Button class="glass btnBottom" text="Open Product" textWrap="true" (tap)="showOpenProduct()" row='0' col='2' ></Button>
+    <Button class="glass btnBottom" text="Change # of Guests" (tap)="changeGuestsNumber()" textWrap="true" row='0' col='3' style="margin-left: 20" ></Button>
+    <Button class="glass btnBottom btnOK" text="Tender" (tap)="tender()" textWrap="true" row='0' col='4' horizontalAlignment="right"></Button>
+  </GridLayout>
   <!-- categories -->
   <StackLayout row="0" col="1" colSpan="2" *ngIf="showMainCategories">
     <Button class="glass btnCategory" [text]="item.Name" textWrap="true" *ngFor="let item of categories let i=index"
