@@ -22,7 +22,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
 
     constructor(private params: ModalDialogParams,        
         ) {
-
+ 
     }
 
     ngOnInit() {

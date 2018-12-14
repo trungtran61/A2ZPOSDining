@@ -132,7 +132,7 @@
        <!-- check mark for selected sub option -->
        <Label class="fa" text="&#xf00c;" [visibility]="item.Selected ? 'visible' : 'collapse'"
         *ngFor="let item of pageOptionCategories" [col]='item.Col' row='0' 
-        style='margin: -40 0 0 75; color: gold; font-weight: bold'></Label>  
+        style='margin: -35 0 0 75; color: gold; font-weight: bold'></Label>  
       <Button text='All' [class]="allOptionFilterClass" (tap)='getOptionsForAllCategories()' row='0' col='3'></Button>           
       <Label class="fa" text="&#xf00c;" [visibility]="allOptionCategorySelected ? 'visible' : 'collapse'" col='3' row='0' 
         style='margin: -40 0 0 75; color: gold; font-weight: bold'></Label>  

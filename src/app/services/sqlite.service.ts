@@ -502,7 +502,7 @@ export class SQLiteService {
             sql += " WHERE Name LIKE '%" + Name + "%'";
         }
 
-        return SQLiteService.database.all(sqlite3_backup_init)
+        return SQLiteService.database.all(sql)
             .then(function (rows) {
                 let items: MenuOption[] = [];
                 let rowCounter: number = 0;

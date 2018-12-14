@@ -200,6 +200,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     showProductOptions() {
         this.isShowingProductOptions = !this.isShowingProductOptions;
+        let that = this;
 
         if (this.isShowingProductOptions) {
             this.productOptionsClass = 'glass productOptionsActive';
@@ -207,7 +208,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.getOptionCategoryPage(true);
             this.resetFixedOptionClasses();
             this.resetUserModifierClasses();
-            this.totalOptionPages = Math.ceil(this.productOptions[this.productOptions.length - 1].Position / this.optionPageSize);
+            this.totalOptionPages = Math.ceil(that.productOptions[this.productOptions.length - 1].Position / this.optionPageSize);
 
             this.optionCurrentPage = 0;
             this.getProductOptionPage(true);
@@ -248,6 +249,10 @@ export class OrderComponent implements OnInit, OnDestroy {
             else {                
                 this.optionCategories = categories;
                 this.optionCategoryCurrentPage = 0;
+                this.totalOptionCategoryPages = Math.ceil(this.optionCategories[this.optionCategories.length - 1].Position / this.optionCategoryPageSize);
+                if (this.totalSubCategoriesPages > 1)
+                    this.canSubCategoryPageDown = true;
+
                 this.getOptionCategoryPage(true);                
             } 
         }); 
@@ -255,18 +260,32 @@ export class OrderComponent implements OnInit, OnDestroy {
  
     getOptionsForAllCategories()
     {
+        this.optionCategories.forEach(oc => oc.Selected = false);
         this.allOptionCategorySelected = true;
         this.productOptions = this.allProductOptions;
         this.optionCategoryCurrentPage = 0;
         this.getOptionCategoryPage(true);
+
+        this.optionCurrentPage = 0;
+        this.getProductOptionPage(true);
     }
 
     getOptionsForCategory(optionCategory: OptionCategory)
     {
         this.allOptionCategorySelected = false;
         this.productOptions = this.allProductOptions.filter(po => po.CategoryCode == optionCategory.PriKey);
-        this.optionCategoryCurrentPage = 0;
+        
+        let rowCtr: number = 0;
 
+        this.productOptions.forEach(oc => {
+            rowCtr++;
+            oc.Position = rowCtr;
+            oc.Col = (rowCtr - 1) % 3;
+        });
+        console.log(this.allProductOptions.length);
+
+        this.optionCategoryCurrentPage = 0;
+        
         this.optionCategories.forEach(oc => oc.Selected = false);
         optionCategory.Selected = true;
         //this.getOptionCategoryPage(true);
@@ -904,7 +923,11 @@ export class OrderComponent implements OnInit, OnDestroy {
                 MarginLeft: marginLeft,
                 IndexDataSub: indexDataSub
             }
-            this.orderItems.splice(lastIndex + 1, 0, orderItem);
+            orderItem.Class = 'lastOrderItem';
+            this.orderItems.splice(lastIndex + 1, 0, orderItem);            
+
+            if (this.orderItems.length > 0)
+                this.orderItems[this.orderItems.length - 1].Class = 'orderItem'
         }
 
         this.totalPrice();
@@ -1229,7 +1252,10 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         this.modalService.showModal(SearchComponent, modalOptions).then(
             (searchTerm: string) => {
-                this.getProductOptions(searchTerm);                
+                this.getProductOptions(searchTerm); 
+                this.optionCategories.forEach(oc => oc.Selected = false);
+                this.optionCurrentPage = 0;
+                this.getProductOptionPage(true);               
             });
         }
     
