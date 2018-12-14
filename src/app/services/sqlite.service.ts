@@ -493,8 +493,16 @@ export class SQLiteService {
         return promise;
     }
 
-    public getLocalOptions(): Promise<MenuOption[]> {
-        return SQLiteService.database.all("SELECT Price, CategoryCode, Name, PrintName FROM Options")
+    public getLocalOptions(Name: string): Promise<MenuOption[]> {
+
+        let sql: string = "SELECT Price, CategoryCode, Name, PrintName FROM Options";
+
+        if (Name != '')
+        {
+            sql += " WHERE Name LIKE '%" + Name + "%'";
+        }
+
+        return SQLiteService.database.all(sqlite3_backup_init)
             .then(function (rows) {
                 let items: MenuOption[] = [];
                 let rowCounter: number = 0;

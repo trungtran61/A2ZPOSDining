@@ -155,7 +155,10 @@
       <Button row='5' col='2' class="glass btnPaging fa" *ngIf='canOptionPageDown' (tap)="getOptionPage(true)" text="&#xf0ab; Down"></Button>      
         -->
     </GridLayout>
-    <Button row='2' col='1' class="glass btnMemo" width="120" text="MEMO" (tap)="showMemoDialog()" style="margin-right: 10"></Button>
+    <Button row='2' col='1' class="glass btnMemo fa" width="120" text="&#xf249; MEMO" *ngIf='!isShowingProductOptions'
+      (tap)="showMemoDialog()" style="margin-right: 10"></Button>
+    <Button row='2' col='1' class="glass btnMemo fa" width="120" text="&#xf002; Find" *ngIf='isShowingProductOptions'
+      (tap)="showSearchDialog()" style="margin-right: 10"></Button>
   </GridLayout>
   <!-- user-defined modifiers - bottom row -->
   <WrapLayout row="1" col="0" colSpan="4" style="margin-bottom:10" *ngIf='showOptions'>

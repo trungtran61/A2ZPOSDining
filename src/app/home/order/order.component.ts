@@ -23,6 +23,7 @@ import { ModifyOrderItemComponent } from "./modify-order-item.component";
 import { ActivatedRoute } from "@angular/router";
 import { NullViewportScroller } from "@angular/common/src/viewport_scroller";
 import { ReasonComponent } from "./reason.component";
+import { SearchComponent } from "./search.component";
 
 @Component({
     selector: "order",
@@ -191,7 +192,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.getProductOptions();
+        this.getProductOptions('');
         this.getOptionCategories();
         this.apiSvc.postToPrint('hero');
         this.allOptionFilterClass = 'glass'
@@ -223,8 +224,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.canOptionPageDown = true;
     }
 
-    getProductOptions() {
-        this.DBService.getLocalOptions().then((options) => {
+    getProductOptions(optionName) {
+        this.DBService.getLocalOptions(optionName).then((options) => {
             if (options.length == 0) {
                 dialogs.alert("Missing Product Options");
             }
@@ -666,7 +667,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         else
             this.optionCurrentPage--;
 
-        let startPosition: number = (this.optionCurrentPage * this.optionCurrentPage) - this.optionPageSize + 1;
+        let startPosition: number = (this.optionCurrentPage * this.optionPageSize) - this.optionPageSize + 1;
         let endPosition: number = startPosition + this.optionPageSize - 1;
 
         if (endPosition > this.menuOptions[this.menuOptions.length - 1].Position)
@@ -1220,6 +1221,18 @@ export class OrderComponent implements OnInit, OnDestroy {
             });
     }
 
+    showSearchDialog() {
+        const modalOptions: ModalDialogOptions = {
+            viewContainerRef: this.viewContainerRef,
+            fullscreen: true
+        };
+
+        this.modalService.showModal(SearchComponent, modalOptions).then(
+            (searchTerm: string) => {
+                this.getProductOptions(searchTerm);                
+            });
+        }
+    
     sendCheck() {
         //var printController = UIPrintInteractionController;
         //console.log(printController.printingAvailable);

@@ -20,6 +20,7 @@ import { MemoComponent } from "./order/memo.component";
 import { MyChecksComponent } from "./my-checks/my-checks.component";
 import { ReasonComponent } from "./order/reason.component";
 import { CloseCheckComponent } from "./order/close-check/close-check.component";
+import { SearchComponent } from "./order/search.component";
 
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 TNSFontIconService.debug = true;
@@ -46,6 +47,7 @@ TNSFontIconService.debug = true;
         PizzaComponent,
         PromptQtyComponent,
         MemoComponent,
+        SearchComponent,
         MyChecksComponent,
         ReasonComponent,
         CloseCheckComponent            
@@ -59,7 +61,8 @@ TNSFontIconService.debug = true;
         OpenProductComponent,
         PromptQtyComponent,
         MemoComponent,
-        ReasonComponent
+        ReasonComponent,
+        SearchComponent
     ]  
 })
 export class HomeModule { }

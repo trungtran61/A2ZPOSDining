@@ -1,0 +1,8 @@
+<GridLayout columns="* *" rows="120 auto" class="p-30 page">
+    <TextField #vcSearchTerm hint="" [text]='searchTerm' [(ngModel)]='searchTerm' class='textEntryLongActive'
+        autocorrect="true" row='0' colSpan="2">
+    </TextField>
+    <Button row='1' col='0' class='glass btnCancel' text='Cancel' (tap)='cancel()' height="60" width="120"
+        horizontalAlignment="left"></Button>
+    <Button row='1' col='1' class='glass btnOK' text='Done' (tap)='done()' height="60" width="120" horizontalAlignment="right"></Button>
+</GridLayout>
