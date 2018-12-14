@@ -13,7 +13,7 @@ import { SQLiteService } from "~/app/services/sqlite.service";
     styleUrls: ['./open-product.component.css']
 })
 export class OpenProductComponent implements OnInit {
-    @ViewChild("productNameModel") productNameModel: ElementRef;
+    @ViewChild("vcProductName") vcProductName: ElementRef;
     productGroups: ProductGroup[] = [];
     productGroupCols: number[] = [];
     productGroupRows: number[] = [];
@@ -28,10 +28,7 @@ export class OpenProductComponent implements OnInit {
         this.selectedGroup = group;
         this.showEditPanel = true;
         this.pageTitle = group.Description;
-
-        setTimeout(() => {
-            this.productNameModel.nativeElement.focus();
-        }, 600);
+        this.vcProductName.nativeElement.focus();         
     }
 
     cancel() {
@@ -63,7 +60,6 @@ export class OpenProductComponent implements OnInit {
     constructor(private params: ModalDialogParams,
         private viewContainerRef: ViewContainerRef,
         private DBService: SQLiteService) {
-
     }
 
     ngOnInit() {

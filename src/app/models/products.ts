@@ -324,6 +324,7 @@ export interface MenuOption {
     ApplyCharge?: boolean;
     Charge?: number;
     Name?: string;
+    PrintName?: string;
     Position?: number;
     ProductCode?: number;
     ReportProductMix?: boolean;

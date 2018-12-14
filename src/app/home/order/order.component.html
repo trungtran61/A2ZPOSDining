@@ -18,7 +18,7 @@
       </StackLayout>
     </GridLayout>
     <GridLayout rows='40' style="background-color: antiquewhite;" columns='* * *' borderTopWidth='1' borderColor='gray'
-      borderLeftWidth='0' borderRightWidth='0'>
+      borderLeftWidth='0' borderRightWidth='0'>      
       <Label [text]="table" style="text-align: left; width:30;" col='0' borderRightWidth='1' borderLeftWidth='0'
         borderLeftColor='antiquewhite' borderRightColor='gray'></Label>|
       <Label [text]="server" style="text-align: left; width:140;" col='1' borderRightWidth='1' borderLeftWidth='0'
@@ -32,7 +32,7 @@
     <ScrollView style="background-color: white" height="500" orientation="vertical">
       <StackLayout *ngIf='showDetails'>
         <StackLayout *ngFor="let item of orderItems">
-          <FlexBoxLayout (tap)="showModifyDialog(item,null,null)" (swipe)="onOrderItemSwipe($event, item)" [class]="textColorClass">
+          <FlexBoxLayout (tap)="showModifyDialog(item,null,null)" (swipe)="onOrderItemSwipe($event, item)" [class]="item.Class">
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.ExtPrice | currency" style="text-align: right; width:50; margin-right:5"></Label>
@@ -131,14 +131,14 @@
     </FlexBoxLayout>
     <!-- fixed modifiers -->
     <StackLayout row='1' col='3' rowSpan="4">
-      <Label text="Product Options" textWrap="true" style='text-align: center; height: 100px;color: yellow;background-color:seagreen;margin:5px;padding:5px'></Label>
+      <button text="Product Options" textWrap="true" [class]='productOptionsClass' (tap)='showProductOptions()'></button>
       <StackLayout *ngFor="let item of fixedOptions let i=index">
         <Button [class]="item.Class" textWrap="true" [text]='item.Name' (tap)='fixedOptionSelected(item)'></Button>
       </StackLayout>
       <Button class="glass" text="DONE" (tap)="doneOption()" style='background-image:linear-gradient(green, black);text-align: center; height: 118px;border-radius: 20'></Button>
     </StackLayout>
     <!-- options -->
-    <GridLayout row='1' col='0' colSpan="3" rowSpan="7" rows='86,86,86,86,86,86,90' columns='auto,auto,auto,auto'
+    <GridLayout row='1' col='0' colSpan="3" rowSpan="7" rows='86 86 86 86 86 86 90' columns='auto,auto,auto,auto'
       (swipe)='onOptionSwipe($event)'>
       <Button class="glass btnMenuOption" [text]="item.Name" *ngFor="let item of pageOptions let i=index" (tap)="optionSelected(item)"
         [col]='item.Col' [row]='item.Row' textWrap="true"></Button>

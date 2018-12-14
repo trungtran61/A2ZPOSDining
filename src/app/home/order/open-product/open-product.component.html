@@ -1,12 +1,15 @@
 <GridLayout columns="*,*,*" rows="50,*,*,*,50" class="p-30 page">
     <Label class='pageHeader' [text]="pageTitle" row='0' col='0' colSpan="3"></Label>
-    <GridLayout *ngIf='!showEditPanel' col='0' row='1' colSpan="3" columns="*,*,*" rows="*,*,*,*">
+    <GridLayout [visibility]="showEditPanel ? 'collapse' : 'visible'"
+         col='0' row='1' colSpan="3" columns="*,*,*" rows="*,*,*,*">
         <Button class="glass" [text]="item.Description" *ngFor="let item of productGroups let i=index" [col]='productGroupCols[i]'
             [row]='productGroupRows[i]' (tap)="groupSelected(item)"></Button>
     </GridLayout>
-    <FlexBoxLayout row='1' col='0' colSpan="3" *ngIf='showEditPanel' style='margin-top:20;height:100'>
+    <FlexBoxLayout row='1' col='0' colSpan="3" 
+        [visibility]="showEditPanel ? 'visible' : 'collapse'" style='margin-top:20;height:100'>
         <StackLayout>
-            <TextField hint="Enter Product Name" [text]='productName' [(ngModel)]='productName' required
+            <TextField hint="Enter Product Name" [text]='productName' [(ngModel)]='productName' 
+                (returnPress)="done()" required #vcProductName
                 #productNameModel='ngModel' autocorrect="true" style='border-radius: 6; border-color: gray; border-width: 1; background-color: white; font-size: 20; font-weight: bold; padding-left: 5; width: 400; margin-right: 20'>
             </TextField>
             <Label class="validation" [visibility]="productNameModel.valid ? 'collapse' : 'visible'" text="Product Name is required"></Label>

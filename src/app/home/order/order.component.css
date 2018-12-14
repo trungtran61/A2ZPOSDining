@@ -110,3 +110,23 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 {
     margin-left: 30;
 }
+
+.lastOrderItem
+{
+	color: red;
+}
+
+.orderItem
+{
+	color: black;
+}
+
+.productOptions
+{
+	color: yellow;background-image: linear-gradient(black,green 10%, black 90%);
+}
+
+.productOptionsActive
+{
+	color: yellow;background-image: linear-gradient(gold,black 10%, gold 90%);
+}

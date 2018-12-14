@@ -16,7 +16,7 @@
         </GridLayout>
     </GridLayout>
 
-    <StackLayout rows="120 auto"  [visibility]="isOtherReason ? 'visible' : 'collapse'">
+    <StackLayout rows="120 auto" [visibility]="isOtherReason ? 'visible' : 'collapse'">
         <GridLayout rows="100 auto auto" columns="*">
             <TextField #vcReason horizontalAlignment="center" hint="Enter Reason" [text]='otherReason' row='1'
                 [(ngModel)]='otherReason' required #otherReasonModel='ngModel' autocorrect="true" class='textEntryLongActive'

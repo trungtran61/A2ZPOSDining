@@ -344,15 +344,17 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS MenuOptions;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS MenuOptions (ApplyCharge INTEGER, Charge REAL, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuOptions " + 
+                    "(ApplyCharge INTEGER, CategoryCode INTEGER, Charge REAL, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
                     let headers = that.createRequestHeader();
                     that.http.get(that.apiUrl + 'GetMenuOption', { headers: headers })
                         .subscribe(
                             data => {
                                 let menuOptions = <MenuOption[]>data;
                                 menuOptions.forEach(function (menuOption: MenuOption) {
-                                    SQLiteService.database.execSQL("INSERT INTO MenuOptions (ApplyCharge, Charge, Name, Position, ProductCode, ReportProductMix) VALUES (?,?,?,?,?,?)",
-                                        [menuOption.ApplyCharge, menuOption.Charge, menuOption.Name, menuOption.Position,
+                                    SQLiteService.database.execSQL("INSERT INTO MenuOptions " + 
+                                        "(ApplyCharge, CategoryCode, Charge, Name, Position, ProductCode, ReportProductMix) VALUES (?,?,?,?,?,?,?)",
+                                        [menuOption.ApplyCharge, menuOption.CategoryCode, menuOption.Charge, menuOption.Name, menuOption.Position,
                                         menuOption.ProductCode, menuOption.ReportProductMix]).then(id => {
                                             resolve("Added MenuOptions records.")
                                         },
@@ -375,17 +377,18 @@ export class SQLiteService {
     }
 
     public getLocalMenuOptions(productCode: number): Promise<MenuOption[]> {
-        return SQLiteService.database.all("SELECT ApplyCharge, Charge, Name, Position FROM MenuOptions " +
-            "INNER JOIN Options WHERE ProductCode=? ORDER BY Position",
+        return SQLiteService.database.all("SELECT ApplyCharge, CategoryCode, Charge, Name, Position FROM MenuOptions " +
+            "WHERE ProductCode=? ORDER BY Position",
             [productCode])
             .then(function (rows) {
                 let items: MenuOption[] = [];
                 for (var row in rows) {
                     items.push({
                         ApplyCharge: rows[row][0],
-                        Charge: rows[row][1],
-                        Name: rows[row][2],
-                        Position: rows[row][3]
+                        CategoryCode: rows[row][1],
+                        Charge: rows[row][2],
+                        Name: rows[row][3],
+                        Position: rows[row][4]
                     });
                 }
                 return (items);
@@ -488,6 +491,26 @@ export class SQLiteService {
             });
         });
         return promise;
+    }
+
+    public getLocalOptions(): Promise<MenuOption[]> {
+        return SQLiteService.database.all("SELECT Price, CategoryCode, Name, PrintName FROM Options")
+            .then(function (rows) {
+                let items: MenuOption[] = [];
+                let rowCounter: number = 0;
+                for (var row in rows) {
+                    rowCounter++;
+                    items.push({
+                        ApplyCharge: true,
+                        Charge: rows[row][0], 
+                        CategoryCode: rows[row][1],
+                        Name: rows[row][2],                                               
+                        PrintName: rows[row][3],                                               
+                        Position: rowCounter
+                    });
+                }
+                return (items);
+            });
     }
 
     public loadUserModifiers(db) {
@@ -1069,8 +1092,8 @@ export class SQLiteService {
                             Enabled: rows[row][2].toLowerCase() == 'true',
                             HappyHourType: rows[row][3],
                             PriceLevel: rows[row][4],
-                            StartTime: '10:00', // rows[row][5],
-                            EndTime: '16:15', //rows[row][6],
+                            StartTime: rows[row][5],
+                            EndTime: rows[row][6],
                             CategoryToLock: rows[row][7],
                             OverRideCategoryBar: rows[row][8], OverRideCategoryDineIn: rows[row][9],
                             Mon: rows[row][10].toLowerCase() == 'true',Tue: rows[row][11].toLowerCase() == 'true',

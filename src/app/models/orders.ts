@@ -256,6 +256,7 @@ export interface OrderDetail {
     IndexDataSub?:number;
     UseModifier?:boolean;
     MarginLeft?:number;
+    Class?: string;
 }
 
 export interface OrderResponse {

@@ -53,6 +53,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     productCurrentPage: number = 1;
     productPageSize: number = 24;
 
+    productOptions: MenuOption[];
     menuOptions: MenuOption[];
     pageOptions: MenuOption[];
     totalOptionPages: number = 0;
@@ -123,7 +124,8 @@ export class OrderComponent implements OnInit, OnDestroy {
     canOptionPageUp: boolean = false;
 
     isExistingOrder: boolean = false;
-    textColorClass: string = 'enabledTextColor';
+    isShowingProductOptions: boolean = false;
+    productOptionsClass: string = 'glass productOptions';
 
     printerPort: string = '192.168.0.125:9100';
 
@@ -170,7 +172,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     let table: TableDetail = JSON.parse(localStorage.getItem('currentTable'));
                     this.getFullOrder(table.OrderFilter);
                     this.isExistingOrder = true;
-                    this.textColorClass = 'disabledTextColor';
+                    //this.textColorClass = 'disabledTextColor';
                 }
             }
             else {
@@ -178,7 +180,52 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
         });
 
+        this.getProductOptions();        
         this.apiSvc.postToPrint('hero');
+    }
+
+    showProductOptions()
+    {
+        this.isShowingProductOptions = !this.isShowingProductOptions;
+
+        if (this.isShowingProductOptions)
+        {
+            this.productOptionsClass = 'glass productOptionsActive';   
+            this.resetFixedOptionClasses();
+            this.resetUserModifierClasses();
+            this.totalOptionPages = Math.ceil(this.productOptions[this.productOptions.length - 1].Position / this.optionPageSize);        
+          
+            this.optionCurrentPage = 0;               
+            this.getProductOptionPage(true);            
+        }
+        else
+        {
+            // show menu's options first page
+            this.productOptionsClass = 'glass productOptions';
+            this.totalOptionPages = Math.ceil(this.menuOptions[this.menuOptions.length - 1].Position / this.optionPageSize);                  
+            this.optionCurrentPage = 0;
+            this.getOptionPage(true);
+        }
+
+        if (this.totalOptionPages > 1)
+            this.canOptionPageDown = true;
+    }
+
+    getProductOptions()
+    {        
+        let that = this;
+        this.DBService.getLocalOptions().then((options) => {
+            if (options.length == 0) {
+                dialogs.alert("Missing Product Options");
+            }
+            else {
+                this.productOptions = options;
+                this.productOptions.forEach(function (option: MenuOption) {
+                    option.Row = ((Math.floor((option.Position - 1) / 3)) % 6);
+                    option.Col = (option.Position - 1) % 3;
+                });               
+            }
+        });       
     }
 
     createNewOrder() {
@@ -195,6 +242,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.table = this.orderResponse.Order.TableNumber;
             this.DBService.getLocalEmployee(this.orderResponse.Order.EmployeeID).then(employee => this.server = employee.FirstName);
             this.guests = this.orderResponse.Order.NumberGuests;
+            this.orderItems.forEach(oi => oi.Class = 'disabledTextColor');            
             this.totalPrice();
         });
     }
@@ -327,7 +375,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
         });
     }
-
+ 
     productSelected(product: MenuProduct) {
         this.currentProduct = product;
 
@@ -567,6 +615,26 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     }
 
+    getProductOptionPage(nextPage: boolean) {
+        if (nextPage)
+            this.optionCurrentPage++;
+        else
+            this.optionCurrentPage--;
+
+        let startPosition: number = (this.optionCurrentPage * this.optionPageSize) - this.optionPageSize + 1;
+        let endPosition: number = startPosition + this.optionPageSize - 1;
+
+        if (endPosition > this.productOptions[this.productOptions.length - 1].Position)
+            endPosition = this.productOptions[this.productOptions.length - 1].Position;
+
+        this.pageOptions = this.productOptions.filter(
+            o => o.Position >= startPosition && o.Position <= endPosition);
+
+        this.canOptionPageUp = this.optionCurrentPage > 1;
+        this.canOptionPageDown = this.totalOptionPages > this.optionCurrentPage;
+
+    }
+
     resetFixedOptionClasses() {
         this.fixedOptions.forEach(function (fixedOption: FixedOption) {
             fixedOption.Class = 'glass btnOption';
@@ -649,7 +717,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     cancelOrder() { 
-        if (this.orderItems.length > 0) {
+        if (this.orderItems.filter(oi => oi.OrderFilter == null).length > 0) {
             dialogs.confirm({
                 title: "Cancel Order",
                 message: "Cancel this order?",
@@ -746,6 +814,11 @@ export class OrderComponent implements OnInit, OnDestroy {
                 ProductCode: productCode,
                 MarginLeft: 0
             }
+            orderItem.Class = 'lastOrderItem';
+            
+            if (this.orderItems.length > 0)
+                this.orderItems[this.orderItems.length-1].Class = 'orderItem';
+
             this.orderItems.push(orderItem);
             this.currentOrderItem = orderItem;
         }
