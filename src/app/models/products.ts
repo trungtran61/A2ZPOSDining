@@ -203,8 +203,11 @@ export interface MenuChoice {
 }
 
 export interface OptionCategory {
-    PriKey: number;
-    Name: string;
+    PriKey?: number;
+    Name?: string;
+    Position?: number;
+    Col?: number;
+    Selected?: boolean;
 }
 
 export interface MenuSubOption {

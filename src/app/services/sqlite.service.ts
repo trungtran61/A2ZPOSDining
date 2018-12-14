@@ -513,6 +513,25 @@ export class SQLiteService {
             });
     }
 
+    public getLocalOptionCategories(): Promise<OptionCategory[]> {
+        return SQLiteService.database.all("SELECT PriKey, Name FROM OptionCategories Where Name <> 'None'")
+            .then(function (rows) {
+                let items: OptionCategory[] = [];
+                let rowCounter: number = 0;
+                for (var row in rows) {
+                    rowCounter++;
+                    items.push({
+                        PriKey: rows[row][0], 
+                        Name: rows[row][1],
+                        Position: rowCounter,       
+                        Col: (rowCounter - 1) % 3,
+                        Selected: false,                 
+                    });
+                }
+                return (items);
+            });
+    }
+
     public loadUserModifiers(db) {
 
         let that = this;

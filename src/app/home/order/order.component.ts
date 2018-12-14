@@ -7,7 +7,7 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import {
     CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem,
-    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail, MenuSubOption, MenuTimerType, OverrideType
+    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail, MenuSubOption, MenuTimerType, OverrideType, OptionCategory
 } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
@@ -54,6 +54,14 @@ export class OrderComponent implements OnInit, OnDestroy {
     productPageSize: number = 24;
 
     productOptions: MenuOption[];
+    allProductOptions: MenuOption[];
+    optionCategories: OptionCategory[];
+    pageOptionCategories: OptionCategory[];
+    optionCategoryCurrentPage: number = 0;
+    optionCategoryPageSize: number = 3;
+    totalOptionCategoryPages: number = 0;
+    allOptionCategorySelected: boolean = true;
+
     menuOptions: MenuOption[];
     pageOptions: MenuOption[];
     totalOptionPages: number = 0;
@@ -110,11 +118,11 @@ export class OrderComponent implements OnInit, OnDestroy {
     allTimers: MenuTimer[] = [];
 
     TAX_RATE: number = .08;
-    MAX_GUESTS: number = 6; 
+    MAX_GUESTS: number = 6;
     TIPS_PCT: number = .15;
-  
+
     qtyEntered: number = 1;
-    orderType: number = OrderType.DineIn; 
+    orderType: number = OrderType.DineIn;
 
     canSubCategoryPageDown: boolean = false;
     canSubCategoryPageUp: boolean = false;
@@ -122,10 +130,13 @@ export class OrderComponent implements OnInit, OnDestroy {
     canProductPageUp: boolean = false;
     canOptionPageDown: boolean = false;
     canOptionPageUp: boolean = false;
+    canOptionCategoryPageDown: boolean = false;
+    canOptionCategoryPageUp: boolean = false;
 
     isExistingOrder: boolean = false;
     isShowingProductOptions: boolean = false;
     productOptionsClass: string = 'glass productOptions';
+    allOptionFilterClass: string = 'glass';
 
     printerPort: string = '192.168.0.125:9100';
 
@@ -160,7 +171,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.countdowns = <Countdown[]>result;
         }
         );
-  
+
         this.getMenuTimers();
         this.getUserModifiers();
 
@@ -180,29 +191,30 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.getProductOptions();        
+        this.getProductOptions();
+        this.getOptionCategories();
         this.apiSvc.postToPrint('hero');
+        this.allOptionFilterClass = 'glass'
     }
 
-    showProductOptions()
-    {
+    showProductOptions() {
         this.isShowingProductOptions = !this.isShowingProductOptions;
 
-        if (this.isShowingProductOptions)
-        {
-            this.productOptionsClass = 'glass productOptionsActive';   
+        if (this.isShowingProductOptions) {
+            this.productOptionsClass = 'glass productOptionsActive';
+            this.optionCategoryCurrentPage = 0;
+            this.getOptionCategoryPage(true);
             this.resetFixedOptionClasses();
             this.resetUserModifierClasses();
-            this.totalOptionPages = Math.ceil(this.productOptions[this.productOptions.length - 1].Position / this.optionPageSize);        
-          
-            this.optionCurrentPage = 0;               
-            this.getProductOptionPage(true);            
+            this.totalOptionPages = Math.ceil(this.productOptions[this.productOptions.length - 1].Position / this.optionPageSize);
+
+            this.optionCurrentPage = 0;
+            this.getProductOptionPage(true);
         }
-        else
-        {
+        else {
             // show menu's options first page
             this.productOptionsClass = 'glass productOptions';
-            this.totalOptionPages = Math.ceil(this.menuOptions[this.menuOptions.length - 1].Position / this.optionPageSize);                  
+            this.totalOptionPages = Math.ceil(this.menuOptions[this.menuOptions.length - 1].Position / this.optionPageSize);
             this.optionCurrentPage = 0;
             this.getOptionPage(true);
         }
@@ -211,21 +223,55 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.canOptionPageDown = true;
     }
 
-    getProductOptions()
-    {        
-        let that = this;
+    getProductOptions() {
         this.DBService.getLocalOptions().then((options) => {
             if (options.length == 0) {
                 dialogs.alert("Missing Product Options");
             }
             else {
+                this.allProductOptions = options;
                 this.productOptions = options;
                 this.productOptions.forEach(function (option: MenuOption) {
                     option.Row = ((Math.floor((option.Position - 1) / 3)) % 6);
                     option.Col = (option.Position - 1) % 3;
-                });               
+                });
             }
-        });       
+        });
+    }
+
+    getOptionCategories() {
+        this.DBService.getLocalOptionCategories().then((categories) => {
+            if (categories.length == 0) {
+                dialogs.alert("Missing OptionCategories");
+            }
+            else {                
+                this.optionCategories = categories;
+                this.optionCategoryCurrentPage = 0;
+                this.getOptionCategoryPage(true);                
+            } 
+        }); 
+    }
+ 
+    getOptionsForAllCategories()
+    {
+        this.allOptionCategorySelected = true;
+        this.productOptions = this.allProductOptions;
+        this.optionCategoryCurrentPage = 0;
+        this.getOptionCategoryPage(true);
+    }
+
+    getOptionsForCategory(optionCategory: OptionCategory)
+    {
+        this.allOptionCategorySelected = false;
+        this.productOptions = this.allProductOptions.filter(po => po.CategoryCode == optionCategory.PriKey);
+        this.optionCategoryCurrentPage = 0;
+
+        this.optionCategories.forEach(oc => oc.Selected = false);
+        optionCategory.Selected = true;
+        //this.getOptionCategoryPage(true);
+        
+        this.optionCurrentPage = 0;
+        this.getProductOptionPage(true);
     }
 
     createNewOrder() {
@@ -242,7 +288,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.table = this.orderResponse.Order.TableNumber;
             this.DBService.getLocalEmployee(this.orderResponse.Order.EmployeeID).then(employee => this.server = employee.FirstName);
             this.guests = this.orderResponse.Order.NumberGuests;
-            this.orderItems.forEach(oi => oi.Class = 'disabledTextColor');            
+            this.orderItems.forEach(oi => oi.Class = 'disabledTextColor');
             this.totalPrice();
         });
     }
@@ -375,7 +421,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
         });
     }
- 
+
     productSelected(product: MenuProduct) {
         this.currentProduct = product;
 
@@ -595,13 +641,32 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     }
 
+    getOptionCategoryPage(nextPage: boolean) {
+        if (nextPage)
+            this.optionCategoryCurrentPage++;
+        else
+            this.optionCategoryCurrentPage--;
+
+        let startPosition: number = (this.optionCategoryCurrentPage * this.optionCategoryPageSize) - this.optionCategoryPageSize + 1;
+        let endPosition: number = startPosition + this.optionCategoryPageSize - 1;
+
+        if (endPosition > this.optionCategories[this.optionCategories.length - 1].Position)
+            endPosition = this.optionCategories[this.optionCategories.length - 1].Position;
+
+        this.pageOptionCategories = this.optionCategories.filter(
+            o => o.Position >= startPosition && o.Position <= endPosition);
+
+        this.canOptionCategoryPageUp = this.optionCategoryCurrentPage > 1;
+        this.canOptionCategoryPageDown = this.totalOptionCategoryPages > this.optionCategoryCurrentPage;
+    }
+
     getOptionPage(nextPage: boolean) {
         if (nextPage)
             this.optionCurrentPage++;
         else
             this.optionCurrentPage--;
 
-        let startPosition: number = (this.optionCurrentPage * this.optionPageSize) - this.optionPageSize + 1;
+        let startPosition: number = (this.optionCurrentPage * this.optionCurrentPage) - this.optionPageSize + 1;
         let endPosition: number = startPosition + this.optionPageSize - 1;
 
         if (endPosition > this.menuOptions[this.menuOptions.length - 1].Position)
@@ -612,7 +677,6 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         this.canOptionPageUp = this.optionCurrentPage > 1;
         this.canOptionPageDown = this.totalOptionPages > this.optionCurrentPage;
-
     }
 
     getProductOptionPage(nextPage: boolean) {
@@ -700,7 +764,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         switch (fixedOption.Name) {
             case 'NO MAKE':
             case 'TO GO':
-                
+
                 this.addItemToOrder
                     (
                     0, fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1
@@ -716,7 +780,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
     }
 
-    cancelOrder() { 
+    cancelOrder() {
         if (this.orderItems.filter(oi => oi.OrderFilter == null).length > 0) {
             dialogs.confirm({
                 title: "Cancel Order",
@@ -726,7 +790,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             }).then(isCanceling => {
                 if (isCanceling)
                     //this.router.back();
-                    this.zone.run(() => this.router.navigate(['/home/area']));                    
+                    this.zone.run(() => this.router.navigate(['/home/area']));
             });
         }
         else {
@@ -815,9 +879,9 @@ export class OrderComponent implements OnInit, OnDestroy {
                 MarginLeft: 0
             }
             orderItem.Class = 'lastOrderItem';
-            
+
             if (this.orderItems.length > 0)
-                this.orderItems[this.orderItems.length-1].Class = 'orderItem';
+                this.orderItems[this.orderItems.length - 1].Class = 'orderItem';
 
             this.orderItems.push(orderItem);
             this.currentOrderItem = orderItem;
@@ -888,6 +952,38 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.showOptions = false;
         this.showProducts = true;
         this.showSubCategories = true;
+    }
+
+    onOptionCategorySwipe(args) {
+        if (this.totalOptionCategoryPages <= 1)
+            return;
+
+        // at last page, can only swipe left
+        if (this.optionCategoryCurrentPage == this.totalOptionCategoryPages) {
+            if (args.direction == SwipeDirection.left) {
+                this.getOptionCategoryPage(false);
+            }
+        }
+        // at first page, can only swipe up
+        else
+            if (this.optionCategoryCurrentPage == 1) {
+                if (args.direction == SwipeDirection.right) {
+                    this.getOptionCategoryPage(true);
+                }
+            }
+            // else, can swipe up or down
+            else
+                if (this.optionCategoryCurrentPage >= 1) {
+                    // go to next page            
+                    if (args.direction == SwipeDirection.right) {
+                        this.getOptionCategoryPage(true);
+                    }
+                    else
+                        // go to previous page
+                        if (args.direction == SwipeDirection.left) {
+                            this.getOptionCategoryPage(false);
+                        }
+                }
     }
 
     onSubCategorySwipe(args) {
@@ -1134,7 +1230,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     printReceipt() {
-                         
+
     }
 
     getMenuTimers() {
@@ -1249,15 +1345,15 @@ export class OrderComponent implements OnInit, OnDestroy {
                 timers = timers.filter(x => x.Sun == true)
                 break;
         }
-  
+
         //timers.forEach(function (timer: MenuTimer) {});
         timers.forEach(function (timer: MenuTimer) {
             // start time is later than end time 
             let date1: Date = new Date();
             let date2: Date = new Date();
             let now: Date = new Date();
-           
-            if (parseInt(timer.StartTime.replace(':','')) > parseInt(timer.EndTime.replace(':',''))) {
+
+            if (parseInt(timer.StartTime.replace(':', '')) > parseInt(timer.EndTime.replace(':', ''))) {
                 if (now.getHours() <= parseInt(timer.EndTime.substr(0, 2))) {
                     date1 = that.convertToDate(that.addDays(now, -1).toDateString(), timer.StartTime);
                     date2 = that.convertToDate(now.toDateString(), timer.EndTime);
