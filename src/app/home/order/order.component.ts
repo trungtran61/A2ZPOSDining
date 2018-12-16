@@ -796,6 +796,14 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         this.resetFixedOptionClasses();
         this.resetUserModifierClasses();
+
+        if (this.currentFixedOption != null) {
+            if (fixedOption.Name == this.currentFixedOption.Name) {
+                this.currentFixedOption = null;
+                return;
+            }
+        }
+
         this.userModifierActive = false;
 
         switch (fixedOption.Name) {
@@ -846,7 +854,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             price = this.currentUserModifier.StampPrice ? this.currentUserModifier.Price : option.Charge;
         }
         else {
-            name = this.currentFixedOption.Name + ' ' + option.Name;
+            name = this.currentFixedOption == null ? option.Name : this.currentFixedOption.Name + ' ' + option.Name;
             price = option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0;
         }
 
