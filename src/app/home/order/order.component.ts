@@ -246,20 +246,19 @@ export class OrderComponent implements OnInit, OnDestroy {
             if (categories.length == 0) {
                 dialogs.alert("Missing OptionCategories");
             }
-            else {                
+            else {
                 this.optionCategories = categories;
                 this.optionCategoryCurrentPage = 0;
                 this.totalOptionCategoryPages = Math.ceil(this.optionCategories[this.optionCategories.length - 1].Position / this.optionCategoryPageSize);
                 if (this.totalSubCategoriesPages > 1)
                     this.canSubCategoryPageDown = true;
 
-                this.getOptionCategoryPage(true);                
-            } 
-        }); 
+                this.getOptionCategoryPage(true);
+            }
+        });
     }
- 
-    getOptionsForAllCategories()
-    {
+
+    getOptionsForAllCategories() {
         this.optionCategories.forEach(oc => oc.Selected = false);
         this.allOptionCategorySelected = true;
         this.productOptions = this.allProductOptions;
@@ -270,11 +269,10 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.getProductOptionPage(true);
     }
 
-    getOptionsForCategory(optionCategory: OptionCategory)
-    {
+    getOptionsForCategory(optionCategory: OptionCategory) {
         this.allOptionCategorySelected = false;
         this.productOptions = this.allProductOptions.filter(po => po.CategoryCode == optionCategory.PriKey);
-        
+
         let rowCtr: number = 0;
 
         this.productOptions.forEach(oc => {
@@ -285,11 +283,11 @@ export class OrderComponent implements OnInit, OnDestroy {
         console.log(this.allProductOptions.length);
 
         this.optionCategoryCurrentPage = 0;
-        
+
         this.optionCategories.forEach(oc => oc.Selected = false);
         optionCategory.Selected = true;
         //this.getOptionCategoryPage(true);
-        
+
         this.optionCurrentPage = 0;
         this.getProductOptionPage(true);
     }
@@ -335,6 +333,13 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     categorySelected(category: MenuCategory) {
+
+        if (this.lockedCategoryId != 0 && category.CategoryID != this.lockedCategoryId) {
+            dialogs.alert(category.Name + " not available during this time period.").then(() => {
+                return;
+            });
+        }
+
         localStorage.setItem("CategoryID", category.CategoryID.toString());
         this.currentCategoryID = category.CategoryID;
         this.showMainCategories = false;
@@ -635,14 +640,20 @@ export class OrderComponent implements OnInit, OnDestroy {
         // at last page, can only swipe right
         if (this.optionCurrentPage == this.totalOptionPages) {
             if (args.direction == SwipeDirection.down) {
-                this.getOptionPage(false);
+                if (this.isShowingProductOptions)
+                    this.getProductOptionPage(false);
+                else
+                    this.getOptionPage(false);
             }
         }
         // at first page, can only swipe left
         else
             if (this.optionCurrentPage == 1) {
                 if (args.direction == SwipeDirection.up) {
-                    this.getOptionPage(true);
+                    if (this.isShowingProductOptions)
+                        this.getProductOptionPage(true);
+                    else
+                        this.getOptionPage(true);
                 }
             }
             // else, can swipe left or right
@@ -650,12 +661,18 @@ export class OrderComponent implements OnInit, OnDestroy {
                 if (this.optionCurrentPage >= 1) {
                     // go to next page            
                     if (args.direction == SwipeDirection.up) {
-                        this.getOptionPage(true);
+                        if (this.isShowingProductOptions)
+                            this.getProductOptionPage(false);
+                        else
+                            this.getOptionPage(false);
                     }
                     else
                         // go to previous page
                         if (args.direction == SwipeDirection.down) {
-                            this.getOptionPage(false);
+                            if (this.isShowingProductOptions)
+                                this.getProductOptionPage(true);
+                            else
+                                this.getOptionPage(true);
                         }
                 }
 
@@ -787,7 +804,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
                 this.addItemToOrder
                     (
-                    0, fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1
+                        0, fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1
                     );
 
                 break;
@@ -842,7 +859,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         //this.currentOrderItem.Modifiers.push(modifier);
         this.addItemToOrder
             (0, modifier.Name, modifier.Price, ItemType.Option, this.currentProduct.ProductCode,
-            this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1);
+                this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1);
     }
 
     getMaxIndexData(): number {
@@ -924,7 +941,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 IndexDataSub: indexDataSub
             }
             orderItem.Class = 'lastOrderItem';
-            this.orderItems.splice(lastIndex + 1, 0, orderItem);            
+            this.orderItems.splice(lastIndex + 1, 0, orderItem);
 
             if (this.orderItems.length > 0)
                 this.orderItems[this.orderItems.length - 1].Class = 'orderItem'
@@ -940,12 +957,12 @@ export class OrderComponent implements OnInit, OnDestroy {
         if (userModifier.ButtonFunction == 1) {
             this.addItemToOrder
                 (
-                this.currentOrderItem.Quantity,
-                userModifier.ItemName,
-                userModifier.Price,
-                ItemType.Option,
-                this.currentProduct.ProductCode,
-                null
+                    this.currentOrderItem.Quantity,
+                    userModifier.ItemName,
+                    userModifier.Price,
+                    ItemType.Option,
+                    this.currentProduct.ProductCode,
+                    null
                 );
 
             return;
@@ -1252,13 +1269,13 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         this.modalService.showModal(SearchComponent, modalOptions).then(
             (searchTerm: string) => {
-                this.getProductOptions(searchTerm); 
+                this.getProductOptions(searchTerm);
                 this.optionCategories.forEach(oc => oc.Selected = false);
                 this.optionCurrentPage = 0;
-                this.getProductOptionPage(true);               
+                this.getProductOptionPage(true);
             });
-        }
-    
+    }
+
     sendCheck() {
         //var printController = UIPrintInteractionController;
         //console.log(printController.printingAvailable);
