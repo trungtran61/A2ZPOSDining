@@ -228,15 +228,24 @@ export class OrderComponent implements OnInit, OnDestroy {
     getProductOptions(optionName) {
         this.DBService.getLocalOptions(optionName).then((options) => {
             if (options.length == 0) {
-                dialogs.alert("Missing Product Options");
+                if (optionName == '')
+                    dialogs.alert("Missing Product Options");
+                else
+                    dialogs.alert(optionName + " not found.");
             }
             else {
-                this.allProductOptions = options;
+                if (optionName == '')
+                {
+                    this.allProductOptions = options;
+                }
+                else
+                {                    
+                    this.allOptionCategorySelected = false;
+                    this.optionCategories.forEach(oc => oc.Selected = false);
+                }
+
                 this.productOptions = options;
-                this.productOptions.forEach(function (option: MenuOption) {
-                    option.Row = ((Math.floor((option.Position - 1) / 3)) % 6);
-                    option.Col = (option.Position - 1) % 3;
-                });
+                this.setOptionsPosition();                    
             }
         });
     }
@@ -262,9 +271,23 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.optionCategories.forEach(oc => oc.Selected = false);
         this.allOptionCategorySelected = true;
         this.productOptions = this.allProductOptions;
+        this.setOptionsPosition();    
         this.optionCategoryCurrentPage = 0;
-        this.getOptionCategoryPage(true);
+        this.getOptionCategoryPage(true);       
+    }
 
+    setOptionsPosition()
+    {
+        let rowCtr: number = 0;
+
+        this.productOptions.forEach(oc => {
+            rowCtr++;
+            oc.Position = rowCtr;
+            oc.Row = ((Math.floor((rowCtr - 1) / 3)) % 6);
+            oc.Col = (rowCtr - 1) % 3;
+        });        
+       
+        this.totalOptionPages = Math.ceil(this.productOptions.length / this.optionPageSize);
         this.optionCurrentPage = 0;
         this.getProductOptionPage(true);
     }
@@ -272,24 +295,10 @@ export class OrderComponent implements OnInit, OnDestroy {
     getOptionsForCategory(optionCategory: OptionCategory) {
         this.allOptionCategorySelected = false;
         this.productOptions = this.allProductOptions.filter(po => po.CategoryCode == optionCategory.PriKey);
-
-        let rowCtr: number = 0;
-
-        this.productOptions.forEach(oc => {
-            rowCtr++;
-            oc.Position = rowCtr;
-            oc.Col = (rowCtr - 1) % 3;
-        });
-        console.log(this.allProductOptions.length);
-
-        this.optionCategoryCurrentPage = 0;
-
+        this.totalOptionPages = Math.ceil(this.productOptions.length / this.optionPageSize);
+        this.setOptionsPosition();                
         this.optionCategories.forEach(oc => oc.Selected = false);
-        optionCategory.Selected = true;
-        //this.getOptionCategoryPage(true);
-
-        this.optionCurrentPage = 0;
-        this.getProductOptionPage(true);
+        optionCategory.Selected = true;        
     }
 
     createNewOrder() {
@@ -345,8 +354,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.showMainCategories = false;
         this.showSubCategories = true;
         this.showOptions = false;
-        let that = this;
-        this.mainCategory = category.Name;
+        let that = this; 
+        this.mainCategory = category.Name;  
 
         this.DBService.getLocalMenuSubCategories(category.CategoryID).then((subCategories) => {
             if (subCategories.length == 0) {
@@ -423,12 +432,12 @@ export class OrderComponent implements OnInit, OnDestroy {
             let lightColor: string = '#' + product.ButtonColorHex;
             //let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
             let darkColor: string = that.utilSvc.colorLuminance(lightColor, -0.2);
-            let style: string = "margin-top:5; color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
-            product.Style = style;
+            let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
+            product.Style = style; 
 
             product.QtyClass = '';
-            product.Disabled = false;
-            product.CountdownActivated = false;
+            product.Disabled = false; 
+            product.CountdownActivated = false; 
 
             let countdown = that.countdowns.find(p => p.ProductFilter == product.ProductID);
 
@@ -637,7 +646,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         if (this.totalOptionPages <= 1)
             return;
 
-        // at last page, can only swipe right
+        // at last page, can only swipe down
         if (this.optionCurrentPage == this.totalOptionPages) {
             if (args.direction == SwipeDirection.down) {
                 if (this.isShowingProductOptions)
@@ -646,7 +655,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     this.getOptionPage(false);
             }
         }
-        // at first page, can only swipe left
+        // at first page, can only swipe up
         else
             if (this.optionCurrentPage == 1) {
                 if (args.direction == SwipeDirection.up) {
@@ -656,23 +665,23 @@ export class OrderComponent implements OnInit, OnDestroy {
                         this.getOptionPage(true);
                 }
             }
-            // else, can swipe left or right
+            // else, can swipe up or down
             else
                 if (this.optionCurrentPage >= 1) {
                     // go to next page            
                     if (args.direction == SwipeDirection.up) {
                         if (this.isShowingProductOptions)
-                            this.getProductOptionPage(false);
+                            this.getProductOptionPage(true);
                         else
-                            this.getOptionPage(false);
+                            this.getOptionPage(true);
                     }
                     else
                         // go to previous page
                         if (args.direction == SwipeDirection.down) {
                             if (this.isShowingProductOptions)
-                                this.getProductOptionPage(true);
+                                this.getProductOptionPage(false);
                             else
-                                this.getOptionPage(true);
+                                this.getOptionPage(false);
                         }
                 }
 
@@ -1277,10 +1286,10 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         this.modalService.showModal(SearchComponent, modalOptions).then(
             (searchTerm: string) => {
-                this.getProductOptions(searchTerm);
-                this.optionCategories.forEach(oc => oc.Selected = false);
-                this.optionCurrentPage = 0;
-                this.getProductOptionPage(true);
+                if (searchTerm != '')
+                {
+                this.getProductOptions(searchTerm);               
+                }
             });
     }
 
