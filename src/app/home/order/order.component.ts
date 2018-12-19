@@ -100,7 +100,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     showDetails: boolean = true;
     showExtraFunctions: boolean = false;
     showProductInfo: boolean = false;
-    productInfoClass: string = 'glass btnBottom fa';
+    productInfoClass: string = 'glass fa';
     viewDetailsCode: string = String.fromCharCode(0xf06e) + ' View Details'
     hideDetailsCode: string = String.fromCharCode(0xf070) + ' Hide Details'
 
@@ -610,9 +610,9 @@ export class OrderComponent implements OnInit, OnDestroy {
         console.log('product info');
         this.showProductInfo = !this.showProductInfo;
         if (this.showProductInfo)
-            this.productInfoClass = 'glass btnBottom btnOK fa';
+            this.productInfoClass = 'glass btnOK fa';
         else
-            this.productInfoClass = 'glass btnBottom fa';
+            this.productInfoClass = 'glass fa';
     }
 
     changeGuestsNumber() {
