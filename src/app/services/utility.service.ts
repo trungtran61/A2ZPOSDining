@@ -6,25 +6,23 @@ import { Order, OrderItem } from "../models/orders";
 //import { EventData } from "tns-core-modules/data/observable";
 import { topmost } from "tns-core-modules/ui/frame";
 import { isIOS } from "tns-core-modules/platform";
-//import { SocketIO } from "nativescript-socketio/socketio";
-//require("nativescript-websockets");
 
 @Injectable()
 export class UtilityService {
     timeoutInSecs: number = 15;
     idleTimer: number;
     public socket: any;
+    private readStream: NSInputStream;
+    private writeStream: NSOutputStream;
 
-    public constructor(private router: RouterExtensions, 
-        private DBService: SQLiteService, 
-        //private socketIO: SocketIO
-        ) 
-    {
-        
+    public constructor(private router: RouterExtensions,
+        private DBService: SQLiteService,
+    ) {
+
     }
 
     public print(message: string) {
-        this.socket.send(message);        
+        this.socket.send(message);
     }
 
     startTimer() {
@@ -45,39 +43,31 @@ export class UtilityService {
         this.idleTimer = 0;
     }
 
-    sendToPrinter(eventName: string, payload: any)
-    {
-        /*
-        this.socketIO.emit('hello', {
-            username: 'someone',
-          });
-          */
+    /*
+  ColorLuminance("#69c", 0);		// returns "#6699cc"
+  ColorLuminance("6699CC", 0.2);	// "#7ab8f5" - 20% lighter
+  ColorLuminance("69C", -0.5);	// "#334d66" - 50% darker
+  */
+
+    colorLuminance(hex, lum) {
+
+        // validate hex string
+        hex = String(hex).replace(/[^0-9a-f]/gi, '');
+        if (hex.length < 6) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+        lum = lum || 0;
+
+        // convert to decimal and change luminosity
+        var rgb = "#", c, i;
+        for (i = 0; i < 3; i++) {
+            c = parseInt(hex.substr(i * 2, 2), 16);
+            c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+            rgb += ("00" + c).substr(c.length);
+        }
+
+        return rgb;
     }
-     /*
-   ColorLuminance("#69c", 0);		// returns "#6699cc"
-   ColorLuminance("6699CC", 0.2);	// "#7ab8f5" - 20% lighter
-   ColorLuminance("69C", -0.5);	// "#334d66" - 50% darker
-   */
-
-  colorLuminance(hex, lum) {
-
-    // validate hex string
-    hex = String(hex).replace(/[^0-9a-f]/gi, '');
-    if (hex.length < 6) {
-        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-    }
-    lum = lum || 0;
-
-    // convert to decimal and change luminosity
-    var rgb = "#", c, i;
-    for (i = 0; i < 3; i++) {
-        c = parseInt(hex.substr(i * 2, 2), 16);
-        c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
-        rgb += ("00" + c).substr(c.length);
-    }
-
-    return rgb;
-}
 
     getTaxTotal(order: Order): number {
         let taxTotal: number = 0.00;
@@ -124,16 +114,15 @@ export class UtilityService {
                     .reduce((sum, current) => sum + current);
             }
         }
-        else
-        {
+        else {
             lineDiscounts = lineDiscounts.filter(ld => !ld.Refund && !ld.IgnoreTax && !ld.Voided && !ld.Comped && ld.Product.Taxable == 0 && ld.Price && ld.Price > 0);
             sumLineDiscounts = lineDiscounts
                 .map(ld => ld.Price > 0 ? ld.Price : 0)
                 .reduce((sum, current) => sum + current);
-            lineDiscount = ((sumLineDiscounts / itemTotal) * discount) / lineDiscounts.length;   
+            lineDiscount = ((sumLineDiscounts / itemTotal) * discount) / lineDiscounts.length;
             taxTotal = lineDiscounts
-                    .map(ld => (ld.Price - lineDiscount) * ld.Product.TaxRate)
-                    .reduce((sum, current) => sum + current);
+                .map(ld => (ld.Price - lineDiscount) * ld.Product.TaxRate)
+                .reduce((sum, current) => sum + current);
         }
 
         if (this.DBService.systemSettings.TaxGratuity)
@@ -153,15 +142,47 @@ export class UtilityService {
         return new Date(parseInt(jsonDate.substr(6)))
     }
 
-    padLeft(text:string, padChar:string, size:number): string {
-        return (String(padChar).repeat(size) + text).substr( (size * -1), size) ;
+    padLeft(text: string, padChar: string, size: number): string {
+        return (String(padChar).repeat(size) + text).substr((size * -1), size);
     }
 
-    public setTopBarStyle(){
-     if (isIOS) {
-        let navigationBar = topmost().ios.controller.navigationBar;
-        navigationBar.barStyle = UIBarStyle.Black;
+    public setTopBarStyle() {
+        if (isIOS) {
+            let navigationBar = topmost().ios.controller.navigationBar;
+            navigationBar.barStyle = UIBarStyle.Black;
+        }
     }
-}
 
+    openPrinterSocket() {        
+        let readStream = new interop.Reference<NSInputStream>();
+        let writeStream = new interop.Reference<NSOutputStream>(); //new interop.Reference(CFWriteStreamCreateWithBuffer(null,'',1000));        
+        CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, "192.168.0.125", 9100, readStream, writeStream);
+
+        if (!(readStream && writeStream)) {
+            console.log("Failed to create read&write stream");
+            return;
+        } else {
+            console.log("Successfully create read&write stream");
+        }
+
+        //this.readStream = readStream.value;
+        this.writeStream = writeStream.value;
+        //this.readStream.open();
+        this.writeStream.open();
+        /*
+        [self scheduleInRunLoop];
+        [self openStreams];
+        
+        telnet = telnet_init(telopts, _event_handler, 0, (__bridge void *)(self)
+        */
+    }
+
+    sendToPrinter(textData: NSString) {
+        this.writeStream.writeMaxLength(textData + '\r\n', 255);
+    }
+
+    closePrinterSocket()
+    {
+        this.writeStream.close();
+    }
 }

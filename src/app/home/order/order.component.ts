@@ -234,18 +234,16 @@ export class OrderComponent implements OnInit, OnDestroy {
                     dialogs.alert(optionName + " not found.");
             }
             else {
-                if (optionName == '')
-                {
+                if (optionName == '') {
                     this.allProductOptions = options;
                 }
-                else
-                {                    
+                else {
                     this.allOptionCategorySelected = false;
                     this.optionCategories.forEach(oc => oc.Selected = false);
                 }
 
                 this.productOptions = options;
-                this.setOptionsPosition();                    
+                this.setOptionsPosition();
             }
         });
     }
@@ -271,13 +269,12 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.optionCategories.forEach(oc => oc.Selected = false);
         this.allOptionCategorySelected = true;
         this.productOptions = this.allProductOptions;
-        this.setOptionsPosition();    
+        this.setOptionsPosition();
         this.optionCategoryCurrentPage = 0;
-        this.getOptionCategoryPage(true);       
+        this.getOptionCategoryPage(true);
     }
 
-    setOptionsPosition()
-    {
+    setOptionsPosition() {
         let rowCtr: number = 0;
 
         this.productOptions.forEach(oc => {
@@ -285,8 +282,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             oc.Position = rowCtr;
             oc.Row = ((Math.floor((rowCtr - 1) / 3)) % 6);
             oc.Col = (rowCtr - 1) % 3;
-        });        
-       
+        });
+
         this.totalOptionPages = Math.ceil(this.productOptions.length / this.optionPageSize);
         this.optionCurrentPage = 0;
         this.getProductOptionPage(true);
@@ -296,9 +293,9 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.allOptionCategorySelected = false;
         this.productOptions = this.allProductOptions.filter(po => po.CategoryCode == optionCategory.PriKey);
         this.totalOptionPages = Math.ceil(this.productOptions.length / this.optionPageSize);
-        this.setOptionsPosition();                
+        this.setOptionsPosition();
         this.optionCategories.forEach(oc => oc.Selected = false);
-        optionCategory.Selected = true;        
+        optionCategory.Selected = true;
     }
 
     createNewOrder() {
@@ -341,12 +338,81 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.showOptions = false;
     }
 
-    categorySelected(category: MenuCategory) {
+    checkCategoryTimer(categoryID: number) : boolean
+    {
+        let timers: MenuTimer[] = this.allTimers.filter(t => t.CategoryToLock == categoryID)
+        let locked: boolean = false;
 
-        if (this.lockedCategoryId != 0 && category.CategoryID != this.lockedCategoryId) {
-            dialogs.alert(category.Name + " not available during this time period.").then(() => {
-                return;
+        if (timers.length == 0)
+            return false;
+
+            let today: Date = new Date();
+            switch (today.getDay()) {
+                case 1:
+                    timers = timers.filter(x => x.Mon == true);
+                    break;
+                case 2:
+                    timers = timers.filter(x => x.Tue == true);
+                    break;
+                case 3:
+                    timers = timers.filter(x => x.Wed == true);
+                    break;
+                case 4:
+                    timers = timers.filter(x => x.Thu == true)
+                    break;
+                case 5:
+                    timers = timers.filter(x => x.Fri == true)
+                    break;
+                case 6:
+                    timers = timers.filter(x => x.Sat == true)
+                    break;
+                case 0:
+                    timers = timers.filter(x => x.Sun == true)
+                    break;
+            }
+            let that = this;
+            
+            timers.forEach(function (timer: MenuTimer) {
+                // start time is later than end time 
+                let date1: Date = new Date();
+                let date2: Date = new Date();
+                let now: Date = new Date();
+    
+                if (parseInt(timer.StartTime.replace(':', '')) > parseInt(timer.EndTime.replace(':', ''))) {
+                    if (now.getHours() <= parseInt(timer.EndTime.substr(0, 2))) {
+                        date1 = that.convertToDate(that.addDays(now, -1).toDateString(), timer.StartTime);
+                        date2 = that.convertToDate(now.toDateString(), timer.EndTime);
+                    }
+                    else {
+                        date1 = that.convertToDate(now.toDateString(), timer.StartTime);
+                        date2 = that.convertToDate(that.addDays(now, 1).toDateString(), timer.EndTime);
+                    }
+                }
+                else {
+                    date1 = that.convertToDate(now.toDateString(), timer.StartTime);
+                    date2 = that.convertToDate(now.toDateString(), timer.EndTime);
+                }
+    
+                console.log(now.toDateString() + ' ' + now.toTimeString());
+                console.log(date1.toDateString() + ' ' + date1.toTimeString());
+                console.log(date2.toDateString() + ' ' + date2.toTimeString());
+                
+                if (now > date2 || now < date1) {    
+                    locked = true;
+                    return;                    
+                }
             });
+
+        return locked;
+    }
+
+    categorySelected(category: MenuCategory) {
+       
+        let isCategoryLocked = this.checkCategoryTimer(category.CategoryID);
+
+        if (isCategoryLocked) {
+            alert(category.Name + " not available during this time period.");
+            return;
         }
 
         localStorage.setItem("CategoryID", category.CategoryID.toString());
@@ -354,8 +420,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.showMainCategories = false;
         this.showSubCategories = true;
         this.showOptions = false;
-        let that = this; 
-        this.mainCategory = category.Name;  
+        let that = this;
+        this.mainCategory = category.Name;
 
         this.DBService.getLocalMenuSubCategories(category.CategoryID).then((subCategories) => {
             if (subCategories.length == 0) {
@@ -433,11 +499,11 @@ export class OrderComponent implements OnInit, OnDestroy {
             //let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
             let darkColor: string = that.utilSvc.colorLuminance(lightColor, -0.2);
             let style: string = "color: #" + product.ButtonForeColorHex + ";background-image: linear-gradient(" + darkColor + "," + lightColor + " 40%," + darkColor + " 95%);";
-            product.Style = style; 
+            product.Style = style;
 
             product.QtyClass = '';
-            product.Disabled = false; 
-            product.CountdownActivated = false; 
+            product.Disabled = false;
+            product.CountdownActivated = false;
 
             let countdown = that.countdowns.find(p => p.ProductFilter == product.ProductID);
 
@@ -941,6 +1007,10 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.currentOrderItem = orderItem;
         }
         else {   // adding product modifier
+            let indentation: string = '   ';
+            if (itemType == ItemType.SubOption)
+                indentation = '      ';
+
             indexData = this.currentOrderItem.IndexData;
             let lastIndex: number = this.orderItems.map(oi =>
                 oi.IndexData === indexData).lastIndexOf(true);
@@ -949,22 +1019,27 @@ export class OrderComponent implements OnInit, OnDestroy {
                 SeatNumber: this.currentSeatNumber.toString(),
                 ExtPrice: null,
                 UnitPrice: unitPrice,
-                PrintName: name,
-                ProductName: name,
+                PrintName: indentation + name,
+                ProductName: indentation + name,
                 ItemType: itemType,
                 IndexData: indexData,
                 ProductCode: productCode,
                 MarginLeft: marginLeft,
                 IndexDataSub: indexDataSub
             }
-            orderItem.Class = 'lastOrderItem';
-            this.orderItems.splice(lastIndex + 1, 0, orderItem);
 
-            if (this.orderItems.length > 0)
-                this.orderItems[this.orderItems.length - 1].Class = 'orderItem'
+            this.orderItems.splice(lastIndex + 1, 0, orderItem);
         }
 
         this.totalPrice();
+        this.setLastItemOrdered();
+    }
+
+    setLastItemOrdered() {
+        this.orderItems.forEach(oi => oi.Class = 'orderItem');
+
+        if (this.orderItems.length > 0)
+            this.orderItems[this.orderItems.length - 1].Class = 'lastOrderItem'
     }
 
     userModifierSelected(userModifier: UserModifier) {
@@ -1286,9 +1361,8 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         this.modalService.showModal(SearchComponent, modalOptions).then(
             (searchTerm: string) => {
-                if (searchTerm != '')
-                {
-                this.getProductOptions(searchTerm);               
+                if (searchTerm != '') {
+                    this.getProductOptions(searchTerm);
                 }
             });
     }
@@ -1339,9 +1413,6 @@ export class OrderComponent implements OnInit, OnDestroy {
                 }
 
                 if (this.currentCategoryID == 0) {
-                    this.showMainCategories = true;
-                }
-                else {
                     this.showMainCategories = true;
                 }
 

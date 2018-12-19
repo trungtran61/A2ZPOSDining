@@ -1063,7 +1063,7 @@ export class SQLiteService {
                     "OverRideCategoryBar INTEGER,OverRideCategoryDineIn INTEGER,Mon INTEGER,Tue INTEGER,Wed INTEGER,Thu INTEGER,Fri INTEGER,Sat INTEGER,Sun INTEGER," +
                     "TableService INTEGER,WalkIn INTEGER,TakeOut INTEGER,Bar INTEGER,PhoneIn INTEGER,QuickSale INTEGER,DefaultCategory TEXT);").then(id => {
                         let headers = that.createRequestHeader();
-                        that.http.get(that.apiUrl + 'GetMenuTimers', { headers: headers })
+                        that.http.get(that.apiUrl + 'GetMenuTimersBasic', { headers: headers })
                             .subscribe(
                                 data => {
                                     let menuTimers = <MenuTimer[]>data;
@@ -1116,7 +1116,7 @@ export class SQLiteService {
                     timers.push(
                         {
                             PriKey: rows[row][0],Name: rows[row][1],
-                            Enabled: rows[row][2].toLowerCase() == 'true',
+                            Enabled: true, // rows[row][2].toLowerCase() == 'true',
                             HappyHourType: rows[row][3],
                             PriceLevel: rows[row][4],
                             StartTime: rows[row][5],
