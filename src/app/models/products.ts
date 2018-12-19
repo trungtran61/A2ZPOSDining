@@ -59,7 +59,7 @@ export interface CategoryCode {
 }
 
 export interface Product {
-    ProductCode?: number;
+    Product?: number;
     ProductFilter?: number;
     ProductName?: string;
     UnitPrice?: number;

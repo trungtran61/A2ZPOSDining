@@ -556,7 +556,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             fullscreen: true,
             context: {
                 productCode: product.ProductCode,
-                indexData: this.getMaxIndexData() + 1,
+                indexData: this.getNextIndexData(),
                 currentChoices: orderItemIndex > -1 ? this.order.OrderItems[orderItemIndex].ForcedModifiers : []
             }
         };
@@ -623,10 +623,33 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.showForcedModifierDialog(product, orderItemIndex, choice, false);
     }
 
-    addProductToOrder(product: MenuProduct) {
-        this.addItemToOrder(
-            1, product.Name, product.UnitPrice, ItemType.Product, product.ProductCode, null
-        );
+    addProductToOrder(menuProduct: MenuProduct) {
+        let indexData: number = this.getNextIndexData();
+        //let marginLeft: number = this.getLeftMargin(ItemType.Product);
+        indexData = this.getNextIndexData();
+
+        this.DBService.getLocalProduct(menuProduct.ProductID).then(product => {
+            let orderItem: OrderDetail = {
+                OrderTime: new Date(),            
+                ProductName: product.ProductName,
+                SeatNumber: this.currentSeatNumber.toString(),
+                Quantity: 1,  // TODO - promted qty?
+                ExtPrice: 1 * product.UnitPrice,
+                UnitPrice: product.UnitPrice,
+                PrintName: product.PrintName,
+                ItemType: ItemType.Product,
+                IndexData: indexData,
+                ProductCode: menuProduct.ProductCode,
+                MarginLeft: 0
+            }
+            orderItem.Class = 'lastOrderItem';
+    
+            if (this.orderItems.length > 0)
+                this.orderItems[this.orderItems.length - 1].Class = 'orderItem';
+    
+            this.orderItems.push(orderItem);
+            this.currentOrderItem = orderItem;
+        });        
     }
 
     showOpenProduct() {
@@ -950,13 +973,22 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.getMaxIndexDataSub(this.currentOrderItem.IndexData) + 1);
     }
 
-    getMaxIndexData(): number {
+    getNextOrderFilter(): number {
         if (this.orderItems.length == 0)
             return 0;
 
         return Math.max.apply(Math, this.orderItems
             .filter(oi => oi.ItemType == ItemType.Product)
-            .map(function (oi) { return oi.IndexData; }));
+            .map(function (oi) { return oi.OrderFilter + 1; }));
+    }
+
+    getNextIndexData(): number {
+        if (this.orderItems.length == 0)
+            return 1;
+
+        return Math.max.apply(Math, this.orderItems
+            .filter(oi => oi.ItemType == ItemType.Product)
+            .map(function (oi) { return oi.IndexData + 1; }));
     }
 
     getMaxIndexDataSub(indexData: number): number {
@@ -990,7 +1022,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         let marginLeft: number = this.getLeftMargin(itemType);
 
         if (itemType == ItemType.Product) {   //adding a product
-            indexData = this.getMaxIndexData() + 1;
+            indexData = this.getNextIndexData();
             let orderItem: OrderDetail = {
                 Quantity: itemType == ItemType.Product ? qty : null,
                 SeatNumber: this.currentSeatNumber.toString(),
@@ -1268,7 +1300,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     repeatOrderItem(orderItem: OrderDetail) {
         let itemsToCopy = this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData);
-        let maxIndexData: number = this.getMaxIndexData();
+        let nextIndexData: number = this.getNextIndexData();
         let that = this;
 
         itemsToCopy.forEach(function (orderItem: OrderDetail) {
@@ -1284,7 +1316,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     PrintName: orderItem.PrintName,
                     ProductName: orderItem.ProductName,
                     ItemType: orderItem.ItemType,
-                    IndexData: maxIndexData + 1,
+                    IndexData: nextIndexData,
                     ProductCode: orderItem.ProductCode,
                     MarginLeft: that.getLeftMargin(orderItem.ItemType)
                 }
