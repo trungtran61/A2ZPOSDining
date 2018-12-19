@@ -118,6 +118,6 @@ export class ModifyOrderItemComponent implements OnInit {
 
     ngOnInit() { 
         this.orderItem = this.params.context.orderItem;
-        this.isForcedModifier = this.params.context.orderItem.ItemType == ItemType.ForcedChoice;
+        this.isForcedModifier = this.orderItem.ItemType == ItemType.ForcedChoice;
     } 
 }

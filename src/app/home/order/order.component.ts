@@ -139,7 +139,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     productOptionsClass: string = 'glass productOptions';
     allOptionFilterClass: string = 'glass';
 
-    printerPort: string = '192.168.0.125:9100';
+    showOptionsButton: boolean = false;
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -523,6 +523,8 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     productSelected(product: MenuProduct) {
+        this.showOptionsButton = true;
+
         this.currentProduct = product;
 
         if (this.showProductInfo) {
@@ -669,9 +671,12 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     showModifyDialog(orderItem: OrderDetail) {
 
-        this.currentOrderItem = orderItem;
+        if (orderItem != null)
+            this.currentOrderItem = orderItem;
+        else
+            orderItem = this.currentOrderItem;            
 
-        let context = { orderItem: orderItem, isForcedModifier: orderItem.ItemType == ItemType.ForcedChoice };
+        let context = { orderItem: orderItem };
 
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
@@ -681,8 +686,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         let that = this;
         this.modalService.showModal(ModifyOrderItemComponent, modalOptions).then(
-            (choice: Choice) => {
-                console.log(choice.ChangeType);
+            (choice: Choice) => {                                
                 switch (choice.ChangeType) {
                     case 'quantity':
                         orderItem.Quantity = parseFloat(choice.SelectedNumber);
@@ -700,6 +704,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         break;
                     case 'modify':
                         this.getMenuOptions(orderItem.ProductCode);
+                        this.showOptionsButton = false;
                         break;
                     case 'changechoice':
                         this.showForcedModifierDialogOrderItem(orderItem);

@@ -32,7 +32,7 @@
     <ScrollView style="background-color: white" height="500" orientation="vertical">
       <StackLayout *ngIf='showDetails'>
         <StackLayout *ngFor="let item of orderItems">
-          <FlexBoxLayout (tap)="showModifyDialog(item,null,null)" (swipe)="onOrderItemSwipe($event, item)" [class]="item.Class">
+          <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" [class]="item.Class">
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.ExtPrice | currency" style="text-align: right; width:50; margin-right:5"></Label>
@@ -42,7 +42,7 @@
       </StackLayout>
       <StackLayout *ngIf='!showDetails'>
         <StackLayout *ngFor="let item of orderItems">
-          <FlexBoxLayout (tap)="showModifyDialog(item,null,null)" (swipe)="onOrderItemSwipe($event, item)" *ngIf='item.ItemType == 1'>
+          <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" *ngIf='item.ItemType == 1'>
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.ExtPrice | currency" style="text-align: right; width:50; margin-right:5"></Label>
@@ -76,16 +76,19 @@
     </StackLayout>
   </StackLayout>
   <!-- bottom navigation -->
-  <WrapLayout row="1" col="0" colSpan="4" style="margin-bottom:10" *ngIf='!showExtraFunctions && !showOptions'>
-    <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancelOrder()"></Button>
-    <Button class="glass btnBottom fa" [text]="viewDetailsText" textWrap="true" (tap)="showHideDetails()"></Button>
-    <Button class="glass btnBottom" (tap)="nextSeat()" textWrap="true" text="" style="background-image: url('res://images/Orders/Seat'); background-repeat: no-repeat; background-position: right 0"></Button>
-    <Label class="nextSeat" [text]='currentSeatNumber'></Label>
-    <Button class="glass btnBottom fa" (tap)="extraFunctions()" textWrap="true" text="&#xf0fe; Extra Functions" style="margin-left: 40"></Button>
-    <Button class="glass btnBottom fa" (tap)="hold()" textWrap="true" text="&#xf256; Hold"></Button>
-    <Button class="glass btnBottom fa" (tap)="sendCheck()" textWrap="true" text="&#xf14d; Send"></Button>
-    <Button [class]="productInfoClass" (tap)="productInfo()" textWrap="true" text="&#xf05a; Product Info"></Button>
-  </WrapLayout>
+  <GridLayout row="1" col="0" colSpan="4" style="margin-bottom:10" columns='110 110 110 110 110 110 110 *'
+    *ngIf='!showExtraFunctions && !showOptions'>
+    <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancelOrder()" col='0'></Button>
+    <Button class="glass btnBottom fa" [text]="viewDetailsText" textWrap="true" (tap)="showHideDetails()" col='1'></Button>
+    <Button class="glass btnBottom" (tap)="nextSeat()" textWrap="true" text="" col='2'
+      style="background-image: url('res://images/Orders/Seat'); background-repeat: no-repeat; background-position: right 0"></Button>
+    <Label class="nextSeat" [text]='currentSeatNumber' col='2'></Label>
+    <Button class="glass btnBottom fa" (tap)="extraFunctions()" col='3' 
+      textWrap="true" text="&#xf0fe; Extra Functions" style="margin-left: 40"></Button>
+    <Button class="glass btnBottom fa" (tap)="hold()" col='5' textWrap="true" text="&#xf256; Hold"></Button>
+    <Button class="glass btnBottom fa" (tap)="sendAndNew()" col='6' textWrap="true" text="&#xf02f; Send & &#xf15c; New"></Button>
+    <Button class="glass btnBottom fa" (tap)="sendCheck()" col='7' textWrap="true" text="&#xf02f; Send" horizontalAlignment="right" ></Button>   
+  </GridLayout>
   <!-- bottom navigation for extra functions -->
   <GridLayout rows='60' row="1" col="0" colSpan="4" columns='100 400 100 100 *' *ngIf='showExtraFunctions'>
     <Button class="glass btnBottom btnCancel" text="Close" (tap)="closeExtraFunctions()" col='0' horizontalAlignment="left"></Button>  
@@ -111,7 +114,7 @@
   -->
   </GridLayout>
   <!-- products -->
-  <GridLayout columns="*,*,*,*" rows="60,92,92,92,92,92,92,80" row="0" col="3" *ngIf="showSubCategories" (swipe)='onProductSwipe($event)'>
+  <GridLayout columns="*,*,*,*" rows="60 86 86 86 86 86 86 80" row="0" col="3" *ngIf="showSubCategories" (swipe)='onProductSwipe($event)'>
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>
     <Button class="btnProduct" [text]="item.Name" (tap)="productSelected(item)" textWrap="true" [style]='item.Style'
       *ngFor="let item of pageProducts let i=index" [col]='item.Col' [row]='item.Row'></Button>
@@ -123,6 +126,10 @@
       <Button col='1' class="glass btnPaging fa" *ngIf='canProductPageDown' (tap)="getProductPage(true)" text="&#xf0ab; Down"></Button>      
       </GridLayout>
     -->
+    <Button [class]="productInfoClass" (tap)="productInfo()" textWrap="true" text="&#xf05a; Product Info" row='7' col='1'></Button>
+    <Button class="glass" (tap)="showModifyDialog(null)" text="Options" row='7' col='2' *ngIf='showOptionsButton'></Button>
+    <Button class="fa" (tap)="showModifyDialog(null)" text="&#xf0c8;" row='7' col='2' *ngIf='showOptionsButton'
+      style='color:lightgreen; margin-left: 80; margin-top: -30' ></Button>
   </GridLayout>
   <GridLayout columns="*,*,*,*" rows="60,*,70" row="0" col="3" *ngIf="showOptions">
     <!-- options filters -->

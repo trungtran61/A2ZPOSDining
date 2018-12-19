@@ -26,12 +26,16 @@ export class MemoComponent implements OnInit, AfterViewInit {
 
     done() {
 
-        let openProductItem: Memo = {
-            Memo: this.memo,
-            Price: this.price
+        if (this.memo != '') {
+            let openProductItem: Memo = {
+                Memo: this.memo,
+                Price: this.price
+            }
+            this.params.closeCallback(openProductItem);
         }
-        this.params.closeCallback(openProductItem);
-
+        else {
+            this.cancel();
+        }
     }
 
     activateMemo() {
