@@ -336,6 +336,7 @@ export interface MenuOption {
     Row?: number;
     Col?: number;
     CategoryCode?: number;
+    Price?: number;
 }
 
 export interface MenuSubOption {
