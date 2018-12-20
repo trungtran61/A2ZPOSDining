@@ -404,16 +404,19 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS MenuSubOptions;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ReportProductMix INTEGER);").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Key INTEGER, Layer INTEGER," + 
+                    "Name TEXT, Position INTEGER, PrintName TEXT, ReportProductMix INTEGER);")
+                .then(id => {
                     let headers = that.createRequestHeader();
                     that.http.get(that.apiUrl + 'GetMenuSubOption', { headers: headers })
                         .subscribe(
                             data => {
                                 let menuSubOptions = <MenuSubOption[]>data;
-                                menuSubOptions.forEach(function (menuSubOption: MenuSubOption) {
-                                    SQLiteService.database.execSQL("INSERT INTO MenuSubOptions (ApplyCharge, Charge, ChoiceID, Layer, Name, Position, ReportProductMix) VALUES (?,?,?,?,?,?,?)",
-                                        [menuSubOption.ApplyCharge, menuSubOption.Charge, menuSubOption.ChoiceID, menuSubOption.Layer,
-                                        menuSubOption.Name, menuSubOption.Position, menuSubOption.ReportProductMix]).then(id => {
+                                menuSubOptions.forEach(function (mso: MenuSubOption) {
+                                    SQLiteService.database.execSQL("INSERT INTO MenuSubOptions (ApplyCharge, Charge, ChoiceID, Key, Layer, Name, Position, PrintName, ReportProductMix)" + 
+                                    " VALUES (?,?,?,?,?,?,?,?,?)",
+                                        [mso.ApplyCharge, mso.Charge, mso.ChoiceID, mso.Key, mso.Layer,
+                                        mso.Name, mso.Position, mso.PrintName, mso.ReportProductMix]).then(id => {
                                             resolve("Added MenuSubOptions records.")
                                         },
                                             err => {
@@ -435,7 +438,7 @@ export class SQLiteService {
     }
 
     public getLocalMenuSubOptions(choiceID: number): Promise<MenuSubOption[]> {
-        return SQLiteService.database.all("SELECT ApplyCharge, Charge, Name, Position, Layer, ReportProductMix " +
+        return SQLiteService.database.all("SELECT ApplyCharge, Charge, Name, Position, Layer, ReportProductMix, PrintName, Key " +
             "FROM MenuSubOptions WHERE ChoiceID=? ORDER BY Position",
             [choiceID])
             .then(function (rows) {
@@ -448,7 +451,8 @@ export class SQLiteService {
                         Position: rows[row][3],
                         Layer: rows[row][4],
                         ReportProductMix: rows[row][5],
-
+                        PrintName: rows[row][6],
+                        Key: rows[row][7]
                     });
                 }
                 return (items);

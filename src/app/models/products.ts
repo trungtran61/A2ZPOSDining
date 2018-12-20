@@ -214,8 +214,10 @@ export interface MenuSubOption {
     ApplyCharge?: boolean;
     Charge?: number;
     ChoiceID?: number;
+    Key?: number;
     Layer?: number;
     Name?: string;
+    PrintName?: string;
     Position?: number;
     ReportProductMix?: boolean;
     Row?: number;

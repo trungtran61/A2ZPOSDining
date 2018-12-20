@@ -44,15 +44,21 @@ export enum ItemType {
     SubOption = 5,
     Discount = 6
 }
-/*
-export interface OrderTypeDetail {
-    Name: string,
-    OrderType: OrderType,
-    Row?: number,
-    Col?: number,
-    Class?: string
+
+export enum ModifierType
+{
+    NONE = 0,
+    NO = 1,
+    EXTRA = 2,
+    LESS = 3,
+    ADD = 4,
+    ONTHESIDE = 5,
+    NOMAKE = 6,
+    HALF = 7,
+    TOGO = 8,
+    USERDEFINED = 255,
 }
-*/
+
 export interface FunctionTypeDetail {
     Name: string,
     FunctionType: FunctionType,
@@ -257,6 +263,7 @@ export interface OrderDetail {
     UseModifier?:boolean;
     MarginLeft?:number;
     Class?: string;
+    ReportProductMix?: boolean;
 }
 
 export interface OrderResponse {
