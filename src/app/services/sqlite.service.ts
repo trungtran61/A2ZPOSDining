@@ -384,7 +384,7 @@ export class SQLiteService {
                 let items: MenuOption[] = [];
                 for (var row in rows) {
                     items.push({
-                        ApplyCharge: rows[row][0],
+                        ApplyCharge: rows[row][0] == 'true',
                         CategoryCode: rows[row][1],
                         Charge: rows[row][2],
                         Name: rows[row][3],
@@ -446,7 +446,7 @@ export class SQLiteService {
                 let items: MenuSubOption[] = [];
                 for (var row in rows) {
                     items.push({
-                        ApplyCharge: rows[row][0],
+                        ApplyCharge: rows[row][0] == 'true',
                         Charge: rows[row][1],
                         Name: rows[row][2],
                         Position: rows[row][3],
@@ -588,7 +588,8 @@ export class SQLiteService {
     }
 
     public getLocalUserModifiers() {
-        return SQLiteService.database.all("SELECT PriKey,Position,Modifier,ApplyCharge,Price,ButtonFunction,StampPrice,TextPosition,FontSize,ItemName FROM UserModifiers ORDER BY Position")
+        return SQLiteService.database.all("SELECT PriKey,Position,Modifier,ApplyCharge,Price,ButtonFunction,StampPrice,TextPosition,FontSize,ItemName " + 
+            "FROM UserModifiers ORDER BY Position")
             .then(function (rows) {
                 let items: UserModifier[] = [];
                 for (var row in rows) {
@@ -596,10 +597,10 @@ export class SQLiteService {
                         PriKey: rows[row][0],
                         Position: rows[row][1],
                         Modifier: rows[row][2],
-                        ApplyCharge: rows[row][3],
+                        ApplyCharge: rows[row][3] == 'true',
                         Price: rows[row][4],
                         ButtonFunction: rows[row][5],
-                        StampPrice: rows[row][6],
+                        StampPrice: rows[row][6] == 'true',
                         TextPosition: rows[row][7],
                         FontSize: rows[row][8],
                         ItemName: rows[row][9]

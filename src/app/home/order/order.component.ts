@@ -966,9 +966,13 @@ export class OrderComponent implements OnInit, OnDestroy {
         let i: number = 1;
         this.orderItems.forEach(oi => {
             oi.ExtPrice = oi.ExtPrice > 0 ? oi.ExtPrice : null;     // hide amount if zero
+            oi.Class = 'orderItem';
             oi.FilterNumber = i;
-            i++;
+            i++;            
         })
+
+        if (this.orderItems.length > 0)
+            this.orderItems[this.orderItems.length - 1].Class = 'lastOrderItem'
     }
 
     onOptionSwipe(args) {
@@ -1346,8 +1350,11 @@ export class OrderComponent implements OnInit, OnDestroy {
     userModifierSelected(userModifier: UserModifier) {
         this.resetUserModifierClasses();
         this.resetFixedOptionClasses();
-
+        this.currentModifierType = ModifierType.USERDEFINED;
+        this.currentUserModifier = userModifier;
+        
         if (userModifier.ButtonFunction == 1) {
+            /*
             this.addItemToOrder
                 (
                     this.currentOrderItem.Quantity,
@@ -1357,11 +1364,11 @@ export class OrderComponent implements OnInit, OnDestroy {
                     this.currentProduct.ProductCode,
                     null
                 );
-
+            */        
+            this.addOption(false, userModifier.ItemName, null, false);
             return;
-        }
-
-        this.currentUserModifier = userModifier;
+        }       
+        
         userModifier.Class = 'glass btnOptionActive';
         this.userModifierActive = true;
     }
