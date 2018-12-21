@@ -377,7 +377,7 @@ export class SQLiteService {
     }
 
     public getLocalMenuOptions(productCode: number): Promise<MenuOption[]> {
-        return SQLiteService.database.all("SELECT ApplyCharge, CategoryCode, Charge, Name, Position FROM MenuOptions " +
+        return SQLiteService.database.all("SELECT ApplyCharge, CategoryCode, Charge, Name, Position, ReportProductMix FROM MenuOptions " +
             "WHERE ProductCode=? ORDER BY Position",
             [productCode])
             .then(function (rows) {
@@ -388,7 +388,8 @@ export class SQLiteService {
                         CategoryCode: rows[row][1],
                         Charge: rows[row][2],
                         Name: rows[row][3],
-                        Position: rows[row][4]
+                        Position: rows[row][4],
+                        ReportProductMix: rows[row][5] == 'true'
                     });
                 }
                 return (items);
@@ -450,7 +451,7 @@ export class SQLiteService {
                         Name: rows[row][2],
                         Position: rows[row][3],
                         Layer: rows[row][4],
-                        ReportProductMix: rows[row][5],
+                        ReportProductMix: rows[row][5] == "true",
                         PrintName: rows[row][6],
                         Key: rows[row][7]
                     });

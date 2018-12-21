@@ -100,6 +100,7 @@ export interface FixedOption {
     Name?: string;
     Position?: number;
     Class?: string;    
+    ModifierType?: ModifierType;
 }
 
 export interface OrderHeader {

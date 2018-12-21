@@ -15,7 +15,7 @@ import { Page } from "tns-core-modules/ui/page/page";
 export class MemoComponent implements OnInit, AfterViewInit {
     @ViewChild("vcMemo") vcMemo: ElementRef;
     memo: string = '';
-    price: number;
+    price: number = 0;
     pageTitle: string = 'Enter Memo';
     memoClass: string = 'textEntryActive';
     priceClass: string = 'textEntry';
@@ -38,7 +38,7 @@ export class MemoComponent implements OnInit, AfterViewInit {
         }
     }
 
-    activateMemo() {
+    activateMemo() {  
         this.memoClass = 'textEntryActive';
         this.priceClass = 'textEntry';
     }
@@ -46,6 +46,11 @@ export class MemoComponent implements OnInit, AfterViewInit {
     activatePrice() {
         this.memoClass = 'textEntry';
         this.priceClass = 'textEntryActive';
+    }
+
+    addDecimal(newPrice: any)
+    {    
+        this.price = newPrice.value * .01; 
     }
 
     constructor(private params: ModalDialogParams,
