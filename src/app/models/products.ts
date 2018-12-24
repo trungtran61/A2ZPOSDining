@@ -1,3 +1,5 @@
+import { ItemType } from "./orders";
+
 export interface MenuCategory {
     CategoryID: number;
     Name: string;
@@ -191,8 +193,10 @@ export interface MenuChoice {
     ChoiceID?: number;
     ChoiceName?: string;
     ForcedChoice?: boolean;
+    Key?: number;
     Layer?: number;
     Name?: string;
+    PrintName?: string;
     Position?: number;
     ProductCode?: number;
     ReportProductMix?: boolean;
@@ -232,6 +236,27 @@ export interface ForcedModifier {
     Layer: number;
     Name: string;
 }
+
+// per Steve's specs
+export interface ChoiceList
+{
+    ChoiceItems?: ChoiceItem[];
+}
+
+export interface ChoiceItem
+{
+    ForcedChoiceItems?: ForcedChoiceItemDetail[];
+}
+
+export interface ForcedChoiceItemDetail {
+    ItemName?: string;
+    PrintName?: string;
+    Key?: number;
+    ItemType?: ItemType;
+    Price?: number;
+    ReportProductMix?: boolean;    
+}
+// per Steve's specs
 
 export interface ProductGroup {
     PriKey: number;

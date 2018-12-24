@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { MenuChoice, ForcedModifier, MenuSubOption, ChoiceLayer } from "~/app/models/products";
+import { MenuChoice, ForcedModifier, MenuSubOption, ChoiceLayer, ForcedChoiceItemDetail, ChoiceItem } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogParams } from "nativescript-angular";
 import { OrderDetail, ItemType } from "~/app/models/orders";
@@ -17,11 +17,14 @@ export class ForcedModifiersComponent implements OnInit {
     currentChoices: OrderDetail[] = [];
     choiceLayers: ChoiceLayer[] = [];
     choiceItems: ForcedModifier[] = [];
+    choiceItem: ChoiceItem = { ForcedChoiceItems: [] };
+
     subChoiceItems: MenuSubOption[] = [];
-    productCode: number = parseInt(localStorage.getItem("ProductCode"));
+    //productCode: number = parseInt(localStorage.getItem("ProductCode"));
     activeLayer: ChoiceLayer = {};
     currentChoice: MenuChoice = null;
-    orderItems: OrderDetail[];
+    orderProduct: OrderDetail;
+    orderItems: OrderDetail[] = [];
 
     subOptionsActiveText: string = String.fromCharCode(0xf00c) + ' Sub Options'
     subOptionsInactiveText: string = 'Sub Options'
@@ -29,22 +32,22 @@ export class ForcedModifiersComponent implements OnInit {
     subOptionsActive: boolean = false;
 
     selectedSubOptions: MenuSubOption[] = [];
-    indexData: number = 0;
-
+    
     showSubChoices: boolean = false;
     changingChoices: boolean = false;
+    isAdding: boolean = false;
 
     getChoiceLayers() {
         let that = this;
 
-        this.DBService.getLocalChoiceLayers(this.productCode).then((choiceLayers) => {
+        this.DBService.getLocalChoiceLayers(this.orderProduct.ProductCode).then((choiceLayers) => {
             if (choiceLayers.length == 0) {
                 dialogs.alert("Menu Choices Layers not loaded.");
             }
             else {
                 this.choiceLayers = choiceLayers;
 
-                if (this.orderItems != null)
+                if (this.orderItems != null && this.orderItems.length > 0)
                 {
                     this.choiceLayers.forEach(cl => 
                         {
@@ -100,7 +103,7 @@ export class ForcedModifiersComponent implements OnInit {
 
         let that = this;
 
-        this.DBService.getLocalMenuChoiceItems(choiceLayer, this.productCode).then((items) => {
+        this.DBService.getLocalMenuChoiceItems(choiceLayer, this.orderProduct.ProductCode).then((items) => {
             if (items.length == 0) {
                 dialogs.alert("Menu Choice Items not loaded.");
             }
@@ -114,6 +117,34 @@ export class ForcedModifiersComponent implements OnInit {
                 this.setActiveLayer(choiceLayer);
             }
         });        
+    }
+
+    choiceSelectedX(choice: MenuChoice)
+    {
+        let forcedChoiceItem: ForcedChoiceItemDetail = {
+            ItemName: choice.Name,          // e.g. Chicken
+            PrintName: choice.PrintName,
+            Key: choice.Key,
+            ItemType: ItemType.ForcedChoice,
+            Price: choice.Charge,
+            ReportProductMix: choice.ReportProductMix,            
+        }
+
+        this.choiceItem.ForcedChoiceItems.push(forcedChoiceItem);
+    }
+
+    subChoiceSelectedX(choice: MenuSubOption)
+    {
+        let forcedChoiceItem: ForcedChoiceItemDetail = {
+            ItemName: choice.Name,          // e.g. Chicken
+            PrintName: choice.PrintName,
+            Key: choice.Key,
+            ItemType: ItemType.SubOption,
+            Price: choice.ApplyCharge ? choice.Charge : 0,
+            ReportProductMix: choice.ReportProductMix,            
+        }
+
+        this.choiceItem.ForcedChoiceItems.push(forcedChoiceItem);
     }
 
     choiceSelected(choice: MenuChoice)
@@ -143,13 +174,7 @@ export class ForcedModifiersComponent implements OnInit {
                         item.Row = Math.floor((item.Position - 1) / 4);
                         // 4 columns so use 4
                         item.Col = item.Position - (item.Row * 4) - 1;
-                        item.Selected = false;
-                        /* commented out - don't need to recall suboptions
-                        if (that.orderItems != null && that.orderItems.find(oi => oi.IndexDataSub == choice.Layer && oi.ProductName == choice.Name) != null)
-                        {
-                            item.Selected = that.selectedSubOptions.find(so => so.Layer == item.Layer && so.Name == item.Name) != null;
-                        }
-                        */
+                        item.Selected = false;                       
                     });
                     this.showSubChoices = true;
                     this.currentChoice = choice;
@@ -166,27 +191,49 @@ export class ForcedModifiersComponent implements OnInit {
     {
         // find current choice and set to new choice
         let that = this;
+        let qty: number = this.orderProduct.Quantity;
 
         let orderItem: OrderDetail  =  {
-                ProductName : choice.Name,
-                IndexDataSub : choice.Layer,
-                IndexData: this.indexData,
-                ItemType: ItemType.ForcedChoice
+                PriKey: 0,
+                OrderTime: new Date(),
+                IndexDataOption: choice.Key,
+                Quantity: null,                
+                //IndexDataSub : choice.Layer,
+                IndexData: this.orderProduct.IndexData,
+                ItemType: ItemType.ForcedChoice,
+                ProductName: '   ' + choice.Name,
+                PrintName: '   ' + choice.PrintName,
+                ReportProductMix: choice.ReportProductMix
            };
+
+        if (choice.Charge > 0)   
+        {
+            orderItem.UnitPrice = choice.Charge;
+            orderItem.ExtPrice = choice.Charge * qty;
+        }
 
         // replace current layer's choice with new choice
         if (this.currentChoices.length > 0)
             this.currentChoices = this.currentChoices.filter(cc=> cc.IndexDataSub != choice.Layer);
 
         this.currentChoices.push(orderItem);
-        choice.SubOptions.forEach( so => {
-            let orderSubItem: OrderDetail  =  {
-                ProductName : so.Name,
-                IndexDataSub : so.Layer,
-                IndexData: that.indexData,
-                ItemType: ItemType.SubOption
-        };
-        this.currentChoices.push(orderSubItem);
+            choice.SubOptions.forEach( so => {
+                let orderSubItem: OrderDetail  =  {
+                    ProductName : '   ' + so.Name,
+                    PrintName: '   ' + so.PrintName,
+                    Quantity: null,   
+                    IndexDataSub : so.Layer,
+                    IndexData: that.orderProduct.IndexData,
+                    ItemType: ItemType.SubOption,
+                    ReportProductMix: so.ReportProductMix,
+                };
+           if (so.ApplyCharge && choice.Charge > 0)              
+            {
+                orderItem.UnitPrice = choice.Charge;
+                orderItem.ExtPrice = choice.Charge * qty;
+            }
+
+            this.currentChoices.push(orderSubItem);
         } );          
         
         // reset current choice
@@ -252,16 +299,17 @@ export class ForcedModifiersComponent implements OnInit {
     constructor(private DBService: SQLiteService, private params: ModalDialogParams) { }
 
     ngOnInit() {
-        this.productCode = this.params.context.productCode;
-        this.currentChoices = this.params.context.currentChoices;
-        this.orderItems = this.params.context.orderItems;
-        this.indexData = this.params.context.indexData;
-
+        //this.productCode = this.params.context.productCode;
+        //this.currentChoices = this.params.context.currentChoices;
+        this.orderProduct = this.params.context.orderProduct;    
+        this.isAdding =  this.params.context.isAdding;   
+        /*
         if (this.orderItems != null)
         {
             this.productCode = this.orderItems[0].ProductCode;
             this.indexData = this.orderItems[0].IndexData;
-        }    
+        } 
+        */   
         this.getChoiceLayers();
     }   
 }

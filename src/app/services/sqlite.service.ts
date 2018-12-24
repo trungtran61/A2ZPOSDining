@@ -619,16 +619,19 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS MenuChoices;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS MenuChoices (Charge REAL, ChoiceID INTEGER, ChoiceName TEXT, ForcedChoice INTEGER, Layer INTEGER, Name TEXT, Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuChoices (Charge REAL, ChoiceID INTEGER, ChoiceName TEXT, ForcedChoice INTEGER, Key INTEGER, Layer INTEGER, Name TEXT, " +
+                    "PrintName Text,Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
                     let headers = that.createRequestHeader();
                     that.http.get(that.apiUrl + 'GetMenuChoice', { headers: headers })
                         .subscribe(
                             data => {
                                 let menuChoices = <MenuChoice[]>data;
-                                menuChoices.forEach(function (menuChoice: MenuChoice) {
-                                    SQLiteService.database.execSQL("INSERT INTO MenuChoices (Charge, ChoiceID, ChoiceName, ForcedChoice, Layer, Name, Position, ProductCode, ReportProductMix) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )",
-                                        [menuChoice.Charge, menuChoice.ChoiceID, menuChoice.ChoiceName, menuChoice.ForcedChoice, menuChoice.Layer,
-                                        menuChoice.Name, menuChoice.Position, menuChoice.ProductCode, menuChoice.ReportProductMix]).then(id => {
+                                menuChoices.forEach(function (mc: MenuChoice) {
+                                    SQLiteService.database.execSQL("INSERT INTO MenuChoices " + 
+                                        "(Charge, ChoiceID, ChoiceName, ForcedChoice, Key, Layer, Name, PrintName, Position, ProductCode, ReportProductMix)" + 
+                                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )",
+                                        [mc.Charge, mc.ChoiceID, mc.ChoiceName, mc.ForcedChoice, mc.Key, mc.Layer,
+                                        mc.Name, mc.PrintName, mc.Position, mc.ProductCode, mc.ReportProductMix]).then(id => {
                                             resolve("Added MenuChoices records.")
                                         },
                                             err => {
@@ -667,7 +670,8 @@ export class SQLiteService {
     }
 
     public getLocalMenuChoiceItems(choiceLayer: ChoiceLayer, productCode: number) {
-        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position, Layer, ForcedChoice FROM MenuChoices WHERE ProductCode=? AND ChoiceName=? AND Layer=? ORDER BY Position",
+        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position, Layer, ForcedChoice, PrintName, Key FROM MenuChoices " + 
+            "WHERE ProductCode=? AND ChoiceName=? AND Layer=? ORDER BY Position",
             [productCode, choiceLayer.Name, choiceLayer.Layer])
             .then(function (rows) {
                 let items: MenuChoice[] = [];
@@ -678,7 +682,9 @@ export class SQLiteService {
                         Name: rows[row][2],
                         Position: rows[row][3],
                         Layer: rows[row][4],
-                        ForcedChoice: rows[row][5] == "true"
+                        ForcedChoice: rows[row][5] == "true",
+                        PrintName: rows[row][6],
+                        Key: rows[row][7]
                     });
                 }
                 return (items);
@@ -770,8 +776,8 @@ export class SQLiteService {
 
             db.execSQL("DROP TABLE IF EXISTS Products;").then(id => {
                 db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER," +
-                    "ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier INTEGER," +
-                    "UseForcedModifier INTEGER,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT," +
+                    "ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier TEXT," +
+                    "UseForcedModifier TEXT,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza INTEGER,ProductType TEXT,TaxRate TEXT," +
                     "PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER, Product INTEGER);").then(id => {
                         let headers = that.createRequestHeader();
                         that.http.get(that.apiUrl + 'GetProducts', { headers: headers })
@@ -1187,8 +1193,8 @@ export class SQLiteService {
                         ProductName: rows[row][0],
                         UnitPrice: rows[row][1],
                         Product: rows[row][2],
-                        ForcedModifier: rows[row][3],
-                        UseForcedModifier: rows[row][4],
+                        ForcedModifier: rows[row][3] == 'true',
+                        UseForcedModifier: rows[row][4] == 'true'
                     });
                 }
                 return (products);
@@ -1213,8 +1219,8 @@ export class SQLiteService {
                     Description: row[10],
                     AutoOption: row[11],
                     PrintName: row[12],
-                    ForcedModifier: row[13],
-                    UseForcedModifier: row[14],
+                    ForcedModifier: row[13] == 'true',
+                    UseForcedModifier: row[14] == 'true',
                     ShowAutoOption: row[15],
                     UseUnitPrice2: row[16],
                     UnitPrice2: row[17],

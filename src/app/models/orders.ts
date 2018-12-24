@@ -265,6 +265,7 @@ export interface OrderDetail {
     MarginLeft?:number;
     Class?: string;
     ReportProductMix?: boolean;
+    ApplyCharge?: boolean;
 }
 
 export interface OrderResponse {

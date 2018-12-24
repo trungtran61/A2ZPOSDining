@@ -556,23 +556,17 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.showPromptQty(product);
         }
         else
-            if (product.UseForcedModifier) {
-                this.showForcedModifierDialog(product, -1, null, true);
-            }
-            else {
-                this.addProductToOrder(product);
-            }
+        {
+            this.addProductToOrder(product);            
+        }
     }
 
-    showForcedModifierDialog(product: MenuProduct, orderItemIndex: number, choice, isAdding: boolean) {
+    showForcedModifierDialog(isAdding: boolean) {       
+        
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
-            context: {
-                productCode: product.ProductCode,
-                indexData: this.getNextIndexData(),
-                currentChoices: orderItemIndex > -1 ? this.order.OrderItems[orderItemIndex].ForcedModifiers : []
-            }
+            context: { orderProduct: this.currentOrderItem, isAdding: isAdding }
         };
 
         let that = this;
@@ -581,14 +575,44 @@ export class OrderComponent implements OnInit, OnDestroy {
             (selectedItems: OrderDetail[]) => {
                 if (selectedItems != null) {
                     this.currentSeatNumber++;
+                    /*
                     if (isAdding) {
                         this.addProductToOrder(product);
                     }
-
+                    */
                     selectedItems.forEach(function (od: OrderDetail) {
+                        that.orderItems.push(od);
+                        /*
+                        if (od.ItemType == ItemType.SubOption)
+                        {
+                            that.currentSubOption = {
+                                Name: od.ProductName,
+                                PrintName: od.PrintName,
+                                ApplyCharge: od.ApplyCharge,
+                            };
+                        }
+                        else
+                        {
+                            that.currentMenuOption = {
+                                Name: od.ProductName,
+                                PrintName: od.PrintName,
+                                ApplyCharge: od.ApplyCharge,
+                                ReportProductMix: od.ReportProductMix
+                            };
+                        }
+                        */                        
+                        /*
                         that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType,
                             that.currentOrderItem.ProductCode, od.IndexDataSub);
+                        */    
                     });
+                    this.totalPrice();
+                    this.setLastItemOrdered();
+                }
+                else
+                {
+                    // cancelled selected on forced modifier page, remove item just added 
+                    this.deleteOrderItem(this.currentOrderItem);                    
                 }
             });
     }
@@ -633,8 +657,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.router.navigate(['/home/tableguests/' + this.table]);
     }
 
-    changeChoice(product: MenuProduct, orderItemIndex: number, choice: MenuChoice) {
-        this.showForcedModifierDialog(product, orderItemIndex, choice, false);
+    changeChoice() {
+        this.showForcedModifierDialog(false);
     }
 
     addProductToOrder(menuProduct: MenuProduct) {
@@ -689,6 +713,9 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.currentOrderItem = orderItem;
             this.totalPrice();
             this.setLastItemOrdered();
+            if (product.UseForcedModifier) {
+                this.showForcedModifierDialog(true);
+            }            
         });
     }
 
@@ -724,7 +751,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     this.qtyEntered = qtyEntered;
                 }
                 if (product.UseForcedModifier) {
-                    this.showForcedModifierDialog(product, -1, null, true);
+                    this.showForcedModifierDialog(true);
                 }
                 else {
                     this.addProductToOrder(product);
@@ -1352,7 +1379,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.resetFixedOptionClasses();
         this.currentModifierType = ModifierType.USERDEFINED;
         this.currentUserModifier = userModifier;
-        
+
         if (userModifier.ButtonFunction == 1) {
             /*
             this.addItemToOrder
