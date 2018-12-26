@@ -34,7 +34,7 @@
     <Button class="glass btnSubOptions" text="Done" textWrap='true' (tap)="doneSubOptions()" row="4" col="4" height="94"
         width="190" [visibility]="showSubChoices ? 'visible' : 'collapse'"></Button>
     <Button class="glass btnSubOptions fa" text="&#xf00c; Accept" textWrap='true' (tap)="accept()" row="6" col="4" height="94"
-        width="190" [visibility]="orderItems != null ? 'visible' : 'collapse'"></Button>    
+        width="190" [visibility]="isAdding ? 'collapse' : 'visible'"></Button>    
     <Button class="glass btnCan fa" text="&#xf0e2; Cancel" (tap)="cancel()" row="6" col="0" style="margin-top: 10"
         height='60' width='100'></Button>
 </GridLayout>

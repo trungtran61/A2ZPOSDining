@@ -33,11 +33,11 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 
 .qtyAvailable
 {
-    margin: 75 0 0 -105;  color:darkblue;font-size: 18; padding: 0; text-align: center; width: 30; height: 30; 
+    margin: 65 0 0 -105;  color:darkblue;font-size: 18; padding: 0; text-align: center; width: 30; height: 30; 
 }
 .qtyLow
 {
-    margin: 75 0 0 -105;  color:red;font-size: 18; padding: 0; text-align: center; width: 30; height: 30; background-color: white; border-radius: 20;
+    margin: 65 0 0 -105;  color:red;font-size: 18; padding: 0; text-align: center; width: 30; height: 30; background-color: white; border-radius: 20;
 }
 
 .btnOptionActive
@@ -103,7 +103,7 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 	border-width: 2;	
 	margin: 3 3 3 3;
 	color: white; 
-	word-wrap: break-word;
+	word-wrap: break-word; 
 }
 
 .modifier

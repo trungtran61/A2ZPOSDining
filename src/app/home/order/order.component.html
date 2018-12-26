@@ -2,16 +2,16 @@
   <ActionItem [text]="checkTitle" ios.position="left"></ActionItem>
   <ActionItem [text]="currentSubCategory" style="font-weight: bold" ios.position="right" android.position="popup"></ActionItem>
 </ActionBar>
-<GridLayout rows="670 85" columns="260 150 20 *">
+<GridLayout rows="670 85" columns="300 150 20 *">
   <StackLayout row="0" col="0">
     <!-- order header -->
     <GridLayout style="background-color: antiquewhite;" rows='40'>
       <StackLayout orientation="horizontal">
-        <FlexBoxLayout *ngIf='ticketNumber'>
-          <Label text="Ticket #" style="text-align: left; width:75;"></Label> |
+        <FlexBoxLayout *ngIf='ticketNumber' justifyContent="center">
+          <Label text="Ticket #" style="text-align: c; width:75;"></Label> |
           <Label [text]="ticketNumber" style="text-align: left; margin-right: 5;width:75;"></Label> |
         </FlexBoxLayout>
-        <FlexBoxLayout>
+        <FlexBoxLayout *ngIf='!ticketNumber' justifyContent="center">
           <Label text="Check #" style="text-align: left; width:75;"></Label> |
           <Label [text]="checkNumber" style="text-align: left; margin-right: 5;width:75;"></Label> |
         </FlexBoxLayout>
@@ -29,18 +29,18 @@
       </StackLayout>
     </GridLayout>
     <!-- order items  -->
-    <ScrollView style="background-color: white" height="500" orientation="vertical">
-      <StackLayout *ngIf='showDetails'>
+    <ScrollView style="background-color: antiquewhite" height="500" orientation="vertical">
+      <StackLayout *ngIf='showDetails' >
         <StackLayout *ngFor="let item of orderItems">
-          <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" [class]="item.Class">
+          <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" [class]="item.Class" style="background-color:#e5efbc">
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
-            <Label [text]="item.ExtPrice | currency" style="text-align: right; width:50; margin-right:5"></Label>
+            <Label [text]="item.ExtPrice | currency" style="text-align: right; width:95; margin-right:5"></Label>
             <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
           </FlexBoxLayout>
         </StackLayout>
       </StackLayout>
-      <StackLayout *ngIf='!showDetails'>
+      <StackLayout *ngIf='!showDetails' style="background-color: lightgreen">
         <StackLayout *ngFor="let item of orderItems">
           <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" *ngIf='item.ItemType == 1'>
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>

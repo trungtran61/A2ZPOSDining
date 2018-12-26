@@ -86,13 +86,14 @@ export class OrderComponent implements OnInit, OnDestroy {
     guests: number = 0;
     table: string = '';
     server: string = '';
-    checkNumber: number = 0;
+    checkNumber: number = 1;
     checkTitle: string = '';
     currentSubCategory: string = '';
     subCategoriesTitle: string = '';
     mainCategory: string = '';
     lockedCategoryId: number = 0;
     currentProduct: MenuProduct;
+    previousProduct: MenuProduct;
     ticketNumber: number = 0;
 
     showMainCategories: boolean = true;
@@ -108,14 +109,14 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     viewDetailsText: string = this.hideDetailsCode;
 
-    fixedOptions: FixedOption[] = [{ Name: 'NO', Class: 'glass btnOption', Position: 1, ModifierType: ModifierType.NO }, 
-        { Name: 'EXTRA', Class: 'glass btnOption', Position: 2, ModifierType: ModifierType.EXTRA }, 
-        { Name: 'LESS', Class: 'glass btnOption', Position: 3, ModifierType: ModifierType.LESS }, 
-        { Name: 'ADD', Class: 'glass btnOption', Position: 4, ModifierType: ModifierType.ADD },
-        { Name: 'OTS', Class: 'glass btnOption', Position: 5, ModifierType: ModifierType.ONTHESIDE }, 
-        { Name: 'NO MAKE', Class: 'glass btnOption', Position: 5, ModifierType: ModifierType.NOMAKE }, 
-        { Name: '1/2', Class: 'glass btnOption', Position: 6, ModifierType: ModifierType.HALF }, 
-        { Name: 'TO GO', Class: 'glass btnOption', Position: 7, ModifierType: ModifierType.TOGO }];
+    fixedOptions: FixedOption[] = [{ Name: 'NO', Class: 'glass btnOption', Position: 1, ModifierType: ModifierType.NO },
+    { Name: 'EXTRA', Class: 'glass btnOption', Position: 2, ModifierType: ModifierType.EXTRA },
+    { Name: 'LESS', Class: 'glass btnOption', Position: 3, ModifierType: ModifierType.LESS },
+    { Name: 'ADD', Class: 'glass btnOption', Position: 4, ModifierType: ModifierType.ADD },
+    { Name: 'OTS', Class: 'glass btnOption', Position: 5, ModifierType: ModifierType.ONTHESIDE },
+    { Name: 'NO MAKE', Class: 'glass btnOption', Position: 5, ModifierType: ModifierType.NOMAKE },
+    { Name: '1/2', Class: 'glass btnOption', Position: 6, ModifierType: ModifierType.HALF },
+    { Name: 'TO GO', Class: 'glass btnOption', Position: 7, ModifierType: ModifierType.TOGO }];
     fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
 
     currentOrderItem: OrderDetail = null;
@@ -176,40 +177,41 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        /*
+        
         this.guests = parseInt(localStorage.getItem('guests'));
         this.table = localStorage.getItem('table');
-        this.server = localStorage.getItem('server');
+        this.server = this.DBService.loggedInUser.FirstName;
+        /*
         this.checkTitle = this.checkNumber + ' ' + this.server + ' ' + this.table + ' ' + this.guests;             
         */
         this.apiSvc.reloadCountdowns().then(result => {
             this.countdowns = <Countdown[]>result;
+
+            this.getMenuTimers();
+            this.getUserModifiers();
+
+            this.route.queryParams.subscribe(params => {
+                if (params['action']) {
+                    let action: string = params['action'];
+
+                    if (action == 'openTable') {
+                        let table: TableDetail = JSON.parse(localStorage.getItem('currentTable'));
+                        this.getFullOrder(table.OrderFilter);
+                        this.isExistingOrder = true;
+                        //this.textColorClass = 'disabledTextColor';
+                    }
+                }
+                else {
+                    this.createNewOrder();
+                }
+            });
+
+            this.getProductOptions('');
+            this.getOptionCategories();
+            this.apiSvc.postToPrint('hero');
+            this.allOptionFilterClass = 'glass';
         }
         );
-
-        this.getMenuTimers();
-        this.getUserModifiers();
-
-        this.route.queryParams.subscribe(params => {
-            if (params['action']) {
-                let action: string = params['action'];
-
-                if (action == 'openTable') {
-                    let table: TableDetail = JSON.parse(localStorage.getItem('currentTable'));
-                    this.getFullOrder(table.OrderFilter);
-                    this.isExistingOrder = true;
-                    //this.textColorClass = 'disabledTextColor';
-                }
-            }
-            else {
-                this.createNewOrder();
-            }
-        });
-
-        this.getProductOptions('');
-        this.getOptionCategories();
-        this.apiSvc.postToPrint('hero');
-        this.allOptionFilterClass = 'glass'
     }
 
     showProductOptions() {
@@ -536,33 +538,36 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     productSelected(product: MenuProduct) {
-        this.showOptionsButton = true;
-
-        this.currentProduct = product;
-
-        if (this.showProductInfo) {
-            dialogs.alert({
-                title: product.Name,
-                message: "Good, healthy ingredients only!",
-                okButtonText: "Close"
-            })
-            //this.showProductInfo = false;
-            this.productInfo();
-            return;
+        if (this.currentProduct == product) {
+            this.currentOrderItem.Quantity++;
         }
-        this.qtyEntered = 1;
+        else {
+            this.showOptionsButton = true;
+            this.currentProduct = product;
 
-        if (product.PromptQty) {
-            this.showPromptQty(product);
-        }
-        else
-        {
-            this.addProductToOrder(product);            
+            if (this.showProductInfo) {
+                dialogs.alert({
+                    title: product.Name,
+                    message: "Good, healthy ingredients only!",
+                    okButtonText: "Close"
+                })
+                //this.showProductInfo = false;
+                this.productInfo();
+                return;
+            }
+            this.qtyEntered = 1;
+
+            if (product.PromptQty) {
+                this.showPromptQty(product);
+            }
+            else {
+                this.addProductToOrder(product);
+            }
         }
     }
 
-    showForcedModifierDialog(isAdding: boolean) {       
-        
+    showForcedModifierDialog(isAdding: boolean) {
+
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
@@ -600,19 +605,18 @@ export class OrderComponent implements OnInit, OnDestroy {
                                 ReportProductMix: od.ReportProductMix
                             };
                         }
-                        */                        
+                        */
                         /*
                         that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType,
                             that.currentOrderItem.ProductCode, od.IndexDataSub);
-                        */    
+                        */
                     });
                     this.totalPrice();
                     this.setLastItemOrdered();
                 }
-                else
-                {
+                else {
                     // cancelled selected on forced modifier page, remove item just added 
-                    this.deleteOrderItem(this.currentOrderItem);                    
+                    this.deleteOrderItem(this.currentOrderItem);
                 }
             });
     }
@@ -678,6 +682,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             orderItem.ProductCode = menuProduct.ProductCode;
             orderItem.PriceLevel = this.priceLevel;
             orderItem.ItemType = ItemType.Product;
+            orderItem.SeatNumber = this.currentSeatNumber.toString();
             /*
             let orderItem: OrderDetail = {              
                 OrderTime: new Date(),            
@@ -715,7 +720,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.setLastItemOrdered();
             if (product.UseForcedModifier) {
                 this.showForcedModifierDialog(true);
-            }            
+            }
+            this.previousProduct = this.currentProduct;
         });
     }
 
@@ -775,25 +781,28 @@ export class OrderComponent implements OnInit, OnDestroy {
         };
 
         let that = this;
+        let orderProduct = this.orderItems.find(oi => oi.IndexData == orderItem.IndexData && oi.ItemType == ItemType.Product);
+
         this.modalService.showModal(ModifyOrderItemComponent, modalOptions).then(
             (choice: Choice) => {
                 switch (choice.ChangeType) {
                     case 'quantity':
-                        orderItem.Quantity = parseFloat(choice.SelectedNumber);
-                        orderItem.ExtPrice = orderItem.UnitPrice * parseFloat(choice.SelectedNumber);
+                        orderProduct.Quantity = parseFloat(choice.SelectedNumber);
+                        orderProduct.ExtPrice = orderProduct.UnitPrice * parseFloat(choice.SelectedNumber);
                         this.totalPrice();
                         break;
                     case 'seat':
-                        orderItem.SeatNumber = choice.SelectedNumber;
+                        orderProduct.SeatNumber = choice.SelectedNumber;
                         break;
                     case 'delete':
-                        this.deleteOrderItem(orderItem);
+                        if (orderItem.ItemType != ItemType.ForcedChoice)
+                            this.deleteOrderItem(orderItem);
                         break;
                     case 'repeat':
                         this.repeatOrderItem(orderItem);
                         break;
                     case 'modify':
-                        this.getMenuOptions(orderItem.ProductCode);
+                        this.getMenuOptions(orderProduct.ProductCode);
                         this.showOptionsButton = false;
                         break;
                     case 'changechoice':
@@ -855,137 +864,118 @@ export class OrderComponent implements OnInit, OnDestroy {
                 }
             }
             modifierIgnoreQuantity = this.currentOrderItem.ProductFilter == 0;
-            orderDetail = Object.assign({},this.orderItems.find(od => od.IndexData == this.currentOrderItem.IndexData && od.ItemType == ItemType.Product));
+            orderDetail = Object.assign({}, this.orderItems.find(od => od.IndexData == this.currentOrderItem.IndexData && od.ItemType == ItemType.Product));
             orderDetail.PriKey = 0
         }
 
         orderDetail.OrderTime = new Date();
-		orderDetail.IndexDataOption = isSubOption ? 0 : -1
-		orderDetail.Quantity = null
-		orderDetail.UnitPrice = null
-		orderDetail.ExtPrice = null
-		orderDetail.ReportProductMix = reportProductMix
-        orderDetail.ItemType =  isSubOption ? ItemType.SubOption : ItemType.Option
-        
-        if (!isMemo)
-        {
-            switch (this.currentModifierType)
-            {
+        orderDetail.IndexDataOption = isSubOption ? 0 : -1
+        orderDetail.Quantity = null
+        orderDetail.UnitPrice = null
+        orderDetail.ExtPrice = null
+        orderDetail.ReportProductMix = reportProductMix
+        orderDetail.ItemType = isSubOption ? ItemType.SubOption : ItemType.Option
+
+        if (!isMemo) {
+            switch (this.currentModifierType) {
                 case ModifierType.NONE:
                     strOption = '     '; //??? remove?
-                    if (applyCharge)
-                    {
-                        orderDetail.UnitPrice = unitPrice;                    
+                    if (applyCharge) {
+                        orderDetail.UnitPrice = unitPrice;
                     }
                     orderDetail.ExtPrice = modifierIgnoreQuantity ? unitPrice : unitPrice * qty;
                     break;
-                
+
                 case ModifierType.LESS:
                 case ModifierType.NO:
                     strOption = '     ' + ModifierType[this.currentModifierType] + ' ';
                     break;
-                
+
                 case ModifierType.EXTRA:
                 case ModifierType.ADD:
                     strOption = '     ' + ModifierType[this.currentModifierType] + ' ';
-                    if (unitPrice > 0)
-                    {
-                        orderDetail.UnitPrice = unitPrice;                    
+                    if (unitPrice > 0) {
+                        orderDetail.UnitPrice = unitPrice;
                         orderDetail.ExtPrice = modifierIgnoreQuantity ? unitPrice : unitPrice * qty;
-                    }                    
-                    break;  
-                
+                    }
+                    break;
+
                 case ModifierType.ONTHESIDE:
                     strOption = ' OTS';
-                    if (unitPrice > 0)
-                    {
-                        orderDetail.UnitPrice = unitPrice;                    
+                    if (unitPrice > 0) {
+                        orderDetail.UnitPrice = unitPrice;
                         orderDetail.ExtPrice = modifierIgnoreQuantity ? unitPrice : unitPrice * qty;
-                    }      
-                    textPosition = 1;              
-                    break;    
-                
+                    }
+                    textPosition = 1;
+                    break;
+
                 case ModifierType.HALF:
                     strOption = '     1/2';
-                    if (unitPrice > 0)
-                    {
-                        orderDetail.UnitPrice = this.round2Decimals(unitPrice / 2);                    
+                    if (unitPrice > 0) {
+                        orderDetail.UnitPrice = this.round2Decimals(unitPrice / 2);
                         orderDetail.ExtPrice = modifierIgnoreQuantity ? orderDetail.UnitPrice : orderDetail.UnitPrice * qty;
-                    }                                     
-                    break;    
-                
+                    }
+                    break;
+
                 case ModifierType.NOMAKE:
                 case ModifierType.TOGO:
-                    strOption = '     ' + ModifierType[this.currentModifierType];                        
-                    break;     
-                
+                    strOption = '     ' + ModifierType[this.currentModifierType];
+                    break;
+
                 case ModifierType.USERDEFINED:
-                    if (this.currentUserModifier.ButtonFunction == 1)
-                    {
+                    if (this.currentUserModifier.ButtonFunction == 1) {
                         strOption = '     ' + this.currentUserModifier.ItemName;
-                        if (this.currentUserModifier.StampPrice)
-                        {
-                            orderDetail.UnitPrice = unitPrice;                    
+                        if (this.currentUserModifier.StampPrice) {
+                            orderDetail.UnitPrice = unitPrice;
                             orderDetail.ExtPrice = modifierIgnoreQuantity ? unitPrice : unitPrice * qty;
-                        }    
+                        }
                     }
-                    else
-                    {
+                    else {
                         strOption = '     ' + this.currentUserModifier.ItemName + ' ';
                         orderDetail.UnitPrice = 0;
 
-                        if (this.currentUserModifier.ApplyCharge)
-                        {
-                            orderDetail.UnitPrice = unitPrice;                                                
-                        }    
-                        else if (this.currentUserModifier.ButtonFunction == 3 && this.currentUserModifier.StampPrice)
-                        {
-                            orderDetail.UnitPrice = this.currentUserModifier.Price;                                                
+                        if (this.currentUserModifier.ApplyCharge) {
+                            orderDetail.UnitPrice = unitPrice;
+                        }
+                        else if (this.currentUserModifier.ButtonFunction == 3 && this.currentUserModifier.StampPrice) {
+                            orderDetail.UnitPrice = this.currentUserModifier.Price;
                         }
                         orderDetail.ExtPrice = modifierIgnoreQuantity ? orderDetail.UnitPrice : orderDetail.UnitPrice * qty;
                         textPosition = this.currentUserModifier.TextPosition;
                     }
-            }           
+            }
         }
-       
-        if (this.currentModifierType == ModifierType.NOMAKE || this.currentModifierType == ModifierType.TOGO || customStamp)
-        {
+
+        if (this.currentModifierType == ModifierType.NOMAKE || this.currentModifierType == ModifierType.TOGO || customStamp) {
             orderDetail.ProductName = strOption;
             orderDetail.PrintName = strOption;
         }
-        else
-        {
-            if (textPosition == 1)
-            {
+        else {
+            if (textPosition == 1) {
                 orderDetail.ProductName = '     ' + optionName + strOption;
             }
-            else
-            {
+            else {
                 orderDetail.ProductName = strOption + optionName;
-                if (printName != null)
-                {
-                    orderDetail.PrintName = printName != ''? strOption + printName : orderDetail.ProductName;
+                if (printName != null) {
+                    orderDetail.PrintName = printName != '' ? strOption + printName : orderDetail.ProductName;
                 }
             }
         }
 
-        if (isMemo)
-        {
+        if (isMemo) {
             orderDetail.ProductName = '     ' + itemName + strOption;
             orderDetail.PrintName = '     ' + itemName + strOption;
-            if (amount > 0)
-            {
+            if (amount > 0) {
                 orderDetail.UnitPrice = amount;
-	            orderDetail.ExtPrice = amount * qty;
+                orderDetail.ExtPrice = amount * qty;
             }
         }
-    
+
         this.orderItems.push(orderDetail);
         this.processFilterNumber();
     }
 
-    round2Decimals(inNumber: number)
-    {
+    round2Decimals(inNumber: number) {
         return Math.round(inNumber * 100) / 100
     }
 
@@ -995,7 +985,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             oi.ExtPrice = oi.ExtPrice > 0 ? oi.ExtPrice : null;     // hide amount if zero
             oi.Class = 'orderItem';
             oi.FilterNumber = i;
-            i++;            
+            i++;
         })
 
         if (this.orderItems.length > 0)
@@ -1178,15 +1168,15 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         switch (fixedOption.Name) {
             case 'NO MAKE':
-            case 'TO GO':            
+            case 'TO GO':
                 this.currentModifierType = fixedOption.ModifierType;
                 this.addOption(false, fixedOption.Name, null, false);
-/*
-                this.addItemToOrder
-                    (
-                        0, fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getNextIndexDataSub(this.currentOrderItem.IndexData)
-                    );
-*/
+                /*
+                                this.addItemToOrder
+                                    (
+                                        0, fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getNextIndexDataSub(this.currentOrderItem.IndexData)
+                                    );
+                */
                 break;
 
             default:
@@ -1218,35 +1208,35 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     optionSelected(option: MenuOption) {
-/*
-        let name: string = '';
-        let price: number = 0;
-
-        if (this.userModifierActive) {
-            name = this.currentUserModifier.ItemName + ' ' + option.Name;
-            price = this.currentUserModifier.StampPrice ? this.currentUserModifier.Price : option.Charge;
-        }
-        else {
-            name = this.currentFixedOption == null ? option.Name : this.currentFixedOption.Name + ' ' + option.Name;
-            price = option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0;
-        }
-
-        let modifier: Modifier = {
-            Name: name,
-            Price: price,
-            DisplayPrice: price > 0 ? price : null
-        };
-*/
+        /*
+                let name: string = '';
+                let price: number = 0;
+        
+                if (this.userModifierActive) {
+                    name = this.currentUserModifier.ItemName + ' ' + option.Name;
+                    price = this.currentUserModifier.StampPrice ? this.currentUserModifier.Price : option.Charge;
+                }
+                else {
+                    name = this.currentFixedOption == null ? option.Name : this.currentFixedOption.Name + ' ' + option.Name;
+                    price = option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0;
+                }
+        
+                let modifier: Modifier = {
+                    Name: name,
+                    Price: price,
+                    DisplayPrice: price > 0 ? price : null
+                };
+        */
         if (this.currentModifierType == null)
             this.currentModifierType = ModifierType.NONE;
 
-        this.currentMenuOption = option; 
+        this.currentMenuOption = option;
         this.addOption(false, option.Name, null, false);
         /*
         this.addItemToOrder
             (0, modifier.Name, modifier.Price, ItemType.Option, this.currentProduct.ProductCode,
                 this.getNextIndexDataSub(this.currentOrderItem.IndexData));
-        */        
+        */
     }
 
     getNextOptionFilterNumber(): number {
@@ -1391,11 +1381,11 @@ export class OrderComponent implements OnInit, OnDestroy {
                     this.currentProduct.ProductCode,
                     null
                 );
-            */        
+            */
             this.addOption(false, userModifier.ItemName, null, false);
             return;
-        }       
-        
+        }
+
         userModifier.Class = 'glass btnOptionActive';
         this.userModifierActive = true;
     }

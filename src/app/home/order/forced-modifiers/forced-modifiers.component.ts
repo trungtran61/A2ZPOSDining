@@ -219,8 +219,8 @@ export class ForcedModifiersComponent implements OnInit {
         this.currentChoices.push(orderItem);
             choice.SubOptions.forEach( so => {
                 let orderSubItem: OrderDetail  =  {
-                    ProductName : '   ' + so.Name,
-                    PrintName: '   ' + so.PrintName,
+                    ProductName : '      ' + so.Name,
+                    PrintName: '      ' + so.PrintName,
                     Quantity: null,   
                     IndexDataSub : so.Layer,
                     IndexData: that.orderProduct.IndexData,
