@@ -13,7 +13,7 @@ import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
-import { OrderType, Countdown, OrderItem, Order, FixedOption, OrderHeader, OrderDetail, OrderResponse, ItemType, ModifierType } from "~/app/models/orders";
+import { OrderType, Countdown, FixedOption, OrderHeader, OrderDetail, OrderResponse, ItemType, ModifierType } from "~/app/models/orders";
 import { APIService } from "~/app/services/api.service";
 import { PromptQtyComponent } from "./prompt-qty.component";
 import { MemoComponent } from "./memo.component";
@@ -73,7 +73,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     userModifiers: UserModifier[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
-    order: Order = null;
+    orderHeader: OrderHeader = null;
     orderResponse: OrderResponse = null;
     orderItems: OrderDetail[] = [];
     //orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
@@ -315,11 +315,11 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     createNewOrder() {
-        this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
+        this.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };
     }
 
     getFullOrder(orderFilter: number) {
-        this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
+        this.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
             this.orderResponse = orderResponse;
             this.orderItems = orderResponse.OrderDetail;
@@ -540,6 +540,8 @@ export class OrderComponent implements OnInit, OnDestroy {
     productSelected(product: MenuProduct) {
         if (this.currentProduct == product) {
             this.currentOrderItem.Quantity++;
+            this.currentOrderItem.ExtPrice = this.currentOrderItem.Quantity * this.currentOrderItem.UnitPrice;
+            this.totalPrice();
         }
         else {
             this.showOptionsButton = true;
@@ -616,7 +618,11 @@ export class OrderComponent implements OnInit, OnDestroy {
                 }
                 else {
                     // cancelled selected on forced modifier page, remove item just added 
-                    this.deleteOrderItem(this.currentOrderItem);
+                    if (isAdding)
+                    {
+                        this.currentProduct = null;
+                        this.deleteOrderItem(this.currentOrderItem);
+                    }
                 }
             });
     }
@@ -806,7 +812,8 @@ export class OrderComponent implements OnInit, OnDestroy {
                         this.showOptionsButton = false;
                         break;
                     case 'changechoice':
-                        this.showForcedModifierDialogOrderItem(orderItem);
+                        //this.showForcedModifierDialogOrderItem(orderItem);
+                        this.changeChoice();
                         break;
                 }
             });
@@ -1615,13 +1622,13 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     totalPrice() {
         this.subTotal = 0;
-
+        
         for (var i = 0; i < this.orderItems.length; i++) {
             {
                 if (this.orderItems[i].ExtPrice != null)
                     this.subTotal += this.orderItems[i].ExtPrice;
             }
-            this.tax = this.utilSvc.getTaxTotal(this.order);
+            this.tax = this.utilSvc.getTaxTotal(this.orderHeader, this.orderItems);
             this.checkTotal = this.subTotal + this.tax;
 
             if (this.guests >= this.MAX_GUESTS) {
@@ -1630,7 +1637,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
         }
     }
-
+/*
     showModifierDialog(orderItemIndex: number) {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
@@ -1647,7 +1654,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 }
             });
     }
-
+*/
     showReasonDialog(orderItem: OrderDetail) {
         // get the product Order
         //let _orderItem: OrderDetail = this.orderItems.find( oi => oi.ItemType == ItemType.Product && oi.IndexData == orderItem.IndexData)

@@ -69,6 +69,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         // Init your component properties here.
         //this.router.navigate(['/home/pizza']);  
         this.utilSvc.setTopBarStyle();
+        this.utilSvc.getTaxRates();
     }
 
     ngAfterViewInit(): void {

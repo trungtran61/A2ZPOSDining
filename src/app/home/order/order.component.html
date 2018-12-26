@@ -8,24 +8,24 @@
     <GridLayout style="background-color: antiquewhite;" rows='40'>
       <StackLayout orientation="horizontal">
         <FlexBoxLayout *ngIf='ticketNumber' justifyContent="center">
-          <Label text="Ticket #" style="text-align: c; width:75;"></Label> |
-          <Label [text]="ticketNumber" style="text-align: left; margin-right: 5;width:75;"></Label> |
+          <Label text="Ticket #" style="text-align: center; width:75;"></Label> |
+          <Label [text]="ticketNumber" style="text-align: left; margin-right: 5;width:75; color:red"></Label> |
         </FlexBoxLayout>
         <FlexBoxLayout *ngIf='!ticketNumber' justifyContent="center">
-          <Label text="Check #" style="text-align: left; width:75;"></Label> |
-          <Label [text]="checkNumber" style="text-align: left; margin-right: 5;width:75;"></Label> |
+          <Label text="Check #" style="text-align: center; width:75;"></Label> |
+          <Label [text]="checkNumber" style="text-align: left; margin-right: 5;width:75; color: red"></Label> |
         </FlexBoxLayout>
       </StackLayout>
     </GridLayout>
     <GridLayout rows='40' style="background-color: antiquewhite;" columns='* * *' borderTopWidth='1' borderColor='gray'
-      borderLeftWidth='0' borderRightWidth='0'>      
-      <Label [text]="table" style="text-align: left; width:30;" col='0' borderRightWidth='1' borderLeftWidth='0'
-        borderLeftColor='antiquewhite' borderRightColor='gray'></Label>|
-      <Label [text]="server" style="text-align: left; width:140;" col='1' borderRightWidth='1' borderLeftWidth='0'
-        borderRightColor='gray'></Label>
+      borderLeftWidth='0' borderRightWidth='0' borderBottomWidth='1'>      
+      <Label [text]="table" style="text-align: left; width:30;color: red" col='0' borderRightWidth='1' borderLeftWidth='0'
+        borderLeftColor='antiquewhite' borderRightColor='gray' borderBottomWidth='1'></Label>|
+      <Label [text]="server" style="text-align: left; width:140;color:green" col='1' borderRightWidth='1' borderLeftWidth='0'
+        borderRightColor='gray' borderBottomWidth='1'></Label>
       <StackLayout col='2' orientation="horizontal">
-        <Label text="Guests: " style="text-align: left;"></Label>
-        <Label [text]="guests"></Label>
+        <Label text="Guests: " style="text-align: left;margin-left: 3"></Label>
+        <Label [text]="guests" style="font-weight: bold; color: red"></Label>
       </StackLayout>
     </GridLayout>
     <!-- order items  -->

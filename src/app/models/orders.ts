@@ -66,7 +66,7 @@ export interface FunctionTypeDetail {
     Col?: number,
     Class?: string
 }
-
+/*
 export interface OrderItem {
     Product?: MenuProduct;
     Qty?: number;
@@ -81,11 +81,11 @@ export interface OrderItem {
     IgnoreTax?: boolean,
     ExtPrice?: number    
 }
-
+*/
 export interface myOption{
     Name: string;
 }
-
+/*
 export interface Order {
     CheckNumber?: number;
     ServerID?: number;
@@ -95,7 +95,7 @@ export interface Order {
     Gratuity?: number;
     OrderItems?:  OrderItem[];
 }
-
+*/
 export interface FixedOption {
     Name?: string;
     Position?: number;
@@ -104,97 +104,97 @@ export interface FixedOption {
 }
 
 export interface OrderHeader {
-    OrderFilter: number;
+    OrderFilter?: number;
     Phone?: any;
-    Name: string;
-    OrderID: number;
-    TableNumber: string;
-    CheckNumber: number;
-    Total: number;
+    Name?: string;
+    OrderID?: number;
+    TableNumber?: string;
+    CheckNumber?: number;
+    Total?: number;
     Status?: any;
-    Discount: number;
+    Discount?: number;
     Cash?: any;
     CheckTender?: any;
-    EmployeeID: number;
+    EmployeeID?: number;
     Charge?: any;
-    TotalCash: number;
-    TotalCheck: number;
+    TotalCash?: number;
+    TotalCheck?: number;
     tag?: any;
     Tendered?: any;
-    CurrentDate: Date;
-    CurrentTime: Date;
+    CurrentDate?: Date;
+    CurrentTime?: Date;
     Void?: any;
-    VoidedBy: number;
+    VoidedBy?: number;
     CashedOut?: any;
-    NumberGuests: number;
-    Tax: number;
-    TimeOrder: Date;
+    NumberGuests?: number;
+    Tax?: number;
+    TimeOrder?: Date;
     TimePrint?: any;
     TimeSettle?: any;
-    Area: number;
-    TransType: number;
-    CompAmount: number;
-    DiscountID: number;
+    Area?: number;
+    TransType?: number;
+    CompAmount?: number;
+    DiscountID?: number;
     CouponMessage?: any;
     DeliveryZone?: any;
-    Delivery: number;
+    Delivery?: number;
     PaymentType?: any;
     Extras?: any;
-    Credit: number;
+    Credit?: number;
     VoidReason?: any;
-    DiscountAmountOriginal: number;
-    DiscountAmountRecall: number;
+    DiscountAmountOriginal?: number;
+    DiscountAmountRecall?: number;
     DiscountTypeOriginal?: any;
     DiscountTypeRecall?: any;
-    CouponTypeOriginal: number;
-    CouponTypeRecall: number;
-    DiscountIDOriginal: number;
-    DiscountIDRecall: number;
+    CouponTypeOriginal?: number;
+    CouponTypeRecall?: number;
+    DiscountIDOriginal?: number;
+    DiscountIDRecall?: number;
     DiscountReason?: any;
     CompReason?: any;
     CouponReason?: any;
     DiscountType?: any;
     DiscountType1?: any;
-    Gratuity: number;
+    Gratuity?: number;
     CashedOut1?: any;
-    CollectorID: number;
-    OriginalAmount: number;
-    VoidServerID: number;
+    CollectorID?: number;
+    OriginalAmount?: number;
+    VoidServerID?: number;
     VoidTime?: any;
     DiscountTime?: any;
     DiscountTimeRecall?: any;
-    DiscountServerID: number;
-    DiscountServerIDRecall: number;
-    ReopenedTicket: boolean;
-    SendToRegister: boolean;
+    DiscountServerID?: number;
+    DiscountServerIDRecall?: number;
+    ReopenedTicket?: boolean;
+    SendToRegister?: boolean;
     PickUpDate?: any;
     WarningDate?: any;
-    Deposit: number;
+    Deposit?: number;
     TimeWarning?: any;
     CashoutTime?: any;
     TerminalNumber?: any;
     StoreNumber?: any;
-    DeliverID: number;
+    DeliverID?: number;
     OutTime?: any;
     InTime?: any;
-    MessageReceived: boolean;
-    Transmedia: number;
-    ReTender: boolean;
+    MessageReceived?: boolean;
+    Transmedia?: number;
+    ReTender?: boolean;
     ReTenderReason?: any;
     ReOpenReason?: any;
-    GratuityManual: boolean;
-    ChangeAmount: number;
-    TenderType: number;
-    Transferred: boolean;
+    GratuityManual?: boolean;
+    ChangeAmount?: number;
+    TenderType?: number;
+    Transferred?: boolean;
     TimeClosed?: any;
     TicketNumber?: any;
-    ClosedRecorded: boolean;
-    VoidRecorded: boolean;
-    ClientName: string;
-    OrderCreationTime: Date;
-    TaxExempt: boolean;
-    OLOOrderID: number;
-    OLOMessageSent: boolean;
+    ClosedRecorded?: boolean;
+    VoidRecorded?: boolean;
+    ClientName?: string;
+    OrderCreationTime?: Date;
+    TaxExempt?: boolean;
+    OLOOrderID?: number;
+    OLOMessageSent?: boolean;
     InitialOrderTime?: any;
     Delayed?: any;
     DelayTime?: any;
@@ -213,7 +213,7 @@ export interface OrderDetail {
     ExtPrice?:number;
     PrintCode?:string;
     Printed?:string;
-    tag?:any;
+    Tag?:any;
     Voided?:any;
     Taxable?:number;
     CategoryCode?:number;

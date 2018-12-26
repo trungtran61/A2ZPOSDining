@@ -405,34 +405,34 @@ export class SQLiteService {
             }
 
             db.execSQL("DROP TABLE IF EXISTS MenuSubOptions;").then(id => {
-                db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Key INTEGER, Layer INTEGER," + 
+                db.execSQL("CREATE TABLE IF NOT EXISTS MenuSubOptions (ApplyCharge INTEGER, Charge REAL, ChoiceID INTEGER, Key INTEGER, Layer INTEGER," +
                     "Name TEXT, Position INTEGER, PrintName TEXT, ReportProductMix INTEGER);")
-                .then(id => {
-                    let headers = that.createRequestHeader();
-                    that.http.get(that.apiUrl + 'GetMenuSubOption', { headers: headers })
-                        .subscribe(
-                            data => {
-                                let menuSubOptions = <MenuSubOption[]>data;
-                                menuSubOptions.forEach(function (mso: MenuSubOption) {
-                                    SQLiteService.database.execSQL("INSERT INTO MenuSubOptions (ApplyCharge, Charge, ChoiceID, Key, Layer, Name, Position, PrintName, ReportProductMix)" + 
-                                    " VALUES (?,?,?,?,?,?,?,?,?)",
-                                        [mso.ApplyCharge, mso.Charge, mso.ChoiceID, mso.Key, mso.Layer,
-                                        mso.Name, mso.Position, mso.PrintName, mso.ReportProductMix]).then(id => {
-                                            resolve("Added MenuSubOptions records.")
-                                        },
-                                            err => {
-                                                reject("Failed to add MenuSubOptions records.")
-                                            }
-                                        );
-                                });
-                            },
-                            err => {
-                                reject("Error occurred while retrieving MenuSubOptions from API.");
-                            }
-                        );
-                }, error => {
-                    reject("CREATE TABLE MenuSubOptions ERROR" + error);
-                });
+                    .then(id => {
+                        let headers = that.createRequestHeader();
+                        that.http.get(that.apiUrl + 'GetMenuSubOption', { headers: headers })
+                            .subscribe(
+                                data => {
+                                    let menuSubOptions = <MenuSubOption[]>data;
+                                    menuSubOptions.forEach(function (mso: MenuSubOption) {
+                                        SQLiteService.database.execSQL("INSERT INTO MenuSubOptions (ApplyCharge, Charge, ChoiceID, Key, Layer, Name, Position, PrintName, ReportProductMix)" +
+                                            " VALUES (?,?,?,?,?,?,?,?,?)",
+                                            [mso.ApplyCharge, mso.Charge, mso.ChoiceID, mso.Key, mso.Layer,
+                                            mso.Name, mso.Position, mso.PrintName, mso.ReportProductMix]).then(id => {
+                                                resolve("Added MenuSubOptions records.")
+                                            },
+                                                err => {
+                                                    reject("Failed to add MenuSubOptions records.")
+                                                }
+                                            );
+                                    });
+                                },
+                                err => {
+                                    reject("Error occurred while retrieving MenuSubOptions from API.");
+                                }
+                            );
+                    }, error => {
+                        reject("CREATE TABLE MenuSubOptions ERROR" + error);
+                    });
             });
         });
         return promise;
@@ -588,7 +588,7 @@ export class SQLiteService {
     }
 
     public getLocalUserModifiers() {
-        return SQLiteService.database.all("SELECT PriKey,Position,Modifier,ApplyCharge,Price,ButtonFunction,StampPrice,TextPosition,FontSize,ItemName " + 
+        return SQLiteService.database.all("SELECT PriKey,Position,Modifier,ApplyCharge,Price,ButtonFunction,StampPrice,TextPosition,FontSize,ItemName " +
             "FROM UserModifiers ORDER BY Position")
             .then(function (rows) {
                 let items: UserModifier[] = [];
@@ -621,32 +621,32 @@ export class SQLiteService {
             db.execSQL("DROP TABLE IF EXISTS MenuChoices;").then(id => {
                 db.execSQL("CREATE TABLE IF NOT EXISTS MenuChoices (Charge REAL, ChoiceID INTEGER, ChoiceName TEXT, ForcedChoice INTEGER, Key INTEGER, Layer INTEGER, Name TEXT, " +
                     "PrintName Text,Position INTEGER, ProductCode INTEGER, ReportProductMix INTEGER);").then(id => {
-                    let headers = that.createRequestHeader();
-                    that.http.get(that.apiUrl + 'GetMenuChoice', { headers: headers })
-                        .subscribe(
-                            data => {
-                                let menuChoices = <MenuChoice[]>data;
-                                menuChoices.forEach(function (mc: MenuChoice) {
-                                    SQLiteService.database.execSQL("INSERT INTO MenuChoices " + 
-                                        "(Charge, ChoiceID, ChoiceName, ForcedChoice, Key, Layer, Name, PrintName, Position, ProductCode, ReportProductMix)" + 
-                                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )",
-                                        [mc.Charge, mc.ChoiceID, mc.ChoiceName, mc.ForcedChoice, mc.Key, mc.Layer,
-                                        mc.Name, mc.PrintName, mc.Position, mc.ProductCode, mc.ReportProductMix]).then(id => {
-                                            resolve("Added MenuChoices records.")
-                                        },
-                                            err => {
-                                                reject("Failed to add MenuChoices records.")
-                                            }
-                                        );
-                                });
-                            },
-                            err => {
-                                reject("Error occurred while retrieving MenuChoices from API.");
-                            }
-                        );
-                }, error => {
-                    reject("CREATE TABLE MenuChoices ERROR" + error);
-                });
+                        let headers = that.createRequestHeader();
+                        that.http.get(that.apiUrl + 'GetMenuChoice', { headers: headers })
+                            .subscribe(
+                                data => {
+                                    let menuChoices = <MenuChoice[]>data;
+                                    menuChoices.forEach(function (mc: MenuChoice) {
+                                        SQLiteService.database.execSQL("INSERT INTO MenuChoices " +
+                                            "(Charge, ChoiceID, ChoiceName, ForcedChoice, Key, Layer, Name, PrintName, Position, ProductCode, ReportProductMix)" +
+                                            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )",
+                                            [mc.Charge, mc.ChoiceID, mc.ChoiceName, mc.ForcedChoice, mc.Key, mc.Layer,
+                                            mc.Name, mc.PrintName, mc.Position, mc.ProductCode, mc.ReportProductMix]).then(id => {
+                                                resolve("Added MenuChoices records.")
+                                            },
+                                                err => {
+                                                    reject("Failed to add MenuChoices records.")
+                                                }
+                                            );
+                                    });
+                                },
+                                err => {
+                                    reject("Error occurred while retrieving MenuChoices from API.");
+                                }
+                            );
+                    }, error => {
+                        reject("CREATE TABLE MenuChoices ERROR" + error);
+                    });
             });
         });
         return promise;
@@ -670,7 +670,7 @@ export class SQLiteService {
     }
 
     public getLocalMenuChoiceItems(choiceLayer: ChoiceLayer, productCode: number) {
-        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position, Layer, ForcedChoice, PrintName, Key FROM MenuChoices " + 
+        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position, Layer, ForcedChoice, PrintName, Key FROM MenuChoices " +
             "WHERE ProductCode=? AND ChoiceName=? AND Layer=? ORDER BY Position",
             [productCode, choiceLayer.Name, choiceLayer.Layer])
             .then(function (rows) {
@@ -785,43 +785,43 @@ export class SQLiteService {
                                 data => {
                                     let products = <Product[]>data;
                                     products.forEach(function (product: Product) {
-                                        SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode," + 
-                                            "ProductGroup,PrintCode1,CouponCode,GeneralCode,Description,AutoOption," + 
+                                        SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode," +
+                                            "ProductGroup,PrintCode1,CouponCode,GeneralCode,Description,AutoOption," +
                                             "PrintName,ForcedModifier,UseForcedModifier,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings," +
-                                            "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity)" + 
+                                            "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity)" +
                                             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                                             [
-                                            product.ProductName,
-                                            product.ProductFilter,
-                                            product.UnitPrice,
-                                            product.PrintCode,
-                                            product.Taxable,
-                                            product.CategoryCode,
-                                            product.ProductGroup,
-                                            product.PrintCode1,
-                                            product.CouponCode,
-                                            product.GeneralCode,
-                                            product.Description,
-                                            product.AutoOption,
-                                            product.PrintName,
-                                            product.ForcedModifier,
-                                            product.UseForcedModifier,
-                                            product.ShowAutoOption,
-                                            product.UseUnitPrice2,
-                                            product.UnitPrice2,
-                                            product.Toppings,
-                                            product.Pizza,
-                                            product.ProductType,
-                                            product.TaxRate,
-                                            product.PromptQuantity,
-                                            product.ModifierIgnoreQuantity,
-                                            product.FractionalQuantity]).then(id => {
-                                                resolve("Added Products records.")
-                                            },
-                                                err => {
-                                                    reject("Failed to add Products records.")
-                                                }
-                                            );
+                                                product.ProductName,
+                                                product.ProductFilter,
+                                                product.UnitPrice,
+                                                product.PrintCode,
+                                                product.Taxable,
+                                                product.CategoryCode,
+                                                product.ProductGroup,
+                                                product.PrintCode1,
+                                                product.CouponCode,
+                                                product.GeneralCode,
+                                                product.Description,
+                                                product.AutoOption,
+                                                product.PrintName,
+                                                product.ForcedModifier,
+                                                product.UseForcedModifier,
+                                                product.ShowAutoOption,
+                                                product.UseUnitPrice2,
+                                                product.UnitPrice2,
+                                                product.Toppings,
+                                                product.Pizza,
+                                                product.ProductType,
+                                                product.TaxRate,
+                                                product.PromptQuantity,
+                                                product.ModifierIgnoreQuantity,
+                                                product.FractionalQuantity]).then(id => {
+                                                    resolve("Added Products records.")
+                                                },
+                                                    err => {
+                                                        reject("Failed to add Products records.")
+                                                    }
+                                                );
                                     });
                                 },
                                 err => {
@@ -1203,7 +1203,7 @@ export class SQLiteService {
 
     public getLocalProduct(productFilter: number): Promise<Product> {
         return SQLiteService.database.get("SELECT * FROM Products WHERE ProductFilter =?", [productFilter])
-            .then(function (row) {                
+            .then(function (row) {
                 let product: Product =
                 {
                     ProductName: row[0],
@@ -1233,7 +1233,7 @@ export class SQLiteService {
                     FractionalQuantity: row[24],
                     Product: row[25]
                 };
-                
+
                 return (product);
             });
     }
@@ -1395,18 +1395,20 @@ export class SQLiteService {
         return promise;
     }
 
-    public getLocalTaxRates(): Promise<TaxRate> {
-        return SQLiteService.database.get("SELECT TaxID,Name, RateType, EffectiveRate, RateType,Disabled,DateEntered FROM TaxRates;")
-            .then(function (row) {
-                let taxRate: TaxRate = {
-                    TaxID: row[0],
-                    Name: row[1],
-                    RateType: row[2],
-                    EffectiveRate: row[3],
-                    Disabled: row[4],
-                    DateEntered: row[5]
-                };
-                return (taxRate);
+    public getLocalTaxRates(): Promise<TaxRate[]> {
+        let taxRates: TaxRate[] = [];
+
+        return SQLiteService.database.all("SELECT TaxID, Name, RateType, EffectiveRate FROM TaxRates WHERE Disabled = 'false'")
+            .then(function (rows) {
+                for (var row in rows) {
+                    taxRates.push({
+                        TaxID: rows[row][0],
+                        Name: rows[row][1],
+                        RateType: rows[row][2],
+                        EffectiveRate: rows[row][3]
+                    });
+                }
+                return (taxRates);
             });
     }
 

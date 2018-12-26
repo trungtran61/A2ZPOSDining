@@ -216,12 +216,12 @@ export class ForcedModifiersComponent implements OnInit {
         if (this.currentChoices.length > 0)
             this.currentChoices = this.currentChoices.filter(cc=> cc.IndexDataSub != choice.Layer);
 
-        this.currentChoices.push(orderItem);
+        this.currentChoices.push(orderItem); 
             choice.SubOptions.forEach( so => {
-                let orderSubItem: OrderDetail  =  {
+                let orderSubItem: OrderDetail  =  { 
                     ProductName : '      ' + so.Name,
                     PrintName: '      ' + so.PrintName,
-                    Quantity: null,   
+                    Quantity: null,    
                     IndexDataSub : so.Layer,
                     IndexData: that.orderProduct.IndexData,
                     ItemType: ItemType.SubOption,

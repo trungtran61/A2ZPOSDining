@@ -1,4 +1,4 @@
-<GridLayout class="p-10" columns="200,*" rows="*,40" style="background-color: black">
+<GridLayout columns="200 *" rows="* 70" style="background-color: black">
     <StackLayout col='0' row='0' style="background-color: wheat">
         <StackLayout *ngFor="let item of choiceLayers" (tap)="choiceLayerSelected(item)" [class]="item.Class">
             <Label [text]="item.Name" *ngIf="item.Choice == null"></Label>
@@ -26,15 +26,14 @@
         <!-- check mark for selected sub option -->
         <Label class="fa" text="&#xf00c;" (tap)="subChoiceTapped()" [visibility]="showSubChoices && item.Selected ? 'visible' : 'collapse'"
             *ngFor="let item of subChoiceItems" [col]='item.Col' [row]='item.Row' style='margin: 40 0 0 120; color: darkgreen; font-weight: bold'></Label>
-
+            <Button class="glass btnSubOptions fa" [text]="subOptionsText" textWrap='true' (tap)="activateSubOptions()" row="5"
+            [visibility]="showSubChoices ? 'collapse' : 'visible'" col="4" height="94" width="190"></Button>
+        <Button class="glass btnSubOptions" text="Done" textWrap='true' (tap)="doneSubOptions()" row="6" col="4" height="94"
+            width="190" [visibility]="showSubChoices ? 'visible' : 'collapse'"></Button>
+        <Button class="glass btnSubOptions fa" text="&#xf00c; Accept" textWrap='true' (tap)="accept()" row="6" col="4" height="94"
+            width="190" [visibility]="isAdding ? 'collapse' : 'visible'"></Button>    
     </GridLayout>
-
-    <Button class="glass btnSubOptions fa" [text]="subOptionsText" textWrap='true' (tap)="activateSubOptions()" row="5"
-        [visibility]="showSubChoices ? 'collapse' : 'visible'" col="4" height="94" width="190"></Button>
-    <Button class="glass btnSubOptions" text="Done" textWrap='true' (tap)="doneSubOptions()" row="4" col="4" height="94"
-        width="190" [visibility]="showSubChoices ? 'visible' : 'collapse'"></Button>
-    <Button class="glass btnSubOptions fa" text="&#xf00c; Accept" textWrap='true' (tap)="accept()" row="6" col="4" height="94"
-        width="190" [visibility]="isAdding ? 'collapse' : 'visible'"></Button>    
-    <Button class="glass btnCan fa" text="&#xf0e2; Cancel" (tap)="cancel()" row="6" col="0" style="margin-top: 10"
+   
+    <Button class="glass btnCan fa" text="&#xf0e2; Cancel" (tap)="cancel()" row="1" col="0" style="margin-top: 10" horizontalAlignment='left'
         height='60' width='100'></Button>
 </GridLayout>

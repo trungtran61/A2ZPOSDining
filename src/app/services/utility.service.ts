@@ -2,10 +2,11 @@ import { Injectable, NgZone } from "@angular/core";
 import { interval, Observable } from 'rxjs'
 import { RouterExtensions } from "nativescript-angular";
 import { SQLiteService } from "./sqlite.service";
-import { Order, OrderItem } from "../models/orders";
+import { OrderDetail, OrderHeader } from "../models/orders";
 //import { EventData } from "tns-core-modules/data/observable";
 import { topmost } from "tns-core-modules/ui/frame";
 import { isIOS } from "tns-core-modules/platform";
+import { TaxRate, MenuOption } from "../models/products";
 
 @Injectable()
 export class UtilityService {
@@ -14,6 +15,7 @@ export class UtilityService {
     public socket: any;
     private readStream: NSInputStream;
     private writeStream: NSOutputStream;
+    public taxRates: TaxRate[]=[];
 
     public constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -69,59 +71,59 @@ export class UtilityService {
         return rgb;
     }
 
-    getTaxTotal(order: Order): number {
+    getTaxTotal(order: OrderHeader, orderItems: OrderDetail[]): number {
         let taxTotal: number = 0.00;
-        if (order.TaxExempt || order.OrderItems.length == 0) return taxTotal;
+        if (order.TaxExempt || orderItems.length == 0) return taxTotal;
 
-        let orderDetails: OrderItem[] = order.OrderItems.filter(od => od.Tag == null);
+        let orderDetails: OrderDetail[] = orderItems.filter(od => od.Tag == null);
         let discount: number = order.Discount;
         let itemTotal: number = orderDetails
-            .map(item => !item.Refund && !item.Voided && !item.Comped && item.Price ? item.Price : 0)
+            .map(item => !item.Refund && !item.Voided && !item.Comped && item.ExtPrice ? item.ExtPrice : 0)
             .reduce((sum, current) => sum + current);
 
         if (itemTotal == 0) return 0;
 
-        let lineDiscounts: OrderItem[] = order.OrderItems;
+        let lineDiscounts: OrderDetail[] = orderItems;
         let sumLineDiscounts: number = 0;
         let lineDiscount: number = 0;
 
         if (this.DBService.systemSettings.SmartTax) {
-            let itemCount = order.OrderItems.filter(od => !od.Refund && !od.Voided && !od.Comped
-                && od.Product.ProductCode != 4 && od.Product.ProductCode != 5 && od.Product.Taxable == 0).length;
+            let itemCount = orderItems.filter(od => !od.Refund && !od.Voided && !od.Comped
+                && od.ProductCode != 4 && od.ProductCode != 5 && od.Taxable == 0).length;
             if (itemCount > 0) {
                 lineDiscounts = lineDiscounts.filter(ld => !ld.Refund && !ld.IgnoreTax && !ld.Voided && !ld.Comped
-                    && ld.Product.ProductCode != 4 && ld.Product.ProductCode != 5 && ld.Product.Taxable != 2 && ld.Price && ld.Price > 0)
+                    && ld.ProductCode != 4 && ld.ProductCode != 5 && ld.Taxable != 2 && ld.ExtPrice && ld.ExtPrice > 0)
                 if (lineDiscounts.length == 0)
                     return taxTotal;
                 else {
                     sumLineDiscounts = lineDiscounts
-                        .map(ld => ld.Price > 0 ? ld.Price : 0)
+                        .map(ld => ld.ExtPrice > 0 ? ld.ExtPrice : 0)
                         .reduce((sum, current) => sum + current);
                     lineDiscount = ((sumLineDiscounts / itemTotal) * discount) / itemCount;
                     taxTotal = lineDiscounts
-                        .map(ld => (ld.Price - lineDiscount) * ld.Product.TaxRate)
+                        .map(ld => (ld.ExtPrice - lineDiscount) * this.getEffectiveTaxRate(ld.TaxRate))
                         .reduce((sum, current) => sum + current);
                 }
             }
             else {
-                lineDiscounts = lineDiscounts.filter(ld => !ld.Refund && !ld.IgnoreTax && !ld.Voided && !ld.Comped && ld.Product.Taxable == 0)
+                lineDiscounts = lineDiscounts.filter(ld => !ld.Refund && !ld.IgnoreTax && !ld.Voided && !ld.Comped && ld.Taxable == 0)
                 sumLineDiscounts = lineDiscounts
-                    .map(ld => ld.Price > 0 ? ld.Price : 0)
+                    .map(ld => ld.ExtPrice > 0 ? ld.ExtPrice : 0)
                     .reduce((sum, current) => sum + current);
                 lineDiscount = ((sumLineDiscounts / itemTotal) * discount) / lineDiscounts.length;
                 taxTotal = lineDiscounts
-                    .map(ld => (ld.Price - lineDiscount) * ld.Product.TaxRate)
+                    .map(ld => (ld.ExtPrice - lineDiscount) * this.getEffectiveTaxRate(ld.TaxRate))
                     .reduce((sum, current) => sum + current);
             }
         }
         else {
-            lineDiscounts = lineDiscounts.filter(ld => !ld.Refund && !ld.IgnoreTax && !ld.Voided && !ld.Comped && ld.Product.Taxable == 0 && ld.Price && ld.Price > 0);
+            lineDiscounts = lineDiscounts.filter(ld => !ld.Refund && !ld.IgnoreTax && !ld.Voided && !ld.Comped && ld.Taxable == 0 && ld.ExtPrice && ld.ExtPrice > 0);
             sumLineDiscounts = lineDiscounts
-                .map(ld => ld.Price > 0 ? ld.Price : 0)
+                .map(ld => ld.ExtPrice > 0 ? ld.ExtPrice : 0)
                 .reduce((sum, current) => sum + current);
             lineDiscount = ((sumLineDiscounts / itemTotal) * discount) / lineDiscounts.length;
             taxTotal = lineDiscounts
-                .map(ld => (ld.Price - lineDiscount) * ld.Product.TaxRate)
+                .map(ld => (ld.ExtPrice - lineDiscount) * this.getEffectiveTaxRate(ld.TaxRate))
                 .reduce((sum, current) => sum + current);
         }
 
@@ -151,6 +153,24 @@ export class UtilityService {
             let navigationBar = topmost().ios.controller.navigationBar;
             navigationBar.barStyle = UIBarStyle.Black;
         }
+    }
+
+    public getTaxRates()
+    {
+        let that = this;
+        this.DBService.getLocalTaxRates().then(taxRates => {
+            if (taxRates.length == 0) {
+                alert("Missing Tax Rates");
+            }
+            else {
+                this.taxRates = taxRates;
+            }
+        });
+    }
+
+    private getEffectiveTaxRate(taxRateID: number): number
+    {
+        return this.taxRates.find(tr => tr.TaxID == taxRateID).EffectiveRate;
     }
 
     openPrinterSocket() {        
