@@ -569,26 +569,18 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
     }
 
-    showForcedModifierDialog(isAdding: boolean, orderItem: OrderDetail) {
+    showForcedModifierDialog(isAdding: boolean) {
         
-        let orderProduct: OrderDetail;        
-        let subOptions: OrderDetail[]
+        let orderItems: OrderDetail[];        
+        orderItems = this.orderItems.filter(od => od.IndexData == this.currentOrderItem.IndexData); 
         
-        // changing choice?        
-        if (!isAdding)
-        {
-            subOptions = this.orderItems.filter(od => od.IndexData == orderItem.IndexData 
-                && od.IndexDataSub == orderItem.IndexDataSub && od.ItemType == ItemType.SubOption)
-            orderProduct = this.orderItems.find(oi => oi.IndexData == orderItem.IndexData && oi.ItemType == ItemType.Product);
-        }
-
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
-            context: { orderProduct: isAdding ? this.currentOrderItem : orderProduct, 
-                orderItem: this.currentOrderItem, 
-                subOptions: subOptions,
-                isAdding: isAdding }
+            context: { 
+                orderItems: orderItems, 
+                isAdding: isAdding 
+            }
         };
 
         let that = this;
@@ -596,37 +588,13 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
             (selectedItems: OrderDetail[]) => {
                 if (selectedItems != null) {
-                    this.currentSeatNumber++;
-                    /*
-                    if (isAdding) {
-                        this.addProductToOrder(product);
-                    }
-                    */
+                    // if changing choices, remove current choices before adding new ones
+                    if (!isAdding)
+                        this.orderItems = this.orderItems.filter(oi => ( (oi.IndexData == this.currentOrderItem.IndexData && oi.ItemType == ItemType.Product) || 
+                                                oi.IndexData != this.currentOrderItem.IndexData ));
+
                     selectedItems.forEach(function (od: OrderDetail) {
                         that.orderItems.push(od);
-                        /*
-                        if (od.ItemType == ItemType.SubOption)
-                        {
-                            that.currentSubOption = {
-                                Name: od.ProductName,
-                                PrintName: od.PrintName,
-                                ApplyCharge: od.ApplyCharge,
-                            };
-                        }
-                        else
-                        {
-                            that.currentMenuOption = {
-                                Name: od.ProductName,
-                                PrintName: od.PrintName,
-                                ApplyCharge: od.ApplyCharge,
-                                ReportProductMix: od.ReportProductMix
-                            };
-                        }
-                        */
-                        /*
-                        that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType,
-                            that.currentOrderItem.ProductCode, od.IndexDataSub);
-                        */
                     });
                     this.totalPrice();
                     this.setLastItemOrdered();
@@ -638,33 +606,6 @@ export class OrderComponent implements OnInit, OnDestroy {
                         this.currentProduct = null;
                         this.deleteOrderItem(this.currentOrderItem);
                     }
-                }
-            });
-    }
-
-    showForcedModifierDialogOrderItem(orderItem: OrderDetail) {
-        const modalOptions: ModalDialogOptions = {
-            viewContainerRef: this.viewContainerRef,
-            fullscreen: true,
-            context: {
-                orderItems: this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData),
-                currentChoices: this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData &&
-                    (oi.ItemType == ItemType.ForcedChoice ||
-                        oi.ItemType == ItemType.SubOption))
-            }
-        };
-        let that = this;
-
-        this.modalService.showModal(ForcedModifiersComponent, modalOptions).then(
-            (selectedItems) => {
-                if (selectedItems != null) {
-                    // remove current choices
-                    this.orderItems = this.orderItems.filter(oi => oi.ItemType != ItemType.ForcedChoice && oi.ItemType != ItemType.SubOption);
-
-                    selectedItems.forEach(function (od: OrderDetail) {
-                        that.addItemToOrder(0, od.ProductName, od.UnitPrice, od.ItemType,
-                            that.currentOrderItem.ProductCode, od.IndexDataSub);
-                    });
                 }
             });
     }
@@ -682,8 +623,9 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.router.navigate(['/home/tableguests/' + this.table]);
     }
 
-    changeChoice(orderItem: OrderDetail) {       
-        this.showForcedModifierDialog(false, orderItem);
+    changeChoice(orderItem: OrderDetail) {      
+        this.currentOrderItem = orderItem; 
+        this.showForcedModifierDialog(false);
     }
 
     addProductToOrder(menuProduct: MenuProduct) {
@@ -739,7 +681,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.currentOrderItem = orderItem;            
             this.setLastItemOrdered();
             if (product.UseForcedModifier) {
-                this.showForcedModifierDialog(true, null);
+                this.showForcedModifierDialog(true);
             }
             else
             {
@@ -781,7 +723,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     this.qtyEntered = qtyEntered;
                 }
                 if (product.UseForcedModifier) {
-                    this.showForcedModifierDialog(true, null);
+                    this.showForcedModifierDialog(true);
                 }
                 else {
                     this.addProductToOrder(product);
