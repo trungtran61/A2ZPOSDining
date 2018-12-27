@@ -8,7 +8,7 @@ import { forkJoin } from "rxjs";
 import { catchError } from 'rxjs/operators';
 import { SystemSettings, Logos } from "~/app/models/settings";
 import { APIService } from "./api.service";
-import { Countdown, Reason } from "~/app/models/orders";
+import { Countdown, Reason, OrderDetail } from "~/app/models/orders";
 import { UtilityService } from "./utility.service";
 
 var Sqlite = require("nativescript-sqlite");
@@ -1550,27 +1550,95 @@ export class SQLiteService {
     }
 
 
-    public dropTables() {
-        SQLiteService.database.execSQL('DROP TABLE IF EXISTS MenuCategories;').then(function (resultSet) {
-            console.log("Result set is:", resultSet);
-        });
-    }
+    public createOrderDetails(db) {
 
-    getTableInfo(tableName: string) {
-        SQLiteService.database.all("SELECT Name, ProductCode, Position FROM MenuProducts")
-            .then(function (rows) {
-                console.log(rows);
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+
+            db.execSQL("DROP TABLE IF EXISTS OrderDetails;").then(id => {
+                db.execSQL("CREATE TABLE IF NOT EXISTS OrderDetails(" +
+                    "PriKey INTEGER,FilterNumber INTEGER,OrderFilter INTEGER,ProductFilter INTEGER," +
+                    "ProductCode INTEGER,IndexData INTEGER,ProductName TEXT,Quantity INTEGER,UnitPrice REAL,ExtPrice REAL," +
+                    "PrintCode TEXT,Printed INTEGER,Tag TEXT,Voided INTEGER,Taxable INTEGER,CategoryCode INTEGER," +
+                    "ProductGroup INTEGER,Comped INTEGER,DeleteID TEXT,CompID TEXT,CouponCode INTEGER,Reprint INTEGER,PrintName TEXT," +
+                    "SubCategory TEXT,EmployeeID INTEGER,PrintCode1 TEXT,SeatNumber TEXT,DeleteReason TEXT,CompTime TEXT,CompTimeRecall TEXT," +
+                    "DeleteTime TEXT,CompIDRecall TEXT,CompServerID TEXT,CompServerIDRecall TEXT,DeleteServerID TEXT,IndexDataOption INTEGER," +
+                    "Side TEXT,OptionCode INTEGER,Pizza INTEGER,Toppings INTEGER,Refund INTEGER,RefundReason TEXT,CompReason TEXT," +
+                    "HappyHour INTEGER,ItemType INTEGER,PriceLevel INTEGER,OrderTime TEXT,ClientName TEXT,ExcludeFromInventory INTEGER," +
+                    "ProductType INTEGER,TaxRate INTEGER,CouponID TEXT,ItemDiscountID TEXT,ItemDiscountReason TEXT,Paid INTEGER,PaymentType TEXT," +
+                    "PaymentLink TEXT,IgnoreTax INTEGER,SplitQuantity TEXT,IndexDataSub INTEGER,UseModifier INTEGER,MarginLeft INTEGER,Class Text," +
+                    "ReportProductMix INTEGER,ApplyCharge INTEGER);")
+                    .then(id => {
+                        console.log("Created TABLE OrderDetails");
+                    }, error => {
+                        reject("CREATE TABLE OrderDetails ERROR" + error);
+                    });
             });
-
+        });
+        return promise;
     }
+
+    public sortOrderDetail(db, orderDetails: OrderDetail[]) {
+        
+        let that = this;
+        let sql: string = 'BEGIN TRANSACTION;';
+        let promise = new Promise(function (resolve, reject) {
+            if (db == null) {
+                db = SQLiteService.database;
+            }
+            orderDetails.forEach( od =>
+                    {
+                        sql += 'INSERT INTO OrderDetails VALUES (' + od.PriKey + ',' + od.FilterNumber + od.OrderFilter + ',' + od.ProductFilter + ',' + od.ProductCode + ',' 
+                        + od.IndexData + ',' + od.ProductName + ',' + od.Quantity + ',' + od.UnitPrice + ',' + od.ExtPrice + ',' + od.PrintCode + ',' + od.Printed + ',' 
+                        + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' 
+                        + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' 
+                        + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' 
+                        + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' 
+                        + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' 
+                        + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' 
+                        + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + 
+                        + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' + od.PriKey + ',' +  ')';
+                    }
+                    );
+            sql+= 'COMMIT;';       
+            
+            SQLiteService.database.execSQL(sql)
+                .then(id => {
+
+                    resolve("inserted order details.")
+                },
+                    err => {
+                        reject("Failed insert order details.")
+                    }
+                );
+
+        });   
+        return promise;
+    }
+
+    public dropTables() {
+    SQLiteService.database.execSQL('DROP TABLE IF EXISTS MenuCategories;').then(function (resultSet) {
+        console.log("Result set is:", resultSet);
+    });
+}
+
+getTableInfo(tableName: string) {
+    SQLiteService.database.all("SELECT Name, ProductCode, Position FROM MenuProducts")
+        .then(function (rows) {
+            console.log(rows);
+        });
+
+}
 
     private createRequestHeader() {
-        let headers = new HttpHeaders({
-            "AuthKey": "my-key",
-            "AuthToken": "my-token",
-            "Content-Type": "application/json"
-        });
+    let headers = new HttpHeaders({
+        "AuthKey": "my-key",
+        "AuthToken": "my-token",
+        "Content-Type": "application/json"
+    });
 
-        return headers;
-    }
+    return headers;
+}
 }
