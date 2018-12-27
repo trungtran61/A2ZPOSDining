@@ -130,10 +130,15 @@ export class UtilityService {
         if (this.DBService.systemSettings.TaxGratuity)
             taxTotal += order.Gratuity * this.DBService.systemSettings.GratuityTaxRate;
 
-        //taxTotal = parseFloat(Math.round((taxTotal * 100) / 100).toFixed(2));
+        taxTotal = this.roundTo2Decimal(taxTotal);
         //taxTotal = Math.round((taxTotal * 100) / 100);
         return taxTotal;
     }
+
+    roundTo2Decimal(value: number) {        
+        return Number((value + .000001).toFixed(2));
+        //return Number(Number((value + .000001).toExponential(2)).toFixed(2));
+      }
     /*
         convertToBoolean(textBoolean: string)
         {
@@ -170,6 +175,9 @@ export class UtilityService {
 
     private getEffectiveTaxRate(taxRateID: number): number
     {
+        if (taxRateID == null)
+            return 0;
+
         return this.taxRates.find(tr => tr.TaxID == taxRateID).EffectiveRate;
     }
 

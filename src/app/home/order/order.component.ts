@@ -26,6 +26,7 @@ import { ReasonComponent } from "./reason.component";
 import { SearchComponent } from "./search.component";
 import { filter } from "rxjs/operators";
 import { QueryBindingType } from "@angular/core/src/view";
+import { NullInjector } from "@angular/core/src/di/injector";
 
 @Component({
     selector: "order",
@@ -568,12 +569,26 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
     }
 
-    showForcedModifierDialog(isAdding: boolean) {
+    showForcedModifierDialog(isAdding: boolean, orderItem: OrderDetail) {
+        
+        let orderProduct: OrderDetail;        
+        let subOptions: OrderDetail[]
+        
+        // changing choice?        
+        if (!isAdding)
+        {
+            subOptions = this.orderItems.filter(od => od.IndexData == orderItem.IndexData 
+                && od.IndexDataSub == orderItem.IndexDataSub && od.ItemType == ItemType.SubOption)
+            orderProduct = this.orderItems.find(oi => oi.IndexData == orderItem.IndexData && oi.ItemType == ItemType.Product);
+        }
 
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
-            context: { orderProduct: this.currentOrderItem, isAdding: isAdding }
+            context: { orderProduct: isAdding ? this.currentOrderItem : orderProduct, 
+                orderItem: this.currentOrderItem, 
+                subOptions: subOptions,
+                isAdding: isAdding }
         };
 
         let that = this;
@@ -667,8 +682,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.router.navigate(['/home/tableguests/' + this.table]);
     }
 
-    changeChoice() {
-        this.showForcedModifierDialog(false);
+    changeChoice(orderItem: OrderDetail) {       
+        this.showForcedModifierDialog(false, orderItem);
     }
 
     addProductToOrder(menuProduct: MenuProduct) {
@@ -721,11 +736,14 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.orderItems[this.orderItems.length - 1].Class = 'orderItem';
 
             this.orderItems.push(orderItem);
-            this.currentOrderItem = orderItem;
-            this.totalPrice();
+            this.currentOrderItem = orderItem;            
             this.setLastItemOrdered();
             if (product.UseForcedModifier) {
-                this.showForcedModifierDialog(true);
+                this.showForcedModifierDialog(true, null);
+            }
+            else
+            {
+                this.totalPrice();
             }
             this.previousProduct = this.currentProduct;
         });
@@ -763,7 +781,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     this.qtyEntered = qtyEntered;
                 }
                 if (product.UseForcedModifier) {
-                    this.showForcedModifierDialog(true);
+                    this.showForcedModifierDialog(true, null);
                 }
                 else {
                     this.addProductToOrder(product);
@@ -813,7 +831,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         break;
                     case 'changechoice':
                         //this.showForcedModifierDialogOrderItem(orderItem);
-                        this.changeChoice();
+                        this.changeChoice(orderItem);
                         break;
                 }
             });
