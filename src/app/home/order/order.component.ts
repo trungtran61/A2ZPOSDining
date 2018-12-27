@@ -355,6 +355,13 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.showOptions = false;
     }
 
+    sortOrderItems() {
+        this.orderItems.sort((a,b) => ( (a.IndexData * 1000) + ((a.IndexDataSub == null? 0 : a.IndexDataSub) * 100) + a.ItemType > 
+            (b.IndexData * 1000) + ((b.IndexDataSub == null? 0 : b.IndexDataSub) * 100) + b.ItemType)
+         ? 1 : (((a.IndexData * 1000) + ((a.IndexDataSub == null? 0 : a.IndexDataSub) * 100) + a.ItemType < 
+        ((b.IndexData * 1000) + ((b.IndexDataSub == null? 0 : b.IndexDataSub) * 100) + b.ItemType) ? -1 : 0))); 
+      }      
+    
     checkCategoryTimer(categoryID: number): boolean {
         let timers: MenuTimer[] = this.allTimers.filter(t => t.CategoryToLock == categoryID)
         let locked: boolean = false;
@@ -596,7 +603,10 @@ export class OrderComponent implements OnInit, OnDestroy {
                     selectedItems.forEach(function (od: OrderDetail) {
                         that.orderItems.push(od);
                     });
-                    this.totalPrice();
+
+                    this.sortOrderItems();
+
+                    this.totalPrice();                    
                     this.setLastItemOrdered();
                 }
                 else {
@@ -832,9 +842,10 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
             modifierIgnoreQuantity = this.currentOrderItem.ProductFilter == 0;
             orderDetail = Object.assign({}, this.orderItems.find(od => od.IndexData == this.currentOrderItem.IndexData && od.ItemType == ItemType.Product));
-            orderDetail.PriKey = 0
+            orderDetail.PriKey = 0            
         }
 
+        orderDetail.IndexData = this.currentOrderItem.IndexData;
         orderDetail.OrderTime = new Date();
         orderDetail.IndexDataOption = isSubOption ? 0 : -1
         orderDetail.Quantity = null
@@ -939,6 +950,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
 
         this.orderItems.push(orderDetail);
+        this.sortOrderItems();
         this.processFilterNumber();
     }
 

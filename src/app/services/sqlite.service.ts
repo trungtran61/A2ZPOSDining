@@ -1548,8 +1548,7 @@ export class SQLiteService {
                 return (reasons);
             });
     }
-
-
+/*
     public createOrderDetails(db) {
 
         let promise = new Promise(function (resolve, reject) {
@@ -1617,7 +1616,7 @@ export class SQLiteService {
         });   
         return promise;
     }
-
+*/
     public dropTables() {
     SQLiteService.database.execSQL('DROP TABLE IF EXISTS MenuCategories;').then(function (resultSet) {
         console.log("Result set is:", resultSet);
