@@ -85,17 +85,12 @@ export interface OrderItem {
 export interface myOption{
     Name: string;
 }
-/*
-export interface Order {
-    CheckNumber?: number;
-    ServerID?: number;
-    TableName?: string;
-    Discount?: number;
-    TaxExempt?: boolean;
-    Gratuity?: number;
-    OrderItems?:  OrderItem[];
+
+export interface OrderUpdate {
+    order?: OrderHeader;
+    orderdetails?:  OrderDetail[];
 }
-*/
+
 export interface FixedOption {
     Name?: string;
     Position?: number;

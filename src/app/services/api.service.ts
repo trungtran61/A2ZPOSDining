@@ -63,7 +63,7 @@ export class APIService {
             .pipe(map(res => res));
             */
     }
-
+/*
     getFullOrderP(orderFilter: number): Promise<any> {
         let promise = new Promise((resolve, reject) => {
             let headers = this.createRequestHeader();
@@ -78,7 +78,7 @@ export class APIService {
         });
         return promise;
     }
-
+*/
     getCheckNumber(tableName: string, employeeID: number): Observable<any> {
         let headers = this.createRequestHeader();
         return this.http.get(this.apiUrl + 'getCheckNumber?Name=' + tableName + '&EmployeeID=' + employeeID,

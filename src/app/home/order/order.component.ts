@@ -13,7 +13,7 @@ import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
-import { OrderType, Countdown, FixedOption, OrderHeader, OrderDetail, OrderResponse, ItemType, ModifierType } from "~/app/models/orders";
+import { OrderType, Countdown, FixedOption, OrderHeader, OrderDetail, OrderResponse, ItemType, ModifierType, OrderUpdate } from "~/app/models/orders";
 import { APIService } from "~/app/services/api.service";
 import { PromptQtyComponent } from "./prompt-qty.component";
 import { MemoComponent } from "./memo.component";
@@ -21,12 +21,8 @@ import { UtilityService } from "~/app/services/utility.service";
 import { ForcedModifiersComponent } from "./forced-modifiers/forced-modifiers.component";
 import { ModifyOrderItemComponent } from "./modify-order-item.component";
 import { ActivatedRoute } from "@angular/router";
-import { NullViewportScroller } from "@angular/common/src/viewport_scroller";
 import { ReasonComponent } from "./reason.component";
 import { SearchComponent } from "./search.component";
-import { filter } from "rxjs/operators";
-import { QueryBindingType } from "@angular/core/src/view";
-import { NullInjector } from "@angular/core/src/di/injector";
 
 @Component({
     selector: "order",
@@ -165,6 +161,10 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     showOptionsButton: boolean = false;
 
+    currentOrderFilter: number = 0;   
+    employeeID: number = 0;
+    area: number = 0;
+
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
@@ -190,6 +190,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.guests = parseInt(localStorage.getItem('guests'));
         this.table = localStorage.getItem('table');
         this.server = this.DBService.loggedInUser.FirstName;
+        this.employeeID = this.DBService.loggedInUser.PriKey;
         /*
         this.checkTitle = this.checkNumber + ' ' + this.server + ' ' + this.table + ' ' + this.guests;             
         */
@@ -1666,7 +1667,36 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     sendCheck() {
-        
+
+        let currentDate: Date = new Date();
+
+        let orderHeader: OrderHeader = {
+            OrderFilter: this.currentOrderFilter,
+            Name: this.table,
+            OrderID: 0,
+            TableNumber: this.table,
+            CheckNumber: 1,
+            Total: this.checkTotal,
+            Discount: 0,
+            EmployeeID: this.employeeID,
+            TotalCash: 0,
+            TotalCheck: 0,
+            CurrentDate: currentDate,
+            CurrentTime: currentDate,
+            VoidedBy: 0,
+            NumberGuests: this.guests,
+            Tax: this.tax,
+            TimeOrder: currentDate,
+            Area: this.area,
+            TransType: this.orderType,
+            CompAmount: 0
+        }
+
+        let orderUpdate: OrderUpdate = {             
+        };
+
+        orderUpdate.order.OrderFilter = this.currentOrderFilter;
+
     }
 
     printReceipt() {
