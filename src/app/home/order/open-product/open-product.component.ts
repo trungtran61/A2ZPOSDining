@@ -18,11 +18,11 @@ export class OpenProductComponent implements OnInit {
 
     productGroups: ProductGroup[] = [];
     selectedGroup: ProductGroup = null;
-    showEditPanel: boolean = false;
+    showEditPanel: boolean = false; 
     productName: string = '';
-    quantity: string;
-    price: string;
-    priceWithDecimal: string;
+    quantity: string = '';
+    price: string = '';
+    priceWithDecimal: string = '';
     showingNumericKeyPad: boolean = false;
     pageTitle: string = 'Choose a Product Group';
     activeTextField: string = '';    
@@ -38,7 +38,7 @@ export class OpenProductComponent implements OnInit {
         this.params.closeCallback(null);
     }
 
-    done() {
+    done() { 
         if (this.selectedGroup != null && this.productName != null &&
             this.quantity != null && this.price != null)
             if (this.productName != '' &&
@@ -47,7 +47,7 @@ export class OpenProductComponent implements OnInit {
                     ProductGroupId: this.selectedGroup.PriKey,
                     ProductName: this.productName,
                     Quantity: Number(this.quantity),
-                    UnitPrice:  Number(this.price)
+                    UnitPrice:  Number(this.price) / 100
                 }
                 this.params.closeCallback(openProductItem); 
             }
@@ -68,17 +68,19 @@ export class OpenProductComponent implements OnInit {
 
     acceptNumericInput()
     {
-        this.showingNumericKeyPad = false;
+        this.done();
+        //this.showingNumericKeyPad = false;
     }
 
     cancelNumericInput()
     {
-        this.showingNumericKeyPad = false;
+        this.cancel();
+        //this.showingNumericKeyPad = false;
     } 
  
     addDigit(digit: string)
     {
-        if (this.activeTextField == 'quantity')
+        if (this.activeTextField == 'quantity') 
         {
         if (this.quantity.length > 0)
             this.quantity +=  digit;

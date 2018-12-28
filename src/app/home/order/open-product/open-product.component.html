@@ -4,22 +4,23 @@
         <Button class="glass" [text]="item.Description" *ngFor="let item of productGroups" [col]='item.Col' [row]='item.Row'
             (tap)="groupSelected(item)"></Button>
     </GridLayout>
-    <GridLayout row='1' col='0' colSpan="3" rows='80 *' columns='600 100 100' [visibility]="showEditPanel ? 'visible' : 'collapse'">
+    <GridLayout row='1' col='0' colSpan="3" rows='200 *' columns='600 100 100' [visibility]="showEditPanel ? 'visible' : 'collapse'">
         <StackLayout row='0' col='0'>
-            <Label Text='Product Name' class='whiteLabel'></Label>
-            <TextField hint="Product Name" [text]='productName' [(ngModel)]='productName' (returnPress)="done()"
+            <Label text='Product Name' class='whiteLabel'></Label>
+            <TextField [text]='productName' [(ngModel)]='productName' (returnPress)="done()"
                 required #vcProductName #productNameModel='ngModel' autocorrect="true" style='border-radius: 6; border-color: gray; border-width: 1; background-color: white; font-size: 20; font-weight: bold; padding-left: 5; width: 580;'>
             </TextField>
         </StackLayout>
         <StackLayout row='0' col='1'>
-            <Label Text='Quantity' class='whiteLabel'></Label>
-            <Label [text]='quantity' (tap)='showNumericKeyPad("quantity")' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5;width: 80;'>
-            </Label>
+            <Label text='Quantity' class='whiteLabel'></Label>
+            <Button [text]='quantity' (tap)='showNumericKeyPad("quantity")' 
+            style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; width: 80;'>
+            </Button>
         </StackLayout>
         <StackLayout row='0' col='2'>
-            <Label Text='Price' class='whiteLabel'></Label>
-            <Label [text]='priceWithDecimal' (tap)='showNumericKeyPad("price")' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5;width: 80;'>
-            </Label>
+            <Label text='Price' class='whiteLabel'></Label>
+            <Button [text]='priceWithDecimal' (tap)='showNumericKeyPad("price")' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; width: 80;'>
+            </Button>
         </StackLayout>
         <GridLayout rows="auto auto auto auto" columns="400 auto auto auto" row='1' col='0' colSpan="3" [visibility]="showingNumericKeyPad ? 'visible' : 'collapse'">
             <Button text="1" class="glass btnSquare" (tap)="addDigit('1')" row="0" col="1"></Button>
@@ -31,11 +32,11 @@
             <Button text="7" class="glass btnSquare" (tap)="addDigit('7')" row="2" col="1"></Button>
             <Button text="8" class="glass btnSquare" (tap)="addDigit('8')" row="2" col="2"></Button>
             <Button text="9" class="glass btnSquare" (tap)="addDigit('9')" row="2" col="3"></Button>
-            <Button text="Cancel" class="glass btnCancel" (tap)="cancelNumericInput()" row='3' col='0'
+            <Button text="Cancel" class="glass btnCancel" (tap)="cancel()" row='3' col='0'
                 horizontalAlignment='right'></Button>
             <Button text="0" class="glass btnSquare" (tap)="addDigit('0')" row="3" col="1"></Button>
             <Button text="00" class="glass btnSquare" (tap)="addDigit('00')" row="3" col="2"></Button>
-            <Button text="Enter" class="glass btnOK" col="3" (tap)="acceptNumericInput()" row="3" col="3"></Button>
+            <Button text="Enter" class="glass btnOK" col="3" (tap)="done()" row="3" col="3"></Button>
         </GridLayout>
     </GridLayout>
 

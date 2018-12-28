@@ -216,6 +216,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     showProductOptions() {
+        this.showSubCategories = false;
         this.isShowingMainOptions = !this.isShowingMainOptions;
         let that = this;
 
@@ -230,7 +231,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.optionCurrentPage = 0;
             this.getProductOptionPage(true);
         }
-        else {
+        else { 
             // show menu's options first page
             this.productOptionsClass = 'glass productOptions';
             this.totalOptionPages = Math.ceil(this.menuOptions[this.menuOptions.length - 1].Position / this.optionPageSize);
@@ -1103,7 +1104,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         let that = this;
         this.DBService.getLocalMenuOptions(productCode).then((menuOptions) => {
             if (menuOptions.length == 0) {
-                dialogs.alert("Missing Menu Options");
+                //dialogs.alert("Missing Menu Options");
+                this.showProductOptions();
             }
             else {
                 this.menuOptions = menuOptions;
@@ -1314,6 +1316,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     addItemToOrder(qty: number, name: string, unitPrice: number,
         itemType: ItemType, productCode: number, indexDataSub: number) {
         let indexData: number = 0;
+        let lastIndex: number = 0;
         let marginLeft: number = this.getLeftMargin(itemType);
 
         // add modifier/option
@@ -1321,10 +1324,13 @@ export class OrderComponent implements OnInit, OnDestroy {
         if (itemType == ItemType.SubOption)
             indentation = '      ';
 
+        if (this.orderItems.length > 0)    
+        {
         indexData = this.currentOrderItem.IndexData;
-        let lastIndex: number = this.orderItems.map(oi =>
-            oi.IndexData === indexData).lastIndexOf(true);
-
+        lastIndex = this.orderItems.map(oi =>
+                oi.IndexData === indexData).lastIndexOf(true);
+        }    
+        
         let orderItem: OrderDetail = this.getInitializedOrderItem(null);
 
         orderItem.SeatNumber = this.currentSeatNumber.toString();
@@ -1336,6 +1342,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         orderItem.ProductCode = productCode;
         orderItem.MarginLeft = marginLeft;
         orderItem.IndexDataSub = indexDataSub;
+        orderItem.Quantity = qty;
+        orderItem.ExtPrice = qty * unitPrice;
 
         // add item to the order
         this.orderItems.splice(lastIndex + 1, 0, orderItem);
