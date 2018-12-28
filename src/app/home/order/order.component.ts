@@ -7,7 +7,7 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import {
     CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem,
-    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail, MenuSubOption, MenuTimerType, OverrideType, OptionCategory, Option
+    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail, MenuSubOption, MenuTimerType, OverrideType, OptionCategory, Option, HoldCategory
 } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
@@ -65,6 +65,13 @@ export class OrderComponent implements OnInit, OnDestroy {
     optionCategoryPageSize: number = 3;
     totalOptionCategoryPages: number = 0;
     allOptionCategorySelected: boolean = true;
+ 
+    holdCategories: HoldCategory[] =[
+        {Name: String.fromCharCode(0xf3ac) + ' ALL', Class : 'HoldOn fa', Position: 1},
+        {Name: String.fromCharCode(0xf3ac) + ' Appetizers', Class : 'HoldOn fa', Position: 2},
+        {Name: String.fromCharCode(0xf3ac) + ' Entrees', Class : 'HoldOn fa', Position: 3},
+        {Name: String.fromCharCode(0xf3ac) + ' Drinks', Class : 'HoldOn fa', Position: 4}
+    ];
 
     menuOptions: MenuOption[];
     pageOptions: MenuOption[];
@@ -104,6 +111,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     showDetails: boolean = true;
     showExtraFunctions: boolean = false;
     showProductInfo: boolean = false;
+    showHoldCategories: boolean = false;
     productInfoClass: string = 'glass fa';
     viewDetailsCode: string = String.fromCharCode(0xf06e) + ' View Details'
     hideDetailsCode: string = String.fromCharCode(0xf070) + ' Hide Details'
@@ -212,7 +220,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.apiSvc.postToPrint('hero');
             this.allOptionFilterClass = 'glass';
         }
-        );
+        );        
     }
 
     showProductOptions() {
@@ -1585,6 +1593,12 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.checkTotal += this.tips;
             }
         }
+    }
+
+    hold()
+    {
+        this.showSubCategories = false;
+        this.showHoldCategories = true;        
     }
 /*
     showModifierDialog(orderItemIndex: number) {

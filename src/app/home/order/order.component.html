@@ -102,17 +102,18 @@
       (tap)="categorySelected(item)" [style]="categoryStyles[i]"></Button>
   </StackLayout>
   <!-- subcategories -->
-  <GridLayout row="0" col="1" rows="60,92,92,92,92,92,80" (swipe)="onSubCategorySwipe($event)">
+  <GridLayout row="0" col="1" rows="60,92,92,92,92,92,80" (swipe)="onSubCategorySwipe($event)" *ngIf="showSubCategories">
     <Button class="glass" text='MAIN' textWrap="true" row='0' col='0' style='text-align: center' (tap)='displayMainCategories()'></Button>
     <Button [class]="item.Class" [text]="item.Name" *ngFor="let item of pageSubCategories let i=index" (tap)="subCategorySelected(item, i)"
-      [row]='item.Row' [col]='item.Col' textWrap="true"></Button>
-    <!--
-    <GridLayout row='6' col='0' columns='80 80' colSpan="2" >
-      <Button col='0' class="glass btnPaging fa" *ngIf='canSubCategoryPageUp' (tap)="getSubCategoryPage(false)" text="&#xf0aa; Up" ></Button>      
-      <Button col='1' class="glass btnPaging fa" *ngIf='canSubCategoryPageDown' (tap)="getSubCategoryPage(true)" text="&#xf0ab; Down"></Button>     
-    </GridLayout>    
-  -->
+      [row]='item.Row' [col]='item.Col' textWrap="true"></Button>   
   </GridLayout>
+
+   <!-- hold categories -->
+   <GridLayout row="0" col="1" rows="92,92,92,92" *ngIf='showHoldCategories'>
+    <Button [class]="item.Class" [text]="item.Name" *ngFor="let item of holdCategories" (tap)="holdCategorySelected(item)"
+      [row]='item.Position - 1' col='0' textWrap="true"></Button>   
+  </GridLayout>
+
   <!-- products -->
   <GridLayout columns="*,*,*,*" rows="60 86 86 86 86 86 86 80" row="0" col="3" *ngIf="showSubCategories" (swipe)='onProductSwipe($event)'>
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>

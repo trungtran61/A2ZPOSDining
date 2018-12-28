@@ -130,3 +130,13 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 {
 	color: yellow;background-image: linear-gradient(gold,black 10%, gold 90%);
 }
+
+.holdOff
+{
+	color: yellow;background-image: linear-gradient(gold,black 10%, gold 90%);
+}
+
+.holdOn
+{
+	color: yellow;background-image: linear-gradient(gold,black 40%, gold 70%);
+}
