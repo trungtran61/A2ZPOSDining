@@ -67,10 +67,10 @@ export class OrderComponent implements OnInit, OnDestroy {
     allOptionCategorySelected: boolean = true;
  
     holdCategories: HoldCategory[] =[
-        {Name: String.fromCharCode(0xf3ac) + ' ALL', Class : 'HoldOn fa', Position: 1},
-        {Name: String.fromCharCode(0xf3ac) + ' Appetizers', Class : 'HoldOn fa', Position: 2},
-        {Name: String.fromCharCode(0xf3ac) + ' Entrees', Class : 'HoldOn fa', Position: 3},
-        {Name: String.fromCharCode(0xf3ac) + ' Drinks', Class : 'HoldOn fa', Position: 4}
+        {Name: String.fromCharCode(0xf06d) + ' ALL', Class : 'glass holdOn fa', Position: 1},
+        {Name: String.fromCharCode(0xf06d) + ' Appetizers', Class : 'glass holdOn fa', Position: 2},
+        {Name: String.fromCharCode(0xf06d) + ' Entrees', Class : 'glass holdOn fa', Position: 3},
+        {Name: String.fromCharCode(0xf06d) + ' Drinks', Class : 'glass holdOn fa', Position: 4}
     ];
 
     menuOptions: MenuOption[];
@@ -613,6 +613,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                                                 oi.IndexData != this.currentOrderItem.IndexData ));
 
                     selectedItems.forEach(function (od: OrderDetail) {
+                        od.SeatNumber = that.currentSeatNumber.toString();
                         that.orderItems.push(od);
                     });
 
@@ -1532,13 +1533,13 @@ export class OrderComponent implements OnInit, OnDestroy {
         else {
             // if item is product, delete product and all associated modifiers
             if (orderItem.ItemType == ItemType.Product)
-                this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
+                this.orderItems = this.orderItems.filter(oi => oi.IndexData !== orderItem.IndexData);
             else
-                if (orderItem.ItemType == ItemType.SubOption) {
-                    this.orderItems = this.orderItems.filter(obj => obj !== orderItem);
+                if (orderItem.ItemType == ItemType.SubOption || orderItem.ItemType == ItemType.Option) {
+                    this.orderItems = this.orderItems.filter(oi => oi !== orderItem);
                 }
                 else {
-                    this.orderItems = this.orderItems.filter(obj => obj.IndexDataSub !== orderItem.IndexDataSub);
+                    this.orderItems = this.orderItems.filter(oi => (oi.IndexData * 100 + oi.IndexDataSub) != (orderItem.IndexData * 100 + orderItem.IndexDataSub) );
                 }
 
             this.totalPrice();
@@ -1645,6 +1646,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             (memo: Memo) => {
                 this.currentModifierType = ModifierType.NONE;
                 this.addOption(true, memo.Memo, memo.Price, false);
+                this.totalPrice();
+                this.setLastItemOrdered();
             });
     }
 

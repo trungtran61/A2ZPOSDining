@@ -1,23 +1,38 @@
-<GridLayout columns="*,*" rows="120,auto" class="p-30 page">
+<GridLayout columns="* *" rows="120 *" class="p-30 page">
     <StackLayout orientation="horizontal" row='0' colSpan="2">
         <StackLayout>
-            <TextField id='memo' #vcMemo hint="Enter Memo" [text]='memo' [(ngModel)]='memo' required #memoModel='ngModel' autocorrect="true"
+            <Label text='Memo' class='whiteLabel'></Label>
+            <TextField id='memo' #vcMemo [text]='memo' [(ngModel)]='memo' required #memoModel='ngModel' autocorrect="true"
                 [class]="memoClass" (tap)='activateMemo()'>
             </TextField>
             <Label class="validation" [visibility]="memoModel.valid ? 'collapse' : 'visible'" text="Memo is required"></Label>
         </StackLayout>
-        <StackLayout>
-        <TextField hint="0.00" [text]='price' [(ngModel)]='price' required #priceModel='ngModel' autocorrect="false"
-            [class]="priceClass" keyboardType='number' (tap)='activatePrice()' width="120">
-        </TextField>
+        <StackLayout>       
+        <Label text='Price' class='whiteLabel'></Label>
+        <Button [text]='priceWithDecimal' (tap)='showNumericKeyPad()' class='textEntryActive' style='width: 100;'>
+        </Button>
         </StackLayout>
     </StackLayout>
+   
+    <GridLayout rows="auto auto auto auto" columns="400 auto auto auto" row='1' col='0' colSpan="3" [visibility]="showingNumericKeyPad ? 'visible' : 'collapse'">
+        <Button text="1" class="glass btnSquare" (tap)="addDigit('1')" row="0" col="1"></Button>
+        <Button text="2" class="glass btnSquare" (tap)="addDigit('2')" row="0" col="2"></Button>
+        <Button text="3" class="glass btnSquare" (tap)="addDigit('3')" row="0" col="3"></Button>
+        <Button text="4" class="glass btnSquare" (tap)="addDigit('4')" row="1" col="1"></Button>
+        <Button text="5" class="glass btnSquare" (tap)="addDigit('5')" row="1" col="2"></Button>
+        <Button text="6" class="glass btnSquare" (tap)="addDigit('6')" row="1" col="3"></Button>
+        <Button text="7" class="glass btnSquare" (tap)="addDigit('7')" row="2" col="1"></Button>
+        <Button text="8" class="glass btnSquare" (tap)="addDigit('8')" row="2" col="2"></Button>
+        <Button text="9" class="glass btnSquare" (tap)="addDigit('9')" row="2" col="3"></Button>
+        <Button text="Cancel" class="glass btnCancel" (tap)="cancel()" row='3' col='0'
+            horizontalAlignment='right'></Button>
+        <Button text="0" class="glass btnSquare" (tap)="addDigit('0')" row="3" col="1"></Button>
+        <Button text="00" class="glass btnSquare" (tap)="addDigit('00')" row="3" col="2"></Button>
+        <Button text="Enter" class="glass btnOK" col="3" (tap)="done()" row="3" col="3"></Button>           
+    </GridLayout>
 
-    <FlexBoxLayout row='1' col='0'>
-        <Button class='glass btnCancel' text='Cancel' (tap)='cancel()' height="60" width="120"></Button>
-    </FlexBoxLayout>
-    <FlexBoxLayout justifyContent="flex-end" row='1' col='1'>
-        <Button class='glass btnOK' text='Done' (tap)='done()' height="60" width="120"></Button>
-    </FlexBoxLayout>
-
+    <GridLayout row='1' col='0' colSpan="2" [visibility]="showingNumericKeyPad ? 'collapse' : 'visible'">
+        <Button class='glass btnCancel' text='Cancel' (tap)='cancel()' height="60" width="120" horizontalAlignment='left' ></Button>
+        <Button class='glass btnOK' text='Done' (tap)='done()' height="60" width="120" horizontalAlignment='right'></Button>
+    </GridLayout>    
 </GridLayout>

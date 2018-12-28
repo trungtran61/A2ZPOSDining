@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, ElementRef, AfterViewInit } from "@angular/core";
 import { ModalDialogParams, ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
-import * as dialogs from "tns-core-modules/ui/dialogs";
-import { TextField } from "tns-core-modules/ui/text-field";
 
 import { Memo } from "~/app/models/products";
 import { Page } from "tns-core-modules/ui/page/page";
@@ -15,10 +13,16 @@ import { Page } from "tns-core-modules/ui/page/page";
 export class MemoComponent implements OnInit, AfterViewInit {
     @ViewChild("vcMemo") vcMemo: ElementRef;
     memo: string = '';
-    price: number = 0;
+    price: string = '0';
+    priceWithDecimal: string = '0.00';
     pageTitle: string = 'Enter Memo';
     memoClass: string = 'textEntryActive';
     priceClass: string = 'textEntry';
+    showingNumericKeyPad: boolean = false; 
+
+    showNumericKeyPad() {
+        this.showingNumericKeyPad = true;
+    }
 
     cancel() {
         this.params.closeCallback(null);
@@ -29,7 +33,7 @@ export class MemoComponent implements OnInit, AfterViewInit {
         if (this.memo != '') {
             let openProductItem: Memo = {
                 Memo: this.memo,
-                Price: this.price
+                Price: Number(this.price) / 100
             }
             this.params.closeCallback(openProductItem);
         }
@@ -38,7 +42,7 @@ export class MemoComponent implements OnInit, AfterViewInit {
         }
     }
 
-    activateMemo() {  
+    activateMemo() {
         this.memoClass = 'textEntryActive';
         this.priceClass = 'textEntry';
     }
@@ -47,10 +51,15 @@ export class MemoComponent implements OnInit, AfterViewInit {
         this.memoClass = 'textEntry';
         this.priceClass = 'textEntryActive';
     }
+ 
+    addDigit(digit: string) {
+        if (this.price.length > 0)
+            this.price += digit;
+        else if (digit != '0' && digit != '00')
+            this.price += digit;
 
-    addDecimal(newPrice: any)
-    {    
-        this.price = newPrice.value * .01; 
+        let price: number = Number(this.price) / 100;
+        this.priceWithDecimal = price.toFixed(2);
     }
 
     constructor(private params: ModalDialogParams,
@@ -60,7 +69,7 @@ export class MemoComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-
+        this.page.actionBarHidden = true;
     }
 
     ngAfterViewInit() {
