@@ -20,9 +20,9 @@ export class OpenProductComponent implements OnInit {
     selectedGroup: ProductGroup = null;
     showEditPanel: boolean = false; 
     productName: string = '';
-    quantity: string = '';
-    price: string = '';
-    priceWithDecimal: string = '';
+    quantity: string = '0';
+    price: string = '0';
+    priceWithDecimal: string = '0.00';
     showingNumericKeyPad: boolean = false;
     pageTitle: string = 'Choose a Product Group';
     activeTextField: string = '';    
@@ -41,13 +41,14 @@ export class OpenProductComponent implements OnInit {
     done() { 
         if (this.selectedGroup != null && this.productName != null &&
             this.quantity != null && this.price != null)
-            if (this.productName != '' &&
-                Number(this.quantity) > 0 && Number(this.price) > 0) {
+            if (this.productName != '' ) {
                 let openProductItem: OpenProductItem = {
                     ProductGroupId: this.selectedGroup.PriKey,
                     ProductName: this.productName,
                     Quantity: Number(this.quantity),
-                    UnitPrice:  Number(this.price) / 100
+                    UnitPrice:  Number(this.price) / 100,  
+                    Taxable: this.selectedGroup.Taxable ? 0 : 1,
+                    TaxRate: this.selectedGroup.TaxRate                  
                 }
                 this.params.closeCallback(openProductItem); 
             }
@@ -82,10 +83,13 @@ export class OpenProductComponent implements OnInit {
     {
         if (this.activeTextField == 'quantity') 
         {
-        if (this.quantity.length > 0)
-            this.quantity +=  digit;
-        else if (digit != '0' && digit != '00')    
-            this.quantity +=  digit;                            
+            if (this.quantity == '0')            
+                {
+                if (digit != '0' && digit != '00') 
+                    this.quantity = digit;            
+                }
+            else 
+                this.quantity +=  digit;        
         }
         else
         {        

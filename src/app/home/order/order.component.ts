@@ -218,6 +218,8 @@ export class OrderComponent implements OnInit, OnDestroy {
     showProductOptions() {
         this.showSubCategories = false;
         this.isShowingMainOptions = !this.isShowingMainOptions;
+        this.showOptions = true;
+
         let that = this;
 
         if (this.isShowingMainOptions) {
@@ -475,6 +477,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     setActiveSubCategoryClass(currentSubCategory: MenuSubCategory) {
         //this.subCategoryClasses = [];
         let that = this;
+        this.showSubCategories = true;
 
         this.pageSubCategories.forEach(function (menuSubCategory: MenuSubCategory) {
             menuSubCategory.Class = 'btnSubCategory'
@@ -714,8 +717,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             (openProductItem: OpenProductItem) => {
                 this.showExtraFunctions = false;
                 if (openProductItem != null) {
-                    that.addItemToOrder(1, openProductItem.ProductName,
-                        openProductItem.UnitPrice, ItemType.Product, 0, null)
+                    that.addOpenProductToOrder(openProductItem);
                 }
             });
     }
@@ -1160,12 +1162,6 @@ export class OrderComponent implements OnInit, OnDestroy {
             case 'TO GO':
                 this.currentModifierType = fixedOption.ModifierType;
                 this.addOption(false, fixedOption.Name, null, false);
-                /*
-                                this.addItemToOrder
-                                    (
-                                        0, fixedOption.Name, 0, ItemType.Option, this.currentProduct.ProductCode, this.getNextIndexDataSub(this.currentOrderItem.IndexData)
-                                    );
-                */
                 break;
 
             default:
@@ -1197,35 +1193,12 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     optionSelected(option: MenuOption) {
-        /*
-                let name: string = '';
-                let price: number = 0;
-        
-                if (this.userModifierActive) {
-                    name = this.currentUserModifier.ItemName + ' ' + option.Name;
-                    price = this.currentUserModifier.StampPrice ? this.currentUserModifier.Price : option.Charge;
-                }
-                else {
-                    name = this.currentFixedOption == null ? option.Name : this.currentFixedOption.Name + ' ' + option.Name;
-                    price = option.Name == 'EXTRA' || option.Name == 'ADD' ? option.Charge : 0;
-                }
-        
-                let modifier: Modifier = {
-                    Name: name,
-                    Price: price,
-                    DisplayPrice: price > 0 ? price : null
-                };
-        */
+       
         if (this.currentModifierType == null)
             this.currentModifierType = ModifierType.NONE;
 
         this.currentMenuOption = option;
-        this.addOption(false, option.Name, null, false);
-        /*
-        this.addItemToOrder
-            (0, modifier.Name, modifier.Price, ItemType.Option, this.currentProduct.ProductCode,
-                this.getNextIndexDataSub(this.currentOrderItem.IndexData));
-        */
+        this.addOption(false, option.Name, null, false);       
     }
 
     getNextOptionFilterNumber(): number {
@@ -1313,17 +1286,10 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
     }
 
-    addItemToOrder(qty: number, name: string, unitPrice: number,
-        itemType: ItemType, productCode: number, indexDataSub: number) {
+    addOpenProductToOrder(product: OpenProductItem) {
         let indexData: number = 0;
-        let lastIndex: number = 0;
-        let marginLeft: number = this.getLeftMargin(itemType);
-
-        // add modifier/option
-        let indentation: string = '   ';
-        if (itemType == ItemType.SubOption)
-            indentation = '      ';
-
+        let lastIndex: number = 0;        
+        
         if (this.orderItems.length > 0)    
         {
         indexData = this.currentOrderItem.IndexData;
@@ -1334,16 +1300,18 @@ export class OrderComponent implements OnInit, OnDestroy {
         let orderItem: OrderDetail = this.getInitializedOrderItem(null);
 
         orderItem.SeatNumber = this.currentSeatNumber.toString();
-        orderItem.UnitPrice = unitPrice;
-        orderItem.PrintName = indentation + name;
-        orderItem.ProductName = indentation + name;
-        orderItem.ItemType = itemType;
+        orderItem.UnitPrice = product.UnitPrice;
+        orderItem.PrintName = product.ProductName;
+        orderItem.ProductName = product.ProductName;
+        orderItem.ItemType = ItemType.Product;
         orderItem.IndexData = indexData;
-        orderItem.ProductCode = productCode;
-        orderItem.MarginLeft = marginLeft;
-        orderItem.IndexDataSub = indexDataSub;
-        orderItem.Quantity = qty;
-        orderItem.ExtPrice = qty * unitPrice;
+        orderItem.ProductCode = 0;
+        orderItem.MarginLeft = 0;
+        orderItem.IndexDataSub = 0;
+        orderItem.Quantity = product.Quantity;
+        orderItem.ExtPrice = product.Quantity * product.UnitPrice;
+        orderItem.TaxRate = product.TaxRate;
+        orderItem.Taxable = product.Taxable;
 
         // add item to the order
         this.orderItems.splice(lastIndex + 1, 0, orderItem);
@@ -1365,18 +1333,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.currentModifierType = ModifierType.USERDEFINED;
         this.currentUserModifier = userModifier;
 
-        if (userModifier.ButtonFunction == 1) {
-            /*
-            this.addItemToOrder
-                (
-                    this.currentOrderItem.Quantity,
-                    userModifier.ItemName,
-                    userModifier.Price,
-                    ItemType.Option,
-                    this.currentProduct.ProductCode,
-                    null
-                );
-            */
+        if (userModifier.ButtonFunction == 1) {            
             this.addOption(false, userModifier.ItemName, null, false);
             return;
         }
@@ -1576,8 +1533,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     this.orderItems = this.orderItems.filter(obj => obj.IndexDataSub !== orderItem.IndexDataSub);
                 }
 
-            if (orderItem.ExtPrice > 0)
-                this.totalPrice();
+            this.totalPrice();
         }
     }
 
@@ -1586,10 +1542,13 @@ export class OrderComponent implements OnInit, OnDestroy {
         let nextIndexData: number = this.getNextIndexData();
         let that = this;
 
-        itemsToCopy.forEach(function (orderItem: OrderDetail) {
-            //that.addItemToOrder(orderItem.ItemType == ItemType.Product ? 1 : null,
-            //   orderItem.ProductName, orderItem.UnitPrice, orderItem.ItemType, orderItem.ProductCode)
-
+        itemsToCopy.forEach(function (orderItem: OrderDetail) {            
+            let copiedItem = Object.assign({},orderItem);
+            copiedItem.IndexData = nextIndexData;
+            copiedItem.Quantity = orderItem.ItemType == ItemType.Product ? 1 : null;
+            copiedItem.ExtPrice = copiedItem.Quantity * copiedItem.UnitPrice;
+            that.orderItems.push(copiedItem);
+            /*
             that.orderItems.push(
                 {
                     Quantity: orderItem.ItemType == ItemType.Product ? 1 : null,
@@ -1604,8 +1563,10 @@ export class OrderComponent implements OnInit, OnDestroy {
                     MarginLeft: that.getLeftMargin(orderItem.ItemType)
                 }
             );
-
+           */     
         });
+        this.setLastItemOrdered();
+        this.totalPrice();
     }
 
     totalPrice() {
@@ -1668,7 +1629,6 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         this.modalService.showModal(MemoComponent, modalOptions).then(
             (memo: Memo) => {
-                //this.addItemToOrder(0, memo.Memo, memo.Price, ItemType.Option, this.currentProduct.ProductCode, null);
                 this.currentModifierType = ModifierType.NONE;
                 this.addOption(true, memo.Memo, memo.Price, false);
             });

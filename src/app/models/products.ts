@@ -278,6 +278,8 @@ export interface OpenProductItem {
     ProductName: string;
     Quantity: number;
     UnitPrice: number;
+    TaxRate?: number;
+    Taxable?: number;
 }
 
 export interface Memo {
