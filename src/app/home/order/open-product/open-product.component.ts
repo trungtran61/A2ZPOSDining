@@ -14,11 +14,9 @@ import { SQLiteService } from "~/app/services/sqlite.service";
 })
 export class OpenProductComponent implements OnInit {
     @ViewChild("vcProductName") vcProductName: ElementRef;
-    @ViewChild("vcPrice") vcPrice: ElementRef;
+    //@ViewChild("vcPrice") vcPrice: ElementRef;
 
     productGroups: ProductGroup[] = [];
-    productGroupCols: number[] = [];
-    productGroupRows: number[] = [];
     selectedGroup: ProductGroup = null;
     showEditPanel: boolean = false;
     productName: string = '';
@@ -106,7 +104,7 @@ export class OpenProductComponent implements OnInit {
      
     ngOnInit() {  
         let that = this;
-        this.vcPrice.nativeElement.dismissSoftInput();
+        //this.vcPrice.nativeElement.dismissSoftInput();
 
         this.DBService.getLocalProductGroups().then((productGroups) => {
             if (productGroups.length == 0) {
@@ -116,8 +114,8 @@ export class OpenProductComponent implements OnInit {
                 this.productGroups = productGroups;
                 let i: number = 1;
                 this.productGroups.forEach(function (productGroup: ProductGroup) {
-                    that.productGroupCols.push((i - 1) % 3);
-                    that.productGroupRows.push(Math.floor((i - 1) / 3) + 1);
+                    productGroup.Col = (i - 1) % 3;
+                    productGroup.Row = Math.floor((i - 1) / 3) + 1;
                     i++;
                 });
             }

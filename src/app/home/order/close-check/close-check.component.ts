@@ -7,7 +7,7 @@ import { TableDetail } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular";
 import { Page } from "tns-core-modules/ui/page/page";
-import { Order, OrderDetail, OrderResponse } from "~/app/models/orders";
+import { OrderHeader, OrderDetail, OrderResponse } from "~/app/models/orders";
 import { APIService } from "~/app/services/api.service";
 import { UtilityService } from "~/app/services/utility.service";
 import { ActivatedRoute } from "@angular/router";
@@ -20,7 +20,7 @@ import { ReasonComponent } from "./../reason.component";
     styleUrls: ['./close-check.component.css']
 })
 export class CloseCheckComponent implements OnInit {
-    order: Order = null;
+    order: OrderHeader = null;
     orderResponse: OrderResponse = null;
     orderItems: OrderDetail[] = [];
 
@@ -75,7 +75,7 @@ export class CloseCheckComponent implements OnInit {
     }
 
     getFullOrder(orderFilter: number) {
-        this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, OrderItems: [], Gratuity: 0, Discount: 0 };
+        this.order = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
             this.orderResponse = orderResponse;
             this.orderItems = orderResponse.OrderDetail;
@@ -117,7 +117,7 @@ export class CloseCheckComponent implements OnInit {
                 if (this.orderItems[i].ExtPrice != null)
                     this.subTotal += this.orderItems[i].ExtPrice;
             }
-            this.tax = this.utilSvc.getTaxTotal(this.order);
+            this.tax = this.utilSvc.getTaxTotal(this.order, this.orderItems);
             this.checkTotal = this.subTotal + this.tax;
 
             if (this.guests >= this.MAX_GUESTS) {

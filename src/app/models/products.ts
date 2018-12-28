@@ -269,6 +269,8 @@ export interface ProductGroup {
     ProductType: number;
     TaxRate: number;
     Taxable: boolean;
+    Row?: number;
+    Col?: number;
 }
 
 export interface OpenProductItem {
