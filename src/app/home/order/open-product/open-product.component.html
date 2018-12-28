@@ -1,37 +1,56 @@
-<GridLayout columns="*,*,*" rows="50,*,*,*,50" class="p-30 page">
+<GridLayout columns="*,*,*" rows="50 * 60" class="p-10 page">
     <Label class='pageHeader' [text]="pageTitle" row='0' col='0' colSpan="3"></Label>
-    <GridLayout [visibility]="showEditPanel ? 'collapse' : 'visible'"
-         col='0' row='1' colSpan="3" columns="*,*,*" rows="*,*,*,*">
+    <GridLayout [visibility]="showEditPanel ? 'collapse' : 'visible'" col='0' row='1' colSpan="3" columns="*,*,*" rows="*,*,*,*">
         <Button class="glass" [text]="item.Description" *ngFor="let item of productGroups let i=index" [col]='productGroupCols[i]'
             [row]='productGroupRows[i]' (tap)="groupSelected(item)"></Button>
     </GridLayout>
-    <FlexBoxLayout row='1' col='0' colSpan="3" 
-        [visibility]="showEditPanel ? 'visible' : 'collapse'" style='margin-top:20;height:100'>
-        <StackLayout>
-            <TextField hint="Enter Product Name" [text]='productName' [(ngModel)]='productName' 
-                (returnPress)="done()" required #vcProductName
-                #productNameModel='ngModel' autocorrect="true" style='border-radius: 6; border-color: gray; border-width: 1; background-color: white; font-size: 20; font-weight: bold; padding-left: 5; width: 400; margin-right: 20'>
+    <GridLayout row='1' col='0' colSpan="3" rows='80 *' columns='600 100 100' [visibility]="showEditPanel ? 'visible' : 'collapse'">        
+        <StackLayout row='0' col='0'>
+            <Label Text='Product Name' class='whiteLabel'></Label>
+            <TextField hint="Product Name" [text]='productName' [(ngModel)]='productName' (returnPress)="done()"
+                required #vcProductName #productNameModel='ngModel' autocorrect="true" 
+                style='border-radius: 6; border-color: gray; border-width: 1; background-color: white; font-size: 20; font-weight: bold; padding-left: 5; width: 580;'>
             </TextField>
-            <Label class="validation" [visibility]="productNameModel.valid ? 'collapse' : 'visible'" text="Product Name is required"></Label>
+            <Label class="validation" [visibility]="productNameModel.valid ? 'collapse' : 'visible'" text="Required"></Label>
         </StackLayout>
-        <StackLayout>
-            <TextField hint="Enter Quantity" [text]='quantity' [(ngModel)]='quantity' required #qtyModel='ngModel'
-                autocorrect="false" class="a2zinput" keyboardType='number' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5; margin-right: 20'>
-            </TextField>
-            <Label class="validation" [visibility]="qtyModel.valid ? 'collapse' : 'visible'" text="Quantity is required"></Label>
+        <StackLayout row='0' col='1'>
+            <Label Text='Quantity' class='whiteLabel'></Label>
+            <Label [text]='quantity' (tap)='showNumericKeyPad("quantity")'                
+                style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5;width: 80;'>
+        </Label>
+            <Label class="validation" [visibility]="qtyModel.valid ? 'collapse' : 'visible'" text="Required"></Label>
         </StackLayout>
-        <StackLayout>
-            <TextField hint="Enter Price" [text]='price' [(ngModel)]='price' required #priceModel='ngModel' autocorrect="false"
-                class="a2zinput" keyboardType='number' style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5'>
-            </TextField>
-            <Label class="validation" [visibility]="priceModel.valid ? 'collapse' : 'visible'" text="Price is required"></Label>
+        <StackLayout row='0' col='2'>
+            <Label Text='Price' class='whiteLabel'></Label>
+            <Label [text]='priceWithDecimal' required 
+                (tap)='showNumericKeyPad("price")' 
+                style='border-radius:6;border-color: gray; border-width: 1;background-color: white; font-size: 20; font-weight: bold; padding-left: 5;width: 80;'>
+        </Label>
+            <Label class="validation" [visibility]="priceModel.valid ? 'collapse' : 'visible'" text="Required"></Label>
         </StackLayout>
-    </FlexBoxLayout>
-    <FlexBoxLayout row='4' col='0' colSpan="3">
+        <GridLayout rows="auto auto auto auto" columns="400 auto auto auto" row='1' col='0' colSpan="3" *ngIf='showingNumericKeyPad'>
+                <Button text="1" class="glass btnSquare" (tap)="addDigit('1')" row="0" col="1"></Button>
+                <Button text="2" class="glass btnSquare" (tap)="addDigit('2')" row="0" col="2"></Button>
+                <Button text="3" class="glass btnSquare" (tap)="addDigit('3')" row="0" col="3"></Button>
+                <Button text="4" class="glass btnSquare" (tap)="addDigit('4')" row="1" col="1"></Button>
+                <Button text="5" class="glass btnSquare" (tap)="addDigit('5')" row="1" col="2"></Button>
+                <Button text="6" class="glass btnSquare" (tap)="addDigit('6')" row="1" col="3"></Button>
+                <Button text="7" class="glass btnSquare" (tap)="addDigit('7')" row="2" col="1"></Button>
+                <Button text="8" class="glass btnSquare" (tap)="addDigit('8')" row="2" col="2"></Button>
+                <Button text="9" class="glass btnSquare" (tap)="addDigit('9')" row="2" col="3"></Button>
+                <Button text="Cancel" class="glass btnCancel" (tap)="cancelNumericInput()" row='3' col='0' horizontalAlignment='right' ></Button>
+                <Button text="0" class="glass btnSquare" (tap)="addDigit('0')" row="3" col="1"></Button>
+                <Button text="00" class="glass btnSquare" (tap)="addDigit('00')" row="3" col="2"></Button>
+                <Button text="Enter" class="glass btnOK" col="3" (tap)="acceptNumericInput()" row="3" col="3"></Button>
+        </GridLayout>        
+    </GridLayout>
+
+    <FlexBoxLayout row='2' col='0' colSpan="3" *ngIf='!showingNumericKeyPad'>
         <Button class='glass btnCancel' text='Cancel' (tap)='cancel()'></Button>
     </FlexBoxLayout>
-    <FlexBoxLayout row='4' col='1' colSpan="2" justifyContent="flex-end">
-        <Button class='glass btnOK' text='Done' 
-            (tap)='done()' style="position: relative; right:0; width: 100"></Button>
+
+    <FlexBoxLayout row='2' col='1' colSpan="2" justifyContent="flex-end" *ngIf='!showingNumericKeyPad'>
+        <Button class='glass btnOK' text='Done' (tap)='done()' style="position: relative; right:0; width: 100"></Button>
     </FlexBoxLayout>
+
 </GridLayout>

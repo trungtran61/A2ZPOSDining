@@ -751,7 +751,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         let context = { orderItem: orderItem };
 
         const modalOptions: ModalDialogOptions = {
-            viewContainerRef: this.viewContainerRef,
+            viewContainerRef: this.viewContainerRef, 
             fullscreen: false,
             context: context
         };
@@ -765,6 +765,14 @@ export class OrderComponent implements OnInit, OnDestroy {
                     case 'quantity':
                         orderProduct.Quantity = parseFloat(choice.SelectedNumber);
                         orderProduct.ExtPrice = orderProduct.UnitPrice * parseFloat(choice.SelectedNumber);
+                        this.orderItems.forEach( oi =>
+                            {
+                                if (oi.ItemType != ItemType.Product && oi.UnitPrice != null ? oi.UnitPrice : 0  > 0)
+                                {
+                                    oi.ExtPrice = oi.UnitPrice * orderProduct.Quantity;
+                                }
+                            }
+                        )
                         this.totalPrice();
                         break;
                     case 'seat':
@@ -1673,12 +1681,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     sendCheck() {
-        //var printController = UIPrintInteractionController;
-        //console.log(printController.printingAvailable);
-        //this.printReceipt();
-        //this.utilSvc.sendToPrinter('hello', {'username': 'trung'});
-        //this.printerSocket.send('hello');
-        //this.socketIO.emit("test", { test: "test" });
+        
     }
 
     printReceipt() {
@@ -1900,7 +1903,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         return checkMenuTimer;
     }
-
+   
     public ngOnDestroy() {
         const SocketIO = require("nativescript-socket.io")
     }
