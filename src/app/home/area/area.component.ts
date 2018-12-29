@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
-import { NavigationExtras} from "@angular/router";
+import { NavigationExtras } from "@angular/router";
 
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
@@ -36,12 +36,9 @@ export class AreaComponent implements OnInit {
     showStaff: boolean = false;
     showGuests: boolean = false;
     showAreas: boolean = false;
+    currentArea: Area;
 
     ngOnInit(): void {
-        this.getTablesInfo();
-    }
-
-    getTablesInfo() {
         this.DBService.getLocalAreas().then((data) => {
             if (data.length == 0) {
                 dialogs.alert("Areas not loaded").then(() => {
@@ -50,37 +47,44 @@ export class AreaComponent implements OnInit {
             }
             else {
                 this.areas = data;
-                this.areaStyle = "margin-left: 10px; background-image: url('" + this.httpProtocol + "://" + this.areas[0].ImageURL + "'); background-repeat: no-repeat";
-
-                this.apiSvc.getTablesDetails(this.areas[0].AreaID,
-                    this.DBService.loggedInUser.PriKey,
-                    this.DBService.loggedInUser.AccessType,
-                    this.DBService.systemSettings.ServerViewAll).subscribe(res => {
-                        this.tables = res;
-                        res.forEach(table => {
-                            let tableClass: string = 'tableOpen';
-                            if (table.Status.indexOf('Disabled') > -1) {
-                                tableClass = 'tableDisabled';
-                            }
-                            else
-                                if (table.Status.indexOf('Open') > -1) {
-                                    tableClass = 'tableOpen';
-                                }
-                                else
-                                    if (table.Status.indexOf('Occupied') > -1) {
-                                        tableClass = 'tableOccupied';
-                                    }
-
-                            table.Class = 'table ' + tableClass;
-                            //let style: string = "text-align: center; background-color: #" + (table.TableColor == '0' ? 'ffffff' :
-                            //       this.utilSvc.padLeft((table.TableColor).toString(16), '0', 6));
-                            //table.Style = style;
-                            table.Opacity = '1';
-                            table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);                            
-                        });
-                    });
+                this.currentArea = this.areas[0];
+                this.getTablesInfo(this.areas[0]);
             }
         });
+    } 
+
+    getTablesInfo(area: Area) {
+
+        this.areaStyle = "margin-left: 10px; background-image: url('" + this.httpProtocol + "://" + area.ImageURL + "'); background-repeat: no-repeat";
+
+        this.apiSvc.getTablesDetails(area.AreaID,
+            this.DBService.loggedInUser.PriKey,
+            this.DBService.loggedInUser.AccessType,
+            this.DBService.systemSettings.ServerViewAll).subscribe(res => {
+                this.tables = res;
+                res.forEach(table => {
+                    let tableClass: string = 'tableOpen';
+                    if (table.Status.indexOf('Disabled') > -1) {
+                        tableClass = 'tableDisabled';
+                    }
+                    else
+                        if (table.Status.indexOf('Open') > -1) {
+                            tableClass = 'tableOpen';
+                        }
+                        else
+                            if (table.Status.indexOf('Occupied') > -1) {
+                                tableClass = 'tableOccupied';
+                            }
+
+                    table.Class = 'table ' + tableClass;
+                    //let style: string = "text-align: center; background-color: #" + (table.TableColor == '0' ? 'ffffff' :
+                    //       this.utilSvc.padLeft((table.TableColor).toString(16), '0', 6));
+                    //table.Style = style;
+                    table.Opacity = '1';
+                    table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);
+                });
+            });
+
     }
 
     viewInfo(showStaff: boolean, showStatus: boolean, showGuests: boolean) {
@@ -115,11 +119,15 @@ export class AreaComponent implements OnInit {
         this.viewInfo(false, false, true);
     }
 
-    resetOccupiedTablesClass()
-    {
+    viewTables(area: Area) {
+        this.currentArea = area;
+        this.getTablesInfo(area);
+    }
+
+    resetOccupiedTablesClass() {
         this.tables.forEach(table => {
             let tableClass: string = 'tableOpen';
-            
+
             if (table.Status.indexOf('Disabled') > -1) {
                 tableClass = 'tableDisabled';
             }
@@ -132,7 +140,7 @@ export class AreaComponent implements OnInit {
                         tableClass = 'tableOccupied';
                     }
 
-            table.Class = 'table ' + tableClass;                      
+            table.Class = 'table ' + tableClass;
         });
     }
 
@@ -145,12 +153,12 @@ export class AreaComponent implements OnInit {
 
         // table is open, go get number of guests
         if (table.Status.indexOf('Open') > -1) {
-            localStorage.setItem('table', table.Name);           
+            localStorage.setItem('table', table.Name);
             this.router.navigate(['/home/tableguests/' + table.Name]);
         }
 
         localStorage.setItem('currentTable', JSON.stringify(table));
-        
+
         // table is active (occupied and enabled)
         if (table.Status.indexOf('Enabled') > -1) {
             // table actions menu is displayed and same table selected
@@ -184,7 +192,7 @@ export class AreaComponent implements OnInit {
     }
 
     startOver() {
-        this.getTablesInfo();
+        this.getTablesInfo(this.currentArea);
         this.showInfo = false;
         this.showStatus = false;
         this.showGuests = false;
@@ -200,7 +208,7 @@ export class AreaComponent implements OnInit {
     openTable() {
         let navigationExtras: NavigationExtras = {
             queryParams: {
-                "action": "openTable"                
+                "action": "openTable"
             }
         };
         this.router.navigate(["home/order"], navigationExtras);
@@ -209,7 +217,7 @@ export class AreaComponent implements OnInit {
     closeTable() {
         let navigationExtras: NavigationExtras = {
             queryParams: {
-                "action": "closeTable"                
+                "action": "closeTable"
             }
         };
         this.router.navigate(["home/closeCheck"], navigationExtras);
@@ -226,18 +234,16 @@ export class AreaComponent implements OnInit {
         }
     }
 
-    viewChecks(closed: boolean)
-    {
+    viewChecks(closed: boolean) {
         let navigationExtras: NavigationExtras = {
             queryParams: {
-                "closed": closed                
+                "closed": closed
             }
         };
         this.router.navigate(['/home/mychecks'], navigationExtras);
     }
-    
-    viewCheckDetail()
-    {
+
+    viewCheckDetail() {
 
     }
     /*
@@ -248,7 +254,7 @@ export class AreaComponent implements OnInit {
     */
     constructor(
         private router: RouterExtensions, private DBService: SQLiteService,
-        private page: Page, private utilSvc: UtilityService, private apiSvc: APIService        
+        private page: Page, private utilSvc: UtilityService, private apiSvc: APIService
     ) {
         page.actionBarHidden = true;
     }

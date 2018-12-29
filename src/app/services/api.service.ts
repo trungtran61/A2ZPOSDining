@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpEvent } from "@angular/common/http";
-import { Countdown, OrderResponse, OrderHeader } from "~/app/models/orders";
+import { Countdown, OrderResponse, OrderHeader, OrderUpdate } from "~/app/models/orders";
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { AccessType } from "../models/employees";
@@ -109,7 +109,7 @@ export class APIService {
             { headers: headers }).pipe(map(res => res));
     }
 
-    updateOrder(order): Observable<any>
+    updateOrder(order: OrderUpdate): Observable<any>
     {
         let options = this.createHttpOptions();
         return this.http.post<Order>(this.apiUrl + 'UpdateOrder',

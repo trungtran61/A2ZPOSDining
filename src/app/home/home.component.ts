@@ -14,6 +14,7 @@ import { UtilityService } from "../services/utility.service";
 import { APIService } from "../services/api.service";
 import { topmost } from "tns-core-modules/ui/frame";
 import { isIOS } from "tns-core-modules/platform";
+import * as utils from "utils/utils";
 
 var Sqlite = require("nativescript-sqlite");
 
@@ -59,6 +60,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
             }
             else {
                 this.DBService.systemSettings = systemSettings;
+                this.DBService.systemSettings.DeviceName = utils.ios.getter(UIDevice, UIDevice.currentDevice).name;
             }
         });
         //}

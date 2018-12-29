@@ -323,4 +323,5 @@ export interface SystemSettings {
     UseTaxRate2?:boolean;
     WasteTicket?:boolean;
     _2ColorPrinter?:boolean;
+    DeviceName?: string;
 }
