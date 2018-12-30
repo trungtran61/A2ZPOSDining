@@ -1660,9 +1660,14 @@ export class OrderComponent implements OnInit, OnDestroy {
             });
     }
 
+    formatUTC(d: Date)
+    {
+        return Date.UTC( d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(), 0 );
+    }
+
     sendCheck() {
 
-        let currentDate: Date = new Date();
+        let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
 
         let orderHeader: OrderHeader = {
             OrderFilter: this.currentOrderFilter,
@@ -1675,7 +1680,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             EmployeeID: this.employeeID,
             TotalCash: 0,
             TotalCheck: 0,
-            CurrentDate: currentDate,
+            CurrentDate: null,
             CurrentTime: currentDate,
             VoidedBy: 0,
             NumberGuests: this.guests,
@@ -1718,10 +1723,21 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         let orderUpdate: OrderUpdate = {
             order: orderHeader,
-            orderdetails: this.orderItems
+            orderdetails: this.orderItems,
+            payments : []
         };
-
-        this.apiSvc.updateOrder(orderUpdate);
+   
+        //console.log(JSON.stringify(orderUpdate));
+        this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
+            console.log(results);
+        },
+            err => {               
+                dialogs.alert({
+                    title: "Error",
+                    message: err.message,
+                    okButtonText: "Close"
+                })
+        });
     }
 
     printReceipt() {

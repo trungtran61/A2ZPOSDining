@@ -44,7 +44,7 @@ export class APIService {
     }
 
     public createHttpOptions() {
-        return ({ headers : this.createHttpOptions()});
+        return ({ headers : this.createRequestHeader()});
     }
 
     getOrder(orderFilter: number, ph1: boolean, ph2: boolean): OrderHeader {
@@ -112,8 +112,11 @@ export class APIService {
     updateOrder(order: OrderUpdate): Observable<any>
     {
         let options = this.createHttpOptions();
-        return this.http.post<Order>(this.apiUrl + 'UpdateOrder',
-            order, options); //.pipe(catchError(this.handleError('updateOrder', order)));
+
+        console.log(JSON.stringify(order.order));
+
+        return this.http.post<OrderUpdate>(this.apiUrl + 'UpdateOrder',
+            JSON.stringify(order), options); //.pipe(catchError(this.handleError('updateOrder', order)));
     }
 
     private handleError(apiCall: string, error: HttpErrorResponse) {

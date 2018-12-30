@@ -75,7 +75,7 @@ export class UtilityService {
         let taxTotal: number = 0.00;
         if (order.TaxExempt || orderItems.length == 0) return taxTotal;
 
-        let orderDetails: OrderDetail[] = orderItems.filter(od => od.Tag == null);
+        let orderDetails: OrderDetail[] = orderItems.filter(od => od.tag == null);
         let discount: number = order.Discount;
         let itemTotal: number = orderDetails
             .map(item => !item.Refund && !item.Voided && !item.Comped && item.ExtPrice ? item.ExtPrice : 0)

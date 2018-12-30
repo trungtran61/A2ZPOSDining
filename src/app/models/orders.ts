@@ -89,6 +89,7 @@ export interface myOption{
 export interface OrderUpdate {
     order?: OrderHeader;
     orderdetails?:  OrderDetail[];
+    payments?: any[]
 }
 
 export interface FixedOption {
@@ -116,14 +117,14 @@ export interface OrderHeader {
     TotalCheck?: number;
     tag?: any;
     Tendered?: any;
-    CurrentDate?: Date;
-    CurrentTime?: Date;
+    CurrentDate?: string;
+    CurrentTime?: string;
     Void?: any;
     VoidedBy?: number;
     CashedOut?: any;
     NumberGuests?: number;
     Tax?: number;
-    TimeOrder?: Date;
+    TimeOrder?: string;
     TimePrint?: any;
     TimeSettle?: any;
     Area?: number;
@@ -186,7 +187,7 @@ export interface OrderHeader {
     ClosedRecorded?: boolean;
     VoidRecorded?: boolean;
     ClientName?: string;
-    OrderCreationTime?: Date;
+    OrderCreationTime?: string;
     TaxExempt?: boolean;
     OLOOrderID?: number;
     OLOMessageSent?: boolean;
@@ -208,7 +209,7 @@ export interface OrderDetail {
     ExtPrice?:number;
     PrintCode?:string;
     Printed?:string;
-    Tag?:any;
+    tag?:any;
     Voided?:any;
     Taxable?:number;
     CategoryCode?:number;
