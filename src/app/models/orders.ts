@@ -243,7 +243,7 @@ export interface OrderDetail {
     HappyHour?:boolean;
     ItemType?: ItemType;
     PriceLevel?:number;
-    OrderTime?:Date;
+    OrderTime?: string;
     ClientName?:string;
     ExcludeFromInventory?:boolean;
     ProductType?:number;

@@ -653,6 +653,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     addProductToOrder(menuProduct: MenuProduct) {
         //let marginLeft: number = this.getLeftMargin(ItemType.Product);
+        let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
 
         this.DBService.getLocalProduct(menuProduct.ProductID).then(product => {
             let orderItem: OrderDetail = Object.assign({}, product);
@@ -669,6 +670,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             orderItem.PriceLevel = this.priceLevel;
             orderItem.ItemType = ItemType.Product;
             orderItem.SeatNumber = this.currentSeatNumber.toString();
+            orderItem.CouponCode = 0;
+            orderItem.OrderTime = currentDate;
             /*
             let orderItem: OrderDetail = {              
                 OrderTime: new Date(),            
@@ -819,6 +822,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         let modifierIgnoreQuantity: boolean = false;
         let strOption = '';
         let textPosition: number = 0;
+        let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
 
         if (this.currentModifierType == ModifierType.USERDEFINED && this.currentUserModifier.ButtonFunction == 1)
             customStamp = true;
@@ -863,7 +867,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
 
         orderDetail.IndexData = this.currentOrderItem.IndexData;
-        orderDetail.OrderTime = new Date();
+        orderDetail.OrderTime = currentDate;
         orderDetail.IndexDataOption = isSubOption ? 0 : -1
         orderDetail.Quantity = null
         orderDetail.UnitPrice = null
@@ -966,8 +970,16 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
         }
 
+        /* handle user modifiers */
+        if (amount > 0) {
+            orderDetail.UnitPrice = amount;
+            orderDetail.ExtPrice = amount * qty;
+        }
+
         this.orderItems.push(orderDetail);
         this.sortOrderItems();
+
+        this.totalPrice();
         this.processFilterNumber();
     }
 
@@ -1204,7 +1216,17 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.currentModifierType = ModifierType.NONE;
 
         this.currentMenuOption = option;
-        this.addOption(false, option.Name, null, false);
+        let amount: number = 0;
+
+        if (this.userModifierActive)
+        {
+            if (this.currentUserModifier.StampPrice)
+            {
+                amount = this.currentUserModifier.Price;
+            }
+        }
+
+        this.addOption(false, option.Name, amount, false);
     }
 
     getNextOptionFilterNumber(): number {
@@ -1341,10 +1363,10 @@ export class OrderComponent implements OnInit, OnDestroy {
         if (userModifier.ButtonFunction == 1) {
             this.addOption(false, userModifier.ItemName, null, false);
             return;
-        }
+        }    
 
         userModifier.Class = 'glass btnOptionActive';
-        this.userModifierActive = true;
+        this.userModifierActive = true;        
     }
     /*
         refreshList() {
@@ -1680,7 +1702,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             EmployeeID: this.employeeID,
             TotalCash: 0,
             TotalCheck: 0,
-            CurrentDate: null,
+            CurrentDate: currentDate,
             CurrentTime: currentDate,
             VoidedBy: 0,
             NumberGuests: this.guests,
