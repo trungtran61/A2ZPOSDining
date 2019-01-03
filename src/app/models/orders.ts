@@ -88,7 +88,7 @@ export interface myOption{
 
 export interface OrderUpdate {
     order?: OrderHeader;
-    orderdetails?:  OrderDetail[];
+    orderDetails?:  OrderDetail[];
     payments?: any[]
 }
 

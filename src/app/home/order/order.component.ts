@@ -23,6 +23,7 @@ import { ModifyOrderItemComponent } from "./modify-order-item.component";
 import { ActivatedRoute } from "@angular/router";
 import { ReasonComponent } from "./reason.component";
 import { SearchComponent } from "./search.component";
+import { NullAstVisitor } from "@angular/compiler";
 
 @Component({
     selector: "order",
@@ -161,7 +162,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     showOptionsButton: boolean = false;
 
-    currentOrderFilter: number = 0;
+    currentOrderFilter: number = null;
     employeeID: number = 0;
     area: number = 0;
 
@@ -653,14 +654,16 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     addProductToOrder(menuProduct: MenuProduct) {
         //let marginLeft: number = this.getLeftMargin(ItemType.Product);
-        let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
+        //let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
+        let currentDate: string = "\/Date(" + new Date().toISOString() + ")\/";
 
         this.DBService.getLocalProduct(menuProduct.ProductID).then(product => {
             let orderItem: OrderDetail = Object.assign({}, product);
             orderItem = this.getInitializedOrderItem(orderItem);
             orderItem.IndexData = this.getNextIndexData();
             orderItem.FilterNumber = this.getNextFilterNumber();
-            orderItem.OrderFilter = 0;
+            if (this.currentOrderFilter != null)
+                orderItem.OrderFilter = this.currentOrderFilter;
             orderItem.Quantity = this.qtyEntered;
             orderItem.ExtPrice = this.qtyEntered * product.UnitPrice;
             orderItem.EmployeeID = this.DBService.loggedInUser.PriKey;
@@ -822,7 +825,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         let modifierIgnoreQuantity: boolean = false;
         let strOption = '';
         let textPosition: number = 0;
-        let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
+        //let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
+        let currentDate: string = "\/Date(" + new Date().toISOString() + ")\/";
 
         if (this.currentModifierType == ModifierType.USERDEFINED && this.currentUserModifier.ButtonFunction == 1)
             customStamp = true;
@@ -976,6 +980,9 @@ export class OrderComponent implements OnInit, OnDestroy {
             orderDetail.ExtPrice = amount * qty;
         }
 
+        if (this.currentOrderFilter != null)
+            orderDetail.OrderFilter = this.currentOrderFilter;
+            
         this.orderItems.push(orderDetail);
         this.sortOrderItems();
 
@@ -1689,10 +1696,11 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     sendCheck() {
 
-        let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
+        //let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
+        let currentDate: string = "\/Date(" + new Date().toISOString() + ")\/";
 
         let orderHeader: OrderHeader = {
-            OrderFilter: this.currentOrderFilter,
+            OrderFilter: this.currentOrderFilter == null ? 0 : this.currentOrderFilter,
             Name: this.table,
             OrderID: 0,
             TableNumber: this.table,
@@ -1745,7 +1753,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         let orderUpdate: OrderUpdate = {
             order: orderHeader,
-            orderdetails: this.orderItems,
+            orderDetails: this.orderItems,
             payments : []
         };
    
