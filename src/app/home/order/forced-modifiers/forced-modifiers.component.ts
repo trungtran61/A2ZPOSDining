@@ -179,10 +179,11 @@ export class ForcedModifiersComponent implements OnInit {
         // find current choice and set to new choice
         let that = this;
         let qty: number = this.orderProduct.Quantity;
+        let currentDate: string = "\/Date(" + new Date().toISOString() + ")\/";
 
         let orderItem: OrderDetail = {
             PriKey: 0,
-            OrderTime: new Date(),
+            OrderTime: currentDate,
             IndexDataOption: choice.Key,
             Quantity: null,
             IndexDataSub : choice.Layer,

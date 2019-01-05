@@ -207,6 +207,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
                     if (action == 'openTable') {
                         let table: TableDetail = JSON.parse(localStorage.getItem('currentTable'));
+                        this.currentOrderFilter = table.OrderFilter;
                         this.getFullOrder(table.OrderFilter);
                         this.isExistingOrder = true;
                         //this.textColorClass = 'disabledTextColor';
@@ -1758,6 +1759,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         };
    
         //console.log(JSON.stringify(orderUpdate));
+        this.orderItems.forEach(oi => oi.Printed = 'P' )
+
         this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
             console.log(results);
         },
