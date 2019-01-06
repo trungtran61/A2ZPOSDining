@@ -1762,7 +1762,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.orderItems.forEach(oi => oi.Printed = 'P' )
 
         this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
-            console.log(results);
+            this.router.navigate(['/home/area/']); 
         },
             err => {               
                 dialogs.alert({

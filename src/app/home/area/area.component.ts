@@ -76,10 +76,7 @@ export class AreaComponent implements OnInit {
                                 tableClass = 'tableOccupied';
                             }
 
-                    table.Class = 'table ' + tableClass;
-                    //let style: string = "text-align: center; background-color: #" + (table.TableColor == '0' ? 'ffffff' :
-                    //       this.utilSvc.padLeft((table.TableColor).toString(16), '0', 6));
-                    //table.Style = style;
+                    table.Class = 'table ' + tableClass;                                        
                     table.Opacity = '1';
                     table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);
                 });

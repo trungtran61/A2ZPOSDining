@@ -1,5 +1,10 @@
 import { ItemType } from "./orders";
 
+export enum TableType {    
+    Round = 1,
+    Rectangle = 2    
+}
+
 export interface MenuCategory {
     CategoryID: number;
     Name: string;
@@ -27,7 +32,7 @@ export interface MenuSubCategory {
     ButtonForeColorHex: string;
     Class?: string;
     Row?: number;
-    Col?: number;
+    Col?: number;    
 }
 
 export interface MenuProduct {
@@ -120,7 +125,7 @@ export interface Table {
     Width: number;
     PosX: number;
     PosY: number;
-    TableType?: number;
+    TableType?: TableType;    
 }
 
 export interface Check {
@@ -175,6 +180,7 @@ export interface TableDetail {
     Class?: string;
     ElapsedTime?: string;
     Opacity?: string;
+    Style?: string;
 }
 
 export interface Option {
