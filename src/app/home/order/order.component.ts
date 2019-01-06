@@ -53,6 +53,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     totalProductPages: number = 0;
     productCurrentPage: number = 1;
     productPageSize: number = 24;
+    newItemsCount: number = 0;
 
     productOptions: MenuOption[];
     allProductOptions: MenuOption[];
@@ -338,6 +339,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
             this.orderResponse = orderResponse;
             this.orderItems = orderResponse.OrderDetail;
+            this.orderItems = this.orderItems.filter(oi => oi.Voided == null);
             this.ticketNumber = this.orderResponse.Order.OrderID;
             this.checkNumber = this.orderResponse.Order.CheckNumber;
             this.table = this.orderResponse.Order.TableNumber;
@@ -717,6 +719,8 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.totalPrice();
             }
             this.previousProduct = this.currentProduct;
+
+            this.newItemsCount = this.orderItems.length;
         });
     }
 
@@ -795,7 +799,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         orderProduct.SeatNumber = choice.SelectedNumber;
                         break;
                     case 'delete':
-                        if (orderItem.ItemType != ItemType.ForcedChoice)
+                        if (orderItem.ItemType != ItemType.ForcedChoice || orderItem.Printed == 'P')
                             this.deleteOrderItem(orderItem);
                         break;
                     case 'repeat':
@@ -983,7 +987,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         if (this.currentOrderFilter != null)
             orderDetail.OrderFilter = this.currentOrderFilter;
-            
+
         this.orderItems.push(orderDetail);
         this.sortOrderItems();
 
@@ -1226,10 +1230,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.currentMenuOption = option;
         let amount: number = 0;
 
-        if (this.userModifierActive)
-        {
-            if (this.currentUserModifier.StampPrice)
-            {
+        if (this.userModifierActive) {
+            if (this.currentUserModifier.StampPrice) {
                 amount = this.currentUserModifier.Price;
             }
         }
@@ -1371,10 +1373,10 @@ export class OrderComponent implements OnInit, OnDestroy {
         if (userModifier.ButtonFunction == 1) {
             this.addOption(false, userModifier.ItemName, null, false);
             return;
-        }    
+        }
 
         userModifier.Class = 'glass btnOptionActive';
-        this.userModifierActive = true;        
+        this.userModifierActive = true;
     }
     /*
         refreshList() {
@@ -1553,7 +1555,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     deleteOrderItem(orderItem: OrderDetail) {
-        if (orderItem.OrderFilter) {
+        if (orderItem.OrderFilter != null) {
             this.showReasonDialog(orderItem);
         }
         else {
@@ -1569,6 +1571,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 }
 
             this.totalPrice();
+            this.newItemsCount = this.orderItems.length;
         }
     }
 
@@ -1654,9 +1657,22 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         this.modalService.showModal(ReasonComponent, modalOptions).then(
             (reason: string) => {
-                // delete product from order if reason given          
-                if (reason != null) {
-                    this.orderItems = this.orderItems.filter(obj => obj.IndexData !== orderItem.IndexData);
+                // void product if reason given          
+                if (reason != null) 
+                {                    
+                    if (orderItem != null)
+                    {                       
+                        this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData).forEach(oi =>
+                        {
+                           oi.Voided = true;     
+                        });
+
+                        this.orderItems = this.orderItems.filter(oi => oi.Voided == null);
+                    }
+                    else    //void the whole order
+                    {   
+                        this.orderHeader.Void = true;
+                    }
                 }
             });
     }
@@ -1690,87 +1706,103 @@ export class OrderComponent implements OnInit, OnDestroy {
             });
     }
 
-    formatUTC(d: Date)
-    {
-        return Date.UTC( d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(), 0 );
+    formatUTC(d: Date) {
+        return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(), 0);
     }
 
-    sendCheck() {
-
-        //let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
-        let currentDate: string = "\/Date(" + new Date().toISOString() + ")\/";
-
-        let orderHeader: OrderHeader = {
-            OrderFilter: this.currentOrderFilter == null ? 0 : this.currentOrderFilter,
-            Name: this.table,
-            OrderID: 0,
-            TableNumber: this.table,
-            CheckNumber: 1,
-            Total: this.checkTotal,
-            Discount: 0,
-            EmployeeID: this.employeeID,
-            TotalCash: 0,
-            TotalCheck: 0,
-            CurrentDate: currentDate,
-            CurrentTime: currentDate,
-            VoidedBy: 0,
-            NumberGuests: this.guests,
-            Tax: this.tax,
-            TimeOrder: currentDate,
-            Area: this.area,
-            TransType: this.orderType,
-            CompAmount: 0,
-            DiscountAmountOriginal: 0.0000,
-            DiscountAmountRecall: 0.0000,
-            CouponTypeOriginal: 0,
-            CouponTypeRecall: 0,
-            DiscountIDOriginal: 0,
-            DiscountIDRecall: 0,
-            Gratuity: 0.0000,
-            CollectorID: 0,
-            OriginalAmount: 0.0000,
-            VoidServerID: 0,
-            DiscountServerID: 0,
-            DiscountServerIDRecall: 0,
-            ReopenedTicket: false,
-            SendToRegister: false,
-            Deposit: 0.0000,
-            DeliverID: 0,
-            MessageReceived: false,
-            Transmedia: 0.0000,
-            ReTender: false,
-            GratuityManual: false,
-            ChangeAmount: 0.0000,
-            TenderType: 0,
-            Transferred: false,
-            ClosedRecorded: false,
-            VoidRecorded: false,
-            ClientName: this.DBService.systemSettings.DeviceName,
-            OrderCreationTime: currentDate,
-            TaxExempt: false,
-            OLOOrderID: 0,
-            OLOMessageSent: false
+    validateOrder(startNewOrder: boolean)
+    {
+        if (this.orderItems.length == 0 && this.currentOrderFilter != null) 
+        {
+            this.showReasonDialog(null);
         }
+        else 
+        {
+            this.sendCheck(startNewOrder);
+        }
+    }
 
-        let orderUpdate: OrderUpdate = {
-            order: orderHeader,
-            orderDetails: this.orderItems,
-            payments : []
-        };
-   
-        //console.log(JSON.stringify(orderUpdate));
-        this.orderItems.forEach(oi => oi.Printed = 'P' )
+    sendCheck(startNewOrder: boolean) {
 
-        this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
-            this.router.navigate(['/home/area/']); 
-        },
-            err => {               
-                dialogs.alert({
-                    title: "Error",
-                    message: err.message,
-                    okButtonText: "Close"
-                })
-        });
+        if (this.orderItems.length == 0 && this.currentOrderFilter != null) {
+
+        }
+        else {
+            //let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
+            let currentDate: string = "\/Date(" + new Date().toISOString() + ")\/";
+
+            let orderHeader: OrderHeader = {
+                OrderFilter: this.currentOrderFilter == null ? 0 : this.currentOrderFilter,
+                Name: this.table,
+                OrderID: 0,
+                TableNumber: this.table,
+                CheckNumber: 1,
+                Total: this.checkTotal,
+                Discount: 0,
+                EmployeeID: this.employeeID,
+                TotalCash: 0,
+                TotalCheck: 0,
+                CurrentDate: currentDate,
+                CurrentTime: currentDate,
+                VoidedBy: 0,
+                NumberGuests: this.guests,
+                Tax: this.tax,
+                TimeOrder: currentDate,
+                Area: this.area,
+                TransType: this.orderType,
+                CompAmount: 0,
+                DiscountAmountOriginal: 0.0000,
+                DiscountAmountRecall: 0.0000,
+                CouponTypeOriginal: 0,
+                CouponTypeRecall: 0,
+                DiscountIDOriginal: 0,
+                DiscountIDRecall: 0,
+                Gratuity: 0.0000,
+                CollectorID: 0,
+                OriginalAmount: 0.0000,
+                VoidServerID: 0,
+                DiscountServerID: 0,
+                DiscountServerIDRecall: 0,
+                ReopenedTicket: false,
+                SendToRegister: false,
+                Deposit: 0.0000,
+                DeliverID: 0,
+                MessageReceived: false,
+                Transmedia: 0.0000,
+                ReTender: false,
+                GratuityManual: false,
+                ChangeAmount: 0.0000,
+                TenderType: 0,
+                Transferred: false,
+                ClosedRecorded: false,
+                VoidRecorded: false,
+                ClientName: this.DBService.systemSettings.DeviceName,
+                OrderCreationTime: currentDate,
+                TaxExempt: false,
+                OLOOrderID: 0,
+                OLOMessageSent: false
+            }
+
+            let orderUpdate: OrderUpdate = {
+                order: orderHeader,
+                orderDetails: this.orderItems,
+                payments: []
+            };
+
+            //console.log(JSON.stringify(orderUpdate));
+            this.orderItems.forEach(oi => oi.Printed = 'P')
+
+            this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
+                this.router.navigate(['/home/area/']);
+            },
+                err => {
+                    dialogs.alert({
+                        title: "Error",
+                        message: err.message,
+                        okButtonText: "Close"
+                    })
+                });
+        }
     }
 
     printReceipt() {
