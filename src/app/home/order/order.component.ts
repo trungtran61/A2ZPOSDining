@@ -82,6 +82,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     orderHeader: OrderHeader = null;
     orderResponse: OrderResponse = null;
     orderItems: OrderDetail[] = [];
+    origOrderItems: OrderDetail[] = [];
     //orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
     currentSeatNumber: number = 1;
     checkTotal: number = 0;
@@ -338,8 +339,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
             this.orderResponse = orderResponse;
-            this.orderItems = orderResponse.OrderDetail;
-            this.orderItems = this.orderItems.filter(oi => oi.Voided == null);
+            this.origOrderItems = orderResponse.OrderDetail;
+            this.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
             this.ticketNumber = this.orderResponse.Order.OrderID;
             this.checkNumber = this.orderResponse.Order.CheckNumber;
             this.table = this.orderResponse.Order.TableNumber;
@@ -1658,23 +1659,105 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.modalService.showModal(ReasonComponent, modalOptions).then(
             (reason: string) => {
                 // void product if reason given          
-                if (reason != null) 
-                {                    
-                    if (orderItem != null)
-                    {                       
-                        this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData).forEach(oi =>
-                        {
-                           oi.Voided = true;     
+                if (reason != null) {
+                    if (orderItem != null) {
+                        this.origOrderItems.filter(oi => oi.IndexData == orderItem.IndexData).forEach(oi => {
+                            oi.Voided = true;
                         });
 
-                        this.orderItems = this.orderItems.filter(oi => oi.Voided == null);
+                        this.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
                     }
                     else    //void the whole order
-                    {   
-                        this.orderHeader.Void = true;
+                    {
+                        this.voidOrder(reason);
                     }
                 }
             });
+    }
+
+    voidOrder(reason: string) {
+        if (this.orderItems.length == 0 && this.currentOrderFilter != null) {
+
+        }
+        else {
+            //let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
+            let currentDate: string = "\/Date(" + new Date().toISOString() + ")\/";
+
+            let orderHeader: OrderHeader = {
+                OrderFilter: this.currentOrderFilter,
+                Name: this.table,
+                OrderID: 0,
+                TableNumber: this.table,
+                CheckNumber: 1,
+                Total: this.checkTotal,
+                Discount: 0,
+                EmployeeID: this.employeeID,
+                TotalCash: 0,
+                TotalCheck: 0,
+                CurrentDate: currentDate,
+                CurrentTime: currentDate,
+                VoidedBy: this.DBService.loggedInUser.PriKey,
+                NumberGuests: this.guests,
+                Tax: this.tax,
+                TimeOrder: currentDate,
+                Area: this.area,
+                TransType: this.orderType,
+                CompAmount: 0,
+                DiscountAmountOriginal: 0.0000,
+                DiscountAmountRecall: 0.0000,
+                CouponTypeOriginal: 0,
+                CouponTypeRecall: 0,
+                DiscountIDOriginal: 0,
+                DiscountIDRecall: 0,
+                Gratuity: 0.0000,
+                CollectorID: 0,
+                OriginalAmount: 0.0000,
+                VoidServerID: this.DBService.loggedInUser.PriKey,
+                DiscountServerID: 0,
+                DiscountServerIDRecall: 0,
+                ReopenedTicket: false,
+                SendToRegister: false,
+                Deposit: 0.0000,
+                DeliverID: 0,
+                MessageReceived: false,
+                Transmedia: 0.0000,
+                ReTender: false,
+                GratuityManual: false,
+                ChangeAmount: 0.0000,
+                TenderType: 0,
+                Transferred: false,
+                ClosedRecorded: false,
+                VoidRecorded: false,
+                ClientName: this.DBService.systemSettings.DeviceName,
+                OrderCreationTime: currentDate,
+                TaxExempt: false,
+                OLOOrderID: 0,
+                OLOMessageSent: false,
+                VoidReason: reason,     
+                Void: 'Void',
+                VoidTime: currentDate           
+            }
+
+            let orderUpdate: OrderUpdate = {
+                order: orderHeader,
+                orderDetails: this.origOrderItems,
+                payments: []
+            };
+
+            //console.log(JSON.stringify(orderUpdate));
+            this.orderItems.forEach(oi => oi.Printed = 'P')
+
+            this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
+                this.router.navigate(['/home/area/']);
+            },
+                err => {
+                    dialogs.alert({
+                        title: "Error",
+                        message: err.message,
+                        okButtonText: "Close"
+                    })
+                });
+        }
     }
 
     showMemoDialog() {
@@ -1710,14 +1793,23 @@ export class OrderComponent implements OnInit, OnDestroy {
         return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(), 0);
     }
 
-    validateOrder(startNewOrder: boolean)
-    {
-        if (this.orderItems.length == 0 && this.currentOrderFilter != null) 
-        {
-            this.showReasonDialog(null);
+    validateOrder(startNewOrder: boolean) {
+        if (this.orderItems.length == 0 && this.currentOrderFilter != null) {
+            let options = {
+                title: "Confirm Void",
+                message: "There are no items so the Order must be voided. Do you want to continue?",
+                okButtonText: "Yes",
+                cancelButtonText: "No"                
+            };
+            
+            dialogs.confirm(options).then((confirmed: boolean) => {
+                if (confirmed)
+                {
+                    this.showReasonDialog(null);
+                }
+            });          
         }
-        else 
-        {
+        else {
             this.sendCheck(startNewOrder);
         }
     }
