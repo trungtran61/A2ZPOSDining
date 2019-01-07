@@ -1,9 +1,9 @@
 <AbsoluteLayout [style]="areaStyle" (tap)='utilSvc.resetIdleTImer()'>
   <Label [text]="employeeName" left="10" top="10" width="100" [height]="20" style="color:white; font-weight: bold"></Label>
   <StackLayout [left]="table.PosX" [top]="table.PosY" [class]="table.Class" (tap)="onTableClick(table)" *ngFor="let table of tables"
-    [width]="table.Width" [height]="table.Height">
+    [width]="table.Width" [height]="table.Height" [style]='table.Style'>
     <!-- table names -->
-    <Label [text]="table.Name" [opacity]='table.Opacity' style='margin-top:10'></Label>
+    <Label [text]="table.Name" [opacity]='table.Opacity' [style]='table.TextTopMargin'></Label>
   </StackLayout>
   <StackLayout [left]="table.PosX" [top]="table.PosY" *ngFor="let table of tables">
     <!-- elapsed times -->

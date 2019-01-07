@@ -5,7 +5,7 @@ import { NavigationExtras } from "@angular/router";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import { SQLiteService } from "~/app/services/sqlite.service";
-import { Area, TableDetail } from "~/app/models/products";
+import { Area, TableDetail, TableType } from "~/app/models/products";
 import { Observable } from "rxjs";
 import { Page } from "tns-core-modules/ui/page/page";
 import { UtilityService } from "~/app/services/utility.service";
@@ -74,11 +74,22 @@ export class AreaComponent implements OnInit {
                         else
                             if (table.Status.indexOf('Occupied') > -1) {
                                 tableClass = 'tableOccupied';
-                            }
+                            } 
 
                     table.Class = 'table ' + tableClass;                                        
                     table.Opacity = '1';
                     table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);
+                    let margin: number = (table.Height / 2) - 10;
+                    table.TextTopMargin = 'margin-top: ' + margin.toString();
+
+                    if (table.TableType == TableType.Round)
+                    {
+                        table.Style = 'border-radius: 100';                        
+                    }
+                    else
+                    {
+                        table.Style = 'border-radius: 5';
+                    }
                 });
             });
 

@@ -176,11 +176,13 @@ export interface TableDetail {
     Printed: boolean;
     Status: string[];
     TableColor: number;
+    TableType: number;
     Width: number;
     Class?: string;
     ElapsedTime?: string;
     Opacity?: string;
     Style?: string;
+    TextTopMargin?: string;
 }
 
 export interface Option {

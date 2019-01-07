@@ -621,13 +621,15 @@ export class OrderComponent implements OnInit, OnDestroy {
 
                     selectedItems.forEach(function (od: OrderDetail) {
                         od.SeatNumber = that.currentSeatNumber.toString();
+                        that.resetLastItemOrdered();
+                        od.Class = 'lastOrderItem';
                         that.orderItems.push(od);
                     });
 
                     this.sortOrderItems();
 
                     this.totalPrice();
-                    this.setLastItemOrdered();
+                    //this.setLastItemOrdered();
                 }
                 else {
                     // cancelled selected on forced modifier page, remove item just added 
@@ -713,9 +715,11 @@ export class OrderComponent implements OnInit, OnDestroy {
             if (this.orderItems.length > 0 && this.orderItems[this.orderItems.length - 1].OrderFilter == null)
                 this.orderItems[this.orderItems.length - 1].Class = 'orderItem';
 
+            this.resetLastItemOrdered();    
+            orderItem.Class = 'lastOrderItem';
             this.orderItems.push(orderItem);
-            this.currentOrderItem = orderItem;
-            this.setLastItemOrdered();
+            this.currentOrderItem = orderItem;            
+            
             if (product.UseForcedModifier) {
                 this.showForcedModifierDialog(true);
             }
@@ -992,6 +996,8 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         //if (this.currentOrderFilter != null)
         //    orderDetail.OrderFilter = this.currentOrderFilter;
+        this.resetLastItemOrdered();
+        orderDetail.Class = 'lastOrderItem';        
 
         this.orderItems.push(orderDetail);
         this.sortOrderItems();
@@ -1007,17 +1013,13 @@ export class OrderComponent implements OnInit, OnDestroy {
     processFilterNumber() {
         let i: number = 1;
         this.orderItems.forEach(oi => {
-            oi.ExtPrice = oi.ExtPrice > 0 ? oi.ExtPrice : null;     // hide amount if zero
-            
-            if (oi.OrderFilter == null)             
-                oi.Class = 'orderItem';
-            
-                oi.FilterNumber = i;
+            oi.ExtPrice = oi.ExtPrice > 0 ? oi.ExtPrice : null;     // hide amount if zero            
+            oi.FilterNumber = i;
             i++;
         })
 
-        if (this.orderItems.length > 0)
-            this.orderItems[this.orderItems.length - 1].Class = 'lastOrderItem'
+        //if (this.orderItems.length > 0)
+        //    this.orderItems[this.orderItems.length - 1].Class = 'lastOrderItem'
     }
 
     onOptionSwipe(args) {
@@ -1357,19 +1359,22 @@ export class OrderComponent implements OnInit, OnDestroy {
         orderItem.ExtPrice = product.Quantity * product.UnitPrice;
         orderItem.TaxRate = product.TaxRate;
         orderItem.Taxable = product.Taxable;
-
+        this.resetLastItemOrdered();
+        orderItem.Class = 'lastOrderItem';
         // add item to the order
         this.orderItems.splice(lastIndex + 1, 0, orderItem);
 
-        this.totalPrice();
-        this.setLastItemOrdered();
+        this.totalPrice();        
     }
 
-    setLastItemOrdered() {
-        //this.orderItems.filter(oi => oi.FilterNumber == null).forEach(oi => oi.Class = 'orderItem');
-
+    resetLastItemOrdered() {
         if (this.orderItems.length > 0)
-            this.orderItems[this.orderItems.length - 1].Class = 'lastOrderItem'
+        {
+            let orderItem: OrderDetail = this.orderItems.find(oi => oi.Class == 'lastOrderItem');
+
+            if (orderItem != null)
+                orderItem.Class = 'orderItem';        
+        }
     }
 
     userModifierSelected(userModifier: UserModifier) {
@@ -1611,7 +1616,9 @@ export class OrderComponent implements OnInit, OnDestroy {
             );
            */
         });
-        this.setLastItemOrdered();
+
+        this.resetLastItemOrdered();
+        this.orderItems[this.orderItems.length-1].Class = 'lastItemOrdered';        
         this.totalPrice();
     }
 
@@ -1775,8 +1782,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             (memo: Memo) => {
                 this.currentModifierType = ModifierType.NONE;
                 this.addOption(true, memo.Memo, memo.Price, false);
-                this.totalPrice();
-                this.setLastItemOrdered();
+                this.totalPrice();                
             });
     }
 
