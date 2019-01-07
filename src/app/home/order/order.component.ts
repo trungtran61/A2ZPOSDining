@@ -1827,7 +1827,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     sendCheck(startNewOrder: boolean) {
 
         if (this.orderItems.length == 0 && this.currentOrderFilter != null) {
-
+            
         }
         else {
             //let currentDate: string = "\/Date(" + '2018-12-29T04:28:49.953Z' + ")\/";
@@ -1895,7 +1895,14 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.orderItems.forEach(oi => oi.Printed = 'P')
 
             this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
-                this.router.navigate(['/home/area/']);
+                if (startNewOrder)
+                {
+                    this.router.navigate(['/home/tableguests/' + this.table]);
+                }
+                else
+                {
+                    this.router.navigate(['/home/area/']);
+                }
             },
                 err => {
                     dialogs.alert({
