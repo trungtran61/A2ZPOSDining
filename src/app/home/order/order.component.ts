@@ -155,6 +155,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     canOptionCategoryPageUp: boolean = false;
 
     isExistingOrder: boolean = false;
+    orderModified: boolean = false;
     isShowingMainOptions: boolean = false;
     productOptionsClass: string = 'glass productOptions';
     allOptionFilterClass: string = 'glass';
@@ -636,7 +637,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     }
                 }
             });
-    }
+    } 
 
     productInfo() {
         console.log('product info');
@@ -665,9 +666,10 @@ export class OrderComponent implements OnInit, OnDestroy {
             let orderItem: OrderDetail = Object.assign({}, product);
             orderItem = this.getInitializedOrderItem(orderItem);
             orderItem.IndexData = this.getNextIndexData();
-            orderItem.FilterNumber = this.getNextFilterNumber();
-            if (this.currentOrderFilter != null)
-                orderItem.OrderFilter = this.currentOrderFilter;
+            orderItem.FilterNumber = this.getNextFilterNumber(); 
+            // null orderFilter indicates a new item
+            //if (this.currentOrderFilter != null) 
+            //    orderItem.OrderFilter = this.currentOrderFilter;
             orderItem.Quantity = this.qtyEntered;
             orderItem.ExtPrice = this.qtyEntered * product.UnitPrice;
             orderItem.EmployeeID = this.DBService.loggedInUser.PriKey;
@@ -707,7 +709,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 MarginLeft: 0
             }
             */
-            if (this.orderItems.length > 0)
+            if (this.orderItems.length > 0 && this.orderItems[this.orderItems.length - 1].OrderFilter == null)
                 this.orderItems[this.orderItems.length - 1].Class = 'orderItem';
 
             this.orderItems.push(orderItem);
@@ -800,7 +802,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         orderProduct.SeatNumber = choice.SelectedNumber;
                         break;
                     case 'delete':
-                        if (orderItem.ItemType != ItemType.ForcedChoice || orderItem.Printed == 'P')
+                        if (orderItem.ItemType != ItemType.ForcedChoice || this.currentOrderFilter != null)
                             this.deleteOrderItem(orderItem);
                         break;
                     case 'repeat':
@@ -1004,8 +1006,11 @@ export class OrderComponent implements OnInit, OnDestroy {
         let i: number = 1;
         this.orderItems.forEach(oi => {
             oi.ExtPrice = oi.ExtPrice > 0 ? oi.ExtPrice : null;     // hide amount if zero
-            oi.Class = 'orderItem';
-            oi.FilterNumber = i;
+            
+            if (oi.OrderFilter == null)             
+                oi.Class = 'orderItem';
+            
+                oi.FilterNumber = i;
             i++;
         })
 
@@ -1359,7 +1364,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     setLastItemOrdered() {
-        this.orderItems.forEach(oi => oi.Class = 'orderItem');
+        //this.orderItems.filter(oi => oi.FilterNumber == null).forEach(oi => oi.Class = 'orderItem');
 
         if (this.orderItems.length > 0)
             this.orderItems[this.orderItems.length - 1].Class = 'lastOrderItem'
@@ -1653,7 +1658,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         //let _orderItem: OrderDetail = this.orderItems.find( oi => oi.ItemType == ItemType.Product && oi.IndexData == orderItem.IndexData)
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
-            fullscreen: true
+            fullscreen: true 
         };
 
         this.modalService.showModal(ReasonComponent, modalOptions).then(
@@ -1666,6 +1671,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         });
 
                         this.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
+                        this.orderModified = true;
                     }
                     else    //void the whole order
                     {

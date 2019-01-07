@@ -88,7 +88,7 @@
     <Button class="glass btnBottom fa" (tap)="hold()" col='5' textWrap="true" text="&#xf256; Hold" *ngIf='newItemsCount > 0'></Button>
     <Button class="glass btnBottom fa" (tap)="validateOrder(true)" col='6' textWrap="true" text="&#xf02f; Send & &#xf15c; New" *ngIf='newItemsCount > 0'></Button>
     <Button class="glass btnBottom fa" (tap)="validateOrder(false)" col='7' textWrap="true" text="&#xf02f; Send" horizontalAlignment="right" 
-        *ngIf='newItemsCount > 0 || (orderItems.length == 0 && currentOrderFilter != null)'></Button>  
+        *ngIf='newItemsCount > 0 || orderModified'></Button>  
   </GridLayout>
   <!-- bottom navigation for extra functions -->
   <GridLayout rows='60' row="1" col="0" colSpan="4" columns='100 400 100 100 *' *ngIf='showExtraFunctions'>
