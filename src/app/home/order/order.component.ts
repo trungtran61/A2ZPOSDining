@@ -681,6 +681,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             orderItem.SeatNumber = this.currentSeatNumber.toString();
             orderItem.CouponCode = 0;
             orderItem.OrderTime = currentDate;
+            orderItem.Voided = null;
             /*
             let orderItem: OrderDetail = {              
                 OrderTime: new Date(),            
@@ -886,6 +887,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         orderDetail.ExtPrice = null
         orderDetail.ReportProductMix = reportProductMix
         orderDetail.ItemType = isSubOption ? ItemType.SubOption : ItemType.Option
+        orderDetail.Voided = null;
 
         if (!isMemo) {
             switch (this.currentModifierType) {
@@ -988,8 +990,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             orderDetail.ExtPrice = amount * qty;
         }
 
-        if (this.currentOrderFilter != null)
-            orderDetail.OrderFilter = this.currentOrderFilter;
+        //if (this.currentOrderFilter != null)
+        //    orderDetail.OrderFilter = this.currentOrderFilter;
 
         this.orderItems.push(orderDetail);
         this.sortOrderItems();
@@ -1670,7 +1672,8 @@ export class OrderComponent implements OnInit, OnDestroy {
                             oi.Voided = true;
                         });
 
-                        this.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
+                        //this.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
+                        this.orderItems = this.orderItems.filter(oi => oi.IndexData != orderItem.IndexData);
                         this.orderModified = true;
                     }
                     else    //void the whole order
