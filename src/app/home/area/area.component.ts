@@ -12,6 +12,8 @@ import { UtilityService } from "~/app/services/utility.service";
 import { APIService } from "~/app/services/api.service";
 import { min } from "rxjs/operators";
 
+require("nativescript-localstorage");
+
 @Component({
     selector: "area",
     moduleId: module.id,
@@ -36,7 +38,7 @@ export class AreaComponent implements OnInit {
     showStaff: boolean = false;
     showGuests: boolean = false;
     showAreas: boolean = false;
-    currentArea: Area;
+    currentArea: Area;    
 
     ngOnInit(): void {
         this.DBService.getLocalAreas().then((data) => {
@@ -47,14 +49,21 @@ export class AreaComponent implements OnInit {
             }
             else {
                 this.areas = data;
-                this.currentArea = this.areas[0];
-                this.getTablesInfo(this.areas[0]);
+                
+                let areaID: number = Number(localStorage.getItem("areaID"));
+                if (areaID != 0)                
+                    this.currentArea = this.areas.find(area => area.AreaID == areaID);
+                else
+                    this.currentArea = this.areas[0];                
+                
+                this.getTablesInfo();
             }
         });
     } 
 
-    getTablesInfo(area: Area) {
-
+    getTablesInfo() {
+        let area: Area = this.currentArea;
+        
         this.areaStyle = "margin-left: 10px; background-image: url('" + this.httpProtocol + "://" + area.ImageURL + "'); background-repeat: no-repeat";
 
         this.apiSvc.getTablesDetails(area.AreaID,
@@ -128,8 +137,9 @@ export class AreaComponent implements OnInit {
     }
 
     viewTables(area: Area) {
+        localStorage.setItem('areaID', area.AreaID.toString());
         this.currentArea = area;
-        this.getTablesInfo(area);
+        this.getTablesInfo();
     }
 
     resetOccupiedTablesClass() {
@@ -152,8 +162,7 @@ export class AreaComponent implements OnInit {
         });
     }
 
-    onTableClick(table: TableDetail) {
-        require("nativescript-localstorage");
+    onTableClick(table: TableDetail) {        
 
         this.resetOccupiedTablesClass();
 
@@ -200,7 +209,7 @@ export class AreaComponent implements OnInit {
     }
 
     startOver() {
-        this.getTablesInfo(this.currentArea);
+        this.getTablesInfo();
         this.showInfo = false;
         this.showStatus = false;
         this.showGuests = false;
@@ -208,6 +217,7 @@ export class AreaComponent implements OnInit {
     }
 
     logOut() {
+        //localStorage.removeItem('areaID');
         this.DBService.logoff().subscribe(res => {
             this.router.navigate(['/home/']);
         });
