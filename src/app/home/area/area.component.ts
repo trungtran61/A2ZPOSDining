@@ -136,6 +136,22 @@ export class AreaComponent implements OnInit {
         this.viewInfo(false, false, true);
     }
 
+    getArea(increment: number)
+    {
+        let currentIndex: number = this.areas.findIndex( area => area.AreaID == this.currentArea.AreaID);
+
+        if (increment > 0)
+            if (this.areas.length - 1 == currentIndex )
+                this.viewTables(this.areas[0]);
+            else
+                this.viewTables(this.areas[currentIndex+1]);
+        else
+        if (currentIndex == 0 )
+            this.viewTables(this.areas[this.areas.length - 1]);
+        else
+            this.viewTables(this.areas[currentIndex-1]);        
+        }
+
     viewTables(area: Area) {
         localStorage.setItem('areaID', area.AreaID.toString());
         this.currentArea = area;

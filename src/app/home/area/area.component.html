@@ -31,7 +31,9 @@
   <Image src="res://images/TableLayout/ViewDetail" left="260" top="690" (tap)='viewCheckDetail()' *ngIf='!showInfo'></Image>
   <button class="glass btnInfo fa" left="360" top="690" text='&#xf05a; Info' (tap)='info()' *ngIf='!showInfo'></button>
   <button class="glass btnInfo fa" left="500" top="690" text='&#xf021; Start Over' (tap)='startOver()'></button>
-  <button class="glass btnInfo fa" left="630" top="690" text='&#xf279; Area' (tap)='viewAreas()'></button>
+  <button class="glass btnCircle fa" left="660" top="690" text='&#xf104;' (tap)='getArea(-1)'></button>
+  <button class="glass btnInfo fa" left="725" top="690" text='&#xf279; Area' (tap)='viewAreas()'></button>
+  <button class="glass btnCircle fa" left="860" top="690" text='&#xf105;' (tap)='getArea(+1)'></button>
   <StackLayout *ngIf='displayTableActions' left="850" top="0">
     <Image src='res://images/TableLayout/Open' (tap)='openTable()' height="82"></Image>
     <Image src='res://images/TableLayout/Close' (tap)='closeTable()' height="82"></Image>
