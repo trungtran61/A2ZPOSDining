@@ -24,6 +24,7 @@ import { ActivatedRoute } from "@angular/router";
 import { ReasonComponent } from "./reason.component";
 import { SearchComponent } from "./search.component";
 import { NullAstVisitor } from "@angular/compiler";
+import { GuestsComponent } from "./guests.component";
 
 @Component({
     selector: "order",
@@ -651,7 +652,20 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     changeGuestsNumber() {
-        this.router.navigate(['/home/tableguests/' + this.table]);
+        //this.router.navigate(['/home/tableguests/' + this.table]);
+        const modalOptions: ModalDialogOptions = {
+            viewContainerRef: this.viewContainerRef,
+            fullscreen: true,
+            //context: { options: options, currentOptions: currentOptions}
+        };
+
+        this.modalService.showModal(GuestsComponent, modalOptions).then(
+            (numberOfGuests: string) => {
+                if (numberOfGuests != null) {
+                    localStorage.setItem('guests', numberOfGuests);
+                    this.guests = Number(numberOfGuests);
+                }
+            });
     }
 
     changeChoice(orderItem: OrderDetail) {

@@ -1,0 +1,25 @@
+<StackLayout style="background-color: black">
+    <StackLayout [visibility]="isNormalChoice ? 'visible' : 'collapse'">
+        <GridLayout style="padding: 200px" rows="60 * * * * * *" columns="*,*,*">
+            <Label [text]="tableGuestsTitle" row='0' colSpan="3" horizontalAlignment="center" class="pageHeader"></Label>
+
+            <Button [text]="digit" *ngFor="let digit of digits let i=index" class="glass" (tap)="setGuests(digit)"
+                [row]="digitRows[i] + 1" [col]="digitCols[i]"></Button>
+            <Button text="Other" class="glass" (tap)="otherQty()" row="4" col='0' colSpan="2"></Button>
+            <Button text="Cancel" class="glass" (tap)="cancel()" row="4" col="2"></Button>
+        </GridLayout>
+    </StackLayout>
+
+    <StackLayout [visibility]="isNormalChoice ? 'collapse' : 'visible'">
+        <GridLayout rows="50" columns="200 100 200">
+            <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='0'
+                col='0' height="60" width="120"></Button>
+            <TextField #guests horizontalAlignment="center" [text]='guestsEntered' [(ngModel)]='guestsEntered' row='0'
+                col='1' maxlength='3' class='textEntryLongActive' (returnPress)="saveEnteredGuests()" (keyPress)="keyPressed($event)"
+                returnKeyType='done'>
+            </TextField>
+            <Button class='glass btnOK' text='Accept' (tap)='saveEnteredGuests()' horizontalAlignment="right" row='0'
+                col='2' height="60" width="120"></Button>
+        </GridLayout>
+    </StackLayout>
+</StackLayout>
