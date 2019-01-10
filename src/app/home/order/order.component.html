@@ -31,8 +31,8 @@
     <!-- order items  -->
     <ScrollView style="background-color: antiquewhite" height="500" orientation="vertical">
       <StackLayout *ngIf='showDetails' >
-        <StackLayout *ngFor="let item of orderItems">
-          <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" [class]="item.Class" style="background-color:#e5efbc">
+        <StackLayout *ngFor="let item of orderItems">          
+          <FlexBoxLayout *ngIf='item.Voided == null' (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" [class]="item.Class" style="background-color:#e5efbc">
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.ExtPrice | currency" style="text-align: right; width:95; margin-right:5"></Label>
@@ -42,7 +42,7 @@
       </StackLayout>
       <StackLayout *ngIf='!showDetails' style="background-color: lightgreen">
         <StackLayout *ngFor="let item of orderItems">
-          <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" *ngIf='item.ItemType == 1'>
+          <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" *ngIf='item.ItemType == 1 && item.Voided == null'>
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.ExtPrice | currency" style="text-align: right; width:50; margin-right:5"></Label>

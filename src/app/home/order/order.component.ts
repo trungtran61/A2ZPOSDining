@@ -83,7 +83,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     orderHeader: OrderHeader = null;
     orderResponse: OrderResponse = null;
     orderItems: OrderDetail[] = [];
-    origOrderItems: OrderDetail[] = [];
+    //origOrderItems: OrderDetail[] = [];
     //orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
     currentSeatNumber: number = 1;
     checkTotal: number = 0;
@@ -342,8 +342,9 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
             this.orderResponse = orderResponse;
-            this.origOrderItems = orderResponse.OrderDetail;
-            this.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
+            //this.origOrderItems = orderResponse.OrderDetail;
+            //this.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
+            this.orderItems = orderResponse.OrderDetail;
             this.ticketNumber = this.orderResponse.Order.OrderID;
             this.checkNumber = this.orderResponse.Order.CheckNumber;
             this.table = this.orderResponse.Order.TableNumber;
@@ -607,7 +608,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             fullscreen: true,
             context: {
                 orderItems: orderItems,
-                isAdding: isAdding
+                isAdding: isAdding,
+                product: this.selectedProduct
             }
         };
 
@@ -624,8 +626,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     selectedItems.forEach(function (od: OrderDetail) {
                         od.SeatNumber = that.currentSeatNumber.toString();
                         that.resetLastItemOrdered();
-                        od.Class = 'lastOrderItem';
-                        od = Object.assign({}, this.selectedProduct);    
+                        od.Class = 'lastOrderItem';                        
                         that.orderItems.push(od);
                     });
 
@@ -1650,12 +1651,15 @@ export class OrderComponent implements OnInit, OnDestroy {
                 // void product if reason given          
                 if (reason != null) {
                     if (orderItem != null) {
-                        this.origOrderItems.filter(oi => oi.IndexData == orderItem.IndexData).forEach(oi => {
+                        //this.origOrderItems.filter(oi => oi.IndexData == orderItem.IndexData).forEach(oi => {
+                        //    oi.Voided = true;
+                        //});
+                        this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData).forEach(oi => {
                             oi.Voided = true;
                         });
 
                         //this.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
-                        this.orderItems = this.orderItems.filter(oi => oi.IndexData != orderItem.IndexData);
+                        //this.orderItems = this.orderItems.filter(oi => oi.IndexData != orderItem.IndexData);
                         this.orderModified = true;
                     }
                     else    //void the whole order
@@ -1727,7 +1731,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         let orderUpdate: OrderUpdate = {
             order: orderHeader,
-            orderDetails: this.origOrderItems,
+            orderDetails: this.orderItems,
             payments: []
         };
 
@@ -1856,7 +1860,8 @@ export class OrderComponent implements OnInit, OnDestroy {
                 OrderCreationTime: currentDate,
                 TaxExempt: false,
                 OLOOrderID: 0,
-                OLOMessageSent: false
+                OLOMessageSent: false,
+                Credit: 0
             }
 
             let orderUpdate: OrderUpdate = {

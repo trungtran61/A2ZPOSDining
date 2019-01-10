@@ -47,7 +47,10 @@ export class UtilityService {
 
     getCurrentTime(): string
     {
-        return "\/Date(" + Date.parse(new Date().toDateString()) + "+0500)\/";  
+        //return "\/Date(" + Date.now().toString() + "+0500)\/";  
+        let offSet: number = new Date().getTimezoneOffset() * 60 * 1000;
+        let timeStamp: string = (Date.now() - offSet).toString();
+        return "\/Date(" + timeStamp + ")\/";  
     }
     /*
   ColorLuminance("#69c", 0);		// returns "#6699cc"

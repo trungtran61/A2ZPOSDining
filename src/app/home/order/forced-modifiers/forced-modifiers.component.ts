@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 
-import { MenuChoice, ForcedModifier, MenuSubOption, ChoiceLayer, ForcedChoiceItemDetail, ChoiceItem } from "~/app/models/products";
+import { MenuChoice, ForcedModifier, MenuSubOption, ChoiceLayer, ForcedChoiceItemDetail, ChoiceItem, Product } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogParams } from "nativescript-angular";
 import { OrderDetail, ItemType } from "~/app/models/orders";
@@ -25,7 +25,8 @@ export class ForcedModifiersComponent implements OnInit {
     orderProduct: OrderDetail;
     orderItems: OrderDetail[];
     subOptions: OrderDetail[];
-    
+    product: Product;
+
     subOptionsActiveText: string = String.fromCharCode(0xf00c) + ' Sub Options'
     subOptionsInactiveText: string = 'Sub Options'
     subOptionsText: string = this.subOptionsInactiveText;
@@ -53,7 +54,7 @@ export class ForcedModifiersComponent implements OnInit {
                             Name: this.orderItems.find(oi => oi.IndexDataSub == cl.Layer && oi.ItemType == ItemType.ForcedChoice).ProductName,
                             SubOptions: []
                         }
-                        this.subOptions.filter(so => so.IndexDataSub == cl.Layer).forEach( function (od) {
+                        this.subOptions.filter(so => so.IndexDataSub == cl.Layer).forEach(function (od) {
                             choice.SubOptions.push(
                                 {
                                     Name: od.ProductName
@@ -95,7 +96,7 @@ export class ForcedModifiersComponent implements OnInit {
         // if new layer selected, set choice for previous layer
         if (this.currentChoice != null)
             this.setChoice(this.currentChoice);
-        
+
         let that = this;
 
         this.DBService.getLocalMenuChoiceItems(choiceLayer, this.orderProduct.ProductCode).then((items) => {
@@ -144,12 +145,12 @@ export class ForcedModifiersComponent implements OnInit {
         // if changing choices - check if choice made is not one of the current choice, if so remove the layer's previous choice
         if (!this.isAdding && this.currentChoices.find(cc => cc.IndexDataSub == choice.Layer && cc.ProductName == choice.Name) == null) {
             this.currentChoices = this.currentChoices.filter(cc => cc.IndexDataSub != choice.Layer)
-        }        
+        }
 
         this.currentChoice = choice;
         this.currentChoice.SubOptions = [];
         this.activeLayer.Choice = choice;
-        let that = this;       
+        let that = this;
 
         if (choice.ForcedChoice || this.subOptionsActive) {
             this.subOptionsActive = false;
@@ -178,53 +179,52 @@ export class ForcedModifiersComponent implements OnInit {
 
     setChoice(choice: MenuChoice) {
         // find current choice and set to new choice
-        let currentDate: string = this.utilSvc.getCurrentTime();   
+        let currentDate: string = this.utilSvc.getCurrentTime();
         let that = this;
-        let qty: number = this.orderProduct.Quantity;       
-
-        let orderItem: OrderDetail = {
-            PriKey: 0,
-            OrderTime: currentDate,
-            IndexDataOption: choice.Key,
-            Quantity: null,
-            IndexDataSub : choice.Layer,
-            IndexData: this.orderProduct.IndexData,
-            ItemType: ItemType.ForcedChoice,
-            ProductName: '   ' + choice.Name,
-            PrintName: '   ' + choice.PrintName,
-            ReportProductMix: choice.ReportProductMix
-        };
+        let qty: number = this.orderProduct.Quantity;
+        let od: OrderDetail = Object.assign({}, this.product);
+        od = Object.assign({}, this.orderProduct);
+        od.PriKey = 0;
+        od.OrderTime = currentDate;
+        od.IndexDataOption = choice.Key;
+        od.Quantity = null;
+        od.IndexDataSub = choice.Layer;        
+        od.ItemType = ItemType.ForcedChoice;
+        od.ProductName = '   ' + choice.Name;
+        od.PrintName = '   ' + choice.PrintName;
+        od.ReportProductMix = choice.ReportProductMix;        
 
         if (choice.Charge > 0) {
-            orderItem.UnitPrice = choice.Charge;
-            orderItem.ExtPrice = choice.Charge * qty;
-            orderItem.TaxRate = this.orderProduct.TaxRate;
+            od.UnitPrice = choice.Charge;
+            od.ExtPrice = choice.Charge * qty;
+            od.TaxRate = this.orderProduct.TaxRate;
         }
 
         // replace current layer's choice with new choice
         if (this.currentChoices.length > 0)
             this.currentChoices = this.currentChoices.filter(cc => cc.IndexDataSub != choice.Layer);
 
-        this.currentChoices.push(orderItem);        
-        
+        this.currentChoices.push(od);
+ 
         choice.SubOptions.forEach(so => {
-            let orderSubItem: OrderDetail = {
-                ProductName: '      ' + so.Name,
-                PrintName: '      ' + so.PrintName,
-                Quantity: null,
-                IndexDataOption: so.ChoiceID,
-                IndexDataSub: so.Layer,
-                IndexData: that.orderProduct.IndexData,
-                ItemType: ItemType.SubOption,
-                ReportProductMix: so.ReportProductMix,
-            };
-            if (so.ApplyCharge && so.Charge > 0) {
-                orderSubItem.UnitPrice = so.Charge;
-                orderSubItem.ExtPrice = so.Charge * qty;
-                orderSubItem.TaxRate = this.orderProduct.TaxRate;
-            }            
+            let osi: OrderDetail = Object.assign({}, this.product);
+            osi = Object.assign({}, this.orderProduct);
+            osi.ProductName = '      ' + so.Name;
+            osi.PrintName = '      ' + so.PrintName;
+            osi.Quantity = null;
+            osi.IndexDataOption = so.ChoiceID;
+            osi.IndexDataSub = so.Layer;
+            osi.IndexData = that.orderProduct.IndexData;
+            osi.ItemType = ItemType.SubOption;
+            osi.ReportProductMix = so.ReportProductMix;
 
-            this.currentChoices.push(orderSubItem);
+            if (so.ApplyCharge && so.Charge > 0) {
+                osi.UnitPrice = so.Charge;
+                osi.ExtPrice = so.Charge * qty;
+                osi.TaxRate = this.orderProduct.TaxRate;
+            }
+
+            this.currentChoices.push(osi);
         });
 
         // reset current choice
@@ -289,7 +289,8 @@ export class ForcedModifiersComponent implements OnInit {
         this.isAdding = this.params.context.isAdding;
         this.orderItems = this.params.context.orderItems;
         this.orderProduct = this.orderItems.find(oi => oi.ItemType == ItemType.Product);
-        this.subOptions = this.orderItems.filter(od => od.ItemType == ItemType.SubOption)            
+        this.subOptions = this.orderItems.filter(od => od.ItemType == ItemType.SubOption);
+        this.product = this.params.context.product;
         this.getChoiceLayers();
     }
 }
