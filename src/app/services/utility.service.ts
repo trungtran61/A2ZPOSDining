@@ -45,6 +45,10 @@ export class UtilityService {
         this.idleTimer = 0;
     }
 
+    getCurrentTime(): string
+    {
+        return "\/Date(" + Date.parse(new Date().toDateString()) + "+0500)\/";  
+    }
     /*
   ColorLuminance("#69c", 0);		// returns "#6699cc"
   ColorLuminance("6699CC", 0.2);	// "#7ab8f5" - 20% lighter

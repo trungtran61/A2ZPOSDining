@@ -5,6 +5,7 @@ import { MenuChoice, ForcedModifier, MenuSubOption, ChoiceLayer, ForcedChoiceIte
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogParams } from "nativescript-angular";
 import { OrderDetail, ItemType } from "~/app/models/orders";
+import { UtilityService } from "~/app/services/utility.service";
 
 @Component({
     selector: "forced-modifiers",
@@ -177,9 +178,9 @@ export class ForcedModifiersComponent implements OnInit {
 
     setChoice(choice: MenuChoice) {
         // find current choice and set to new choice
+        let currentDate: string = this.utilSvc.getCurrentTime();   
         let that = this;
-        let qty: number = this.orderProduct.Quantity;
-        let currentDate: string = "\/Date(" + new Date().toISOString() + ")\/";
+        let qty: number = this.orderProduct.Quantity;       
 
         let orderItem: OrderDetail = {
             PriKey: 0,
@@ -221,7 +222,7 @@ export class ForcedModifiersComponent implements OnInit {
                 orderSubItem.UnitPrice = so.Charge;
                 orderSubItem.ExtPrice = so.Charge * qty;
                 orderSubItem.TaxRate = this.orderProduct.TaxRate;
-            }
+            }            
 
             this.currentChoices.push(orderSubItem);
         });
@@ -282,7 +283,7 @@ export class ForcedModifiersComponent implements OnInit {
         this.params.closeCallback(null);
     }
 
-    constructor(private DBService: SQLiteService, private params: ModalDialogParams) { }
+    constructor(private DBService: SQLiteService, private params: ModalDialogParams, private utilSvc: UtilityService) { }
 
     ngOnInit() {
         this.isAdding = this.params.context.isAdding;

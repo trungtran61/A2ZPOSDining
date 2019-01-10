@@ -14,6 +14,9 @@ import { min } from "rxjs/operators";
 
 require("nativescript-localstorage");
 
+const ONE_HOUR: number = 1000 * 60 * 60; // in milliseconds
+const ONE_MINUTE: number = 1000 * 60; // in milliseconds
+
 @Component({
     selector: "area",
     moduleId: module.id,
@@ -31,8 +34,7 @@ export class AreaComponent implements OnInit {
     displayTableActions: boolean = false;
     displayTableActionsClass: string = "sliderHide";
     employeeName: string = this.DBService.loggedInUser.FirstName;
-    oneHour: number = 1000 * 60 * 60; // in milliseconds
-    oneMinute: number = 1000 * 60; // in milliseconds
+    
     showStatus: boolean = false;
     showInfo: boolean = false;
     showStaff: boolean = false;
@@ -115,7 +117,7 @@ export class AreaComponent implements OnInit {
             if (Date.parse(table.OrderTime)) {
                 table.Opacity = '0.5'
                 if (this.showStatus) {
-                    let elapsedTime: number = Math.ceil((now - new Date(table.OrderTime).getTime()) / (this.oneMinute));
+                    let elapsedTime: number = Math.ceil((now - Date.parse(table.OrderTime)) / (ONE_MINUTE));
                     let hours = Math.floor(elapsedTime / 60);
                     let minutes = elapsedTime % 60;
                     table.ElapsedTime = hours.toString() + ':' + this.utilSvc.padLeft(minutes.toString(), '0', 2);
@@ -153,6 +155,7 @@ export class AreaComponent implements OnInit {
         }
 
     viewTables(area: Area) {
+        this.showAreas = false;
         localStorage.setItem('areaID', area.AreaID.toString());
         this.currentArea = area;
         this.getTablesInfo();
