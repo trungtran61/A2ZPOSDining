@@ -193,6 +193,8 @@ export class ForcedModifiersComponent implements OnInit {
         od.ProductName = '   ' + choice.Name;
         od.PrintName = '   ' + choice.PrintName;
         od.ReportProductMix = choice.ReportProductMix;        
+        od.UnitPrice = 0;
+        od.ExtPrice = null;
 
         if (choice.Charge > 0) {
             od.UnitPrice = choice.Charge;
@@ -217,12 +219,14 @@ export class ForcedModifiersComponent implements OnInit {
             osi.IndexData = that.orderProduct.IndexData;
             osi.ItemType = ItemType.SubOption;
             osi.ReportProductMix = so.ReportProductMix;
+            osi.UnitPrice = 0;
+            osi.ExtPrice = null;
 
             if (so.ApplyCharge && so.Charge > 0) {
                 osi.UnitPrice = so.Charge;
                 osi.ExtPrice = so.Charge * qty;
                 osi.TaxRate = this.orderProduct.TaxRate;
-            }
+            }            
 
             this.currentChoices.push(osi);
         });

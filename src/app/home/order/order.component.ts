@@ -626,7 +626,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     selectedItems.forEach(function (od: OrderDetail) {
                         od.SeatNumber = that.currentSeatNumber.toString();
                         that.resetLastItemOrdered();
-                        od.Class = 'lastOrderItem';                        
+                        od.Class = 'lastOrderItem';
                         that.orderItems.push(od);
                     });
 
@@ -643,7 +643,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     }
                 }
             });
-    } 
+    }
 
     productInfo() {
         console.log('product info');
@@ -678,14 +678,14 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     addProductToOrder(mp: MenuProduct) {
         //let marginLeft: number = this.getLeftMargin(ItemType.Product);
-        let currentDate: string = this.utilSvc.getCurrentTime();  
+        let currentDate: string = this.utilSvc.getCurrentTime();
 
         this.DBService.getLocalProduct(mp.ProductID).then(product => {
             this.selectedProduct = product;
             let orderItem: OrderDetail = Object.assign({}, product);
             orderItem = this.getInitializedOrderItem(orderItem);
             orderItem.IndexData = this.getNextIndexData();
-            orderItem.FilterNumber = this.getNextFilterNumber(); 
+            orderItem.FilterNumber = this.getNextFilterNumber();
             // null orderFilter indicates a new item
             //if (this.currentOrderFilter != null) 
             //    orderItem.OrderFilter = this.currentOrderFilter;
@@ -699,19 +699,19 @@ export class OrderComponent implements OnInit, OnDestroy {
             orderItem.ItemType = ItemType.Product;
             orderItem.SeatNumber = this.currentSeatNumber.toString();
             orderItem.CouponCode = 0;
-            orderItem.OrderTime = currentDate;            
-            orderItem.Voided = null;            
-            orderItem.ReportProductMix = false;          
+            orderItem.OrderTime = currentDate;
+            orderItem.Voided = null;
+            orderItem.ReportProductMix = false;
             orderItem.ClientName = this.DBService.systemSettings.DeviceName;
 
             if (this.orderItems.length > 0 && this.orderItems[this.orderItems.length - 1].OrderFilter == null)
                 this.orderItems[this.orderItems.length - 1].Class = 'orderItem';
 
-            this.resetLastItemOrdered();    
+            this.resetLastItemOrdered();
             orderItem.Class = 'lastOrderItem';
             this.orderItems.push(orderItem);
-            this.currentOrderItem = orderItem;            
-            
+            this.currentOrderItem = orderItem;
+
             if (product.UseForcedModifier) {
                 this.showForcedModifierDialog(true);
             }
@@ -825,13 +825,13 @@ export class OrderComponent implements OnInit, OnDestroy {
         let optionName: string = '';
         let printName: string = null;
         let orderDetail: OrderDetail = null;
-        
+
         //let filterNumber: number = 0;
         let reportProductMix: boolean = false;
         let modifierIgnoreQuantity: boolean = false;
         let strOption = '';
         let textPosition: number = 0;
-        let currentDate: string = this.utilSvc.getCurrentTime();  
+        let currentDate: string = this.utilSvc.getCurrentTime();
 
         if (this.currentModifierType == ModifierType.USERDEFINED && this.currentUserModifier.ButtonFunction == 1)
             customStamp = true;
@@ -854,7 +854,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 (od.ItemType == ItemType.Choice || od.ItemType == ItemType.ForcedChoice));
             orderDetail.OptionCode = this.currentSubOption.Key;
             orderDetail.PriKey = 0
-            orderDetail = Object.assign({}, this.selectedProduct);    
+            orderDetail = Object.assign({}, this.selectedProduct);
         }
         else    // not suboption
         {
@@ -867,7 +867,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 else {
                     applyCharge = this.currentMenuOption.ApplyCharge;
                     optionName = this.currentMenuOption.Name;
-                    printName = this.currentMenuOption.PrintName;                    
+                    printName = this.currentMenuOption.PrintName;
                 }
                 reportProductMix = this.currentMenuOption.ReportProductMix;
             }
@@ -990,12 +990,12 @@ export class OrderComponent implements OnInit, OnDestroy {
         //if (this.currentOrderFilter != null)
         //    orderDetail.OrderFilter = this.currentOrderFilter;
         this.resetLastItemOrdered();
-        orderDetail.Class = 'lastOrderItem';        
+        orderDetail.Class = 'lastOrderItem';
 
         this.orderItems.push(orderDetail);
         this.sortOrderItems();
 
-        this.totalPrice();        
+        this.totalPrice();
     }
 
     round2Decimals(inNumber: number) {
@@ -1356,16 +1356,15 @@ export class OrderComponent implements OnInit, OnDestroy {
         // add item to the order
         this.orderItems.splice(lastIndex + 1, 0, orderItem);
 
-        this.totalPrice();        
+        this.totalPrice();
     }
 
     resetLastItemOrdered() {
-        if (this.orderItems.length > 0)
-        {
+        if (this.orderItems.length > 0) {
             let orderItem: OrderDetail = this.orderItems.find(oi => oi.Class == 'lastOrderItem');
 
             if (orderItem != null)
-                orderItem.Class = 'orderItem';        
+                orderItem.Class = 'orderItem';
         }
     }
 
@@ -1590,7 +1589,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             copiedItem.IndexData = nextIndexData;
             copiedItem.Quantity = orderItem.ItemType == ItemType.Product ? 1 : null;
             copiedItem.ExtPrice = copiedItem.Quantity * copiedItem.UnitPrice;
-            copiedItem = Object.assign({}, this.selectedProduct);    
+            copiedItem = Object.assign({}, this.selectedProduct);
             that.orderItems.push(copiedItem);
             /*
             that.orderItems.push(
@@ -1611,18 +1610,17 @@ export class OrderComponent implements OnInit, OnDestroy {
         });
 
         this.resetLastItemOrdered();
-        this.orderItems[this.orderItems.length-1].Class = 'lastItemOrdered';        
+        this.orderItems[this.orderItems.length - 1].Class = 'lastItemOrdered';
         this.totalPrice();
     }
 
     totalPrice() {
         this.subTotal = 0;
 
-        for (var i = 0; i < this.orderItems.length; i++) {
-            {
-                if (this.orderItems[i].ExtPrice != null)
-                    this.subTotal += this.orderItems[i].ExtPrice;
-            }
+        this.orderItems.filter(oi => oi.Voided == null).forEach (oi => {
+            if (oi.ExtPrice != null)
+                this.subTotal += oi.ExtPrice;
+
             this.tax = this.utilSvc.getTaxTotal(this.orderHeader, this.orderItems);
             this.checkTotal = this.subTotal + this.tax;
 
@@ -1630,20 +1628,20 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.tips = this.subTotal * this.TIPS_PCT;
                 this.checkTotal += this.tips;
             }
-        }
+        });
     }
 
     hold() {
         this.showSubCategories = false;
         this.showHoldCategories = true;
     }
-    
+
     showReasonDialog(orderItem: OrderDetail) {
         // get the product Order
         //let _orderItem: OrderDetail = this.orderItems.find( oi => oi.ItemType == ItemType.Product && oi.IndexData == orderItem.IndexData)
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
-            fullscreen: true 
+            fullscreen: true
         };
 
         this.modalService.showModal(ReasonComponent, modalOptions).then(
@@ -1671,8 +1669,8 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     voidOrder(reason: string) {
-        
-        let currentDate: string = this.utilSvc.getCurrentTime();  
+
+        let currentDate: string = this.utilSvc.getCurrentTime();
 
         let orderHeader: OrderHeader = {
             OrderFilter: this.currentOrderFilter,
@@ -1761,7 +1759,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             (memo: Memo) => {
                 this.currentModifierType = ModifierType.NONE;
                 this.addOption(true, memo.Memo, memo.Price, false);
-                this.totalPrice();                
+                this.totalPrice();
             });
     }
 
@@ -1806,10 +1804,10 @@ export class OrderComponent implements OnInit, OnDestroy {
     sendCheck(startNewOrder: boolean) {
 
         if (this.orderItems.length == 0 && this.currentOrderFilter != null) {
-            
+
         }
         else {
-            let currentDate: string = this.utilSvc.getCurrentTime();  
+            let currentDate: string = this.utilSvc.getCurrentTime();
 
             let orderHeader: OrderHeader = {
                 OrderFilter: this.currentOrderFilter == null ? 0 : this.currentOrderFilter,
@@ -1875,12 +1873,10 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.orderItems.forEach(oi => oi.Printed = 'P')
 
             this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
-                if (startNewOrder)
-                {
+                if (startNewOrder) {
                     this.router.navigate(['/home/tableguests/' + this.table]);
                 }
-                else
-                {
+                else {
                     this.router.navigate(['/home/area/']);
                 }
             },
