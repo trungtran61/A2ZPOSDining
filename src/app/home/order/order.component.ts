@@ -1782,7 +1782,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     validateOrder(startNewOrder: boolean) {
-        if (this.orderItems.length == 0 && this.currentOrderFilter != null) {
+        if (this.orderItems.filter(oi => oi.Voided == null).length == 0 && this.currentOrderFilter != null) {
             let options = {
                 title: "Confirm Void",
                 message: "There are no items so the Order must be voided. Do you want to continue?",
