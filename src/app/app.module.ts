@@ -12,7 +12,7 @@ import { SQLiteService } from "~/app/services/sqlite.service";
 import { SplashComponent } from "~/app/home/splash/splash.component";
 import { APIService } from "./services/api.service";
 import { UtilityService } from "./services/utility.service";
-import { OrderService } from "./services/order.service";
+//import { OrderService } from "./services/order.service";
 
 //TNSFontIconService.debug = true;
 
@@ -38,7 +38,7 @@ import { OrderService } from "./services/order.service";
         SQLiteService,
         APIService,
         UtilityService,
-        OrderService
+        //OrderService
     ] 
 })
 export class AppModule { }
