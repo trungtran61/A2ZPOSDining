@@ -8,6 +8,8 @@ import { topmost } from "tns-core-modules/ui/frame";
 import { isIOS } from "tns-core-modules/platform";
 import { TaxRate, MenuOption } from "../models/products";
 
+const TIMEZONE_OFFSET: number = new Date().getTimezoneOffset() * 60 * 1000; // offset from UTC in millisetseconds
+
 @Injectable()
 export class UtilityService {
     timeoutInSecs: number = 15;
@@ -46,11 +48,9 @@ export class UtilityService {
     }
 
     getCurrentTime(): string
-    {
-        //return "\/Date(" + Date.now().toString() + "+0500)\/";  
-        //let offSet: number = new Date().getTimezoneOffset() * 60 * 1000;
-        //let timeStamp: string = (Date.now() - offSet).toString();
-        let timeStamp: string = (Date.now()).toString();
+    {        
+        //offSet = new Date().getTimezoneOffset() * 60 * 1000;
+        let timeStamp: string = (Date.now() - TIMEZONE_OFFSET).toString();
         return "\/Date(" + timeStamp + ")\/";  
     }
     /*
@@ -154,7 +154,9 @@ export class UtilityService {
         }
     */
     getJSONDate(jsonDate: string): Date {
-        return new Date(parseInt(jsonDate.substr(6)))
+
+        let longDate: number = parseInt(jsonDate.substr(6));         
+        return new Date(longDate + TIMEZONE_OFFSET)
     }
 
     padLeft(text: string, padChar: string, size: number): string {

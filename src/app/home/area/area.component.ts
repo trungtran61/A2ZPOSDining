@@ -88,7 +88,7 @@ export class AreaComponent implements OnInit {
                             } 
 
                     table.Class = 'table ' + tableClass;                                        
-                    table.Opacity = '1';
+                    table.Opacity = '1';                          
                     table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);
                     let margin: number = (table.Height / 2) - 10;
                     table.TextTopMargin = 'margin-top: ' + margin.toString();
