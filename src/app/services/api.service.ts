@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpEvent } from "@angular/common/http";
-import { Countdown, OrderResponse, OrderHeader, OrderUpdate } from "~/app/models/orders";
+import { Countdown, OrderResponse, OrderHeader, OrderUpdate, DirectPrintJobsRequest } from "~/app/models/orders";
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { AccessType } from "../models/employees";
@@ -33,6 +33,20 @@ export class APIService {
         return promise;
     }
 
+    public createRequestHeaderText() {
+        let headers = new HttpHeaders({
+            "AuthKey": "my-key",
+            "AuthToken": "my-token",
+            "Content-Type": "text/plain"
+        });
+
+        return headers;
+    }
+
+    public createHttpOptionsText() {
+        return ({ headers : this.createRequestHeaderText()});
+    }  
+
     public createRequestHeader() {
         let headers = new HttpHeaders({
             "AuthKey": "my-key",
@@ -45,7 +59,7 @@ export class APIService {
 
     public createHttpOptions() {
         return ({ headers : this.createRequestHeader()});
-    }
+    }    
 
     getOrder(orderFilter: number, ph1: boolean, ph2: boolean): OrderHeader {
         let order: OrderHeader;
@@ -109,12 +123,23 @@ export class APIService {
             { headers: headers }).pipe(map(res => res));
     }
 
+    directPrint(printRequest: DirectPrintJobsRequest): Observable<any>
+    {
+        let options = this.createHttpOptions();
+        return this.http.post<any>(this.apiUrl + 'DirectPrintJobs,',
+            JSON.stringify(printRequest), options);
+    }
+
+    checkPrintStatus(systemID: string): Observable<any>
+    {
+        let headers = this.createRequestHeader();
+        return this.http.get(this.apiUrl + '?systemID=' + systemID,
+            { headers: headers }).pipe(map(res => res));
+    }
+
     updateOrder(order: OrderUpdate): Observable<any>
     {
         let options = this.createHttpOptions();
-
-        console.log(JSON.stringify(order.order));
-
         return this.http.post<OrderUpdate>(this.apiUrl + 'UpdateOrder',
             JSON.stringify(order), options); //.pipe(catchError(this.handleError('updateOrder', order)));
     }

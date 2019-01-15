@@ -13,7 +13,7 @@ import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
 import { Page } from "tns-core-modules/ui/page/page";
 import { OpenProductComponent } from "./open-product/open-product.component";
-import { OrderType, Countdown, FixedOption, OrderHeader, OrderDetail, OrderResponse, ItemType, ModifierType, OrderUpdate } from "~/app/models/orders";
+import { OrderType, Countdown, FixedOption, OrderHeader, OrderDetail, OrderResponse, ItemType, ModifierType, OrderUpdate, DirectPrintJobsRequest, PrintType, PrintStatus, PrintStatusDetail } from "~/app/models/orders";
 import { APIService } from "~/app/services/api.service";
 import { PromptQtyComponent } from "./prompt-qty.component";
 import { MemoComponent } from "./memo.component";
@@ -1892,6 +1892,40 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.orderItems.forEach(oi => oi.Printed = 'P')
 
             this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
+                let orderFilter: number = results.UpdateOrderResult;
+
+                let printRequest: DirectPrintJobsRequest =  {
+                    orderFilter: orderFilter,
+                    printType: PrintType.All,
+                    modified: false,
+                    systemID: this.DBService.systemSettings.DeviceName
+                }
+
+                this.apiSvc.directPrint(printRequest).subscribe(printResult => {
+                    if (printResult)
+                    {
+                        this.apiSvc.checkPrintStatus(this.DBService.systemSettings.DeviceName).subscribe(printStatus => {
+                            let printStatuses: PrintStatusDetail[] = printStatus;
+                            if (printStatuses.length > 0)
+                            {
+                                dialogs.alert({
+                                    title: "Error",
+                                    message: "Error occurred while printing. " + PrintStatus[printStatuses[0].PrintStatus],
+                                    okButtonText: "Close"
+                                })
+                            }
+                        });
+                    }
+                    else
+                    {
+                        dialogs.alert({
+                            title: "Error",
+                            message: "Error occurred sending to print API.",
+                            okButtonText: "Close"
+                        })
+                    }
+                });    
+
                 if (startNewOrder) {
                     this.router.navigate(['/home/tableguests/' + this.table]);
                 }

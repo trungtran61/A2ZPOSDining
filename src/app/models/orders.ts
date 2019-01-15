@@ -59,6 +59,28 @@ export enum ModifierType
     USERDEFINED = 255,
 }
 
+export enum PrintType {
+    NotPrinted = 1,   
+    Selected = 2,
+    All = 3,
+    Void = 4,
+    VoidTicket = 5
+}
+
+export enum PrintStatus {
+    OK = 1,   
+    PaperOut = 2,
+    CoverOpen = 3,
+    Error = 4,
+    NotFound = 5
+}
+
+export interface PrintStatusDetail {
+    SystemName: string;
+    PrinterName: string;
+    PrintStatus: PrintStatus;
+}
+
 export interface FunctionTypeDetail {
     Name: string,
     FunctionType: FunctionType,
@@ -97,6 +119,13 @@ export interface FixedOption {
     Position?: number;
     Class?: string;    
     ModifierType?: ModifierType;
+}
+
+export interface DirectPrintJobsRequest {
+    orderFilter?: number;
+    printType?: PrintType;
+    modified?: boolean;    
+    systemID?: string;
 }
 
 export interface OrderHeader {
