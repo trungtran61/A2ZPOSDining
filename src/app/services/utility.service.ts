@@ -48,8 +48,9 @@ export class UtilityService {
     getCurrentTime(): string
     {
         //return "\/Date(" + Date.now().toString() + "+0500)\/";  
-        let offSet: number = new Date().getTimezoneOffset() * 60 * 1000;
-        let timeStamp: string = (Date.now() - offSet).toString();
+        //let offSet: number = new Date().getTimezoneOffset() * 60 * 1000;
+        //let timeStamp: string = (Date.now() - offSet).toString();
+        let timeStamp: string = (Date.now()).toString();
         return "\/Date(" + timeStamp + ")\/";  
     }
     /*
