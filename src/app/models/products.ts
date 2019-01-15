@@ -51,6 +51,7 @@ export interface MenuProduct {
     UseForcedModifier?: boolean;
     CountdownActivated?: boolean;
     QtyAvailable?: number;
+    OrigQtyAvailable?: number;
     QtyAllocated?: number;
     TaxRate?: number;
     ProductType?: number;

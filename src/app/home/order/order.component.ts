@@ -555,6 +555,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             if (countdown != null) {
                 product.CountdownActivated = true; // countdown.Activated;
                 product.QtyAvailable = countdown.Quantity;
+                product.OrigQtyAvailable = countdown.Quantity;
                 product.QtyAllocated = countdown.QuantityChange;
 
                 if (product.QtyAvailable <= product.QtyAllocated)
@@ -572,6 +573,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.currentOrderItem.Quantity++;
             this.currentOrderItem.ExtPrice = this.currentOrderItem.Quantity * this.currentOrderItem.UnitPrice;
             this.totalPrice();
+            product.QtyAvailable -= 1;
         }
         else {
             this.showOptionsButton = true;
@@ -702,7 +704,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             orderItem.OrderTime = currentDate;
             orderItem.Voided = null;
             orderItem.ReportProductMix = false;
-            orderItem.ClientName = this.DBService.systemSettings.DeviceName;
+            orderItem.ClientName = this.DBService.systemSettings.DeviceName;                        
+            this.changeQtyAvailable(product.ProductFilter, this.qtyEntered * -1);
 
             if (this.orderItems.length > 0 && this.orderItems[this.orderItems.length - 1].OrderFilter == null)
                 this.orderItems[this.orderItems.length - 1].Class = 'orderItem';
@@ -722,6 +725,12 @@ export class OrderComponent implements OnInit, OnDestroy {
 
             this.newItemsCount = this.orderItems.length;
         });
+    }
+
+    changeQtyAvailable(productId: number, qty: number)
+    {
+        let product = this.pageProducts.find( p => p.ProductID == productId);
+        product.QtyAvailable = product.QtyAvailable + qty;
     }
 
     showOpenProduct() {
@@ -785,7 +794,10 @@ export class OrderComponent implements OnInit, OnDestroy {
             (choice: Choice) => {
                 switch (choice.ChangeType) {
                     case 'quantity':
-                        orderProduct.Quantity = parseFloat(choice.SelectedNumber);
+                        let qtyChange: number = orderProduct.Quantity - parseFloat(choice.SelectedNumber);
+                        this.changeQtyAvailable(orderItem.ProductFilter, qtyChange);
+
+                        orderProduct.Quantity = parseFloat(choice.SelectedNumber);                        
                         orderProduct.ExtPrice = orderProduct.UnitPrice * parseFloat(choice.SelectedNumber);
                         this.orderItems.forEach(oi => {
                             if (oi.ItemType != ItemType.Product && oi.UnitPrice != null ? oi.UnitPrice : 0 > 0) {
@@ -793,7 +805,8 @@ export class OrderComponent implements OnInit, OnDestroy {
                             }
                         }
                         )
-                        this.totalPrice();
+                        this.totalPrice();                        
+
                         break;
                     case 'seat':
                         orderProduct.SeatNumber = choice.SelectedNumber;
@@ -1565,7 +1578,11 @@ export class OrderComponent implements OnInit, OnDestroy {
         else {
             // if item is product, delete product and all associated modifiers
             if (orderItem.ItemType == ItemType.Product)
+            {
                 this.orderItems = this.orderItems.filter(oi => oi.IndexData !== orderItem.IndexData);
+                this.changeQtyAvailable(orderItem.ProductFilter, orderItem.Quantity);                
+                this.currentProduct = null;
+            }
             else
                 if (orderItem.ItemType == ItemType.SubOption || orderItem.ItemType == ItemType.Option) {
                     this.orderItems = this.orderItems.filter(oi => oi !== orderItem);
@@ -1590,7 +1607,9 @@ export class OrderComponent implements OnInit, OnDestroy {
             copiedItem.Quantity = orderItem.ItemType == ItemType.Product ? 1 : null;
             copiedItem.ExtPrice = copiedItem.Quantity * copiedItem.UnitPrice;
             copiedItem = Object.assign({}, this.selectedProduct);
+            this.pageProducts.find( p => p.ProductID == orderItem.ProductFilter ).QtyAvailable -= copiedItem.Quantity;
             that.orderItems.push(copiedItem);
+            
             /*
             that.orderItems.push(
                 {
