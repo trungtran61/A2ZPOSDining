@@ -1600,14 +1600,26 @@ export class OrderComponent implements OnInit, OnDestroy {
         let itemsToCopy = this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData);
         let nextIndexData: number = this.getNextIndexData();
         let that = this;
+        let product: MenuProduct = this.pageProducts.find(p => p.ProductID == orderItem.ProductFilter);
 
         itemsToCopy.forEach(function (orderItem: OrderDetail) {
             let copiedItem = Object.assign({}, orderItem);
             copiedItem.IndexData = nextIndexData;
             copiedItem.Quantity = orderItem.ItemType == ItemType.Product ? 1 : null;
             copiedItem.ExtPrice = copiedItem.Quantity * copiedItem.UnitPrice;
-            copiedItem = Object.assign({}, this.selectedProduct);
-            this.pageProducts.find( p => p.ProductID == orderItem.ProductFilter ).QtyAvailable -= copiedItem.Quantity;
+            //copiedItem = Object.assign({}, that.selectedProduct);
+            copiedItem.Quantity = orderItem.ItemType == ItemType.Product ? 1  : null;
+            copiedItem.SeatNumber = that.currentSeatNumber.toString();
+            copiedItem.ExtPrice = orderItem.ExtPrice;
+            copiedItem.UnitPrice = orderItem.UnitPrice;
+            copiedItem.PrintName = orderItem.PrintName;
+            copiedItem.ProductName = orderItem.ProductName;
+            copiedItem.ItemType = orderItem.ItemType;
+            copiedItem.IndexData = nextIndexData;
+            copiedItem.ProductCode = orderItem.ProductCode;
+            that.resetLastItemOrdered();
+            copiedItem.Class = 'lastOrderItem';
+            product.QtyAvailable -= copiedItem.Quantity;            
             that.orderItems.push(copiedItem);
             
             /*
@@ -1628,8 +1640,6 @@ export class OrderComponent implements OnInit, OnDestroy {
            */
         });
 
-        this.resetLastItemOrdered();
-        this.orderItems[this.orderItems.length - 1].Class = 'lastItemOrdered';
         this.totalPrice();
     }
 

@@ -32,21 +32,7 @@ export class APIService {
 
         return promise;
     }
-
-    public createRequestHeaderText() {
-        let headers = new HttpHeaders({
-            "AuthKey": "my-key",
-            "AuthToken": "my-token",
-            "Content-Type": "text/plain"
-        });
-
-        return headers;
-    }
-
-    public createHttpOptionsText() {
-        return ({ headers : this.createRequestHeaderText()});
-    }  
-
+    
     public createRequestHeader() {
         let headers = new HttpHeaders({
             "AuthKey": "my-key",
@@ -77,22 +63,7 @@ export class APIService {
             .pipe(map(res => res));
             */
     }
-/*
-    getFullOrderP(orderFilter: number): Promise<any> {
-        let promise = new Promise((resolve, reject) => {
-            let headers = this.createRequestHeader();
-            this.http.get(this.apiUrl + 'GetFullOrder?OrderFilter=' + orderFilter,
-                { headers: headers })
-                .toPromise()
-                .then(
-                    res => { // Success
-                        resolve();
-                    }
-                );
-        });
-        return promise;
-    }
-*/
+
     getCheckNumber(tableName: string, employeeID: number): Observable<any> {
         let headers = this.createRequestHeader();
         return this.http.get(this.apiUrl + 'getCheckNumber?Name=' + tableName + '&EmployeeID=' + employeeID,
@@ -126,14 +97,18 @@ export class APIService {
     directPrint(printRequest: DirectPrintJobsRequest): Observable<any>
     {
         let options = this.createHttpOptions();
-        return this.http.post<any>(this.apiUrl + 'DirectPrintJobs,',
-            JSON.stringify(printRequest), options);
+        let JSONrequest: string = JSON.stringify(printRequest);
+
+        return this.http.post<any>(this.apiUrl + 'DirectPrintJobs',
+            JSONrequest, options);
     }
 
     checkPrintStatus(systemID: string): Observable<any>
     {
         let headers = this.createRequestHeader();
-        return this.http.get(this.apiUrl + '?systemID=' + systemID,
+        let url: string = this.apiUrl + 'CheckPrintStatus?systemID=' + encodeURIComponent(systemID);
+        //let url: string = this.apiUrl + 'CheckPrintStatus';
+        return this.http.get(url,
             { headers: headers }).pipe(map(res => res));
     }
 
