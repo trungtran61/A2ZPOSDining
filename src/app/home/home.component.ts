@@ -239,7 +239,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     checkPrint() {
         this.apiSvc.checkPrintStatus(this.DBService.systemSettings.DeviceName).subscribe(printStatus => {
             let printStatuses: PrintStatusDetail[] = printStatus;
-            if (printStatuses.length >= 0) {
+            if (printStatuses.length > 0) {
                 let message: string = 'Error occurred while printing:\n';
                 printStatuses.forEach( ps => 
                     {
