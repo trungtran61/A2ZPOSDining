@@ -1912,30 +1912,15 @@ export class OrderComponent implements OnInit, OnDestroy {
                 }
 
                 this.apiSvc.directPrint(printRequest).subscribe(printResult => {
-                    if (printResult)
-                    {
-                        this.apiSvc.checkPrintStatus(this.DBService.systemSettings.DeviceName).subscribe(printStatus => {
-                            let printStatuses: PrintStatusDetail[] = printStatus;
-                            if (printStatuses.length > 0)
-                            {
-                                dialogs.alert({
-                                    title: "Error",
-                                    message: "Error occurred while printing. " + PrintStatus[printStatuses[0].PrintStatus],
-                                    okButtonText: "Close"
-                                })
-                            }
-                        });
-                    }
-                    else
+                    if (!printResult)
                     {
                         dialogs.alert({
                             title: "Error",
                             message: "Error occurred sending to print API.",
                             okButtonText: "Close"
-                        })
-                    }
+                        })                                           
+                    }                  
                 });    
-
                 if (startNewOrder) {
                     this.router.navigate(['/home/tableguests/' + this.table]);
                 }
@@ -1954,9 +1939,8 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     printReceipt() {
-
     }
-
+    
     getMenuTimers() {
         this.lockedCategoryId = 0;
         let timers: MenuTimer[] = [];

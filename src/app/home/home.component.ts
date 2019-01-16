@@ -15,6 +15,7 @@ import { APIService } from "../services/api.service";
 import { topmost } from "tns-core-modules/ui/frame";
 import { isIOS } from "tns-core-modules/platform";
 import * as utils from "utils/utils";
+import { PrintStatusDetail, PrintStatus } from "../models/orders";
 
 var Sqlite = require("nativescript-sqlite");
 
@@ -60,7 +61,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
             }
             else {
                 this.DBService.systemSettings = systemSettings;
-                this.DBService.systemSettings.DeviceName = utils.ios.getter(UIDevice, UIDevice.currentDevice).name;
+                this.DBService.systemSettings.DeviceName = utils.ios.getter(UIDevice, UIDevice.currentDevice).name.toUpperCase();
+                
+                // check for print errors every 30 seconds
+                let that = this;
+                setInterval(() => 
+                {
+                    that.checkPrint();            
+                }, 30000);                
             }
         });
         //}
@@ -71,7 +79,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         // Init your component properties here.
         //this.router.navigate(['/home/pizza']);  
         this.utilSvc.setTopBarStyle();
-        this.utilSvc.getTaxRates();
+        this.utilSvc.getTaxRates();        
     }
 
     ngAfterViewInit(): void {
@@ -226,6 +234,20 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     dropTables() {
         this.DBService.getTableInfo('MenuCategories'); // .createTables(db);
+    }
+
+    checkPrint() {
+        this.apiSvc.checkPrintStatus(this.DBService.systemSettings.DeviceName).subscribe(printStatus => {
+            let printStatuses: PrintStatusDetail[] = printStatus;
+            if (printStatuses.length >= 0) {
+                let message: string = 'Error occurred while printing:\n';
+                printStatuses.forEach( ps => 
+                    {
+                        message += ps.SystemName + ', ' + ps.PrinterName + ': ' + PrintStatus[ps.Status] + '\n';
+                    });
+                alert(message);
+            }
+        });
     }
 
     shutDown() {

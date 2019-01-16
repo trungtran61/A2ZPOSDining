@@ -78,7 +78,7 @@ export enum PrintStatus {
 export interface PrintStatusDetail {
     SystemName: string;
     PrinterName: string;
-    PrintStatus: PrintStatus;
+    Status: PrintStatus;
 }
 
 export interface FunctionTypeDetail {
