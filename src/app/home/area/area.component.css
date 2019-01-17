@@ -85,7 +85,12 @@
 
 .tableOccupied
 {
-    text-align: center; background-color: gold;
+    text-align: center; background-color: orange;
+}
+
+.tableName
+{
+    font-weight: bold;
 }
 
 .currentTable
@@ -105,7 +110,7 @@
 
 .infoText
 {
-    color: black; background-color: lightgray; border-radius: 5;
+    color: yellow; font-weight: bold;
 }
 .viewClosedChecks
 {

@@ -71,8 +71,7 @@ export class AreaComponent implements OnInit {
         this.apiSvc.getTablesDetails(area.AreaID,
             this.DBService.loggedInUser.PriKey,
             this.DBService.loggedInUser.AccessType,
-            this.DBService.systemSettings.ServerViewAll).subscribe(res => {
-                this.tables = res;
+            this.DBService.systemSettings.ServerViewAll).subscribe(res => {                
                 res.forEach(table => {
                     let tableClass: string = 'tableOpen';
                     if (table.Status.indexOf('Disabled') > -1) {
@@ -89,7 +88,7 @@ export class AreaComponent implements OnInit {
 
                     table.Class = 'table ' + tableClass;                                        
                     table.Opacity = '1';                          
-                    table.OrderTime = table.OrderTime == null ? '' : this.utilSvc.getJSONDate(table.OrderTime);
+                    table.OrderTime = table.OrderTime == null ? 0 : this.utilSvc.getJSONDate(table.OrderTime);
                     let margin: number = (table.Height / 2) - 10;
                     table.TextTopMargin = 'margin-top: ' + margin.toString();
 
@@ -102,6 +101,7 @@ export class AreaComponent implements OnInit {
                         table.Style = 'border-radius: 5';
                     }
                 });
+                this.tables = res;
             });
 
     }
@@ -115,7 +115,7 @@ export class AreaComponent implements OnInit {
 
         this.tables.forEach(table => {
             if (Date.parse(table.OrderTime)) {
-                table.Opacity = '0.5'
+                table.Opacity = '0.4'
                 if (this.showStatus) {
                     let elapsedTime: number = Math.ceil((now - Date.parse(table.OrderTime)) / (ONE_MINUTE));
                     let hours = Math.floor(elapsedTime / 60);
