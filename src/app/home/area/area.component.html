@@ -4,18 +4,18 @@
     [width]="table.Width" [height]="table.Height" [style]='table.Style'>    
     <!-- table names -->
     <Label [text]="table.Name" [opacity]='table.Opacity' [style]='table.TextTopMargin' class='tableName'></Label>  
+     <!-- receipt printed -->
+     <Label class="fa" text="&#xf00c;" *ngIf="table.Printed" [style]="'color: green;margin-left:' + (table.Width - 20).toString() + ';margin-top:-' + (table.Height).toString()"></Label>    
   </StackLayout>
     <StackLayout [left]="table.PosX" [top]="table.PosY" *ngFor="let table of tables">  
+   <!-- hold -->
+   <Image src="res://images/TableLayout/blinkingH" *ngIf="table.Holds" style="margin-left:5"></Image>
     <!-- elapsed times -->
-    <Label [text]="table.ElapsedTime" *ngIf="showStatus && table.Class == 'table tableOccupied'" class="infoText"></Label>
+    <Label [text]="table.ElapsedTime" *ngIf="showStatus && table.Class == 'table tableOccupied'" class="infoText" [style]='table.TextTopMargin'></Label>
     <!-- number of guests -->
     <Label [text]="table.Covers" *ngIf="showGuests" class="infoText"></Label>
     <!-- staff -->
-    <Label [text]="table.EmployeeName" *ngIf="showStaff" class="infoText"></Label>
-    <!-- receipt printed -->
-    <Label class="fa" text="&#xf00c;" *ngIf="table.Printed" [style]="'color: green;margin-left:' + (table.Width - 20).toString() "></Label>
-    <!-- hold -->
-    <Label class="blink" text="H" *ngIf="table.Holds" [style]="'color: red;margin-left:' + (table.Width - 20).toString() "></Label>
+    <Label [text]="table.EmployeeName" *ngIf="showStaff" class="infoText"></Label>   
   </StackLayout>  
   <button class="glass btnLogout" left="0" top="690" text='Log Out' (tap)='logOut()'></button>
   <button class="glass btnInfo fa" left="120" top="690" text='&#xf0c0; Guests' text-wrap="true" (tap)='viewGuests()'

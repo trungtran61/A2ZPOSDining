@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { NavigationExtras } from "@angular/router";
 
@@ -25,7 +25,7 @@ const ONE_MINUTE: number = 1000 * 60; // in milliseconds
 })
 
 export class AreaComponent implements OnInit {
-    areas: Area[] = [];
+   areas: Area[] = [];
     //tables: Observable<TableDetail[]>;   
     tables: TableDetail[];
     areaStyle: string = "";
@@ -41,7 +41,7 @@ export class AreaComponent implements OnInit {
     showGuests: boolean = false;
     showAreas: boolean = false;
     currentArea: Area;    
-
+    
     ngOnInit(): void {
         this.DBService.getLocalAreas().then((data) => {
             if (data.length == 0) {
@@ -89,7 +89,7 @@ export class AreaComponent implements OnInit {
                     table.Class = 'table ' + tableClass;                                        
                     table.Opacity = '1';                          
                     table.OrderTime = table.OrderTime == null ? 0 : this.utilSvc.getJSONDate(table.OrderTime);
-                    let margin: number = (table.Height / 2) - 10;
+                    let margin: number = (table.Height / 2) - 14;
                     table.TextTopMargin = 'margin-top: ' + margin.toString();
 
                     if (table.TableType == TableType.Round)
@@ -101,7 +101,7 @@ export class AreaComponent implements OnInit {
                         table.Style = 'border-radius: 5';
                     }
                 });
-                this.tables = res;
+                this.tables = res;                
             });
 
     }

@@ -90,7 +90,7 @@
 
 .tableName
 {
-    font-weight: bold;
+    font-weight: bold; font-size: 25;
 }
 
 .currentTable
@@ -126,4 +126,16 @@
 {
     background-image: url("res://images/TableLayout/ViewDetail"); 
     background-repeat: no-repeat;
+}
+
+.animated {
+    animation-name: animation;
+    animation-duration: 1.2s;
+}
+@keyframes animation {
+    to {
+                transform: translate(100, 100) scale(1.5, 1.5);
+                background-color: #00A0FF;
+                opacity: 0.5;
+    }
 }
