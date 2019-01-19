@@ -1,21 +1,29 @@
 <AbsoluteLayout [style]="areaStyle" (tap)='utilSvc.resetIdleTImer()'>
   <Label [text]="employeeName" left="10" top="10" width="100" [height]="20" style="color:white; font-weight: bold"></Label>
-  <GridLayout [left]="table.PosX" [top]="table.PosY" [class]="table.Class" (tap)="onTableClick(table)" *ngFor="let table of tables"
-    [width]="table.Width" [height]="table.Height" [style]='table.Style'>    
+  <GridLayout [left]="table.PosX+20" [top]="table.PosY" [class]="table.Class" (tap)="onTableClick(table)" *ngFor="let table of tables"
+    [width]="table.Width" [height]="table.Height" [style]='table.Style'>
     <!-- table names -->
-    <Label [text]="table.Name" [opacity]='table.Opacity' [style]='table.TextTopMargin' class='tableName'></Label>  
-     <!-- receipt printed -->
-     <Label class="fa" text="&#xf00c;" *ngIf="table.Printed" [style]="'color: green;margin-left:' + (table.Width - 20).toString() + ';margin-top:-' + (table.Height).toString()"></Label>        
-   <!-- hold --> 
-   <!--Image src="res://images/TableLayout/blinkingH.gif" *ngIf="table.Holds" style="margin-left:5"></Image-->
-   <Label class="blink" text="H" *ngIf="table.Holds && isBlinking" [style]="'color: red;margin-left:' + (table.Width - 20).toString() + ';margin-top:' + (table.Height - 20).toString()"></Label>
+    <Label [text]="table.Name" [opacity]='table.Opacity' [style]='table.TextTopMargin' class='tableName'></Label>
+    <!-- receipt printed -->
+    <Label class="fa" text="&#xf00c;" *ngIf="table.Printed" 
+      [style]="'color: green;margin-left:' + (table.Width - 20).toString() + ';margin-top:-' + (table.Height-13).toString()"></Label>
+    <!-- hold -->
+    <!--Image src="res://images/TableLayout/blinkingH.gif" *ngIf="table.Holds" style="margin-left:5"></Image-->
+    <Label class="blink" text="H" *ngIf="table.Holds && isBlinking" 
+      [style]="'color: red;margin-left:' + (table.Width - 20).toString() + ';margin-top:' + (table.Height - 20).toString()"></Label>
+  </GridLayout>
+
+  <GridLayout [left]="table.PosX-8" [top]="table.PosY" (tap)="onTableClick(table)" *ngFor="let table of tables" width="100"
+    [height]="50" style='text-align: center'>
     <!-- elapsed times -->
-    <Label [text]="table.ElapsedTime" *ngIf="showStatus && table.Class == 'table tableOccupied'" class="infoText" [style]='table.TextTopMargin'></Label>
+    <Label [text]="table.ElapsedTime" *ngIf="showStatus && table.Class == 'table tableOccupied'" class="infoText"
+      [style]='table.TextTopMargin'></Label>
     <!-- number of guests -->
     <Label [text]="table.Covers" *ngIf="showGuests" class="infoText"></Label>
     <!-- staff -->
-    <Label [text]="table.EmployeeName" *ngIf="showStaff" class="infoText"></Label>   
-  </GridLayout>  
+    <Label [text]="table.EmployeeName" *ngIf="showStaff" class="infoText"></Label>
+  </GridLayout>
+
   <button class="glass btnLogout" left="0" top="690" text='Log Out' (tap)='logOut()'></button>
   <button class="glass btnInfo fa" left="120" top="690" text='&#xf0c0; Guests' text-wrap="true" (tap)='viewGuests()'
     *ngIf='showInfo'></button>
@@ -23,7 +31,7 @@
     *ngIf='showInfo'></button>
   <button class="glass btnInfo fa" left="360" top="690" text='&#xf183; Staff' text-wrap="true" (tap)='viewStaff()'
     *ngIf='showInfo'></button>
-  <Image src="res://images/TableLayout/ViewClosedChecks" left="140" top="690" (tap)='viewChecks(true)' *ngIf='!showInfo'></Image> 
+  <Image src="res://images/TableLayout/ViewClosedChecks" left="140" top="690" (tap)='viewChecks(true)' *ngIf='!showInfo'></Image>
   <Image src="res://images/TableLayout/MyChecks" left="200" top="690" (tap)='viewChecks(false)' *ngIf='!showInfo'></Image>
   <Image src="res://images/TableLayout/ViewDetail" left="260" top="690" (tap)='viewCheckDetail()' *ngIf='!showInfo'></Image>
   <button class="glass btnInfo fa" left="360" top="690" text='&#xf05a; Info' (tap)='info()' *ngIf='!showInfo'></button>
@@ -43,10 +51,12 @@
     <Image src='res://images/TableLayout/PrintReceipt' (tap)='closeTable()' height="64"></Image>
   </StackLayout>
 
-  <StackLayout *ngFor="let area of areas let i=index" (tap)='viewTables(area)' [left]="605 + (82 * i)" top="635" [visibility]="showAreas ? 'visible' : 'collapse'">
+  <StackLayout *ngFor="let area of areas let i=index" (tap)='viewTables(area)' [left]="605 + (82 * i)" top="635"
+    [visibility]="showAreas ? 'visible' : 'collapse'">
     <Label [text]="area.OccupiedTables" style='border-radius: 2;color:gold; border-width:2;border-color:gold;background-color: red'></Label>
   </StackLayout>
-  <StackLayout *ngFor="let area of areas let i=index" (tap)='viewTables(area)' [left]="602 + (82 * i)" top="630" [visibility]="showAreas ? 'visible' : 'collapse'">
+  <StackLayout *ngFor="let area of areas let i=index" (tap)='viewTables(area)' [left]="602 + (82 * i)" top="630"
+    [visibility]="showAreas ? 'visible' : 'collapse'">
     <Label [text]="area.Name" class='area' textWrap="true" left="605" top="595"></Label>
   </StackLayout>
 

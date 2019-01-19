@@ -77,7 +77,7 @@ export class AreaComponent implements OnInit {
     getTablesInfo() {
         let area: Area = this.currentArea;
         
-        this.areaStyle = "margin-left: 10px; background-image: url('" + this.httpProtocol + "://" + area.ImageURL + "'); background-repeat: no-repeat";
+        this.areaStyle = "margin-left: 30px; background-image: url('" + this.httpProtocol + "://" + area.ImageURL + "'); background-repeat: no-repeat";
 
         console.log(this.DBService.loggedInUser.PriKey);
         console.log(this.DBService.loggedInUser.AccessType);
