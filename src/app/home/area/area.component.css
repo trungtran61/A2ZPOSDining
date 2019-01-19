@@ -110,8 +110,14 @@
 
 .infoText
 {
-    color: yellow; font-weight: bold;
+    color: lightyellow; font-weight: bold;
 }
+
+.guestsInfoText
+{
+    color: red; font-weight: bold; font-size: 30
+}
+
 .viewClosedChecks
 {
     background-image: url("res://images/TableLayout/ViewClosedChecks"); 

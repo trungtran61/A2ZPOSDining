@@ -130,7 +130,9 @@ export class AreaComponent implements OnInit {
 
         this.tables.forEach(table => {
             if (Date.parse(table.OrderTime)) {
-                table.Opacity = '0.4'
+                if (table.Covers > 0)                    
+                    table.Opacity = '0.2'
+                    
                 if (this.showStatus) {
                     let elapsedTime: number = Math.ceil((now - Date.parse(table.OrderTime)) / (ONE_MINUTE));
                     let hours = Math.floor(elapsedTime / 60);

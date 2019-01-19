@@ -13,13 +13,13 @@
       [style]="'color: red;margin-left:' + (table.Width - 20).toString() + ';margin-top:' + (table.Height - 20).toString()"></Label>
   </GridLayout>
 
-  <GridLayout [left]="table.PosX-8" [top]="table.PosY" (tap)="onTableClick(table)" *ngFor="let table of tables" width="100"
+  <GridLayout [left]="table.Width < 95 ? table.PosX-8 : table.PosX+5" [top]="table.PosY" (tap)="onTableClick(table)" *ngFor="let table of tables" [width]="table.Width > 95 ? table.Width : 95"
     [height]="50" style='text-align: center'>
     <!-- elapsed times -->
     <Label [text]="table.ElapsedTime" *ngIf="showStatus && table.Class == 'table tableOccupied'" class="infoText"
       [style]='table.TextTopMargin'></Label>
     <!-- number of guests -->
-    <Label [text]="table.Covers" *ngIf="showGuests" class="infoText"></Label>
+    <Label [text]="table.Covers" *ngIf="showGuests" class="guestsInfoText"></Label>
     <!-- staff -->
     <Label [text]="table.EmployeeName" *ngIf="showStaff" class="infoText"></Label>
   </GridLayout>
