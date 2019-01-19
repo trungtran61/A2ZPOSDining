@@ -25,7 +25,9 @@ const ONE_MINUTE: number = 1000 * 60; // in milliseconds
 })
 
 export class AreaComponent implements OnInit {
-   areas: Area[] = [];
+    isBlinking: boolean = true;
+    blinkingInterval: number;
+    areas: Area[] = [];
     //tables: Observable<TableDetail[]>;   
     tables: TableDetail[];
     areaStyle: string = "";
@@ -61,12 +63,25 @@ export class AreaComponent implements OnInit {
                 this.getTablesInfo();
             }
         });
+
+        //if (this.utilSvc.blinkingInterval == null)
+           //clearInterval(this.utilSvc.blinkingInterval);
+        //{
+            this.utilSvc.blinkingInterval = setInterval(() => 
+            {
+                this.isBlinking = !this.isBlinking;
+            }, 500);   
+        //}
     } 
 
     getTablesInfo() {
         let area: Area = this.currentArea;
         
         this.areaStyle = "margin-left: 10px; background-image: url('" + this.httpProtocol + "://" + area.ImageURL + "'); background-repeat: no-repeat";
+
+        console.log(this.DBService.loggedInUser.PriKey);
+        console.log(this.DBService.loggedInUser.AccessType);
+        console.log(this.DBService.systemSettings.ServerViewAll);
 
         this.apiSvc.getTablesDetails(area.AreaID,
             this.DBService.loggedInUser.PriKey,

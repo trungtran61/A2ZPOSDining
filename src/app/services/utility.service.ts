@@ -15,6 +15,7 @@ export class UtilityService {
     timeoutInSecs: number = 15;
     idleTimer: number;
     public socket: any;
+    public blinkingInterval: number = null;
     private readStream: NSInputStream;
     private writeStream: NSOutputStream;
     public taxRates: TaxRate[]=[];

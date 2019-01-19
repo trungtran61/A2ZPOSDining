@@ -84,16 +84,20 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 
 .btnSubCategory {
 	font-size: 20;
-	height: 110;
+	height: 100;
 	font-family: sans-serif;
     font-weight: bold;
 	margin: 5 5 5 5;
 	color: white; 
+	border-color: gray;
+	border-style: solid;
+	border-width: 1;	
+	border-radius: 5;
 	word-wrap: break-word;
 }
 
 .btnSubCategory:active,  .btnSubCategoryActive{ 
-	font-size: 25;
+	font-size: 20;
 	height: 110;
 	font-family: sans-serif;
 	font-weight: bold;	
@@ -102,7 +106,7 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 	border-style: solid;
 	border-width: 2;	
 	margin: 3 3 3 3;
-	color: white; 
+	color: red; 
 	word-wrap: break-word; 
 }
 

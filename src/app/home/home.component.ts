@@ -14,8 +14,9 @@ import { UtilityService } from "../services/utility.service";
 import { APIService } from "../services/api.service";
 import { topmost } from "tns-core-modules/ui/frame";
 import { isIOS } from "tns-core-modules/platform";
-import * as utils from "utils/utils";
+// import * as utils from "utils/utils";
 import { PrintStatusDetail, PrintStatus } from "../models/orders";
+import * as utils from "utils/utils";
 
 var Sqlite = require("nativescript-sqlite");
 
@@ -26,7 +27,7 @@ var Sqlite = require("nativescript-sqlite");
     styleUrls: ['./home.component.css']
 })
 
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit {
 
     employees: Employee[];
     employeeId: string = "";
@@ -50,39 +51,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        if (isIOS) {
-            topmost().ios.controller.navigationBar.barStyle = UIBarStyle.Black;
-        }
-        //if (this.DBService.systemSettings == null)
-        //{
-        this.DBService.getLocalSystemSettings().then((systemSettings) => {
-            if (systemSettings == null) {
-                console.log("SystemSettings not loaded.")
-            }
-            else {
-                this.DBService.systemSettings = systemSettings;
-                this.DBService.systemSettings.DeviceName = utils.ios.getter(UIDevice, UIDevice.currentDevice).name.toUpperCase();
-                
-                // check for print errors every 30 seconds
-                let that = this;
-                setInterval(() => 
-                {
-                    that.checkPrint();            
-                }, 30000);                
-            }
-        });
-        //}
-
-        //this.page.className = 'loginBG';
-        //this.router.navigate(['/home/area'])
-        //this.router.navigate(['/home/order'])
-        // Init your component properties here.
-        //this.router.navigate(['/home/pizza']);  
-        this.utilSvc.setTopBarStyle();
-        this.utilSvc.getTaxRates();        
-    }
-
-    ngAfterViewInit(): void {
 
         if (appSettings.getBoolean("isFirstLaunch", true)) {
             this.isLoading = true;
@@ -94,14 +62,38 @@ export class HomeComponent implements OnInit, AfterViewInit {
                 ]).then
                 {
                     this.isLoading = false;
-                    this.showLogos();
+                    this.showLogos();   
+                    //this.initSystemSettings();                 
                 };
             }, error => {
                 console.log("OPEN DB ERROR", error);
             });
             appSettings.setBoolean("isFirstLaunch", false);
+        }      
+        else
+        {
+            this.DBService.initSystemSettings();
+        }  
+
+        if (isIOS) {
+            topmost().ios.controller.navigationBar.barStyle = UIBarStyle.Black;
         }
-    }
+        
+        //this.page.className = 'loginBG';
+        //this.router.navigate(['/home/area'])
+        //this.router.navigate(['/home/order'])
+        // Init your component properties here.
+        //this.router.navigate(['/home/pizza']);  
+        this.utilSvc.setTopBarStyle();
+        this.utilSvc.getTaxRates();        
+
+         // check for print errors every 30 seconds
+         let that = this;
+         setInterval(() => 
+         {
+             that.checkPrint();            
+         }, 30000);       
+    }    
 
     showLogos() {
         require("nativescript-localstorage");

@@ -500,7 +500,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.pageSubCategories.forEach(function (menuSubCategory: MenuSubCategory) {
             menuSubCategory.Class = 'btnSubCategory'
             //that.subCategoryClasses.push('btnSubCategory');
-        });
+        }); 
         currentSubCategory.Class = 'btnSubCategoryActive';
         //this.subCategoryClasses[currentIndex] = 'btnSubCategoryActive';
     }

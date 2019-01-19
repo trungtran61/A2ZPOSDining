@@ -8,8 +8,9 @@
      <Label class="fa" text="&#xf00c;" *ngIf="table.Printed" [style]="'color: green;margin-left:' + (table.Width - 20).toString() + ';margin-top:-' + (table.Height).toString()"></Label>    
   </StackLayout>
     <StackLayout [left]="table.PosX" [top]="table.PosY" *ngFor="let table of tables">  
-   <!-- hold -->
-   <Image src="res://images/TableLayout/blinkingH" *ngIf="table.Holds" style="margin-left:5"></Image>
+   <!-- hold --> 
+   <!--Image src="res://images/TableLayout/blinkingH.gif" *ngIf="table.Holds" style="margin-left:5"></Image-->
+   <Label class="blink" text="H" *ngIf="table.Holds && isBlinking" [style]="'color: red;margin-left:' + (table.Width - 20).toString() + ';margin-top:' + (table.Height - 20).toString()"></Label>
     <!-- elapsed times -->
     <Label [text]="table.ElapsedTime" *ngIf="showStatus && table.Class == 'table tableOccupied'" class="infoText" [style]='table.TextTopMargin'></Label>
     <!-- number of guests -->

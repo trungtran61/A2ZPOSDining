@@ -40,12 +40,12 @@
           </FlexBoxLayout>
         </StackLayout>
       </StackLayout>
-      <StackLayout *ngIf='!showDetails' style="background-color: lightgreen">
+      <StackLayout *ngIf='!showDetails' >
         <StackLayout *ngFor="let item of orderItems">
           <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" *ngIf='item.ItemType == 1 && item.Voided == null'>
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
-            <Label [text]="item.ExtPrice | currency" style="text-align: right; width:50; margin-right:5"></Label>
+            <Label [text]="item.ExtPrice | currency" style="text-align: right; width:95; margin-right:5"></Label>
             <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
           </FlexBoxLayout>
         </StackLayout>
@@ -82,7 +82,7 @@
     <Button class="glass btnBottom fa" [text]="viewDetailsText" textWrap="true" (tap)="showHideDetails()" col='1' *ngIf='newItemsCount > 0'></Button>
     <Button class="glass btnBottom" (tap)="nextSeat()" textWrap="true" text="" col='2'
       style="background-image: url('res://images/Orders/Seat'); background-repeat: no-repeat; background-position: right 0"></Button>
-    <Label class="nextSeat" [text]='currentSeatNumber' col='2'></Label>
+    <Label class="nextSeat" [text]='currentSeatNumber' col='2' style='margin-left: 5'></Label>
     <Button class="glass btnBottom fa" (tap)="extraFunctions()" col='3' 
       textWrap="true" text="&#xf0fe; Extra Functions" style="margin-left: 40"></Button>
     <Button class="glass btnBottom fa" (tap)="hold()" col='5' textWrap="true" text="&#xf256; Hold" *ngIf='newItemsCount > 0'></Button>
@@ -103,7 +103,7 @@
       (tap)="categorySelected(item)" [style]="categoryStyles[i]"></Button>
   </StackLayout>
   <!-- subcategories -->
-  <GridLayout row="0" col="1" rows="60,92,92,92,92,92,80" (swipe)="onSubCategorySwipe($event)" *ngIf="showSubCategories">
+  <GridLayout row="0" col="1" rows="60 105 105 105 105 105 80" (swipe)="onSubCategorySwipe($event)" *ngIf="showSubCategories">
     <Button class="glass" text='MAIN' textWrap="true" row='0' col='0' style='text-align: center' (tap)='displayMainCategories()'></Button>
     <Button [class]="item.Class" [text]="item.Name" *ngFor="let item of pageSubCategories let i=index" (tap)="subCategorySelected(item, i)"
       [row]='item.Row' [col]='item.Col' textWrap="true"></Button>   
