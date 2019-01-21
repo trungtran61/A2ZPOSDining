@@ -144,3 +144,13 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 {
 	color: yellow;background-image: linear-gradient(gold,black 40%, gold 70%);
 }
+
+.btnChoice
+{
+    color: black;background-image: linear-gradient(lightgreen, white 20%, lightgreen 80%); margin: 2px;
+}
+
+.btnSubChoice
+{
+    color: black;background-image: linear-gradient(cyan, white 20%, cyan 80%); margin: 2px;
+}

@@ -693,6 +693,28 @@ export class SQLiteService {
             });
     }
 
+    public getLocalMenuChoiceItemsByProductCode(productCode: number) {
+        return SQLiteService.database.all("SELECT ChoiceID, Charge, Name, Position, Layer, ForcedChoice, PrintName, Key, ReportProductMix FROM MenuChoices " +
+            "WHERE ProductCode=? AND Layer=1 ORDER BY Position", 
+            [productCode])
+            .then(function (rows) {
+                let items: MenuChoice[] = [];
+                for (var row in rows) {
+                    items.push({
+                        ChoiceID: rows[row][0],
+                        Charge: rows[row][1],
+                        Name: rows[row][2],
+                        Position: rows[row][3],
+                        Layer: rows[row][4],
+                        ForcedChoice: rows[row][5] == "true",
+                        PrintName: rows[row][6],
+                        Key: rows[row][7],
+                        ReportProductMix: rows[row][8] == "true"
+                    });
+                }
+                return (items);
+            });
+    }
 
     public loadEmployees(db) {
         let that = this;

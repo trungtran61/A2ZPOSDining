@@ -105,10 +105,10 @@ export class OrderComponent implements OnInit, OnDestroy {
     previousProduct: MenuProduct;
     ticketNumber: number = 0;
 
-    showMainCategories: boolean = true;
-    showSubCategories: boolean = false;
-    showOptions: boolean = false;
-    showProducts: boolean = false;
+    isShowingMainCategories: boolean = true;
+    isShowingSubCategories: boolean = false;
+    isShowingOptions: boolean = false;
+    isShowingProducts: boolean = false;
     showDetails: boolean = true;
     showExtraFunctions: boolean = false;
     showProductInfo: boolean = false;
@@ -145,7 +145,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     TIPS_PCT: number = .15;
 
     qtyEntered: number = 1;
-    orderType: number = OrderType.DineIn;
+    orderType: number = OrderType.DineIn; 
 
     canSubCategoryPageDown: boolean = false;
     canSubCategoryPageUp: boolean = false;
@@ -163,13 +163,16 @@ export class OrderComponent implements OnInit, OnDestroy {
     allOptionFilterClass: string = 'glass';
 
     priceLevel: number = 0;
-    currentModifierType: ModifierType;
+    currentModifierType: ModifierType; 
 
-    showOptionsButton: boolean = false;
+    isShowingOptionsButton: boolean = false;
 
     currentOrderFilter: number = null;
     employeeID: number = 0;
     area: number = 0;
+
+    choiceItems: MenuChoice[] = [];
+    isShowingChoices: boolean = false;
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -232,9 +235,9 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     showProductOptions() {
-        this.showSubCategories = false;
+        this.isShowingSubCategories = false;
         this.isShowingMainOptions = !this.isShowingMainOptions;
-        this.showOptions = true;
+        this.isShowingOptions = true;
 
         let that = this;
 
@@ -371,9 +374,9 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     displayMainCategories() {
-        this.showMainCategories = true;
-        this.showSubCategories = false;
-        this.showOptions = false;
+        this.isShowingMainCategories = true;
+        this.isShowingSubCategories = false;
+        this.isShowingOptions = false;
     }
 
     sortOrderItems() {
@@ -461,9 +464,9 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         localStorage.setItem("CategoryID", category.CategoryID.toString());
         this.currentCategoryID = category.CategoryID;
-        this.showMainCategories = false;
-        this.showSubCategories = true;
-        this.showOptions = false;
+        this.isShowingMainCategories = false;
+        this.isShowingSubCategories = true;
+        this.isShowingOptions = false;
         let that = this;
         this.mainCategory = category.Name;
 
@@ -495,7 +498,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     setActiveSubCategoryClass(currentSubCategory: MenuSubCategory) {
         //this.subCategoryClasses = [];
         let that = this;
-        this.showSubCategories = true;
+        this.isShowingSubCategories = true;
 
         this.pageSubCategories.forEach(function (menuSubCategory: MenuSubCategory) {
             menuSubCategory.Class = 'btnSubCategory'
@@ -528,7 +531,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
                 this.getProductPage(true);
                 this.currentSubCategory = subCategory.Name;
-                this.showProducts = true;
+                this.isShowingProducts = true;
                 this.setActiveSubCategoryClass(subCategory);
             }
         });
@@ -576,7 +579,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             product.QtyAvailable -= 1;
         }
         else {
-            this.showOptionsButton = true;
+            this.isShowingOptionsButton = true;
             this.currentProduct = product;
 
             if (this.showProductInfo) {
@@ -715,8 +718,12 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.orderItems.push(orderItem);
             this.currentOrderItem = orderItem;
 
-            if (product.UseForcedModifier) {
+            if (product.UseForcedModifier && product.ForcedModifier) {
                 this.showForcedModifierDialog(true);
+            }
+            else if (product.UseForcedModifier)
+            {
+                this.showChoices(mp.ProductCode);
             }
             else {
                 this.totalPrice();
@@ -725,6 +732,26 @@ export class OrderComponent implements OnInit, OnDestroy {
 
             this.newItemsCount = this.orderItems.length;
         });
+    }
+
+    showChoices (productCode: number)
+    {
+        this.DBService.getLocalMenuChoiceItemsByProductCode(productCode).then((items) => { 
+            if (items.length == 0) {
+                dialogs.alert("Menu Choice Items not loaded.");
+            }
+            else {
+                this.isShowingChoices = true;  
+                this.isShowingSubCategories = true;
+                this.choiceItems = items;
+                this.choiceItems.forEach(function (menuChoice: MenuChoice) {
+                    menuChoice.Row = Math.floor((menuChoice.Position - 1) / 4);
+                    // 4 columns so use 4
+                    menuChoice.Col = menuChoice.Position - (menuChoice.Row * 4) - 1;
+                });              
+            }
+        });
+        this.isShowingOptionsButton = false;        
     }
 
     changeQtyAvailable(productId: number, qty: number)
@@ -820,7 +847,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         break;
                     case 'modify':
                         this.getMenuOptions(orderProduct.ProductCode);
-                        this.showOptionsButton = false;
+                        this.isShowingOptionsButton = false;
                         break;
                     case 'changechoice':
                         //this.showForcedModifierDialogOrderItem(orderItem);
@@ -1166,9 +1193,9 @@ export class OrderComponent implements OnInit, OnDestroy {
                 if (this.totalOptionPages > 1)
                     this.canOptionPageDown = true;
 
-                this.showOptions = true;
-                this.showMainCategories = false;
-                this.showSubCategories = false;
+                this.isShowingOptions = true;
+                this.isShowingMainCategories = false;
+                this.isShowingSubCategories = false;
                 this.optionCurrentPage = 0;
                 this.getOptionPage(true);
             }
@@ -1413,9 +1440,9 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     doneOption() {
-        this.showOptions = false;
-        this.showProducts = true;
-        this.showSubCategories = true;
+        this.isShowingOptions = false;
+        this.isShowingProducts = true;
+        this.isShowingSubCategories = true;
     }
 
     onOptionCategorySwipe(args) {
@@ -1661,7 +1688,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     hold() {
-        this.showSubCategories = false;
+        this.isShowingSubCategories = false;
         this.showHoldCategories = true;
     }
 
@@ -1956,7 +1983,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 if (this.DBService.systemSettings.AutoCategory) {
                     // CategoryName is actually CategoryID
                     this.currentCategoryID = this.DBService.systemSettings.CategoryName;
-                    this.showMainCategories = false;
+                    this.isShowingMainCategories = false;
                 }
 
                 let isCategoryLocked: boolean = false;
@@ -1964,7 +1991,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
                 if (isCategoryLocked) {
                     this.currentCategoryID = this.lockedCategoryId;
-                    this.showMainCategories = false;
+                    this.isShowingMainCategories = false;
                 }
 
                 isCategoryLocked = this.checkMenuTimer(MenuTimerType.Locked, OverrideType.Type0, false);
@@ -1974,7 +2001,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 }
 
                 if (this.currentCategoryID == 0) {
-                    this.showMainCategories = true;
+                    this.isShowingMainCategories = true;
                 }
 
                 this.DBService.getLocalMenuCategories().then((categories) => {
