@@ -96,7 +96,8 @@ export class OrderComponent implements OnInit, OnDestroy {
     server: string = '';
     checkNumber: number = 1;
     checkTitle: string = '';
-    currentSubCategory: string = '';
+    currentSubCategory: MenuSubCategory;
+    currentSubCategoryName: string = '';
     subCategoriesTitle: string = '';
     mainCategory: string = '';
     lockedCategoryId: number = 0;
@@ -238,6 +239,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.isShowingSubCategories = false;
         this.isShowingMainOptions = !this.isShowingMainOptions;
         this.isShowingOptions = true;
+        this.isShowingChoices = false;
 
         let that = this;
 
@@ -490,7 +492,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     this.canSubCategoryPageDown = true;
 
                 this.getSubCategoryPage(true);
-                this.subCategorySelected(subCategories[0], 0);
+                this.subCategorySelected(subCategories[0]); 
             }
         });
     }
@@ -508,12 +510,14 @@ export class OrderComponent implements OnInit, OnDestroy {
         //this.subCategoryClasses[currentIndex] = 'btnSubCategoryActive';
     }
 
-    subCategorySelected(subCategory: MenuSubCategory, currentIndex: number) {
+    subCategorySelected(subCategory: MenuSubCategory) {
         // build menu products list        
+        this.isShowingChoices = false;
         this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
         let that = this;
         //let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
         let categoryID: number = this.currentCategoryID;
+        this.currentSubCategory = subCategory;
 
         this.DBService.getLocalMenuProducts(categoryID, subCategory.SubCategoryID).then((products) => {
             if (products.length == 0) {
@@ -530,7 +534,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     this.canProductPageDown = true;
 
                 this.getProductPage(true);
-                this.currentSubCategory = subCategory.Name;
+                this.currentSubCategoryName = subCategory.Name;
                 this.isShowingProducts = true;
                 this.setActiveSubCategoryClass(subCategory);
             }
@@ -725,7 +729,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             {
                 this.showChoices(mp.ProductCode);
             }
-            else {
+            else { 
                 this.totalPrice();
             }
             this.previousProduct = this.currentProduct;
@@ -734,7 +738,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         });
     }
 
-    showChoices (productCode: number)
+    showChoices (productCode: number)   
     {
         this.DBService.getLocalMenuChoiceItemsByProductCode(productCode).then((items) => { 
             if (items.length == 0) {
@@ -744,14 +748,14 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.isShowingChoices = true;  
                 this.isShowingSubCategories = true;
                 this.choiceItems = items;
-                this.choiceItems.forEach(function (menuChoice: MenuChoice) {
-                    menuChoice.Row = Math.floor((menuChoice.Position - 1) / 4);
-                    // 4 columns so use 4
-                    menuChoice.Col = menuChoice.Position - (menuChoice.Row * 4) - 1;
+                this.choiceItems.forEach(function (ci: MenuChoice) {
+                    ci.Row = ((Math.floor((ci.Position - 1) / 4)) % 6) + 1;
+                    ci.Col = (ci.Position - 1) % 4;                    
                 });              
             }
         });
-        this.isShowingOptionsButton = false;        
+        this.isShowingOptionsButton = false;    
+        this.isShowingProducts = false;    
     }
 
     changeQtyAvailable(productId: number, qty: number)
@@ -848,6 +852,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     case 'modify':
                         this.getMenuOptions(orderProduct.ProductCode);
                         this.isShowingOptionsButton = false;
+                        this.isShowingProducts = false;
                         break;
                     case 'changechoice':
                         //this.showForcedModifierDialogOrderItem(orderItem);
@@ -1281,6 +1286,17 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.addOption(false, option.Name, amount, false);
     }
 
+    choiceSelected(choice: MenuChoice) {      
+        this.currentMenuOption = choice;  
+        this.addOption(false, choice.Name, choice.Charge, false); 
+    }
+
+    doneChoices()
+    {
+        this.isShowingChoices = false;
+        this.isShowingProducts = true;
+    }
+
     getNextOptionFilterNumber(): number {
         if (this.orderItems.length == 0)
             return 0;
@@ -1535,7 +1551,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         if (this.pageSubCategories[0].Row >= this.subCategoryPageSize)
             this.pageSubCategories = this.pageSubCategories.slice(0, 1);
 
-        this.subCategorySelected(this.pageSubCategories[0], 0);
+        this.subCategorySelected(this.pageSubCategories[0]);
         this.canSubCategoryPageUp = this.subCategoryCurrentPage > 1;
         this.canSubCategoryPageDown = this.subCategoryCurrentPage < this.totalSubCategoriesPages;
     }

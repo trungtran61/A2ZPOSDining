@@ -147,10 +147,30 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 
 .btnChoice
 {
-    color: black;background-image: linear-gradient(lightgreen, white 20%, lightgreen 80%); margin: 2px;
+	color: black;background-image: linear-gradient(lightgreen, white 20%, lightgreen 80%); margin: 2px;
+	height: 84;
+	font-size: 18;
+	font-family: sans-serif;
+    font-weight: bold;
+	border-radius: 20px;
+	border-color: #fff;
+	border-style: solid;
+	border-width: 2px;
+	margin: 3 3 3 3;	
+	word-wrap: break-word;
 }
 
 .btnSubChoice
 {
-    color: black;background-image: linear-gradient(cyan, white 20%, cyan 80%); margin: 2px;
+	color: black;background-image: linear-gradient(cyan, white 20%, cyan 80%); margin: 2px;
+	height: 84;
+	font-size: 18;
+	font-family: sans-serif;
+    font-weight: bold;
+	border-radius: 20px;
+	border-color: #fff;
+	border-style: solid;
+	border-width: 2px;
+	margin: 3 3 3 3;
+	word-wrap: break-word;
 }
