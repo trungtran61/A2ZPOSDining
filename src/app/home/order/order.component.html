@@ -144,10 +144,10 @@
     <Button class="btnSubOption" [text]="item.Name" [visibility]="isShowingSubOptions ? 'visible' : 'collapse'"
       *ngFor="let item of subOptions" (tap)="subOptionSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true'
       height="60" width="100"></Button>
-    <Button class="glass btnOK fa" text="Done" textWrap='true' (tap)="doneSubOptions()" row="6" col="4"  style="margin-top:20"
-      height="60" width="100" *ngIf="isShowingSubOptions"></Button>
-    <Button class="glass btnOK fa" text="&#xf00c; Done" textWrap='true' (tap)="doneChoices()" row="6" col="4" style="margin-top:20"
-      height="60" width="100" *ngIf="isShowingChoices"></Button>
+    <Button class="glass btnShowSubOptions" text="Sub Options" textWrap='true' (tap)="showSubOptions()" row="6" col="2"  style="margin-top:20"
+      height="60" width="100" *ngIf="isShowingSubOptionsButton"></Button>  
+    <Button class="glass btnOK fa" text="&#xf00c; Done" textWrap='true' (tap)="doneChoices()" row="6" col="3" style="margin-top:20"
+      height="60" width="100"></Button>
   </GridLayout>
 
   <!-- Options -->

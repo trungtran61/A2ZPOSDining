@@ -174,3 +174,8 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 	margin: 3 3 3 3;
 	word-wrap: break-word;
 }
+
+.btnShowSubOptions
+{
+	background-image:linear-gradient(darkblue, black)
+}

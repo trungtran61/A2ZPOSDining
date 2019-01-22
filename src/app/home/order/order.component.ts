@@ -178,11 +178,12 @@ export class OrderComponent implements OnInit, OnDestroy {
     pageChoices: MenuChoice[] = [];
     isShowingChoices: boolean = false;
     totalChoicePages: number = 0;
-    choiceCurrentPage: number = 1;
+    choiceCurrentPage: number = 1; 
 
     subOptions: MenuChoice[] = [];
     isShowingSubOptions: boolean = false;
-
+    isShowingSubOptionsButton: boolean = false; 
+ 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
@@ -904,7 +905,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             });
     }
 
-    addOption(isMemo: boolean, itemName: string, amount: number, isSubOption: boolean) {
+    addOption(isMemo: boolean, itemName: string, amount: number, isSubOption: boolean, itemType: ItemType) {
         let qty = this.currentOrderItem.Quantity;
         let customStamp: boolean = false;
         let unitPrice: number = 0;
@@ -970,7 +971,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         orderDetail.UnitPrice = null
         orderDetail.ExtPrice = null
         orderDetail.ReportProductMix = reportProductMix
-        orderDetail.ItemType = isSubOption ? ItemType.SubOption : ItemType.Option
+        orderDetail.ItemType = itemType; // isSubOption ? ItemType.SubOption : ItemType.Option
         orderDetail.Voided = null;
 
         if (!isMemo) {
@@ -1280,7 +1281,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             case 'NO MAKE':
             case 'TO GO':
                 this.currentModifierType = fixedOption.ModifierType;
-                this.addOption(false, fixedOption.Name, null, false);
+                this.addOption(false, fixedOption.Name, null, false, ItemType.Option);
                 break;
 
             default:
@@ -1325,44 +1326,51 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
         }
 
-        this.addOption(false, option.Name, amount, false);
+        this.addOption(false, option.Name, amount, false, ItemType.Option);
     } 
 
     choiceSelected(choice: MenuChoice) {       
         this.currentMenuOption = choice;  
-        this.addOption(false, choice.Name, choice.Charge, false); 
+        this.addOption(false, choice.Name, choice.Charge, false, ItemType.Choice); 
  
         this.DBService.getLocalMenuSubOptions(choice.ChoiceID).then((items) => {
             if (items.length > 0) {                
                 this.subOptions = items;
                 this.subOptions.forEach(function (item: MenuSubOption) {
                     item.Row = Math.floor((item.Position - 1) / 4) + 1;
-                    item.Col = item.Position - (item.Row * 4) - 1;                    
+                    item.Col = item.Position - ((item.Row - 1) * 4) - 1;                    
                 }); 
-                this.isShowingSubOptions = true;     
-                this.isShowingChoices = false;            
+                this.isShowingSubOptionsButton = true;                        
             }
         });
     }
 
+    showSubOptions()
+    {
+        this.isShowingSubOptions = true;     
+        this.isShowingChoices = false;  
+        this.isShowingOptionsButton = false;
+    }
+
     subOptionSelected(subOption: MenuSubOption)
     {
-        this.currentMenuOption = subOption;  
-        this.addOption(false, subOption.Name, subOption.Charge, false);       
+        this.currentSubOption = subOption;  
+        this.addOption(false, subOption.Name, subOption.Charge, true, ItemType.SubOption);       
     }
 
     doneChoices()
     {
-        this.isShowingChoices = false;
-        this.isShowingProducts = true;
+        if (this.isShowingSubOptions)
+        {
+            this.isShowingSubOptions = false;
+            this.isShowingChoices = true;            
+        }
+        else {
+            this.isShowingChoices = false;
+            this.isShowingProducts = true;
+        }
     }
-
-    doneSubOptions()
-    {
-        this.isShowingChoices = true;
-        this.isShowingProducts = false;
-    }
-
+    
     getNextOptionFilterNumber(): number {
         if (this.orderItems.length == 0)
             return 0;
@@ -1497,7 +1505,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.currentUserModifier = userModifier;
 
         if (userModifier.ButtonFunction == 1) {
-            this.addOption(false, userModifier.ItemName, null, false);
+            this.addOption(false, userModifier.ItemName, null, false, ItemType.ForcedChoice);
             return;
         }
 
@@ -1896,7 +1904,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.modalService.showModal(MemoComponent, modalOptions).then(
             (memo: Memo) => {
                 this.currentModifierType = ModifierType.NONE;
-                this.addOption(true, memo.Memo, memo.Price, false);
+                this.addOption(true, memo.Memo, memo.Price, false, ItemType.Option);
                 this.totalPrice();
             });
     }
