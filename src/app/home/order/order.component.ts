@@ -180,6 +180,9 @@ export class OrderComponent implements OnInit, OnDestroy {
     totalChoicePages: number = 0;
     choiceCurrentPage: number = 1;
 
+    subOptions: MenuChoice[] = [];
+    isShowingSubOptions: boolean = false;
+
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
@@ -746,7 +749,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     showChoices (productCode: number)   
     {
         let that = this;
-        
+
         this.DBService.getLocalMenuChoiceItemsByProductCode(productCode).then((items) => { 
             if (items.length == 0) {
                 dialogs.alert("Menu Choice Items not loaded.");
@@ -769,8 +772,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
         });
        
-    }
-
+    }         
+   
     onChoiceSwipe(args) {
         if (this.totalChoicePages <= 1)
             return;
@@ -1323,17 +1326,41 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
 
         this.addOption(false, option.Name, amount, false);
-    }
+    } 
 
-    choiceSelected(choice: MenuChoice) {      
+    choiceSelected(choice: MenuChoice) {       
         this.currentMenuOption = choice;  
         this.addOption(false, choice.Name, choice.Charge, false); 
+ 
+        this.DBService.getLocalMenuSubOptions(choice.ChoiceID).then((items) => {
+            if (items.length > 0) {                
+                this.subOptions = items;
+                this.subOptions.forEach(function (item: MenuSubOption) {
+                    item.Row = Math.floor((item.Position - 1) / 4) + 1;
+                    item.Col = item.Position - (item.Row * 4) - 1;                    
+                }); 
+                this.isShowingSubOptions = true;     
+                this.isShowingChoices = false;            
+            }
+        });
+    }
+
+    subOptionSelected(subOption: MenuSubOption)
+    {
+        this.currentMenuOption = subOption;  
+        this.addOption(false, subOption.Name, subOption.Charge, false);       
     }
 
     doneChoices()
     {
         this.isShowingChoices = false;
         this.isShowingProducts = true;
+    }
+
+    doneSubOptions()
+    {
+        this.isShowingChoices = true;
+        this.isShowingProducts = false;
     }
 
     getNextOptionFilterNumber(): number {

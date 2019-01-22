@@ -160,7 +160,7 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 	word-wrap: break-word;
 }
 
-.btnSubChoice
+.btnSubOption
 {
 	color: black;background-image: linear-gradient(cyan, white 20%, cyan 80%); margin: 2px;
 	height: 84;
