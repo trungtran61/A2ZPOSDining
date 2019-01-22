@@ -26,6 +26,9 @@ import { SearchComponent } from "./search.component";
 import { NullAstVisitor } from "@angular/compiler";
 import { GuestsComponent } from "./guests.component";
 
+const CHOICE_PAGESIZE: number = 20;
+const PRODUCT_PAGESIZE: number = 24;
+
 @Component({
     selector: "order",
     moduleId: module.id,
@@ -52,8 +55,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     pageProducts: MenuProduct[] = [];
 
     totalProductPages: number = 0;
-    productCurrentPage: number = 1;
-    productPageSize: number = 24;
+    productCurrentPage: number = 1;    
     newItemsCount: number = 0;
 
     productOptions: MenuOption[];
@@ -172,8 +174,11 @@ export class OrderComponent implements OnInit, OnDestroy {
     employeeID: number = 0;
     area: number = 0;
 
-    choiceItems: MenuChoice[] = [];
+    choices: MenuChoice[] = [];
+    pageChoices: MenuChoice[] = [];
     isShowingChoices: boolean = false;
+    totalChoicePages: number = 0;
+    choiceCurrentPage: number = 1;
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -527,7 +532,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.products = products;
 
                 this.setProductAttributes();
-                this.totalProductPages = Math.ceil(this.products[that.products.length - 1].Position / this.productPageSize);
+                this.totalProductPages = Math.ceil(this.products[that.products.length - 1].Position / PRODUCT_PAGESIZE);
                 this.productCurrentPage = 0;
 
                 if (this.totalProductPages > 1)
@@ -740,6 +745,8 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     showChoices (productCode: number)   
     {
+        let that = this;
+        
         this.DBService.getLocalMenuChoiceItemsByProductCode(productCode).then((items) => { 
             if (items.length == 0) {
                 dialogs.alert("Menu Choice Items not loaded.");
@@ -747,15 +754,47 @@ export class OrderComponent implements OnInit, OnDestroy {
             else {
                 this.isShowingChoices = true;  
                 this.isShowingSubCategories = true;
-                this.choiceItems = items;
-                this.choiceItems.forEach(function (ci: MenuChoice) {
+                this.choices = items;
+                this.choices.forEach(function (ci: MenuChoice) {
                     ci.Row = ((Math.floor((ci.Position - 1) / 4)) % 6) + 1;
-                    ci.Col = (ci.Position - 1) % 4;                    
-                });              
+                    ci.Col = (ci.Position - 1) % 4;  
+                    ci.Page = Math.ceil(ci.Position / CHOICE_PAGESIZE);                  
+                    that.totalChoicePages = ci.Page;
+                });                              
+
+                this.choiceCurrentPage = 1;
+                this.getChoicePage(); 
+                this.isShowingOptionsButton = false;    
+                this.isShowingProducts = false;    
             }
         });
-        this.isShowingOptionsButton = false;    
-        this.isShowingProducts = false;    
+       
+    }
+
+    onChoiceSwipe(args) {
+        if (this.totalChoicePages <= 1)
+            return;
+
+        // swiping up, goes to next page -- swiping down, goes to previous page
+        if (args.direction == SwipeDirection.down) {                
+            this.choiceCurrentPage--;
+        }    
+        else if (args.direction == SwipeDirection.up) 
+        {
+            this.choiceCurrentPage++;
+        }
+
+        if (this.choiceCurrentPage > this.totalChoicePages)
+            this.choiceCurrentPage = 1;
+        else if (this.choiceCurrentPage == 0)
+            this.choiceCurrentPage = this.totalChoicePages;  
+
+        this.getChoicePage();        
+    }
+
+    getChoicePage()
+    {
+        this.pageChoices = this.choices.filter(c => c.Page == this.choiceCurrentPage);
     }
 
     changeQtyAvailable(productId: number, qty: number)
@@ -1595,8 +1634,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         else
             this.productCurrentPage--;
 
-        let startPosition: number = (this.productCurrentPage * this.productPageSize) - this.productPageSize + 1;
-        let endPosition: number = startPosition + this.productPageSize;
+        let startPosition: number = (this.productCurrentPage * PRODUCT_PAGESIZE) - PRODUCT_PAGESIZE + 1;
+        let endPosition: number = startPosition + PRODUCT_PAGESIZE;
 
         if (endPosition > this.products[this.products.length - 1].Position)
             endPosition = this.products[this.products.length - 1].Position;

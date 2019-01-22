@@ -137,12 +137,12 @@
   </GridLayout>
 
   <!-- Choices -->
-  <GridLayout columns="* * * *" rows="60 86 86 86 86 86 86 80" row="0" col="3" *ngIf='isShowingChoices'>
+  <GridLayout columns="* * * *" rows="60 86 86 86 86 86 86 80" row="0" col="3" *ngIf='isShowingChoices' (swipe)='onChoiceSwipe($event)'>
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>
     <Button class="btnChoice" [visibility]="showSubChoices ? 'collapse' : 'visible'" [text]="item.Name" 
-      *ngFor="let item of choiceItems" (tap)="choiceSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true' ></Button>
+      *ngFor="let item of pageChoices" (tap)="choiceSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true' ></Button>
     <Button class="btnSubChoice" [text]="item.Name" [visibility]="showSubChoices ? 'visible' : 'collapse'"
-      *ngFor="let item of subChoiceItems" (tap)="subChoiceSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true'
+      *ngFor="let item of subChoices" (tap)="subChoiceSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true'
       height="94" width="150"></Button>
     <Button class="glass btnSubOptions" text="Done" textWrap='true' (tap)="doneSubOptions()" row="6" col="4"  
       height="60" width="100" [visibility]="showSubChoices ? 'visible' : 'collapse'"></Button>

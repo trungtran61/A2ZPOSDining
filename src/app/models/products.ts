@@ -218,7 +218,8 @@ export interface MenuChoice {
     SubOptions?: MenuSubOption[];
     Row?: number;
     Col?: number;  
-    Class?: string;  
+    Class?: string; 
+    Page?: number; 
 }
 
 export interface OptionCategory {
