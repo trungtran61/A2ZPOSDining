@@ -2,7 +2,7 @@
   <Label class="action-bar-title" [text]="tableGuestsTitle"></Label>
 </ActionBar>
 <StackLayout [visibility]="isNormalChoice ? 'visible' : 'collapse'">    
-  <GridLayout style="padding-left: 600px; margin-top: 20px" rows="110 110 110 110" columns="110 110 110" >         
+  <GridLayout style="padding-left: 650px; margin-top: 20px" rows="110 110 110 110" columns="110 110 110" >         
     <Button [text]="digit" *ngFor="let digit of digits let i=index" class="glass btnRound" (tap)="setGuests(digit)" [row]="digitRows[i]"
       [col]="digitCols[i]"></Button>
     <Button text="Other" class="glass" (tap)="otherQty()" row="3" col='0' colSpan="2"></Button>

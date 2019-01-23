@@ -680,7 +680,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         //this.router.navigate(['/home/tableguests/' + this.table]);
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
-            fullscreen: true,
+            fullscreen: false,
             //context: { options: options, currentOptions: currentOptions}
         };
 

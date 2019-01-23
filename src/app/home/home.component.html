@@ -4,21 +4,21 @@
 
 <GridLayout class="m-20" rows="auto,auto,auto" columns="auto,auto,auto">
     <Image [src]='logInLogo' col='0' row='1' style='margin: 25 0 0 0; width: 400'></Image>
-    <GridLayout class="m-20" rows="auto,auto,auto,auto,auto" columns="auto,auto,auto" row="1" col="1">
+    <GridLayout class="m-20" rows="60 auto auto auto auto" columns="auto auto auto" row="1" col="1">
         <TextField hint='Enter Id' [text]="employeeId" row="0" col="0" colspan="3" class="glass form-input" secure="true"
-            style='text-align: center; width: 370; height: 80;'></TextField>
-        <Button text="1" class="glass btnSquare" (tap)="addDigit('1')" row="1" col="0"></Button>
-        <Button text="2" class="glass btnSquare" (tap)="addDigit('2')" row="1" col="1"></Button>
-        <Button text="3" class="glass btnSquare" (tap)="addDigit('3')" row="1" col="2"></Button>
-        <Button text="4" class="glass btnSquare" (tap)="addDigit('4')" row="2" col="0"></Button>
-        <Button text="5" class="glass btnSquare" (tap)="addDigit('5')" row="2" col="1"></Button>
-        <Button text="6" class="glass btnSquare" (tap)="addDigit('6')" row="2" col="2"></Button>
-        <Button text="7" class="glass btnSquare" (tap)="addDigit('7')" row="3" col="0"></Button>
-        <Button text="8" class="glass btnSquare" (tap)="addDigit('8')" row="3" col="1"></Button>
-        <Button text="9" class="glass btnSquare" (tap)="addDigit('9')" row="3" col="2"></Button>
-        <Button text="CLEAR" class="glass btnSquare" row="4" col="0" (tap)="clearInput()" style='color: red;background-image:linear-gradient(white, lightgray )'></Button>
-        <Button text="0" class="glass btnSquare" (tap)="addDigit('0')" row="4" col="1"></Button>
-        <Button text="LOG ON" class="glass btnSquare" (tap)="logIn()" row="4" col="2" style='color: white;background-image:linear-gradient(lightgreen, darkgreen)'></Button>
+            style='text-align: center; width: 370; height: 60; margin-bottom: 30'></TextField>
+        <Button text="1" class="glass btnRound" (tap)="addDigit('1')" row="1" col="0"></Button>
+        <Button text="2" class="glass btnRound" (tap)="addDigit('2')" row="1" col="1"></Button>
+        <Button text="3" class="glass btnRound" (tap)="addDigit('3')" row="1" col="2"></Button>
+        <Button text="4" class="glass btnRound" (tap)="addDigit('4')" row="2" col="0"></Button>
+        <Button text="5" class="glass btnRound" (tap)="addDigit('5')" row="2" col="1"></Button>
+        <Button text="6" class="glass btnRound" (tap)="addDigit('6')" row="2" col="2"></Button>
+        <Button text="7" class="glass btnRound" (tap)="addDigit('7')" row="3" col="0"></Button>
+        <Button text="8" class="glass btnRound" (tap)="addDigit('8')" row="3" col="1"></Button>
+        <Button text="9" class="glass btnRound" (tap)="addDigit('9')" row="3" col="2"></Button>
+        <Button text="CLEAR" class="glass btnRound" row="4" col="0" (tap)="clearInput()" style='color: red;background-image:linear-gradient(white, lightgray )'></Button>
+        <Button text="0" class="glass btnRound" (tap)="addDigit('0')" row="4" col="1"></Button>
+        <Button text="LOG ON" class="glass btnRound" (tap)="logIn()" row="4" col="2" style='color: white;background-image:linear-gradient(lightgreen, darkgreen)'></Button>
     </GridLayout>
     <StackLayout row="2" col="0" colSpan="3">
         <FlexBoxLayout style='margin: 0 0 30 0'>
@@ -28,7 +28,7 @@
             <Image src="res://images/shutdown" (tap)="shutDown()" style="width: 100; border-radius: 100; border-width: 2; border-color: red; height: 100;"></Image>
         </FlexBoxLayout>
     </StackLayout>
-    <Image src='res://images/a2zlogo' col='0' row='2' colSpan="2" style="width: 600; height:100"></Image>
+    <!--Image src='res://images/a2zlogo' col='0' row='2' colSpan="2" style="width: 600; height:100"></Image-->
     <ActivityIndicator col='0' row='1' [busy]='isLoading' width="100" height="100" class="activity-indicator" style="color:white"
         ></ActivityIndicator>   
 </GridLayout>

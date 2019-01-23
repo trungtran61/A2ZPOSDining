@@ -29,7 +29,7 @@ export class GuestsComponent implements OnInit {
 
     setGuests(numberOfGuests: string) {
         this.params.closeCallback(numberOfGuests);      
-    }  
+    }     
  
     saveEnteredGuests()
     {
@@ -40,13 +40,13 @@ export class GuestsComponent implements OnInit {
         this.params.closeCallback(this.guestsEntered);       
     }
 
-    addDigit(digit: string)
+    addDigit(digit: string)  
     {
         if (parseInt(digit) || (digit == '0' && parseInt(this.guestsEntered)))
             this.guestsEntered = this.guestsEntered + digit;          
     }
 
-    backSpace()
+    backSpace()    
     {
         if (this.guestsEntered.length > 0)
             this.guestsEntered = this.guestsEntered.substring(0, this.guestsEntered.length - 1); 
@@ -69,7 +69,7 @@ export class GuestsComponent implements OnInit {
     }
 
     constructor(private params: ModalDialogParams, private page: Page) {       
-        page.actionBarHidden = true;    
+        //page.actionBarHidden = true;    
     }
 
 }

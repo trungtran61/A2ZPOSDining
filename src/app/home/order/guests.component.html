@@ -1,11 +1,7 @@
-<ActionBar android:title="Title" style="background-color: black">
-    <ActionItem text="Number of Guests" ios.position="left"></ActionItem>        
-</ActionBar>
-
 <StackLayout style="background-color: black">
     <StackLayout [visibility]="isNormalChoice ? 'visible' : 'collapse'">
-    <Label [text]="tableGuestsTitle" row='0' colSpan="3" horizontalAlignment="center" class="pageHeader"></Label>
-        <GridLayout style="padding-left: 600px; margin-top: 20px" rows="110 110 110 10 100" columns="110 110 110">            
+        <label class="dialogTitle" [text]="tableGuestsTitle" ></label>
+        <GridLayout style="padding-left: 220px;" rows="110 110 110 10 100" columns="110 110 110">
             <Button [text]="digit" *ngFor="let digit of digits let i=index" class="glass btnRound" (tap)="setGuests(digit)"
                 [row]="digitRows[i]" [col]="digitCols[i]"></Button>
             <Button text="Other" class="glass" (tap)="otherQty()" row="4" col='0' colSpan="2"></Button>
@@ -14,7 +10,7 @@
     </StackLayout>
 
     <StackLayout [visibility]="isNormalChoice ? 'collapse' : 'visible'">
-        <GridLayout rows="50" columns="200 100 200">
+        <GridLayout rows="50" columns="200 100 200" style='margin-top: 50; margin-left:10'>
             <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='0'
                 col='0' height="60" width="120"></Button>
             <TextField #guests horizontalAlignment="center" [text]='guestsEntered' [(ngModel)]='guestsEntered' row='0'
