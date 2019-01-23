@@ -28,6 +28,7 @@ import { GuestsComponent } from "./guests.component";
 
 const CHOICE_PAGESIZE: number = 20;
 const PRODUCT_PAGESIZE: number = 24;
+const SUBCATEGORY_PAGESIZE: number = 5;
 const SPACES5: string = '     ';
 const SPACES3: string = '   ';
 
@@ -454,11 +455,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 date1 = that.convertToDate(now.toDateString(), timer.StartTime);
                 date2 = that.convertToDate(now.toDateString(), timer.EndTime);
             }
-
-            console.log(now.toDateString() + ' ' + now.toTimeString());
-            console.log(date1.toDateString() + ' ' + date1.toTimeString());
-            console.log(date2.toDateString() + ' ' + date2.toTimeString());
-
+           
             if (now > date2 || now < date1) {
                 locked = true;
                 return;
@@ -495,15 +492,19 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.subCategoryCurrentPage = 0;
                 this.subCategories = subCategories;
 
-                this.subCategories.forEach(function (subCategory: MenuSubCategory) {
-                    subCategory.Row = ((subCategory.Position - 1) % 5) + 1;
-                    subCategory.Col = 0;
+                this.subCategories.forEach(function (sc: MenuSubCategory) {
+                    sc.Row = ((sc.Position - 1) % 5) + 1;
+                    sc.Col = 0;
+                    sc.Page = Math.ceil(sc.Position / SUBCATEGORY_PAGESIZE);    
+                    sc.Class = 'btnSubCategory';                                  
+                    that.totalSubCategoriesPages = sc.Page;
                 });
 
-                this.totalSubCategoriesPages = Math.ceil(this.subCategories[this.subCategories.length - 1].Position / this.subCategoryPageSize);
-                if (this.totalSubCategoriesPages > 1)
-                    this.canSubCategoryPageDown = true;
+                //this.totalSubCategoriesPages = Math.ceil(this.subCategories[this.subCategories.length - 1].Position / this.subCategoryPageSize);
+                //if (this.totalSubCategoriesPages > 1)
+                //    this.canSubCategoryPageDown = true;
 
+                this.subCategoryCurrentPage = 1;    
                 this.getSubCategoryPage(true);
                 this.subCategorySelected(subCategories[0]); 
             }
@@ -1574,70 +1575,61 @@ export class OrderComponent implements OnInit, OnDestroy {
                         }
                 }
     }
+    
 
     onSubCategorySwipe(args) {
         if (this.totalSubCategoriesPages <= 1)
             return;
 
-        // at last page, can only swipe down
-        if (this.subCategoryCurrentPage == this.totalSubCategoriesPages) {
-            if (args.direction == SwipeDirection.down) {
-                this.getSubCategoryPage(false);
+        // swiping up, goes to next page -- swiping down, goes to previous page
+        let getNextPage: boolean = true;
+
+        if (args.direction == SwipeDirection.down) {                
+            this.subCategoryCurrentPage--;
+            getNextPage = false;
+        }    
+        else if (args.direction == SwipeDirection.up) 
+        {
+            this.subCategoryCurrentPage++;
+        }
+
+        if (this.subCategoryCurrentPage > this.totalSubCategoriesPages)
+            this.subCategoryCurrentPage = 1;        
+        else if (this.subCategoryCurrentPage == 0)
+            this.subCategoryCurrentPage = this.totalSubCategoriesPages;  
+
+        this.getSubCategoryPage(getNextPage);        
+    }
+
+    getSubCategoryPage(getNextPage: boolean)
+    {
+        this.pageSubCategories = this.subCategories.filter(sc => sc.Page == this.subCategoryCurrentPage);
+
+        if (this.pageSubCategories.length == 0)
+        {
+            if (getNextPage)
+            {
+                this.subCategoryCurrentPage++;
+                if (this.subCategoryCurrentPage > this.totalSubCategoriesPages)
+                    this.subCategoryCurrentPage = 1;  
+                this.getSubCategoryPage(true);        
+            }
+            else        
+            {
+                this.subCategoryCurrentPage--;
+                if (this.subCategoryCurrentPage == 0)
+                this.subCategoryCurrentPage = this.totalSubCategoriesPages;  
+                this.getSubCategoryPage(false);        
             }
         }
-        // at first page, can only swipe up
         else
-            if (this.subCategoryCurrentPage == 1) {
-                if (args.direction == SwipeDirection.up) {
-                    this.getSubCategoryPage(true);
-                }
-            }
-            // else, can swipe up or down
-            else
-                if (this.subCategoryCurrentPage >= 1) {
-                    // go to next page            
-                    if (args.direction == SwipeDirection.up) {
-                        this.getSubCategoryPage(true);
-                    }
-                    else
-                        // go to previous page
-                        if (args.direction == SwipeDirection.down) {
-                            this.getSubCategoryPage(false);
-                        }
-                }
-
+        {
+            this.pageSubCategories.forEach(function (sc: MenuSubCategory) {
+                sc.Class = 'btnSubCategory';  
+            });
+        }
     }
-
-    getSubCategoryPage(nextPage: boolean) {
-
-        if (nextPage)
-            this.subCategoryCurrentPage++;
-        else
-            this.subCategoryCurrentPage--;
-
-        let startPosition: number = (this.subCategoryCurrentPage * this.subCategoryPageSize) - this.subCategoryPageSize + 1;
-
-        // find the first sub category on the next page      
-        if (this.subCategoryCurrentPage > 1 && nextPage)
-            startPosition = this.subCategories.find(sc => sc.Position > this.pageSubCategories[this.pageSubCategories.length - 1].Position).Position;
-
-        let endPosition: number = startPosition + this.subCategoryPageSize - 1;
-
-        if (endPosition > this.subCategories[this.subCategories.length - 1].Position)
-            endPosition = this.subCategories[this.subCategories.length - 1].Position;
-
-        this.pageSubCategories = this.subCategories.filter(
-            sc => sc.Position >= startPosition && sc.Position <= endPosition);
-
-        // if first item is in last row - page has only 1 row    
-        if (this.pageSubCategories[0].Row >= this.subCategoryPageSize)
-            this.pageSubCategories = this.pageSubCategories.slice(0, 1);
-
-        this.subCategorySelected(this.pageSubCategories[0]);
-        this.canSubCategoryPageUp = this.subCategoryCurrentPage > 1;
-        this.canSubCategoryPageDown = this.subCategoryCurrentPage < this.totalSubCategoriesPages;
-    }
-
+    
     onProductSwipe(args) {
         if (this.totalProductPages <= 1)
             return;

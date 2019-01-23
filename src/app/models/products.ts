@@ -32,7 +32,8 @@ export interface MenuSubCategory {
     ButtonForeColorHex: string;
     Class?: string;
     Row?: number;
-    Col?: number;    
+    Col?: number; 
+    Page?: number;    
 }
 
 export interface MenuProduct {
