@@ -15,7 +15,7 @@
                 col='0' height="60" width="120"></Button>
             <TextField #guests horizontalAlignment="center" [text]='guestsEntered' [(ngModel)]='guestsEntered' row='0'
                 col='1' maxlength='3' class='textEntryLongActive' (returnPress)="saveEnteredGuests()" (keyPress)="keyPressed($event)"
-                returnKeyType='done'>
+                returnKeyType='done' keyboardType="Number">
             </TextField>
             <Button class='glass btnOK' text='Accept' (tap)='saveEnteredGuests()' horizontalAlignment="right" row='0'
                 col='2' height="60" width="120"></Button>

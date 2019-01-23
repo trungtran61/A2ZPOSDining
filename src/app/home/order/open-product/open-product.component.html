@@ -23,25 +23,25 @@
             </Button>
         </StackLayout>
         <GridLayout rows="auto auto auto auto" columns="400 auto auto auto" row='1' col='0' colSpan="3" [visibility]="showingNumericKeyPad ? 'visible' : 'collapse'">
-            <Button text="1" class="glass btnSquare" (tap)="addDigit('1')" row="0" col="1"></Button>
-            <Button text="2" class="glass btnSquare" (tap)="addDigit('2')" row="0" col="2"></Button>
-            <Button text="3" class="glass btnSquare" (tap)="addDigit('3')" row="0" col="3"></Button>
-            <Button text="4" class="glass btnSquare" (tap)="addDigit('4')" row="1" col="1"></Button>
-            <Button text="5" class="glass btnSquare" (tap)="addDigit('5')" row="1" col="2"></Button>
-            <Button text="6" class="glass btnSquare" (tap)="addDigit('6')" row="1" col="3"></Button>
-            <Button text="7" class="glass btnSquare" (tap)="addDigit('7')" row="2" col="1"></Button>
-            <Button text="8" class="glass btnSquare" (tap)="addDigit('8')" row="2" col="2"></Button>
-            <Button text="9" class="glass btnSquare" (tap)="addDigit('9')" row="2" col="3"></Button>
+            <Button text="1" class="glass btnRound" (tap)="addDigit('1')" row="0" col="1"></Button>
+            <Button text="2" class="glass btnRound" (tap)="addDigit('2')" row="0" col="2"></Button>
+            <Button text="3" class="glass btnRound" (tap)="addDigit('3')" row="0" col="3"></Button>
+            <Button text="4" class="glass btnRound" (tap)="addDigit('4')" row="1" col="1"></Button>
+            <Button text="5" class="glass btnRound" (tap)="addDigit('5')" row="1" col="2"></Button>
+            <Button text="6" class="glass btnRound" (tap)="addDigit('6')" row="1" col="3"></Button>
+            <Button text="7" class="glass btnRound" (tap)="addDigit('7')" row="2" col="1"></Button>
+            <Button text="8" class="glass btnRound" (tap)="addDigit('8')" row="2" col="2"></Button>
+            <Button text="9" class="glass btnRound" (tap)="addDigit('9')" row="2" col="3"></Button>
             <Button text="Cancel" class="glass btnCancel" (tap)="cancel()" row='3' col='0'
                 horizontalAlignment='right'></Button>
-            <Button text="0" class="glass btnSquare" (tap)="addDigit('0')" row="3" col="1"></Button>
-            <Button text="00" class="glass btnSquare" (tap)="addDigit('00')" row="3" col="2"></Button>
+            <Button text="0" class="glass btnRound" (tap)="addDigit('0')" row="3" col="1"></Button>
+            <Button text="00" class="glass btnRound" (tap)="addDigit('00')" row="3" col="2"></Button>
             <Button text="Enter" class="glass btnOK" col="3" (tap)="done()" row="3" col="3"></Button>
         </GridLayout>
     </GridLayout>
 
     <GridLayout row='2' col='0' colSpan="3" [visibility]="showingNumericKeyPad ? 'collapse' : 'visible'">
-        <Button class='glass btnCancel' text='Cancel' (tap)='cancel()' horizontalAlignment='left'></Button>
-        <Button class='glass btnOK' text='Done' (tap)='done()' horizontalAlignment='right'></Button>
+        <Button class='glass btnCancel btnRound' text='Cancel' (tap)='cancel()' horizontalAlignment='left'></Button>
+        <Button class='glass btnOK btnRound' text='Done' (tap)='done()' horizontalAlignment='right'></Button>
     </GridLayout>
 </GridLayout>

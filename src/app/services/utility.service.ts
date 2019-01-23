@@ -191,7 +191,10 @@ export class UtilityService {
         if (taxRateID == null)
             return 0;
 
-        return this.taxRates.find(tr => tr.TaxID == taxRateID).EffectiveRate;
+        if (this.taxRates !== null)    
+            return this.taxRates.find(tr => tr.TaxID == taxRateID).EffectiveRate;
+        else
+            return .08;    
     }
 
     openPrinterSocket() {        
