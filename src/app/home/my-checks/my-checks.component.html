@@ -1,6 +1,6 @@
 <GridLayout rows='25 * 105' columns='780 *'>
     <Label [text]='myChecksHeader' row='0' col='0' class='pageHeader'></Label>
-    <Label [text]="currentDateTime | date:'EEE, MMM d yyyy h:mm:ss aa'" row='0' col='1' class='dateTime'></Label>
+    <Label [text]="utilSvc.currentDateTime | date:'EEE, MMM d yyyy h:mm:ss aa'" row='0' col='1' class='dateTime'></Label>
     <!-- checks -->
     <GridLayout row='1' col='0' rows='170 170 170 170' columns='170 170 170 170'>
         <StackLayout *ngFor='let check of checks' [row]='check.Row' [col]='check.Col'

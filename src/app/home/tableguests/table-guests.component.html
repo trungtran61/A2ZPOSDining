@@ -2,13 +2,11 @@
   <Label class="action-bar-title" [text]="tableGuestsTitle"></Label>
 </ActionBar>
 <StackLayout [visibility]="isNormalChoice ? 'visible' : 'collapse'">    
-  <GridLayout style="padding: 200px" rows="60 * * * * * *" columns="*,*,*" >    
-     <Label [text]="tableGuestsTitle" row='0' colSpan="3" horizontalAlignment="center" class="pageHeader" ></Label> 
-             
-    <Button [text]="digit" *ngFor="let digit of digits let i=index" class="glass" (tap)="setGuests(digit)" [row]="digitRows[i] + 1"
+  <GridLayout style="padding-left: 600px; margin-top: 20px" rows="110 110 110 110" columns="110 110 110" >         
+    <Button [text]="digit" *ngFor="let digit of digits let i=index" class="glass btnRound" (tap)="setGuests(digit)" [row]="digitRows[i]"
       [col]="digitCols[i]"></Button>
-    <Button text="Other" class="glass" (tap)="otherQty()" row="4" col='0' colSpan="2"></Button>
-    <Button text="Cancel" class="glass" (tap)="goBack()" row="4" col="2"></Button>
+    <Button text="Other" class="glass" (tap)="otherQty()" row="3" col='0' colSpan="2"></Button>
+    <Button text="Cancel" class="glass btnCancel btnRound" (tap)="goBack()" row="3" col="2"></Button>
   </GridLayout>  
 </StackLayout>
 

@@ -667,7 +667,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             });
     }
 
-    productInfo() {
+    productInfo() {  
         console.log('product info');
         this.showProductInfo = !this.showProductInfo;
         if (this.showProductInfo)

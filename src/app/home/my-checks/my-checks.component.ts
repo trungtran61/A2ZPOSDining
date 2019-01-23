@@ -25,7 +25,6 @@ export class MyChecksComponent implements OnInit {
 
     checks: Check[] = [];
     myChecksHeader: string = 'Checks';
-    currentDateTime: Date;
     oneHour: number = 1000 * 60 * 60; // in milliseconds
     oneMinute: number = 1000 * 60; // in milliseconds
 

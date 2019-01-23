@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 import { TextField } from "tns-core-modules/ui/text-field/text-field";
 import { ModalDialogParams } from "nativescript-angular/modal-dialog";
+import { Page } from "tns-core-modules/ui/page/page";
 
 @Component({
     selector: "guests",
@@ -17,9 +18,9 @@ export class GuestsComponent implements OnInit {
     digits: number[] = [1,2,3,4,5,6,7,8,9];
     digitRows: number[] = [];
     digitCols: number[] = [];
-    isNormalChoice: boolean = true;
-    guestsEntered: string = '';    
-
+    isNormalChoice: boolean = true;   
+    guestsEntered: string = '';       
+ 
     setNormalStyle() {        
         for (let i = 0; i < this.styles.length; i++) {
             this.styles[i] = this.normalStyle;
@@ -28,8 +29,8 @@ export class GuestsComponent implements OnInit {
 
     setGuests(numberOfGuests: string) {
         this.params.closeCallback(numberOfGuests);      
-    }
-
+    }  
+ 
     saveEnteredGuests()
     {
         this.params.closeCallback(this.guestsEntered);
@@ -57,7 +58,7 @@ export class GuestsComponent implements OnInit {
         this.isNormalChoice = false;
     }
 
-    ngOnInit(): void {
+    ngOnInit(): void {        
         this.tableGuestsTitle += localStorage.getItem('table');  
         let that = this;
         this.digits.forEach(function (digit: number) {
@@ -67,8 +68,8 @@ export class GuestsComponent implements OnInit {
        
     }
 
-    constructor(private params: ModalDialogParams) {       
-        
+    constructor(private params: ModalDialogParams, private page: Page) {       
+        page.actionBarHidden = true;    
     }
 
 }
