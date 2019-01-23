@@ -1,9 +1,10 @@
 <AbsoluteLayout [style]="areaStyle" (tap)='utilSvc.resetIdleTImer()'>
-  <Label [text]="employeeName" left="10" top="10" width="100" [height]="20" style="color:white; font-weight: bold"></Label>
-  <GridLayout [left]="table.PosX+20" [top]="table.PosY" [class]="table.Class" (tap)="onTableClick(table)" *ngFor="let table of tables"
+  <Label [text]="employeeName" left="-20" top="10" width="100" [height]="20" style="color:white; font-weight: bold"></Label>
+  <Label [text]="utilSvc.currentDateTime | date:'EEE, MMM d yyyy h:mm:ss aa'" left="800" top="10" width="200" [height]="20" class='dateTime'></Label>
+  <GridLayout [left]="table.PosX" [top]="table.PosY" [class]="table.Class" (tap)="onTableClick(table)" *ngFor="let table of tables"
     [width]="table.Width" [height]="table.Height" [style]='table.Style'>
     <!-- table names -->
-    <Label [text]="table.Name" [opacity]='table.Opacity' [style]='table.TextTopMargin' class='tableName'></Label>
+    <Label [text]="table.Name" [opacity]='table.Opacity' class='tableName'></Label>
     <!-- receipt printed -->
     <Label class="fa" text="&#xf00c;" *ngIf="table.Printed" 
       [style]="'color: green;margin-left:' + (table.Width - 20).toString() + ';margin-top:-' + (table.Height-13).toString()"></Label>
@@ -13,11 +14,11 @@
       [style]="'color: red;margin-left:' + (table.Width - 20).toString() + ';margin-top:' + (table.Height - 20).toString()"></Label>
   </GridLayout>
 
-  <GridLayout [left]="table.Width < 95 ? table.PosX-8 : table.PosX+5" [top]="table.PosY" (tap)="onTableClick(table)" *ngFor="let table of tables" [width]="table.Width > 95 ? table.Width : 95"
+  <GridLayout [left]="table.Width > 95 ? table.PosX:table.PosX-25" [top]="table.PosY" (tap)="onTableClick(table)" *ngFor="let table of tables" 
+    [width]="table.Width > 95 ? table.Width : 95"
     [height]="50" style='text-align: center'>
     <!-- elapsed times -->
-    <Label [text]="table.ElapsedTime" *ngIf="showStatus && table.Class == 'table tableOccupied'" class="infoText"
-      [style]='table.TextTopMargin'></Label>
+    <Label [text]="table.ElapsedTime" *ngIf="showStatus && table.Class == 'table tableOccupied'" class="infoText"></Label>
     <!-- number of guests -->
     <Label [text]="table.Covers" *ngIf="showGuests" class="guestsInfoText"></Label>
     <!-- staff -->

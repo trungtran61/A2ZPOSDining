@@ -184,7 +184,7 @@ export interface TableDetail {
     ElapsedTime?: string;
     Opacity?: string;
     Style?: string;
-    TextTopMargin?: string;
+    TopMargin?: string;
 }
 
 export interface Option {

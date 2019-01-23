@@ -77,11 +77,8 @@ export class AreaComponent implements OnInit {
     getTablesInfo() {
         let area: Area = this.currentArea;
         
-        this.areaStyle = "margin-left: 30px; background-image: url('" + this.httpProtocol + "://" + area.ImageURL + "'); background-repeat: no-repeat";
-
-        console.log(this.DBService.loggedInUser.PriKey);
-        console.log(this.DBService.loggedInUser.AccessType);
-        console.log(this.DBService.systemSettings.ServerViewAll);
+        this.areaStyle = "padding-left: 30;background-image: url('" + this.httpProtocol + "://" + area.ImageURL + 
+            "'); background-repeat: no-repeat;background-size: 970px; background-position: 30px 0px;";        
 
         this.apiSvc.getTablesDetails(area.AreaID,
             this.DBService.loggedInUser.PriKey,
@@ -104,9 +101,9 @@ export class AreaComponent implements OnInit {
                     table.Class = 'table ' + tableClass;                                        
                     table.Opacity = '1';                          
                     table.OrderTime = table.OrderTime == null ? 0 : this.utilSvc.getJSONDate(table.OrderTime);
-                    let margin: number = (table.Height / 2) - 14;
-                    table.TextTopMargin = 'margin-top: ' + margin.toString();
-
+                    //let margin: number = (table.Height / 2) - 20; 
+                    //table.TopMargin = margin;
+                    
                     if (table.TableType == TableType.Round)
                     {
                         table.Style = 'border-radius: 100';                        

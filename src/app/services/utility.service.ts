@@ -14,6 +14,7 @@ const TIMEZONE_OFFSET: number = new Date().getTimezoneOffset() * 60 * 1000; // o
 export class UtilityService {
     timeoutInSecs: number = 15;
     idleTimer: number;
+    public currentDateTime: Date;    
     public socket: any;
     public blinkingInterval: number = null;
     private readStream: NSInputStream;

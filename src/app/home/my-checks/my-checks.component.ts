@@ -38,11 +38,7 @@ export class MyChecksComponent implements OnInit {
     filter: FunctionType;
 
     ngOnInit(): void {
-        // this is for the date/time display at top right corner
-        setInterval(() => {
-            this.currentDateTime = new Date();
-        }, 1000);
-
+        
         this.getGroupedChecks();
 
         if (this.DBService.loggedInUser.ClockInType == 2 ||

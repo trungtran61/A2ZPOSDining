@@ -93,6 +93,11 @@ export class HomeComponent implements OnInit {
          {
              that.checkPrint();            
          }, 30000);       
+
+         // this is for the date/time display at top right corner
+        setInterval(() => {
+            this.utilSvc.currentDateTime = new Date();
+        }, 1000);
     }    
 
     showLogos() {
