@@ -291,6 +291,7 @@ export interface OrderDetail {
     Class?: string;
     ReportProductMix?: boolean;
     ApplyCharge?: boolean;
+    CostID?: number;
 }
 
 export interface OrderResponse {

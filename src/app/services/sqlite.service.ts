@@ -802,7 +802,7 @@ export class SQLiteService {
                 db.execSQL("CREATE TABLE IF NOT EXISTS Products (ProductName TEXT, ProductFilter INTEGER, UnitPrice REAL ,PrintCode TEXT,Taxable INTEGER,CategoryCode INTEGER," +
                     "ProductGroup INTEGER,PrintCode1 TEXT,CouponCode TEXT,GeneralCode TEXT,Description TEXT,AutoOption TEXT,PrintName TEXT,ForcedModifier TEXT," +
                     "UseForcedModifier TEXT,ShowAutoOption INTEGER,UseUnitPrice2 INTEGER,UnitPrice2 REAL,Toppings INTEGER,Pizza TEXT,ProductType TEXT,TaxRate TEXT," +
-                    "PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER, Product INTEGER);").then(id => {
+                    "PromptQuantity TEXT,ModifierIgnoreQuantity TEXT,FractionalQuantity INTEGER, Product INTEGER, CostID INTEGER);").then(id => {
                         let headers = that.createRequestHeader();
                         that.http.get(that.apiUrl + 'GetProducts', { headers: headers })
                             .subscribe(
@@ -812,8 +812,8 @@ export class SQLiteService {
                                         SQLiteService.database.execSQL("INSERT INTO Products (ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode," +
                                             "ProductGroup,PrintCode1,CouponCode,GeneralCode,Description,AutoOption," +
                                             "PrintName,ForcedModifier,UseForcedModifier,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings," +
-                                            "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity)" +
-                                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                                            "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity, Product, CostID)" +
+                                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                                             [
                                                 product.ProductName,
                                                 product.ProductFilter,
@@ -839,7 +839,10 @@ export class SQLiteService {
                                                 product.TaxRate,
                                                 product.PromptQuantity,
                                                 product.ModifierIgnoreQuantity,
-                                                product.FractionalQuantity]).then(id => {
+                                                product.FractionalQuantity,
+                                                product.Product,
+                                                product.CostID
+                                            ]).then(id => {
                                                     resolve("Added Products records.")
                                                 },
                                                     err => {
@@ -1226,7 +1229,10 @@ export class SQLiteService {
     }
 
     public getLocalProduct(productFilter: number): Promise<Product> {
-        return SQLiteService.database.get("SELECT * FROM Products WHERE ProductFilter =?", [productFilter])
+        return SQLiteService.database.get("SELECT ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode," +
+        "ProductGroup,PrintCode1,CouponCode,GeneralCode,Description,AutoOption," +
+        "PrintName,ForcedModifier,UseForcedModifier,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings," +
+        "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity, Product, CostID FROM Products WHERE ProductFilter =?", [productFilter])
             .then(function (row) {
                 let product: Product =
                 {
@@ -1255,7 +1261,8 @@ export class SQLiteService {
                     PromptQuantity: row[22],
                     ModifierIgnoreQuantity: row[23],
                     FractionalQuantity: row[24],
-                    Product: row[25]
+                    Product: row[25],
+                    CostID: row[26]
                 };
 
                 return (product);

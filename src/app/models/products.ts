@@ -99,6 +99,7 @@ export interface Product {
     PromptQuantity?: boolean;
     ModifierIgnoreQuantity?: boolean;
     FractionalQuantity?: boolean;
+    CostID?: number;
 }
 
 export interface ProductCategory {

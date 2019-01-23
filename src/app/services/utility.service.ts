@@ -180,6 +180,7 @@ export class UtilityService {
             }
             else {
                 this.taxRates = taxRates;
+                console.log('got tax rates');
             }
         });
     }
