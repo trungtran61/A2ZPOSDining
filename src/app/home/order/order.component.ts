@@ -58,7 +58,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     pageProducts: MenuProduct[] = [];
 
     totalProductPages: number = 0;
-    productCurrentPage: number = 1;    
+    productCurrentPage: number = 1;
     newItemsCount: number = 0;
 
     productOptions: MenuOption[];
@@ -112,15 +112,15 @@ export class OrderComponent implements OnInit, OnDestroy {
     selectedProduct: Product;
     previousProduct: MenuProduct;
     ticketNumber: number = 0;
-  
+
     isShowingMainCategories: boolean = true;
     isShowingSubCategories: boolean = false;
-    isShowingOptions: boolean = false;  
+    isShowingOptions: boolean = false;
     isShowingProducts: boolean = false;
     isShowingDetails: boolean = true;
     isShowingExtraFunctions: boolean = false;
-    isShowingProductInfo: boolean = false;  
-    isShowingBottomNav: boolean = true;  
+    isShowingProductInfo: boolean = false;
+    isShowingBottomNav: boolean = true;
     showHoldCategories: boolean = false;
     productInfoClass: string = 'glass fa';
     viewDetailsCode: string = String.fromCharCode(0xf06e) + ' View Details'
@@ -136,7 +136,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     { Name: 'NO MAKE', Class: 'glass btnOption', Position: 5, ModifierType: ModifierType.NOMAKE },
     { Name: '1/2', Class: 'glass btnOption', Position: 6, ModifierType: ModifierType.HALF },
     { Name: 'TO GO', Class: 'glass btnOption', Position: 7, ModifierType: ModifierType.TOGO }];
-    fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8]; 
+    fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
 
     currentOrderItem: OrderDetail = null;
     currentFixedOption: FixedOption;
@@ -154,7 +154,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     TIPS_PCT: number = .15;
 
     qtyEntered: number = 1;
-    orderType: number = OrderType.DineIn; 
+    orderType: number = OrderType.DineIn;
 
     canSubCategoryPageDown: boolean = false;
     canSubCategoryPageUp: boolean = false;
@@ -172,7 +172,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     allOptionFilterClass: string = 'glass';
 
     priceLevel: number = 0;
-    currentModifierType: ModifierType; 
+    currentModifierType: ModifierType;
 
     isShowingOptionsButton: boolean = false;
 
@@ -184,13 +184,13 @@ export class OrderComponent implements OnInit, OnDestroy {
     pageChoices: MenuChoice[] = [];
     isShowingChoices: boolean = false;
     totalChoicePages: number = 0;
-    choiceCurrentPage: number = 1; 
+    choiceCurrentPage: number = 1;
 
     subOptions: MenuChoice[] = [];
     isShowingSubOptions: boolean = false;
-    isShowingSubOptionsButton: boolean = false; 
+    isShowingSubOptionsButton: boolean = false;
     currentItemIndex: number = 0;
- 
+
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
         private modalService: ModalDialogService,
@@ -457,7 +457,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 date1 = that.convertToDate(now.toDateString(), timer.StartTime);
                 date2 = that.convertToDate(now.toDateString(), timer.EndTime);
             }
-           
+
             if (now > date2 || now < date1) {
                 locked = true;
                 return;
@@ -497,8 +497,8 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.subCategories.forEach(function (sc: MenuSubCategory) {
                     sc.Row = ((sc.Position - 1) % 5) + 1;
                     sc.Col = 0;
-                    sc.Page = Math.ceil(sc.Position / SUBCATEGORY_PAGESIZE);    
-                    sc.Class = 'btnSubCategory';                                  
+                    sc.Page = Math.ceil(sc.Position / SUBCATEGORY_PAGESIZE);
+                    sc.Class = 'btnSubCategory';
                     that.totalSubCategoriesPages = sc.Page;
                 });
 
@@ -506,9 +506,9 @@ export class OrderComponent implements OnInit, OnDestroy {
                 //if (this.totalSubCategoriesPages > 1)
                 //    this.canSubCategoryPageDown = true;
 
-                this.subCategoryCurrentPage = 1;    
+                this.subCategoryCurrentPage = 1;
                 this.getSubCategoryPage(true);
-                this.subCategorySelected(subCategories[0]); 
+                this.subCategorySelected(subCategories[0]);
             }
         });
     }
@@ -521,7 +521,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.pageSubCategories.forEach(function (menuSubCategory: MenuSubCategory) {
             menuSubCategory.Class = 'btnSubCategory'
             //that.subCategoryClasses.push('btnSubCategory');
-        }); 
+        });
         currentSubCategory.Class = 'btnSubCategoryActive';
         //this.subCategoryClasses[currentIndex] = 'btnSubCategoryActive';
     }
@@ -542,14 +542,9 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
             else {
                 this.products = products;
-                this.setProductAttributes();
-                this.totalProductPages = Math.ceil(this.products[that.products.length - 1].Position / PRODUCT_PAGESIZE);
-                this.productCurrentPage = 0;
-
-                if (this.totalProductPages > 1)
-                    this.canProductPageDown = true;
-
-                this.getProductPage(true);
+                this.setProductAttributes();                
+                this.productCurrentPage = 1;
+                this.getProductPage();
                 this.currentSubCategoryName = subCategory.Name;
                 this.isShowingProducts = true;
                 this.setActiveSubCategoryClass(subCategory);
@@ -563,6 +558,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.products.forEach(function (product: MenuProduct) {
             product.Row = ((Math.floor((product.Position - 1) / 4)) % 6) + 1;
             product.Col = (product.Position - 1) % 4;
+            product.Page = Math.ceil(product.Position / PRODUCT_PAGESIZE);
+            that.totalProductPages = product.Page;
             let lightColor: string = '#' + product.ButtonColorHex;
             //let lightColor: string = darkColor //that.lightenDarkenColor(darkColor, 50);
             let darkColor: string = that.utilSvc.colorLuminance(lightColor, -0.2);
@@ -652,7 +649,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         od.SeatNumber = that.currentSeatNumber.toString();
                         that.resetLastItemOrdered();
                         od.Class = 'lastOrderItem';
-                        that.orderItems.push(od);                        
+                        that.orderItems.push(od);
                         //that.addItemToOrder(od);
                     });
                     this.currentItemIndex = this.orderItems.length - 1;
@@ -671,7 +668,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             });
     }
 
-    productInfo() {  
+    productInfo() {
         console.log('product info');
         this.isShowingProductInfo = !this.isShowingProductInfo;
         if (this.isShowingProductInfo)
@@ -702,8 +699,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.showForcedModifierDialog(false);
     }
 
-    resetOptions()
-    {
+    resetOptions() {
         this.currentFixedOption = null;
         this.currentModifierType = null;
     }
@@ -736,7 +732,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             orderItem.OrderTime = currentDate;
             orderItem.Voided = null;
             orderItem.ReportProductMix = false;
-            orderItem.ClientName = this.DBService.systemSettings.DeviceName;                        
+            orderItem.ClientName = this.DBService.systemSettings.DeviceName;
             orderItem.CostID = product.CostID;
             this.changeQtyAvailable(product.ProductFilter, this.qtyEntered * -1);
 
@@ -752,11 +748,10 @@ export class OrderComponent implements OnInit, OnDestroy {
             if (product.UseForcedModifier && product.ForcedModifier) {
                 this.showForcedModifierDialog(true);
             }
-            else if (product.UseForcedModifier)
-            {
+            else if (product.UseForcedModifier) {
                 this.showChoices(mp.ProductCode);
             }
-            else { 
+            else {
                 this.totalPrice();
             }
             this.previousProduct = this.currentProduct;
@@ -765,63 +760,59 @@ export class OrderComponent implements OnInit, OnDestroy {
         });
     }
 
-    showChoices (productCode: number)   
-    {
+    showChoices(productCode: number) {
         let that = this;
 
-        this.DBService.getLocalMenuChoiceItemsByProductCode(productCode).then((items) => { 
+        this.DBService.getLocalMenuChoiceItemsByProductCode(productCode).then((items) => {
             if (items.length == 0) {
                 dialogs.alert("Menu Choice Items not loaded.");
             }
             else {
-                this.isShowingChoices = true;  
+                this.isShowingChoices = true;
                 this.isShowingSubCategories = true;
                 this.choices = items;
                 this.choices.forEach(function (ci: MenuChoice) {
                     ci.Row = ((Math.floor((ci.Position - 1) / 4)) % 6) + 1;
-                    ci.Col = (ci.Position - 1) % 4;  
-                    ci.Page = Math.ceil(ci.Position / CHOICE_PAGESIZE);                  
+                    ci.Col = (ci.Position - 1) % 4;
+                    ci.Page = Math.ceil(ci.Position / CHOICE_PAGESIZE);
                     that.totalChoicePages = ci.Page;
-                });                              
+                });
 
                 this.choiceCurrentPage = 1;
-                this.getChoicePage(); 
-                this.isShowingOptionsButton = false;    
-                this.isShowingProducts = false;    
+                this.getChoicePage();
+                this.isShowingOptionsButton = false;
+                this.isShowingProducts = false;
             }
         });
-       
-    }         
-   
+
+    }
+
     onChoiceSwipe(args) {
         if (this.totalChoicePages <= 1)
             return;
 
         // swiping up, goes to next page -- swiping down, goes to previous page
-        if (args.direction == SwipeDirection.down) {                
+        if (args.direction == SwipeDirection.down) {
             this.choiceCurrentPage--;
-        }    
-        else if (args.direction == SwipeDirection.up) 
-        {
+        }
+        else if (args.direction == SwipeDirection.up) {
             this.choiceCurrentPage++;
         }
 
         if (this.choiceCurrentPage > this.totalChoicePages)
             this.choiceCurrentPage = 1;
         else if (this.choiceCurrentPage == 0)
-            this.choiceCurrentPage = this.totalChoicePages;  
+            this.choiceCurrentPage = this.totalChoicePages;
 
-        this.getChoicePage();        
+        this.getChoicePage();
     }
 
-    getChoicePage()
-    {
+    getChoicePage() {
         this.pageChoices = this.choices.filter(c => c.Page == this.choiceCurrentPage);
     }
 
-    changeQtyAvailable(productId: number, qty: number)
-    {
-        let product = this.pageProducts.find( p => p.ProductID == productId);
+    changeQtyAvailable(productId: number, qty: number) {
+        let product = this.pageProducts.find(p => p.ProductID == productId);
         product.QtyAvailable = product.QtyAvailable + qty;
     }
 
@@ -891,7 +882,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         let qtyChange: number = orderProduct.Quantity - parseFloat(choice.SelectedNumber);
                         this.changeQtyAvailable(orderItem.ProductFilter, qtyChange);
 
-                        orderProduct.Quantity = parseFloat(choice.SelectedNumber);                        
+                        orderProduct.Quantity = parseFloat(choice.SelectedNumber);
                         orderProduct.ExtPrice = orderProduct.UnitPrice * parseFloat(choice.SelectedNumber);
                         this.orderItems.forEach(oi => {
                             if (oi.ItemType != ItemType.Product && oi.UnitPrice != null ? oi.UnitPrice : 0 > 0) {
@@ -899,7 +890,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                             }
                         }
                         )
-                        this.totalPrice();                        
+                        this.totalPrice();
 
                         break;
                     case 'seat':
@@ -945,7 +936,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         if (this.currentModifierType == ModifierType.USERDEFINED && this.currentUserModifier.ButtonFunction == 1)
             customStamp = true;
 
-        if (isSubOption) {           
+        if (isSubOption) {
             if (!isMemo && this.currentModifierType != ModifierType.TOGO && this.currentModifierType != ModifierType.NOMAKE && !customStamp) {
                 if (this.isShowingMainOptions) {
                     unitPrice = this.currentOption.Price;
@@ -1103,7 +1094,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         //    orderDetail.OrderFilter = this.currentOrderFilter;
         this.resetLastItemOrdered();
         orderDetail.Class = 'lastOrderItem';
-        orderDetail.CostID = 0;        
+        orderDetail.CostID = 0;
         //this.orderItems.push(orderDetail);
         this.addItemToOrder(orderDetail);
         //this.sortOrderItems();
@@ -1111,9 +1102,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.totalPrice();
     }
 
-    addItemToOrder(orderItem: OrderDetail)
-    {
-        this.orderItems.splice(this.currentItemIndex+1,0, orderItem);
+    addItemToOrder(orderItem: OrderDetail) {
+        this.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
         this.currentItemIndex = this.orderItems.indexOf(orderItem);
     }
 
@@ -1360,50 +1350,46 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
 
         this.addOption(false, option.Name, amount, false, ItemType.Option);
-    } 
+    }
 
-    choiceSelected(choice: MenuChoice) {       
-        this.currentMenuOption = choice;  
-        this.addOption(false, choice.Name, choice.Charge, false, ItemType.Choice); 
- 
+    choiceSelected(choice: MenuChoice) {
+        this.currentMenuOption = choice;
+        this.addOption(false, choice.Name, choice.Charge, false, ItemType.Choice);
+
         this.DBService.getLocalMenuSubOptions(choice.ChoiceID).then((items) => {
-            if (items.length > 0) {                
+            if (items.length > 0) {
                 this.subOptions = items;
                 this.subOptions.forEach(function (item: MenuSubOption) {
                     item.Row = Math.floor((item.Position - 1) / 4) + 1;
-                    item.Col = item.Position - ((item.Row - 1) * 4) - 1;                    
-                }); 
-                this.isShowingSubOptionsButton = true;                        
+                    item.Col = item.Position - ((item.Row - 1) * 4) - 1;
+                });
+                this.isShowingSubOptionsButton = true;
             }
         });
     }
 
-    showSubOptions()
-    {
-        this.isShowingSubOptions = true;     
-        this.isShowingChoices = false;  
+    showSubOptions() {
+        this.isShowingSubOptions = true;
+        this.isShowingChoices = false;
         this.isShowingOptionsButton = false;
     }
 
-    subOptionSelected(subOption: MenuSubOption)
-    {
-        this.currentSubOption = subOption;  
-        this.addOption(false, subOption.Name, subOption.Charge, true, ItemType.SubOption);       
+    subOptionSelected(subOption: MenuSubOption) {
+        this.currentSubOption = subOption;
+        this.addOption(false, subOption.Name, subOption.Charge, true, ItemType.SubOption);
     }
 
-    doneChoices()
-    {
-        if (this.isShowingSubOptions)
-        {
+    doneChoices() {
+        if (this.isShowingSubOptions) {
             this.isShowingSubOptions = false;
-            this.isShowingChoices = true;            
+            this.isShowingChoices = true;
         }
         else {
             this.isShowingChoices = false;
             this.isShowingProducts = true;
         }
     }
-    
+
     getNextOptionFilterNumber(): number {
         if (this.orderItems.length == 0)
             return 0;
@@ -1600,7 +1586,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         }
                 }
     }
-    
+
 
     onSubCategorySwipe(args) {
         if (this.totalSubCategoriesPages <= 1)
@@ -1609,102 +1595,69 @@ export class OrderComponent implements OnInit, OnDestroy {
         // swiping up, goes to next page -- swiping down, goes to previous page
         let getNextPage: boolean = true;
 
-        if (args.direction == SwipeDirection.down) {                
+        if (args.direction == SwipeDirection.down) {
             this.subCategoryCurrentPage--;
             getNextPage = false;
-        }    
-        else if (args.direction == SwipeDirection.up) 
-        {
+        }
+        else if (args.direction == SwipeDirection.up) {
             this.subCategoryCurrentPage++;
         }
 
         if (this.subCategoryCurrentPage > this.totalSubCategoriesPages)
-            this.subCategoryCurrentPage = 1;        
+            this.subCategoryCurrentPage = 1;
         else if (this.subCategoryCurrentPage == 0)
-            this.subCategoryCurrentPage = this.totalSubCategoriesPages;  
+            this.subCategoryCurrentPage = this.totalSubCategoriesPages;
 
-        this.getSubCategoryPage(getNextPage);        
+        this.getSubCategoryPage(getNextPage);
     }
 
-    getSubCategoryPage(getNextPage: boolean)
-    {
+    getSubCategoryPage(getNextPage: boolean) {
         this.pageSubCategories = this.subCategories.filter(sc => sc.Page == this.subCategoryCurrentPage);
 
-        if (this.pageSubCategories.length == 0)
-        {
-            if (getNextPage)
-            {
+        if (this.pageSubCategories.length == 0) {
+            if (getNextPage) {
                 this.subCategoryCurrentPage++;
                 if (this.subCategoryCurrentPage > this.totalSubCategoriesPages)
-                    this.subCategoryCurrentPage = 1;  
-                this.getSubCategoryPage(true);        
+                    this.subCategoryCurrentPage = 1;
+                this.getSubCategoryPage(true);
             }
-            else        
-            {
+            else {
                 this.subCategoryCurrentPage--;
                 if (this.subCategoryCurrentPage == 0)
-                this.subCategoryCurrentPage = this.totalSubCategoriesPages;  
-                this.getSubCategoryPage(false);        
+                    this.subCategoryCurrentPage = this.totalSubCategoriesPages;
+                this.getSubCategoryPage(false);
             }
         }
-        else
-        {
+        else {
             this.pageSubCategories.forEach(function (sc: MenuSubCategory) {
-                sc.Class = 'btnSubCategory';  
+                sc.Class = 'btnSubCategory';
             });
         }
     }
-    
+
     onProductSwipe(args) {
+
         if (this.totalProductPages <= 1)
             return;
 
-        // at last page, can only swipe right
-        if (this.productCurrentPage == this.totalProductPages) {
-            if (args.direction == SwipeDirection.down) {
-                this.getProductPage(false);
-            }
+        // swiping up, goes to next page -- swiping down, goes to previous page
+        if (args.direction == SwipeDirection.down) {
+            this.productCurrentPage--;           
         }
-        // at first page, can only swipe left
-        else
-            if (this.productCurrentPage == 1) {
-                if (args.direction == SwipeDirection.up) {
-                    this.getProductPage(true);
-                }
-            }
-            // else, can swipe left or right
-            else
-                if (this.productCurrentPage >= 1) {
-                    // go to next page            
-                    if (args.direction == SwipeDirection.up) {
-                        this.getProductPage(true);
-                    }
-                    else
-                        // go to previous page
-                        if (args.direction == SwipeDirection.down) {
-                            this.getProductPage(false);
-                        }
-                }
+        else if (args.direction == SwipeDirection.up) {
+            this.productCurrentPage++;
+        }
 
+        if (this.productCurrentPage > this.totalProductPages)
+            this.productCurrentPage = 1;
+        else if (this.productCurrentPage == 0)
+            this.productCurrentPage = this.totalProductPages;
+
+        this.getProductPage();
     }
 
-    getProductPage(nextPage: boolean) {
-        if (nextPage)
-            this.productCurrentPage++;
-        else
-            this.productCurrentPage--;
-
-        let startPosition: number = (this.productCurrentPage * PRODUCT_PAGESIZE) - PRODUCT_PAGESIZE + 1;
-        let endPosition: number = startPosition + PRODUCT_PAGESIZE;
-
-        if (endPosition > this.products[this.products.length - 1].Position)
-            endPosition = this.products[this.products.length - 1].Position;
-
-        this.pageProducts = this.products.filter(
-            product => product.Position >= startPosition && product.Position <= endPosition);
-
-        this.canProductPageUp = this.productCurrentPage > 1;
-        this.canProductPageDown = this.totalProductPages > this.productCurrentPage;
+    getProductPage() {
+        this.pageProducts = this.products.filter(p => p.Page == this.productCurrentPage);
     }
 
     onOrderItemSwipe(args, orderItem: OrderDetail) {
@@ -1719,10 +1672,9 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
         else {
             // if item is product, delete product and all associated modifiers
-            if (orderItem.ItemType == ItemType.Product)
-            {
+            if (orderItem.ItemType == ItemType.Product) {
                 this.orderItems = this.orderItems.filter(oi => oi.IndexData !== orderItem.IndexData);
-                this.changeQtyAvailable(orderItem.ProductFilter, orderItem.Quantity);                
+                this.changeQtyAvailable(orderItem.ProductFilter, orderItem.Quantity);
                 this.currentProduct = null;
             }
             else
@@ -1742,16 +1694,16 @@ export class OrderComponent implements OnInit, OnDestroy {
         let itemsToCopy = this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData);
         let nextIndexData: number = this.getNextIndexData();
         let that = this;
-        
+
         let product: MenuProduct = this.pageProducts.find(p => p.ProductID == orderItem.ProductFilter);
-        
+
         itemsToCopy.forEach(function (orderItem: OrderDetail) {
             let copiedItem = Object.assign({}, orderItem);
             copiedItem.IndexData = nextIndexData;
             copiedItem.Quantity = orderItem.ItemType == ItemType.Product ? 1 : null;
             copiedItem.ExtPrice = copiedItem.Quantity * copiedItem.UnitPrice;
             //copiedItem = Object.assign({}, that.selectedProduct);
-            copiedItem.Quantity = orderItem.ItemType == ItemType.Product ? 1  : null;
+            copiedItem.Quantity = orderItem.ItemType == ItemType.Product ? 1 : null;
             copiedItem.SeatNumber = that.currentSeatNumber.toString();
             copiedItem.ExtPrice = orderItem.ExtPrice;
             copiedItem.UnitPrice = orderItem.UnitPrice;
@@ -1762,10 +1714,10 @@ export class OrderComponent implements OnInit, OnDestroy {
             copiedItem.ProductCode = orderItem.ProductCode;
             that.resetLastItemOrdered();
             copiedItem.Class = 'lastOrderItem';
-            
+
             if (product != null)
-                product.QtyAvailable -= copiedItem.Quantity;            
-            
+                product.QtyAvailable -= copiedItem.Quantity;
+
             that.orderItems.push(copiedItem);
             //that.addItemToOrder(copiedItem);
             /*
@@ -1796,7 +1748,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.tips = 0;
         this.checkTotal = 0;
 
-        this.orderItems.filter(oi => oi.Voided == null).forEach (oi => {
+        this.orderItems.filter(oi => oi.Voided == null).forEach(oi => {
             if (oi.ExtPrice != null)
                 this.subTotal += oi.ExtPrice;
 
@@ -1810,14 +1762,13 @@ export class OrderComponent implements OnInit, OnDestroy {
         });
     }
 
-    getCheckTotal()
-    {
+    getCheckTotal() {
         let subTotal = 0;
         this.taxAll = 0;
         let tips: number = 0;
         this.checkTotalAll = 0;
 
-        this.orderItems.forEach (oi => {
+        this.orderItems.forEach(oi => {
             if (oi.ExtPrice != null)
                 subTotal += oi.ExtPrice;
 
@@ -1828,7 +1779,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 tips = subTotal * this.TIPS_PCT;
                 this.checkTotalAll += tips;
             }
-        });        
+        });
     }
 
     hold() {
@@ -1941,7 +1892,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             order: orderHeader,
             orderDetails: this.orderItems,
             payments: []
-        };       
+        };
 
         this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
             this.router.navigate(['/home/area/']);
@@ -2069,11 +2020,10 @@ export class OrderComponent implements OnInit, OnDestroy {
                 Credit: 0
             }
 
-            this.orderItems.forEach(oi => 
-                {
-                    if (oi.Voided == null)
-                        oi.Printed = 'P';
-                });
+            this.orderItems.forEach(oi => {
+                if (oi.Voided == null)
+                    oi.Printed = 'P';
+            });
 
             let orderUpdate: OrderUpdate = {
                 order: orderHeader,
@@ -2082,11 +2032,11 @@ export class OrderComponent implements OnInit, OnDestroy {
             };
 
             this.processFilterNumber();
-            
+
             this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
                 let orderFilter: number = results.UpdateOrderResult;
 
-                let printRequest: DirectPrintJobsRequest =  {
+                let printRequest: DirectPrintJobsRequest = {
                     orderFilter: orderFilter,
                     printType: PrintType.All,
                     modified: false,
@@ -2094,15 +2044,14 @@ export class OrderComponent implements OnInit, OnDestroy {
                 }
 
                 this.apiSvc.directPrint(printRequest).subscribe(printResult => {
-                    if (!printResult)
-                    {
+                    if (!printResult) {
                         dialogs.alert({
                             title: "Error",
                             message: "Error occurred sending to print API.",
                             okButtonText: "Close"
-                        })                                           
-                    }                  
-                });    
+                        })
+                    }
+                });
                 if (startNewOrder) {
                     this.router.navigate(['/home/tableguests/' + this.table]);
                 }
@@ -2122,7 +2071,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     printReceipt() {
     }
-    
+
     getMenuTimers() {
         this.lockedCategoryId = 0;
         let timers: MenuTimer[] = [];

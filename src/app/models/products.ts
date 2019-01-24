@@ -64,6 +64,7 @@ export interface MenuProduct {
     Style?: string;
     Row?: number;
     Col?: number;
+    Page?: number;  
 }
 
 export interface CategoryCode {
@@ -384,6 +385,7 @@ export interface MenuOption {
     Col?: number;
     CategoryCode?: number;
     Price?: number;
+    Page?: number;  
 }
 
 export interface MenuSubOption {
