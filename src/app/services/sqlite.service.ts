@@ -13,6 +13,7 @@ import { UtilityService } from "./utility.service";
 import * as utils from "utils/utils";
 
 var Sqlite = require("nativescript-sqlite");
+const OPTIONCATEGORY_PAGESIZE: number = 3;
 
 @Injectable()
 export class SQLiteService {
@@ -538,6 +539,7 @@ export class SQLiteService {
                         Name: rows[row][1],
                         Position: rowCounter,
                         Col: (rowCounter - 1) % 3,
+                        Page: Math.ceil(rowCounter / OPTIONCATEGORY_PAGESIZE),
                         Selected: false,
                     });
                 }

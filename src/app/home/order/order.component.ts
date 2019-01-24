@@ -28,8 +28,9 @@ import { GuestsComponent } from "./guests.component";
 
 const CHOICE_PAGESIZE: number = 20;
 const PRODUCT_PAGESIZE: number = 24;
-const SUBCATEGORY_PAGESIZE: number = 5; 
+const SUBCATEGORY_PAGESIZE: number = 5;
 const OPTION_PAGESIZE: number = 18;
+const OPTIONCATEGORY_PAGESIZE: number = 3;
 const SPACES5: string = '     ';
 const SPACES3: string = '   ';
 
@@ -67,7 +68,6 @@ export class OrderComponent implements OnInit, OnDestroy {
     optionCategories: OptionCategory[];
     pageOptionCategories: OptionCategory[];
     optionCategoryCurrentPage: number = 0;
-    optionCategoryPageSize: number = 3;
     totalOptionCategoryPages: number = 0;
     allOptionCategorySelected: boolean = true;
 
@@ -81,7 +81,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     menuOptions: MenuOption[];
     pageOptions: MenuOption[];
     totalOptionPages: number = 0;
-    optionCurrentPage: number = 1;   
+    optionCurrentPage: number = 1;
     userModifiers: UserModifier[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
@@ -155,15 +155,6 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     qtyEntered: number = 1;
     orderType: number = OrderType.DineIn;
-
-    canSubCategoryPageDown: boolean = false;
-    canSubCategoryPageUp: boolean = false;
-    canProductPageDown: boolean = false;
-    canProductPageUp: boolean = false;
-    canOptionPageDown: boolean = false;
-    canOptionPageUp: boolean = false;
-    canOptionCategoryPageDown: boolean = false;
-    canOptionCategoryPageUp: boolean = false;
 
     isExistingOrder: boolean = false;
     orderModified: boolean = false;
@@ -261,8 +252,8 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         if (this.isShowingMainOptions) {
             this.productOptionsClass = 'glass productOptionsActive';
-            this.optionCategoryCurrentPage = 0;
-            this.getOptionCategoryPage(true);
+            this.optionCategoryCurrentPage = 1;
+            this.getOptionCategoryPage();
             this.resetFixedOptionClasses();
             this.resetUserModifierClasses();
             this.totalOptionPages = Math.ceil(that.productOptions[this.productOptions.length - 1].Position / OPTION_PAGESIZE);
@@ -278,8 +269,6 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.getOptionPage();
         }
 
-        if (this.totalOptionPages > 1)
-            this.canOptionPageDown = true;
     }
 
     getProductOptions(optionName) {
@@ -312,12 +301,9 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
             else {
                 this.optionCategories = categories;
-                this.optionCategoryCurrentPage = 0;
-                this.totalOptionCategoryPages = Math.ceil(this.optionCategories[this.optionCategories.length - 1].Position / this.optionCategoryPageSize);
-                if (this.totalSubCategoriesPages > 1)
-                    this.canSubCategoryPageDown = true;
-
-                this.getOptionCategoryPage(true);
+                this.optionCategoryCurrentPage = 1;
+                this.totalOptionCategoryPages = Math.ceil(this.optionCategories[this.optionCategories.length - 1].Position / OPTIONCATEGORY_PAGESIZE);
+                this.getOptionCategoryPage();
             }
         });
     }
@@ -327,8 +313,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.allOptionCategorySelected = true;
         this.productOptions = this.allProductOptions;
         this.setOptionsPosition();
-        this.optionCategoryCurrentPage = 0;
-        this.getOptionCategoryPage(true);
+        this.optionCategoryCurrentPage = 1;
+        this.getOptionCategoryPage();
     }
 
     setOptionsPosition() {
@@ -1149,23 +1135,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.getOptionPage();
     }
 
-    getOptionCategoryPage(nextPage: boolean) {
-        if (nextPage)
-            this.optionCategoryCurrentPage++;
-        else
-            this.optionCategoryCurrentPage--;
-
-        let startPosition: number = (this.optionCategoryCurrentPage * this.optionCategoryPageSize) - this.optionCategoryPageSize + 1;
-        let endPosition: number = startPosition + this.optionCategoryPageSize - 1;
-
-        if (endPosition > this.optionCategories[this.optionCategories.length - 1].Position)
-            endPosition = this.optionCategories[this.optionCategories.length - 1].Position;
-
-        this.pageOptionCategories = this.optionCategories.filter(
-            o => o.Position >= startPosition && o.Position <= endPosition);
-
-        this.canOptionCategoryPageUp = this.optionCategoryCurrentPage > 1;
-        this.canOptionCategoryPageDown = this.totalOptionCategoryPages > this.optionCategoryCurrentPage;
+    getOptionCategoryPage() {
+        this.pageOptionCategories = this.optionCategories.filter(oc => oc.Page == this.optionCategoryCurrentPage);
     }
 
     getOptionPage() {
@@ -1210,11 +1181,6 @@ export class OrderComponent implements OnInit, OnDestroy {
                     menuOption.Page = Math.ceil(menuOption.Position / OPTION_PAGESIZE);
                     that.totalOptionPages = menuOption.Page;
                 });
-
-                //this.totalOptionPages = Math.ceil(menuOptions[menuOptions.length - 1].Position / OPTION_PAGESIZE);
-
-                if (this.totalOptionPages > 1)
-                    this.canOptionPageDown = true;
 
                 this.isShowingOptions = true;
                 this.isShowingMainCategories = false;
@@ -1511,32 +1477,20 @@ export class OrderComponent implements OnInit, OnDestroy {
         if (this.totalOptionCategoryPages <= 1)
             return;
 
-        // at last page, can only swipe left
-        if (this.optionCategoryCurrentPage == this.totalOptionCategoryPages) {
-            if (args.direction == SwipeDirection.left) {
-                this.getOptionCategoryPage(false);
-            }
+        // swiping left, goes to next page -- swiping right, goes to previous page
+        if (args.direction == SwipeDirection.right) {
+            this.optionCategoryCurrentPage--;
         }
-        // at first page, can only swipe up
-        else
-            if (this.optionCategoryCurrentPage == 1) {
-                if (args.direction == SwipeDirection.right) {
-                    this.getOptionCategoryPage(true);
-                }
-            }
-            // else, can swipe up or down
-            else
-                if (this.optionCategoryCurrentPage >= 1) {
-                    // go to next page            
-                    if (args.direction == SwipeDirection.right) {
-                        this.getOptionCategoryPage(true);
-                    }
-                    else
-                        // go to previous page
-                        if (args.direction == SwipeDirection.left) {
-                            this.getOptionCategoryPage(false);
-                        }
-                }
+        else if (args.direction == SwipeDirection.left) {
+            this.optionCategoryCurrentPage++;
+        }
+
+        if (this.optionCategoryCurrentPage > this.totalOptionCategoryPages)
+            this.optionCategoryCurrentPage = 1;
+        else if (this.optionCategoryCurrentPage == 0)
+            this.optionCategoryCurrentPage = this.totalOptionCategoryPages;
+
+        this.getOptionCategoryPage();
     }
 
 

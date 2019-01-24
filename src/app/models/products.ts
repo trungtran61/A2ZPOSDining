@@ -231,6 +231,7 @@ export interface OptionCategory {
     Position?: number;
     Col?: number;
     Selected?: boolean;
+    Page?: number; 
 }
 
 export interface MenuSubOption {
