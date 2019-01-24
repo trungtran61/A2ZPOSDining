@@ -28,7 +28,8 @@ import { GuestsComponent } from "./guests.component";
 
 const CHOICE_PAGESIZE: number = 20;
 const PRODUCT_PAGESIZE: number = 24;
-const SUBCATEGORY_PAGESIZE: number = 5;
+const SUBCATEGORY_PAGESIZE: number = 5; 
+const OPTION_PAGESIZE: number = 18;
 const SPACES5: string = '     ';
 const SPACES3: string = '   ';
 
@@ -80,8 +81,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     menuOptions: MenuOption[];
     pageOptions: MenuOption[];
     totalOptionPages: number = 0;
-    optionCurrentPage: number = 1;
-    optionPageSize: number = 18;
+    optionCurrentPage: number = 1;   
     userModifiers: UserModifier[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
@@ -265,17 +265,17 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.getOptionCategoryPage(true);
             this.resetFixedOptionClasses();
             this.resetUserModifierClasses();
-            this.totalOptionPages = Math.ceil(that.productOptions[this.productOptions.length - 1].Position / this.optionPageSize);
+            this.totalOptionPages = Math.ceil(that.productOptions[this.productOptions.length - 1].Position / OPTION_PAGESIZE);
 
-            this.optionCurrentPage = 0;
-            this.getProductOptionPage(true);
+            this.optionCurrentPage = 1;
+            this.getProductOptionPage();
         }
         else {
             // show menu's options first page
             this.productOptionsClass = 'glass productOptions';
-            this.totalOptionPages = Math.ceil(this.menuOptions[this.menuOptions.length - 1].Position / this.optionPageSize);
-            this.optionCurrentPage = 0;
-            this.getOptionPage(true);
+            this.totalOptionPages = Math.ceil(this.menuOptions[this.menuOptions.length - 1].Position / OPTION_PAGESIZE);
+            this.optionCurrentPage = 1;
+            this.getOptionPage();
         }
 
         if (this.totalOptionPages > 1)
@@ -339,17 +339,18 @@ export class OrderComponent implements OnInit, OnDestroy {
             oc.Position = rowCtr;
             oc.Row = ((Math.floor((rowCtr - 1) / 3)) % 6);
             oc.Col = (rowCtr - 1) % 3;
+            oc.Page = Math.ceil(rowCtr / OPTION_PAGESIZE);
+            this.totalOptionPages = oc.Page;
         });
 
-        this.totalOptionPages = Math.ceil(this.productOptions.length / this.optionPageSize);
-        this.optionCurrentPage = 0;
-        this.getProductOptionPage(true);
+        this.optionCurrentPage = 1;
+        this.getProductOptionPage();
     }
 
     getOptionsForCategory(optionCategory: OptionCategory) {
         this.allOptionCategorySelected = false;
         this.productOptions = this.allProductOptions.filter(po => po.CategoryCode == optionCategory.PriKey);
-        this.totalOptionPages = Math.ceil(this.productOptions.length / this.optionPageSize);
+        this.totalOptionPages = Math.ceil(this.productOptions.length / OPTION_PAGESIZE);
         this.setOptionsPosition();
         this.optionCategories.forEach(oc => oc.Selected = false);
         optionCategory.Selected = true;
@@ -542,7 +543,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
             else {
                 this.products = products;
-                this.setProductAttributes();                
+                this.setProductAttributes();
                 this.productCurrentPage = 1;
                 this.getProductPage();
                 this.currentSubCategoryName = subCategory.Name;
@@ -1127,45 +1128,25 @@ export class OrderComponent implements OnInit, OnDestroy {
         if (this.totalOptionPages <= 1)
             return;
 
-        // at last page, can only swipe down
-        if (this.optionCurrentPage == this.totalOptionPages) {
-            if (args.direction == SwipeDirection.down) {
-                if (this.isShowingMainOptions)
-                    this.getProductOptionPage(false);
-                else
-                    this.getOptionPage(false);
-            }
-        }
-        // at first page, can only swipe up
-        else
-            if (this.optionCurrentPage == 1) {
-                if (args.direction == SwipeDirection.up) {
-                    if (this.isShowingMainOptions)
-                        this.getProductOptionPage(true);
-                    else
-                        this.getOptionPage(true);
-                }
-            }
-            // else, can swipe up or down
-            else
-                if (this.optionCurrentPage >= 1) {
-                    // go to next page            
-                    if (args.direction == SwipeDirection.up) {
-                        if (this.isShowingMainOptions)
-                            this.getProductOptionPage(true);
-                        else
-                            this.getOptionPage(true);
-                    }
-                    else
-                        // go to previous page
-                        if (args.direction == SwipeDirection.down) {
-                            if (this.isShowingMainOptions)
-                                this.getProductOptionPage(false);
-                            else
-                                this.getOptionPage(false);
-                        }
-                }
+        ////
 
+        // swiping up, goes to next page -- swiping down, goes to previous page
+        if (args.direction == SwipeDirection.down) {
+            this.optionCurrentPage--;
+        }
+        else if (args.direction == SwipeDirection.up) {
+            this.optionCurrentPage++;
+        }
+
+        if (this.optionCurrentPage > this.totalOptionPages)
+            this.optionCurrentPage = 1;
+        else if (this.optionCurrentPage == 0)
+            this.optionCurrentPage = this.totalOptionPages;
+
+        if (this.isShowingMainOptions)
+            this.getProductOptionPage();
+        else
+            this.getOptionPage();
     }
 
     getOptionCategoryPage(nextPage: boolean) {
@@ -1187,43 +1168,12 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.canOptionCategoryPageDown = this.totalOptionCategoryPages > this.optionCategoryCurrentPage;
     }
 
-    getOptionPage(nextPage: boolean) {
-        if (nextPage)
-            this.optionCurrentPage++;
-        else
-            this.optionCurrentPage--;
-
-        let startPosition: number = (this.optionCurrentPage * this.optionPageSize) - this.optionPageSize + 1;
-        let endPosition: number = startPosition + this.optionPageSize - 1;
-
-        if (endPosition > this.menuOptions[this.menuOptions.length - 1].Position)
-            endPosition = this.menuOptions[this.menuOptions.length - 1].Position;
-
-        this.pageOptions = this.menuOptions.filter(
-            o => o.Position >= startPosition && o.Position <= endPosition);
-
-        this.canOptionPageUp = this.optionCurrentPage > 1;
-        this.canOptionPageDown = this.totalOptionPages > this.optionCurrentPage;
+    getOptionPage() {
+        this.pageOptions = this.menuOptions.filter(po => po.Page == this.optionCurrentPage);
     }
 
-    getProductOptionPage(nextPage: boolean) {
-        if (nextPage)
-            this.optionCurrentPage++;
-        else
-            this.optionCurrentPage--;
-
-        let startPosition: number = (this.optionCurrentPage * this.optionPageSize) - this.optionPageSize + 1;
-        let endPosition: number = startPosition + this.optionPageSize - 1;
-
-        if (endPosition > this.productOptions[this.productOptions.length - 1].Position)
-            endPosition = this.productOptions[this.productOptions.length - 1].Position;
-
-        this.pageOptions = this.productOptions.filter(
-            o => o.Position >= startPosition && o.Position <= endPosition);
-
-        this.canOptionPageUp = this.optionCurrentPage > 1;
-        this.canOptionPageDown = this.totalOptionPages > this.optionCurrentPage;
-
+    getProductOptionPage() {
+        this.pageOptions = this.productOptions.filter(c => c.Page == this.optionCurrentPage);
     }
 
     resetFixedOptionClasses() {
@@ -1257,9 +1207,11 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.menuOptions.forEach(function (menuOption: MenuOption) {
                     menuOption.Row = ((Math.floor((menuOption.Position - 1) / 3)) % 6);
                     menuOption.Col = (menuOption.Position - 1) % 3;
+                    menuOption.Page = Math.ceil(menuOption.Position / OPTION_PAGESIZE);
+                    that.totalOptionPages = menuOption.Page;
                 });
 
-                this.totalOptionPages = Math.ceil(menuOptions[menuOptions.length - 1].Position / that.optionPageSize);
+                //this.totalOptionPages = Math.ceil(menuOptions[menuOptions.length - 1].Position / OPTION_PAGESIZE);
 
                 if (this.totalOptionPages > 1)
                     this.canOptionPageDown = true;
@@ -1267,8 +1219,8 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.isShowingOptions = true;
                 this.isShowingMainCategories = false;
                 this.isShowingSubCategories = false;
-                this.optionCurrentPage = 0;
-                this.getOptionPage(true);
+                this.optionCurrentPage = 1;
+                this.getOptionPage();
             }
         });
     }
@@ -1642,7 +1594,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         // swiping up, goes to next page -- swiping down, goes to previous page
         if (args.direction == SwipeDirection.down) {
-            this.productCurrentPage--;           
+            this.productCurrentPage--;
         }
         else if (args.direction == SwipeDirection.up) {
             this.productCurrentPage++;
