@@ -112,14 +112,15 @@ export class OrderComponent implements OnInit, OnDestroy {
     selectedProduct: Product;
     previousProduct: MenuProduct;
     ticketNumber: number = 0;
-
+  
     isShowingMainCategories: boolean = true;
     isShowingSubCategories: boolean = false;
-    isShowingOptions: boolean = false;
+    isShowingOptions: boolean = false;  
     isShowingProducts: boolean = false;
-    showDetails: boolean = true;
-    showExtraFunctions: boolean = false;
-    showProductInfo: boolean = false;
+    isShowingDetails: boolean = true;
+    isShowingExtraFunctions: boolean = false;
+    isShowingProductInfo: boolean = false;  
+    isShowingBottomNav: boolean = true;  
     showHoldCategories: boolean = false;
     productInfoClass: string = 'glass fa';
     viewDetailsCode: string = String.fromCharCode(0xf06e) + ' View Details'
@@ -135,7 +136,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     { Name: 'NO MAKE', Class: 'glass btnOption', Position: 5, ModifierType: ModifierType.NOMAKE },
     { Name: '1/2', Class: 'glass btnOption', Position: 6, ModifierType: ModifierType.HALF },
     { Name: 'TO GO', Class: 'glass btnOption', Position: 7, ModifierType: ModifierType.TOGO }];
-    fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
+    fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8]; 
 
     currentOrderItem: OrderDetail = null;
     currentFixedOption: FixedOption;
@@ -249,7 +250,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         );
     }
 
-    showProductOptions() {
+    isShowingProductOptions() {
         this.isShowingSubCategories = false;
         this.isShowingMainOptions = !this.isShowingMainOptions;
         this.isShowingOptions = true;
@@ -600,13 +601,13 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.isShowingOptionsButton = true;
             this.currentProduct = product;
 
-            if (this.showProductInfo) {
+            if (this.isShowingProductInfo) {
                 dialogs.alert({
                     title: product.Name,
                     message: "Good, healthy ingredients only!",
                     okButtonText: "Close"
                 })
-                //this.showProductInfo = false;
+                //this.isShowingProductInfo = false;
                 this.productInfo();
                 return;
             }
@@ -670,8 +671,8 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     productInfo() {  
         console.log('product info');
-        this.showProductInfo = !this.showProductInfo;
-        if (this.showProductInfo)
+        this.isShowingProductInfo = !this.isShowingProductInfo;
+        if (this.isShowingProductInfo)
             this.productInfoClass = 'glass btnOK fa';
         else
             this.productInfoClass = 'glass fa';
@@ -823,7 +824,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         let that = this;
         this.modalService.showModal(OpenProductComponent, modalOptions).then(
             (openProductItem: OpenProductItem) => {
-                this.showExtraFunctions = false;
+                this.isShowingExtraFunctions = false;
                 if (openProductItem != null) {
                     that.addOpenProductToOrder(openProductItem);
                 }
@@ -902,6 +903,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         this.getMenuOptions(orderProduct.ProductCode);
                         this.isShowingOptionsButton = false;
                         this.isShowingProducts = false;
+                        this.isShowingBottomNav = false;
                         break;
                     case 'changechoice':
                         //this.showForcedModifierDialogOrderItem(orderItem);
@@ -1221,11 +1223,13 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     extraFunctions() {
-        this.showExtraFunctions = true;
+        this.isShowingExtraFunctions = true;
+        this.isShowingBottomNav = false;
     }
 
     closeExtraFunctions() {
-        this.showExtraFunctions = false;
+        this.isShowingExtraFunctions = false;
+        this.isShowingBottomNav = true;
     }
 
     getMenuOptions(productCode: number) {
@@ -1236,7 +1240,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.DBService.getLocalMenuOptions(productCode).then((menuOptions) => {
             if (menuOptions.length == 0) {
                 //dialogs.alert("Missing Menu Options");
-                this.showProductOptions();
+                this.isShowingProductOptions();
             }
             else {
                 this.menuOptions = menuOptions;
@@ -1534,14 +1538,15 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     showHideDetails() {
-        this.showDetails = !this.showDetails;
-        this.viewDetailsText = this.showDetails ? this.hideDetailsCode : this.viewDetailsCode;
+        this.isShowingDetails = !this.isShowingDetails;
+        this.viewDetailsText = this.isShowingDetails ? this.hideDetailsCode : this.viewDetailsCode;
     }
 
     doneOption() {
         this.isShowingOptions = false;
         this.isShowingProducts = true;
         this.isShowingSubCategories = true;
+        this.isShowingBottomNav = true;
     }
 
     onOptionCategorySwipe(args) {

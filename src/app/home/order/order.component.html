@@ -30,7 +30,7 @@
     </GridLayout>
     <!-- order items  -->
     <ScrollView style="background-color: antiquewhite" height="500" orientation="vertical">
-      <StackLayout *ngIf='showDetails'>
+      <StackLayout *ngIf='isShowingDetails'>
         <StackLayout *ngFor="let item of orderItems">
           <FlexBoxLayout *ngIf='item.Voided == null' (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)"
             [class]="item.Class" style="background-color:#e5efbc">
@@ -41,7 +41,7 @@
           </FlexBoxLayout>
         </StackLayout>
       </StackLayout>
-      <StackLayout *ngIf='!showDetails'>
+      <StackLayout *ngIf='!isShowingDetails'>
         <StackLayout *ngFor="let item of orderItems">
           <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" *ngIf='item.ItemType == 1 && item.Voided == null'>
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
@@ -77,11 +77,11 @@
     </StackLayout>
   </StackLayout>
   <!-- bottom navigation -->
-  <GridLayout row="1" col="0" colSpan="4" style="margin-bottom:10" columns='110 110 110 110 110 110 110 *' *ngIf='!showExtraFunctions && !showOptions'>
+  <GridLayout row="1" col="0" colSpan="4" style="margin-bottom:10" columns='110 110 110 110 110 110 110 *' *ngIf='isShowingBottomNav'>
     <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancelOrder()" col='0'></Button>
     <Button class="glass btnBottom fa" [text]="viewDetailsText" textWrap="true" (tap)="showHideDetails()" col='1' *ngIf='newItemsCount > 0'></Button>
-    <Button class="glass btnBottom" (tap)="nextSeat()" textWrap="true" text="" col='2' style="background-image: url('res://images/Orders/Seat'); background-repeat: no-repeat; background-position: right 0"></Button>
-    <Label class="nextSeat" [text]='currentSeatNumber' col='2' style='margin-left: 5'></Label>
+    <Button class="glass btnBottom" (tap)="nextSeat()" textWrap="true" text="" col='2' style="background-image: url('res://images/Orders/Seat'); background-repeat: no-repeat; background-position: right 2"></Button>
+    <Label class="nextSeat" [text]='currentSeatNumber' col='2' style='margin-left: 74'></Label>
     <Button class="glass btnBottom fa" (tap)="extraFunctions()" col='3' textWrap="true" text="&#xf0fe; Extra Functions"
       style="margin-left: 40"></Button>
     <Button class="glass btnBottom fa" (tap)="hold()" col='5' textWrap="true" text="&#xf256; Hold" *ngIf='newItemsCount > 0'></Button>
@@ -91,7 +91,7 @@
       horizontalAlignment="right" *ngIf='newItemsCount > 0 || orderModified'></Button>
   </GridLayout>
   <!-- bottom navigation for extra functions -->
-  <GridLayout rows='60' row="1" col="0" colSpan="4" columns='100 400 100 100 *' *ngIf='showExtraFunctions'>
+  <GridLayout rows='60' row="1" col="0" colSpan="4" columns='100 400 100 100 *' *ngIf='isShowingExtraFunctions'>
     <Button class="glass btnBottom btnCancel" text="Close" (tap)="closeExtraFunctions()" col='0' horizontalAlignment="left"></Button>
     <Button class="glass btnBottom" text="Open Product" textWrap="true" (tap)="showOpenProduct()" row='0' col='2'></Button>
     <Button class="glass btnBottom" text="Change # of Guests" (tap)="changeGuestsNumber()" textWrap="true" row='0' col='3'
@@ -165,7 +165,7 @@
     </GridLayout>
     <!-- fixed modifiers -->
     <StackLayout row='1' col='3' rowSpan="4">
-      <button text="Product Options" textWrap="true" [class]='productOptionsClass' (tap)='showProductOptions()'></button>
+      <button text="Product Options" textWrap="true" [class]='productOptionsClass' (tap)='isShowingProductOptions()'></button>
       <StackLayout *ngFor="let item of fixedOptions let i=index">
         <Button [class]="item.Class" textWrap="true" [text]='item.Name' (tap)='fixedOptionSelected(item)'></Button>
       </StackLayout>
@@ -189,7 +189,7 @@
   </GridLayout>
 
   <!-- user-defined modifiers - bottom row -->
-  <WrapLayout row="1" col="0" colSpan="4" style="margin-bottom:10" *ngIf='showOptions'>
+  <WrapLayout row="1" col="0" colSpan="4" style="margin-bottom:10" *ngIf='isShowingOptions'>
     <Button [class]="item.Class" width="120" [text]="item.ItemName" *ngFor="let item of userModifiers let i=index"
       (tap)="userModifierSelected(item)"></Button>
   </WrapLayout>
