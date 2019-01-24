@@ -189,6 +189,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     subOptions: MenuChoice[] = [];
     isShowingSubOptions: boolean = false;
     isShowingSubOptionsButton: boolean = false; 
+    currentItemIndex: number = 0;
  
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -527,6 +528,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     subCategorySelected(subCategory: MenuSubCategory) {
         // build menu products list        
+        this.isShowingSubOptions = false;
         this.isShowingChoices = false;
         this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
         let that = this;
@@ -540,7 +542,6 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
             else {
                 this.products = products;
-
                 this.setProductAttributes();
                 this.totalProductPages = Math.ceil(this.products[that.products.length - 1].Position / PRODUCT_PAGESIZE);
                 this.productCurrentPage = 0;
@@ -651,10 +652,11 @@ export class OrderComponent implements OnInit, OnDestroy {
                         od.SeatNumber = that.currentSeatNumber.toString();
                         that.resetLastItemOrdered();
                         od.Class = 'lastOrderItem';
-                        that.orderItems.push(od);
+                        that.orderItems.push(od);                        
+                        //that.addItemToOrder(od);
                     });
-
-                    this.sortOrderItems();
+                    this.currentItemIndex = this.orderItems.length - 1;
+                    //this.sortOrderItems();
 
                     this.totalPrice();
                     //this.setLastItemOrdered();
@@ -700,8 +702,16 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.showForcedModifierDialog(false);
     }
 
+    resetOptions()
+    {
+        this.currentFixedOption = null;
+        this.currentModifierType = null;
+    }
+
     addProductToOrder(mp: MenuProduct) {
         //let marginLeft: number = this.getLeftMargin(ItemType.Product);
+        this.resetOptions();
+
         let currentDate: string = this.utilSvc.getCurrentTime();
 
         this.DBService.getLocalProduct(mp.ProductID).then(product => {
@@ -735,8 +745,9 @@ export class OrderComponent implements OnInit, OnDestroy {
 
             this.resetLastItemOrdered();
             orderItem.Class = 'lastOrderItem';
-            this.orderItems.push(orderItem);
+            //this.orderItems.push(orderItem);
             this.currentOrderItem = orderItem;
+            this.addItemToOrder(orderItem);
 
             if (product.UseForcedModifier && product.ForcedModifier) {
                 this.showForcedModifierDialog(true);
@@ -854,6 +865,8 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     showModifyDialog(orderItem: OrderDetail) {
+
+        this.currentItemIndex = this.orderItems.indexOf(orderItem);
 
         if (orderItem != null)
             this.currentOrderItem = orderItem;
@@ -1090,11 +1103,18 @@ export class OrderComponent implements OnInit, OnDestroy {
         //    orderDetail.OrderFilter = this.currentOrderFilter;
         this.resetLastItemOrdered();
         orderDetail.Class = 'lastOrderItem';
-        orderDetail.CostID = 0;
-        this.orderItems.push(orderDetail);
+        orderDetail.CostID = 0;        
+        //this.orderItems.push(orderDetail);
+        this.addItemToOrder(orderDetail);
         //this.sortOrderItems();
 
         this.totalPrice();
+    }
+
+    addItemToOrder(orderItem: OrderDetail)
+    {
+        this.orderItems.splice(this.currentItemIndex+1,0, orderItem);
+        this.currentItemIndex = this.orderItems.indexOf(orderItem);
     }
 
     round2Decimals(inNumber: number) {
@@ -1722,8 +1742,9 @@ export class OrderComponent implements OnInit, OnDestroy {
         let itemsToCopy = this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData);
         let nextIndexData: number = this.getNextIndexData();
         let that = this;
+        
         let product: MenuProduct = this.pageProducts.find(p => p.ProductID == orderItem.ProductFilter);
-
+        
         itemsToCopy.forEach(function (orderItem: OrderDetail) {
             let copiedItem = Object.assign({}, orderItem);
             copiedItem.IndexData = nextIndexData;
@@ -1741,9 +1762,12 @@ export class OrderComponent implements OnInit, OnDestroy {
             copiedItem.ProductCode = orderItem.ProductCode;
             that.resetLastItemOrdered();
             copiedItem.Class = 'lastOrderItem';
-            product.QtyAvailable -= copiedItem.Quantity;            
-            that.orderItems.push(copiedItem);
             
+            if (product != null)
+                product.QtyAvailable -= copiedItem.Quantity;            
+            
+            that.orderItems.push(copiedItem);
+            //that.addItemToOrder(copiedItem);
             /*
             that.orderItems.push(
                 {
@@ -1762,6 +1786,7 @@ export class OrderComponent implements OnInit, OnDestroy {
            */
         });
 
+        this.currentItemIndex = this.orderItems.length - 1;
         this.totalPrice();
     }
 
