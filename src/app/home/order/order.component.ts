@@ -1092,8 +1092,18 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     addItemToOrder(orderItem: OrderDetail) {
-        this.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
-        this.currentItemIndex = this.orderItems.indexOf(orderItem);
+        if (orderItem.ItemType == ItemType.Product)
+        {
+            this.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
+            this.currentItemIndex = this.orderItems.indexOf(orderItem);
+        }
+        else
+        {
+        // get last item in product group        
+            let item: OrderDetail = this.orderItems.slice().reverse().find(oi => oi.IndexData == orderItem.IndexData);
+            let itemIndex: number = this.orderItems.indexOf(item);            
+            this.orderItems.splice(itemIndex + 1, 0, orderItem);
+        }        
     }
 
     round2Decimals(inNumber: number) {
