@@ -514,9 +514,8 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     subCategorySelected(subCategory: MenuSubCategory) {
-        // build menu products list        
-        this.isShowingSubOptions = false;
-        this.isShowingChoices = false;
+        // build menu products list      
+        this.hideOptions();  
         this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
         let that = this;
         //let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
@@ -576,6 +575,9 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     productSelected(product: MenuProduct) {
+        this.isShowingMainOptions = false;
+        this.currentItemIndex = this.orderItems.length - 1;
+
         if (this.currentProduct == product) {
             this.currentOrderItem.Quantity++;
             this.currentOrderItem.ExtPrice = this.currentOrderItem.Quantity * this.currentOrderItem.UnitPrice;
@@ -1123,7 +1125,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         else if (args.direction == SwipeDirection.up) {
             this.optionCurrentPage++;
         }
-
+ 
         if (this.optionCurrentPage > this.totalOptionPages)
             this.optionCurrentPage = 1;
         else if (this.optionCurrentPage == 0)
@@ -1151,6 +1153,12 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.fixedOptions.forEach(function (fixedOption: FixedOption) {
             fixedOption.Class = 'glass btnOption';
         });
+    }
+
+    hideOptions() {
+        this.isShowingOptions = false;
+        this.isShowingChoices = false;
+        this.isShowingSubOptions = false;
     }
 
     extraFunctions() {
