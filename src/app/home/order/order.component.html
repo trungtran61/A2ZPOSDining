@@ -105,7 +105,7 @@
       (tap)="categorySelected(item)" [style]="categoryStyles[i]"></Button>
   </StackLayout>
   <!-- subcategories -->
-  <GridLayout row="0" col="1" rows="60 105 105 105 105 105 80" (swipe)="onSubCategorySwipe($event)" >
+  <GridLayout row="0" col="1" rows="60 105 105 105 105 105 80" (swipe)="onSubCategorySwipe($event)" *ngIf="isShowingSubCategories">
     <Button class="glass" text='MAIN' textWrap="true" row='0' col='0' style='text-align: center' (tap)='displayMainCategories()'></Button>
     <Button [class]="item.Class" [text]="item.Name" *ngFor="let item of pageSubCategories" (tap)="subCategorySelected(item)"
       [row]='item.Row' [col]='item.Col' textWrap="true"></Button>
