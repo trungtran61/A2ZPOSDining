@@ -1,6 +1,6 @@
 .choiceLayer
 {
-    background-color: white;
+    background-color: antiquewhite;
     color: silver;
     border-style: solid;
     border-width: 1px;
@@ -12,12 +12,12 @@
 
 .choiceLayerActive
 {
-    background-color: antiquewhite;
+    background-color: white;   
     color: black;
     border-style: solid;
     border-width: 2px;
     border-radius: 10px;
-    border-color: gray;
+    border-color: red;
     height: 200px; 
     margin-bottom: 5px;   
 }

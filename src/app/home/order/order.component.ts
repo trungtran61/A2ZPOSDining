@@ -515,7 +515,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     subCategorySelected(subCategory: MenuSubCategory) {
         // build menu products list      
-        this.hideOptions();  
+        this.hideOptions();
         this.subCategoriesTitle = this.mainCategory + ' - ' + subCategory.Name;
         let that = this;
         //let categoryID: number = parseInt(localStorage.getItem("CategoryID"));
@@ -620,7 +620,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             context: {
                 orderItems: orderItems,
                 isAdding: isAdding,
-                product: this.selectedProduct
+                product: this.selectedProduct,
+                orderItem: this.currentOrderItem
             }
         };
 
@@ -846,12 +847,14 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     showModifyDialog(orderItem: OrderDetail) {
 
-        this.currentItemIndex = this.orderItems.indexOf(orderItem);
-
+        this.orderItems.forEach(oi => oi.Class = 'orderItem');
         if (orderItem != null)
             this.currentOrderItem = orderItem;
         else
             orderItem = this.currentOrderItem;
+
+        orderItem.Class = 'activeOrderItem';
+        this.currentItemIndex = this.orderItems.indexOf(orderItem);
 
         let context = { orderItem: orderItem };
 
@@ -1084,7 +1087,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.resetLastItemOrdered();
         orderDetail.Class = 'lastOrderItem';
         orderDetail.CostID = 0;
-        //this.orderItems.push(orderDetail);
+        //this.orderItems.push(orderDetail);      
         this.addItemToOrder(orderDetail);
         //this.sortOrderItems();
 
@@ -1092,18 +1095,16 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     addItemToOrder(orderItem: OrderDetail) {
-        if (orderItem.ItemType == ItemType.Product)
-        {
+        if (orderItem.ItemType == ItemType.Product) {
             this.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
             this.currentItemIndex = this.orderItems.indexOf(orderItem);
         }
-        else
-        {
-        // get last item in product group        
+        else {
+            // get last item in product group        
             let item: OrderDetail = this.orderItems.slice().reverse().find(oi => oi.IndexData == orderItem.IndexData);
-            let itemIndex: number = this.orderItems.indexOf(item);            
+            let itemIndex: number = this.orderItems.indexOf(item);
             this.orderItems.splice(itemIndex + 1, 0, orderItem);
-        }        
+        }
     }
 
     round2Decimals(inNumber: number) {
@@ -1135,7 +1136,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         else if (args.direction == SwipeDirection.up) {
             this.optionCurrentPage++;
         }
- 
+
         if (this.optionCurrentPage > this.totalOptionPages)
             this.optionCurrentPage = 1;
         else if (this.optionCurrentPage == 0)

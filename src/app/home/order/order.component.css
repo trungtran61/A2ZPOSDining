@@ -125,6 +125,12 @@ background: url('https://www.nativescript.org/images/default-source/Blogs/ns-log
 	color: black;
 }
 
+.activeOrderItem
+{
+	color: white;
+	background-color: blue;
+}
+
 .productOptions
 {
 	color: yellow;background-image: linear-gradient(black,green 10%, black 90%);

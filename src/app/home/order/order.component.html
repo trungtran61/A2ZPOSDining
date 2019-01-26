@@ -33,7 +33,7 @@
       <StackLayout *ngIf='isShowingDetails'>
         <StackLayout *ngFor="let item of orderItems">
           <FlexBoxLayout *ngIf='item.Voided == null' (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)"
-            [class]="item.Class" style="background-color:#e5efbc">
+            [class]="item.Class">
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.ExtPrice | currency" style="text-align: right; width:95; margin-right:5"></Label>
@@ -131,8 +131,8 @@
       </GridLayout>
     -->
     <Button [class]="productInfoClass" (tap)="productInfo()" textWrap="true" text="&#xf05a; Product Info" row='7' col='1'></Button>
-    <Button class="glass" (tap)="showModifyDialog(null)" text="Options" row='7' col='2' *ngIf='showOptionsButton && newItemsCount > 0'></Button>
-    <Button class="fa" (tap)="showModifyDialog(null)" text="&#xf0c8;" row='7' col='2' *ngIf='showOptionsButton && newItemsCount > 0'
+    <Button class="glass" (tap)="showModifyDialog(null)" text="Options" row='7' col='2' *ngIf='isShowingOptionsButton && newItemsCount > 0'></Button>
+    <Button class="fa" (tap)="showModifyDialog(null)" text="&#xf0c8;" row='7' col='2' *ngIf='isShowingOptionsButton && newItemsCount > 0'
       style='color:lightgreen; margin-left: 85; margin-top: -34'></Button>
   </GridLayout>
 

@@ -23,6 +23,7 @@ export class ForcedModifiersComponent implements OnInit {
     activeLayer: ChoiceLayer = {};
     currentChoice: MenuChoice = null;
     orderProduct: OrderDetail;
+    orderItem: OrderDetail;
     orderItems: OrderDetail[];
     subOptions: OrderDetail[];
     product: Product;
@@ -72,7 +73,14 @@ export class ForcedModifiersComponent implements OnInit {
                     }
                     );
                 }
-                this.choiceLayerSelected(this.choiceLayers[0]);
+                let choiceLayer: ChoiceLayer = this.choiceLayers[0];
+                
+                if (this.orderItem.ItemType != ItemType.Product)
+                {
+                    choiceLayer = this.choiceLayers.find(cl => cl.Layer == this.orderItem.IndexDataSub);
+                }    
+
+                this.choiceLayerSelected(choiceLayer);
             }
             //this.setActiveLayer(0);   
         });
@@ -114,33 +122,7 @@ export class ForcedModifiersComponent implements OnInit {
             }
         });
     }
-
-    choiceSelectedX(choice: MenuChoice) {
-        let forcedChoiceItem: ForcedChoiceItemDetail = {
-            ItemName: choice.Name,          // e.g. Chicken
-            PrintName: choice.PrintName,
-            Key: choice.Key,
-            ItemType: ItemType.ForcedChoice,
-            Price: choice.Charge,
-            ReportProductMix: choice.ReportProductMix,
-        }
-
-        this.choiceItem.ForcedChoiceItems.push(forcedChoiceItem);
-    }
-
-    subChoiceSelectedX(choice: MenuSubOption) {
-        let forcedChoiceItem: ForcedChoiceItemDetail = {
-            ItemName: choice.Name,          // e.g. Chicken
-            PrintName: choice.PrintName,
-            Key: choice.Key,
-            ItemType: ItemType.SubOption,
-            Price: choice.ApplyCharge ? choice.Charge : 0,
-            ReportProductMix: choice.ReportProductMix,
-        }
-
-        this.choiceItem.ForcedChoiceItems.push(forcedChoiceItem);
-    }
-
+   
     choiceSelected(choice: MenuChoice) {
         // if changing choices - check if choice made is not one of the current choice, if so remove the layer's previous choice
         if (!this.isAdding && this.currentChoices.find(cc => cc.IndexDataSub == choice.Layer && cc.ProductName == choice.Name) == null) {
@@ -150,8 +132,7 @@ export class ForcedModifiersComponent implements OnInit {
         this.currentChoice = choice;
         this.currentChoice.SubOptions = [];
         this.activeLayer.Choice = choice;
-        let that = this;
-
+       
         if (choice.ForcedChoice || this.subOptionsActive) {
             this.subOptionsActive = false;
             this.DBService.getLocalMenuSubOptions(choice.ChoiceID).then((items) => {
@@ -195,7 +176,7 @@ export class ForcedModifiersComponent implements OnInit {
         od.ReportProductMix = choice.ReportProductMix;        
         od.UnitPrice = 0;
         od.ExtPrice = null;
-
+        
         if (choice.Charge > 0) {
             od.UnitPrice = choice.Charge;
             od.ExtPrice = choice.Charge * qty;
@@ -273,6 +254,10 @@ export class ForcedModifiersComponent implements OnInit {
     }
 
     close() {
+        // if changing choices, re-sort choices by layer
+        this.currentChoices.sort((a, b) => a.IndexDataSub > b.IndexDataSub
+                ? 1 : a.IndexDataSub < b.IndexDataSub  ? -1 : 0);
+        
         this.params.closeCallback(this.currentChoices);
     }
 
@@ -295,6 +280,13 @@ export class ForcedModifiersComponent implements OnInit {
         this.orderProduct = this.orderItems.find(oi => oi.ItemType == ItemType.Product);
         this.subOptions = this.orderItems.filter(od => od.ItemType == ItemType.SubOption);
         this.product = this.params.context.product;
+        this.orderItem = this.params.context.orderItem; 
+
+        if (!this.isAdding)
+        {
+            this.currentChoices = this.orderItems.filter(od => (od.ItemType != ItemType.SubOption && od.ItemType != ItemType.Product && od.IndexDataSub != null));
+        }
+
         this.getChoiceLayers();
     }
 }

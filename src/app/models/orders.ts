@@ -292,6 +292,7 @@ export interface OrderDetail {
     ReportProductMix?: boolean;
     ApplyCharge?: boolean;
     CostID?: number;
+    Layer?: number;
 }
 
 export interface OrderResponse {
