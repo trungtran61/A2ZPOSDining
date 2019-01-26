@@ -578,13 +578,14 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.isShowingMainOptions = false;
         this.currentItemIndex = this.orderItems.length - 1;
 
-        if (this.currentProduct == product) {
+        if (this.previousProduct == product) {
             this.currentOrderItem.Quantity++;
             this.currentOrderItem.ExtPrice = this.currentOrderItem.Quantity * this.currentOrderItem.UnitPrice;
             this.totalPrice();
             product.QtyAvailable -= 1;
         }
         else {
+            this.previousProduct = product;
             this.isShowingOptionsButton = true;
             this.currentProduct = product;
 
@@ -610,6 +611,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     showForcedModifierDialog(isAdding: boolean) {
+        this.previousProduct = null;
 
         let orderItems: OrderDetail[];
         orderItems = this.orderItems.filter(od => od.IndexData == this.currentOrderItem.IndexData);
@@ -639,8 +641,8 @@ export class OrderComponent implements OnInit, OnDestroy {
                         od.SeatNumber = that.currentSeatNumber.toString();
                         that.resetLastItemOrdered();
                         od.Class = 'lastOrderItem';
-                        that.orderItems.push(od);
-                        //that.addItemToOrder(od);
+                        //that.orderItems.push(od);
+                        that.addItemToOrder(od);
                     });
                     this.currentItemIndex = this.orderItems.length - 1;
                     //this.sortOrderItems();
@@ -744,7 +746,6 @@ export class OrderComponent implements OnInit, OnDestroy {
             else {
                 this.totalPrice();
             }
-            this.previousProduct = this.currentProduct;
 
             this.newItemsCount = this.orderItems.length;
         });
@@ -846,6 +847,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     showModifyDialog(orderItem: OrderDetail) {
+        this.previousProduct = null;
 
         this.orderItems.forEach(oi => oi.Class = 'orderItem');
         if (orderItem != null)
