@@ -20,6 +20,7 @@ export class UtilityService {
     private readStream: NSInputStream;
     private writeStream: NSOutputStream;
     public taxRates: TaxRate[]=[];
+    orderItems: OrderDetail[] = [];
 
     public constructor(private router: RouterExtensions,
         private DBService: SQLiteService,

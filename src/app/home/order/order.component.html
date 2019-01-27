@@ -31,7 +31,7 @@
     <!-- order items  -->
     <ScrollView style="background-color: antiquewhite" height="500" orientation="vertical" (tap)="hideOptions()">
       <StackLayout *ngIf='isShowingDetails'>
-        <StackLayout *ngFor="let item of orderItems">
+        <StackLayout *ngFor="let item of utilSvc.orderItems">
           <FlexBoxLayout *ngIf='item.Voided == null' (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)"
             [class]="item.Class">
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
@@ -42,7 +42,7 @@
         </StackLayout>
       </StackLayout>
       <StackLayout *ngIf='!isShowingDetails'>
-        <StackLayout *ngFor="let item of orderItems">
+        <StackLayout *ngFor="let item of utilSvc.orderItems">
           <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" *ngIf='item.ItemType == 1 && item.Voided == null'>
             <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>

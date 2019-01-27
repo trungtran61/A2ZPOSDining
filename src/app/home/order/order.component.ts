@@ -87,7 +87,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     categoryCodes: CategoryCode[] = [];
     orderHeader: OrderHeader = null;
     orderResponse: OrderResponse = null;
-    orderItems: OrderDetail[] = [];
+    //orderItems: OrderDetail[] = [];
     //origOrderItems: OrderDetail[] = [];
     //orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
     currentSeatNumber: number = 1;
@@ -351,14 +351,14 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
             this.orderResponse = orderResponse;
             //this.origOrderItems = orderResponse.OrderDetail;
-            //this.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
-            this.orderItems = orderResponse.OrderDetail;
+            //this.utilSvc.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
+            this.utilSvc.orderItems = orderResponse.OrderDetail;
             this.ticketNumber = this.orderResponse.Order.OrderID;
             this.checkNumber = this.orderResponse.Order.CheckNumber;
             this.table = this.orderResponse.Order.TableNumber;
             this.DBService.getLocalEmployee(this.orderResponse.Order.EmployeeID).then(employee => this.server = employee.FirstName);
             this.guests = this.orderResponse.Order.NumberGuests;
-            this.orderItems.forEach(oi => oi.Class = 'disabledTextColor');
+            this.utilSvc.orderItems.forEach(oi => oi.Class = 'disabledTextColor');
             this.totalPrice();
         });
     }
@@ -385,7 +385,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     sortOrderItems() {
-        this.orderItems.sort((a, b) => ((a.IndexData * 1000) + ((a.IndexDataSub == null ? 0 : a.IndexDataSub) * 100) + a.ItemType >
+        this.utilSvc.orderItems.sort((a, b) => ((a.IndexData * 1000) + ((a.IndexDataSub == null ? 0 : a.IndexDataSub) * 100) + a.ItemType >
             (b.IndexData * 1000) + ((b.IndexDataSub == null ? 0 : b.IndexDataSub) * 100) + b.ItemType)
             ? 1 : (((a.IndexData * 1000) + ((a.IndexDataSub == null ? 0 : a.IndexDataSub) * 100) + a.ItemType <
                 ((b.IndexData * 1000) + ((b.IndexDataSub == null ? 0 : b.IndexDataSub) * 100) + b.ItemType) ? -1 : 0)));
@@ -576,7 +576,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     productSelected(product: MenuProduct) {
         this.isShowingMainOptions = false;
-        this.currentItemIndex = this.orderItems.length - 1;
+        this.currentItemIndex = this.utilSvc.orderItems.length - 1;
 
         if (this.previousProduct == product) {
             this.currentOrderItem.Quantity++;
@@ -614,7 +614,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.previousProduct = null;
 
         let orderItems: OrderDetail[];
-        orderItems = this.orderItems.filter(od => od.IndexData == this.currentOrderItem.IndexData);
+        orderItems = this.utilSvc.orderItems.filter(od => od.IndexData == this.currentOrderItem.IndexData);
 
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
@@ -634,7 +634,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 if (selectedItems != null) {
                     // if changing choices, remove current choices before adding new ones
                     if (!isAdding)
-                        this.orderItems = this.orderItems.filter(oi => ((oi.IndexData == this.currentOrderItem.IndexData && oi.ItemType == ItemType.Product) ||
+                        this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => ((oi.IndexData == this.currentOrderItem.IndexData && oi.ItemType == ItemType.Product) ||
                             oi.IndexData != this.currentOrderItem.IndexData));
 
                     selectedItems.forEach(function (od: OrderDetail) {
@@ -644,7 +644,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         //that.orderItems.push(od);
                         that.addItemToOrder(od);
                     });
-                    this.currentItemIndex = this.orderItems.length - 1;
+                    this.currentItemIndex = this.utilSvc.orderItems.length - 1;
                     //this.sortOrderItems();
 
                     this.totalPrice();
@@ -728,12 +728,12 @@ export class OrderComponent implements OnInit, OnDestroy {
             orderItem.CostID = product.CostID;
             this.changeQtyAvailable(product.ProductFilter, this.qtyEntered * -1);
 
-            if (this.orderItems.length > 0 && this.orderItems[this.orderItems.length - 1].OrderFilter == null)
-                this.orderItems[this.orderItems.length - 1].Class = 'orderItem';
+            if (this.utilSvc.orderItems.length > 0 && this.utilSvc.orderItems[this.utilSvc.orderItems.length - 1].OrderFilter == null)
+                this.utilSvc.orderItems[this.utilSvc.orderItems.length - 1].Class = 'orderItem';
 
             this.resetLastItemOrdered();
             orderItem.Class = 'lastOrderItem';
-            //this.orderItems.push(orderItem);
+            //this.utilSvc.orderItems.push(orderItem);
             this.currentOrderItem = orderItem;
             this.addItemToOrder(orderItem);
 
@@ -747,7 +747,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.totalPrice();
             }
 
-            this.newItemsCount = this.orderItems.length;
+            this.newItemsCount = this.utilSvc.orderItems.length;
         });
     }
 
@@ -772,7 +772,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.choiceCurrentPage = 1;
                 this.getChoicePage();
                 this.isShowingOptionsButton = false;
-                this.isShowingProducts = false;
+                //this.isShowingProducts = false;
             }
         });
 
@@ -846,17 +846,26 @@ export class OrderComponent implements OnInit, OnDestroy {
             });
     }
 
+    showProducts() {
+        this.isShowingOptionsButton = true;
+        this.isShowingBottomNav = true;
+        this.isShowingProducts = true;
+        this.isShowingProducts = true;
+        this.isShowingSubCategories = true;
+    }
+
     showModifyDialog(orderItem: OrderDetail) {
+        this.showProducts();
         this.previousProduct = null;
 
-        this.orderItems.forEach(oi => oi.Class = 'orderItem');
+        this.utilSvc.orderItems.forEach(oi => oi.Class = 'orderItem');
         if (orderItem != null)
             this.currentOrderItem = orderItem;
         else
             orderItem = this.currentOrderItem;
 
         orderItem.Class = 'activeOrderItem';
-        this.currentItemIndex = this.orderItems.indexOf(orderItem);
+        this.currentItemIndex = this.utilSvc.orderItems.indexOf(orderItem);
 
         let context = { orderItem: orderItem };
 
@@ -867,7 +876,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         };
 
         let that = this;
-        let orderProduct = this.orderItems.find(oi => oi.IndexData == orderItem.IndexData && oi.ItemType == ItemType.Product);
+        let orderProduct = this.utilSvc.orderItems.find(oi => oi.IndexData == orderItem.IndexData && oi.ItemType == ItemType.Product);
 
         this.modalService.showModal(ModifyOrderItemComponent, modalOptions).then(
             (choice: Choice) => {
@@ -878,7 +887,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
                         orderProduct.Quantity = parseFloat(choice.SelectedNumber);
                         orderProduct.ExtPrice = orderProduct.UnitPrice * parseFloat(choice.SelectedNumber);
-                        this.orderItems.forEach(oi => {
+                        this.utilSvc.orderItems.forEach(oi => {
                             if (oi.ItemType != ItemType.Product && oi.UnitPrice != null ? oi.UnitPrice : 0 > 0) {
                                 oi.ExtPrice = oi.UnitPrice * orderProduct.Quantity;
                             }
@@ -900,11 +909,12 @@ export class OrderComponent implements OnInit, OnDestroy {
                     case 'modify':
                         this.getMenuOptions(orderProduct.ProductCode);
                         this.isShowingOptionsButton = false;
-                        this.isShowingProducts = false;
                         this.isShowingBottomNav = false;
+                        this.isShowingProducts = false;
                         break;
                     case 'changechoice':
                         //this.showForcedModifierDialogOrderItem(orderItem);
+                        this.isShowingProducts = false;
                         this.changeChoice(orderItem);
                         break;
                 }
@@ -943,7 +953,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     printName = SPACES5 + this.currentSubOption.PrintName;
                 }
             }
-            orderDetail = this.orderItems.find(od => od.IndexData == this.currentOrderItem.IndexData &&
+            orderDetail = this.utilSvc.orderItems.find(od => od.IndexData == this.currentOrderItem.IndexData &&
                 od.IndexDataSub == this.currentOrderItem.IndexDataSub &&
                 (od.ItemType == ItemType.Choice || od.ItemType == ItemType.ForcedChoice));
             orderDetail.OptionCode = this.currentSubOption.Key;
@@ -969,7 +979,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 reportProductMix = this.currentMenuOption.ReportProductMix;
             }
             modifierIgnoreQuantity = this.currentOrderItem.ProductFilter == 0;
-            orderDetail = Object.assign({}, this.orderItems.find(od => od.IndexData == this.currentOrderItem.IndexData && od.ItemType == ItemType.Product));
+            orderDetail = Object.assign({}, this.utilSvc.orderItems.find(od => od.IndexData == this.currentOrderItem.IndexData && od.ItemType == ItemType.Product));
             orderDetail.PriKey = 0
         }
 
@@ -1089,7 +1099,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.resetLastItemOrdered();
         orderDetail.Class = 'lastOrderItem';
         orderDetail.CostID = 0;
-        //this.orderItems.push(orderDetail);      
+        //this.utilSvc.orderItems.push(orderDetail);      
         this.addItemToOrder(orderDetail);
         //this.sortOrderItems();
 
@@ -1097,16 +1107,20 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     addItemToOrder(orderItem: OrderDetail) {
+        /*
         if (orderItem.ItemType == ItemType.Product) {
-            this.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
-            this.currentItemIndex = this.orderItems.indexOf(orderItem);
+            this.utilSvc.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
+            this.currentItemIndex = this.utilSvc.orderItems.indexOf(orderItem);
         }
         else {
             // get last item in product group        
-            let item: OrderDetail = this.orderItems.slice().reverse().find(oi => oi.IndexData == orderItem.IndexData);
-            let itemIndex: number = this.orderItems.indexOf(item);
-            this.orderItems.splice(itemIndex + 1, 0, orderItem);
+            let item: OrderDetail = this.utilSvc.orderItems.slice().reverse().find(oi => oi.IndexData == orderItem.IndexData);
+            let itemIndex: number = this.utilSvc.orderItems.indexOf(item);
+            this.utilSvc.orderItems.splice(itemIndex + 1, 0, orderItem);
         }
+        */
+        this.utilSvc.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
+        this.currentItemIndex = this.utilSvc.orderItems.indexOf(orderItem);
     }
 
     round2Decimals(inNumber: number) {
@@ -1115,14 +1129,14 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     processFilterNumber() {
         let i: number = 1;
-        this.orderItems.forEach(oi => {
+        this.utilSvc.orderItems.forEach(oi => {
             oi.ExtPrice = oi.ExtPrice > 0 ? oi.ExtPrice : null;     // hide amount if zero            
             oi.FilterNumber = i;
             i++;
         })
 
-        //if (this.orderItems.length > 0)
-        //    this.orderItems[this.orderItems.length - 1].Class = 'lastOrderItem'
+        //if (this.utilSvc.orderItems.length > 0)
+        //    this.utilSvc.orderItems[this.utilSvc.orderItems.length - 1].Class = 'lastOrderItem'
     }
 
     onOptionSwipe(args) {
@@ -1256,7 +1270,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     cancelOrder() {
-        if (this.orderItems.filter(oi => oi.OrderFilter == null).length > 0) {
+        if (this.utilSvc.orderItems.filter(oi => oi.OrderFilter == null).length > 0) {
             dialogs.confirm({
                 title: "Cancel Order",
                 message: "Cancel this order?",
@@ -1330,37 +1344,37 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     getNextOptionFilterNumber(): number {
-        if (this.orderItems.length == 0)
+        if (this.utilSvc.orderItems.length == 0)
             return 0;
 
-        return Math.max.apply(Math, this.orderItems
+        return Math.max.apply(Math, this.utilSvc.orderItems
             .filter(oi => oi.IndexData == this.currentOrderItem.IndexData && oi.IndexDataSub == this.currentOrderItem.IndexDataSub)
             .map(function (oi) { return oi.FilterNumber + 1; }));
     }
 
     getNextFilterNumber(): number {
-        if (this.orderItems.length == 0)
+        if (this.utilSvc.orderItems.length == 0)
             return 0;
 
-        return Math.max.apply(Math, this.orderItems
+        return Math.max.apply(Math, this.utilSvc.orderItems
             .filter(oi => oi.ItemType == ItemType.Product)
             .map(function (oi) { return oi.FilterNumber + 1; }));
     }
 
     getNextIndexData(): number {
-        if (this.orderItems.length == 0)
+        if (this.utilSvc.orderItems.length == 0)
             return 1;
 
-        return Math.max.apply(Math, this.orderItems
+        return Math.max.apply(Math, this.utilSvc.orderItems
             .filter(oi => oi.ItemType == ItemType.Product)
             .map(function (oi) { return oi.IndexData + 1; }));
     }
 
     getNextIndexDataSub(indexData: number): number {
-        if (this.orderItems.filter(oi => oi.IndexData == indexData && oi.ItemType == ItemType.Option).length == 0)
+        if (this.utilSvc.orderItems.filter(oi => oi.IndexData == indexData && oi.ItemType == ItemType.Option).length == 0)
             return 0;
 
-        return Math.max.apply(Math, this.orderItems
+        return Math.max.apply(Math, this.utilSvc.orderItems
             .filter(oi => oi.IndexData == indexData && oi.ItemType == ItemType.Option)
             .map(function (oi) { return oi.IndexDataSub + 1; }));
     }
@@ -1418,9 +1432,9 @@ export class OrderComponent implements OnInit, OnDestroy {
         let indexData: number = 0;
         let lastIndex: number = 0;
 
-        if (this.orderItems.length > 0) {
+        if (this.utilSvc.orderItems.length > 0) {
             indexData = this.currentOrderItem.IndexData;
-            lastIndex = this.orderItems.map(oi =>
+            lastIndex = this.utilSvc.orderItems.map(oi =>
                 oi.IndexData === indexData).lastIndexOf(true);
         }
 
@@ -1442,14 +1456,14 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.resetLastItemOrdered();
         orderItem.Class = 'lastOrderItem';
         // add item to the order
-        this.orderItems.splice(lastIndex + 1, 0, orderItem);
+        this.utilSvc.orderItems.splice(lastIndex + 1, 0, orderItem);
 
         this.totalPrice();
     }
 
     resetLastItemOrdered() {
-        if (this.orderItems.length > 0) {
-            let orderItem: OrderDetail = this.orderItems.find(oi => oi.Class == 'lastOrderItem');
+        if (this.utilSvc.orderItems.length > 0) {
+            let orderItem: OrderDetail = this.utilSvc.orderItems.find(oi => oi.Class == 'lastOrderItem');
 
             if (orderItem != null)
                 orderItem.Class = 'orderItem';
@@ -1600,25 +1614,25 @@ export class OrderComponent implements OnInit, OnDestroy {
         else {
             // if item is product, delete product and all associated modifiers
             if (orderItem.ItemType == ItemType.Product) {
-                this.orderItems = this.orderItems.filter(oi => oi.IndexData !== orderItem.IndexData);
+                this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => oi.IndexData !== orderItem.IndexData);
                 this.changeQtyAvailable(orderItem.ProductFilter, orderItem.Quantity);
                 this.currentProduct = null;
             }
             else
                 if (orderItem.ItemType == ItemType.SubOption || orderItem.ItemType == ItemType.Option) {
-                    this.orderItems = this.orderItems.filter(oi => oi !== orderItem);
+                    this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => oi !== orderItem);
                 }
                 else {
-                    this.orderItems = this.orderItems.filter(oi => (oi.IndexData * 100 + oi.IndexDataSub) != (orderItem.IndexData * 100 + orderItem.IndexDataSub));
+                    this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => (oi.IndexData * 100 + oi.IndexDataSub) != (orderItem.IndexData * 100 + orderItem.IndexDataSub));
                 }
 
             this.totalPrice();
-            this.newItemsCount = this.orderItems.length;
+            this.newItemsCount = this.utilSvc.orderItems.length;
         }
     }
 
     repeatOrderItem(orderItem: OrderDetail) {
-        let itemsToCopy = this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData);
+        let itemsToCopy = this.utilSvc.orderItems.filter(oi => oi.IndexData == orderItem.IndexData);
         let nextIndexData: number = this.getNextIndexData();
         let that = this;
 
@@ -1645,7 +1659,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             if (product != null)
                 product.QtyAvailable -= copiedItem.Quantity;
 
-            that.orderItems.push(copiedItem);
+            that.utilSvc.orderItems.push(copiedItem);
             //that.addItemToOrder(copiedItem);
             /*
             that.orderItems.push(
@@ -1665,7 +1679,7 @@ export class OrderComponent implements OnInit, OnDestroy {
            */
         });
 
-        this.currentItemIndex = this.orderItems.length - 1;
+        this.currentItemIndex = this.utilSvc.orderItems.length - 1;
         this.totalPrice();
     }
 
@@ -1675,11 +1689,11 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.tips = 0;
         this.checkTotal = 0;
 
-        this.orderItems.filter(oi => oi.Voided == null).forEach(oi => {
+        this.utilSvc.orderItems.filter(oi => oi.Voided == null).forEach(oi => {
             if (oi.ExtPrice != null)
                 this.subTotal += oi.ExtPrice;
 
-            this.tax = this.utilSvc.getTaxTotal(this.orderHeader, this.orderItems);
+            this.tax = this.utilSvc.getTaxTotal(this.orderHeader, this.utilSvc.orderItems);
             this.checkTotal = this.subTotal + this.tax;
 
             if (this.guests >= this.MAX_GUESTS) {
@@ -1695,11 +1709,11 @@ export class OrderComponent implements OnInit, OnDestroy {
         let tips: number = 0;
         this.checkTotalAll = 0;
 
-        this.orderItems.forEach(oi => {
+        this.utilSvc.orderItems.forEach(oi => {
             if (oi.ExtPrice != null)
                 subTotal += oi.ExtPrice;
 
-            this.taxAll = this.utilSvc.getTaxTotal(this.orderHeader, this.orderItems);
+            this.taxAll = this.utilSvc.getTaxTotal(this.orderHeader, this.utilSvc.orderItems);
             this.checkTotalAll = subTotal + this.taxAll;
 
             if (this.guests >= this.MAX_GUESTS) {
@@ -1716,7 +1730,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     showReasonDialog(orderItem: OrderDetail) {
         // get the product Order
-        //let _orderItem: OrderDetail = this.orderItems.find( oi => oi.ItemType == ItemType.Product && oi.IndexData == orderItem.IndexData)
+        //let _orderItem: OrderDetail = this.utilSvc.orderItems.find( oi => oi.ItemType == ItemType.Product && oi.IndexData == orderItem.IndexData)
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true
@@ -1727,7 +1741,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 // void product if reason given          
                 if (reason != null) {
                     if (orderItem != null) {
-                        this.orderItems.filter(oi => oi.IndexData == orderItem.IndexData).forEach(oi => {
+                        this.utilSvc.orderItems.filter(oi => oi.IndexData == orderItem.IndexData).forEach(oi => {
                             oi.Voided = true;
                         });
                         this.orderModified = true;
@@ -1804,7 +1818,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         /*
         let that = this;
-        this.orderItems.forEach(oi => {
+        this.utilSvc.orderItems.forEach(oi => {
             oi.Refund = false;
             oi.Paid = false;
             oi.Comped = false;
@@ -1817,7 +1831,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         */
         let orderUpdate: OrderUpdate = {
             order: orderHeader,
-            orderDetails: this.orderItems,
+            orderDetails: this.utilSvc.orderItems,
             payments: []
         };
 
@@ -1867,7 +1881,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     validateOrder(startNewOrder: boolean) {
-        if (this.orderItems.filter(oi => oi.Voided == null).length == 0 && this.currentOrderFilter != null) {
+        if (this.utilSvc.orderItems.filter(oi => oi.Voided == null).length == 0 && this.currentOrderFilter != null) {
             let options = {
                 title: "Confirm Void",
                 message: "There are no items so the Order must be voided. Do you want to continue?",
@@ -1888,7 +1902,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     sendCheck(startNewOrder: boolean) {
 
-        if (this.orderItems.length == 0 && this.currentOrderFilter != null) {
+        if (this.utilSvc.orderItems.length == 0 && this.currentOrderFilter != null) {
 
         }
         else {
@@ -1947,14 +1961,14 @@ export class OrderComponent implements OnInit, OnDestroy {
                 Credit: 0
             }
 
-            this.orderItems.forEach(oi => {
+            this.utilSvc.orderItems.forEach(oi => {
                 if (oi.Voided == null)
                     oi.Printed = 'P';
             });
 
             let orderUpdate: OrderUpdate = {
                 order: orderHeader,
-                orderDetails: this.orderItems,
+                orderDetails: this.utilSvc.orderItems,
                 payments: []
             };
 

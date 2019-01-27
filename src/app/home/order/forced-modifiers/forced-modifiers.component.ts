@@ -284,7 +284,8 @@ export class ForcedModifiersComponent implements OnInit {
 
         if (!this.isAdding)
         {
-            this.currentChoices = this.orderItems.filter(od => (od.ItemType != ItemType.Option && od.ItemType != ItemType.Product && od.IndexDataSub != null));
+            //this.currentChoices = this.orderItems.filter(od => (od.ItemType != ItemType.Option && od.ItemType != ItemType.Product && od.IndexDataSub != null));
+            this.currentChoices = this.orderItems.filter(od => od.ItemType != ItemType.Product);
         }
 
         this.getChoiceLayers();
