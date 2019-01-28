@@ -613,14 +613,13 @@ export class OrderComponent implements OnInit, OnDestroy {
     showForcedModifierDialog(isAdding: boolean) {
         this.previousProduct = null;
 
-        let orderItems: OrderDetail[];
-        orderItems = this.utilSvc.orderItems.filter(od => od.IndexData == this.currentOrderItem.IndexData);
+        //let orderItems: OrderDetail[];
+        //orderItems = this.utilSvc.orderItems.filter(od => od.IndexData == this.currentOrderItem.IndexData);
 
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
-            fullscreen: true,
+            fullscreen: true, 
             context: {
-                orderItems: orderItems,
                 isAdding: isAdding,
                 product: this.selectedProduct,
                 orderItem: this.currentOrderItem
@@ -804,7 +803,9 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     changeQtyAvailable(productId: number, qty: number) {
         let product = this.pageProducts.find(p => p.ProductID == productId);
-        product.QtyAvailable = product.QtyAvailable + qty;
+
+        if (product != null)
+            product.QtyAvailable = product.QtyAvailable + qty;
     }
 
     showOpenProduct() {

@@ -34,7 +34,7 @@
         <StackLayout *ngFor="let item of utilSvc.orderItems">
           <FlexBoxLayout *ngIf='item.Voided == null' (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)"
             [class]="item.Class">
-            <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
+            <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:30;"></Label>
             <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
             <Label [text]="item.ExtPrice | currency" style="text-align: right; width:95; margin-right:5"></Label>
             <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>

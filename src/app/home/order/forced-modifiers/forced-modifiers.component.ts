@@ -24,7 +24,7 @@ export class ForcedModifiersComponent implements OnInit {
     currentChoice: MenuChoice = null;
     orderProduct: OrderDetail;
     orderItem: OrderDetail;
-    orderItems: OrderDetail[];
+    //orderItems: OrderDetail[];
     subOptions: OrderDetail[];
     product: Product;
 
@@ -52,7 +52,7 @@ export class ForcedModifiersComponent implements OnInit {
                 if (!this.isAdding) {
                     this.choiceLayers.forEach(cl => {
                         let choice: MenuChoice = {
-                            Name: this.orderItems.find(oi => oi.IndexDataSub == cl.Layer && oi.ItemType == ItemType.ForcedChoice).ProductName,
+                            Name: this.utilSvc.orderItems.find(oi => oi.IndexDataSub == cl.Layer && oi.ItemType == ItemType.ForcedChoice).ProductName,
                             SubOptions: []
                         }
                         this.subOptions.filter(so => so.IndexDataSub == cl.Layer).forEach(function (od) {
@@ -276,16 +276,15 @@ export class ForcedModifiersComponent implements OnInit {
 
     ngOnInit() {
         this.isAdding = this.params.context.isAdding;
-        this.orderItems = this.params.context.orderItems;
-        this.orderProduct = this.orderItems.find(oi => oi.ItemType == ItemType.Product);
-        this.subOptions = this.orderItems.filter(od => od.ItemType == ItemType.SubOption);
+        this.orderProduct = this.utilSvc.orderItems.find(oi => oi.ItemType == ItemType.Product);
+        this.subOptions = this.utilSvc.orderItems.filter(od => od.ItemType == ItemType.SubOption);
         this.product = this.params.context.product;
         this.orderItem = this.params.context.orderItem; 
 
         if (!this.isAdding)
         {
-            //this.currentChoices = this.orderItems.filter(od => (od.ItemType != ItemType.Option && od.ItemType != ItemType.Product && od.IndexDataSub != null));
-            this.currentChoices = this.orderItems.filter(od => od.ItemType != ItemType.Product);
+            //this.currentChoices = this.utilSvc.orderItems.filter(od => (od.ItemType != ItemType.Option && od.ItemType != ItemType.Product && od.IndexDataSub != null));
+            this.currentChoices = this.utilSvc.orderItems.filter(od => od.ItemType != ItemType.Product);
         }
 
         this.getChoiceLayers();
