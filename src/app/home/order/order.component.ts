@@ -578,7 +578,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     productSelected(product: MenuProduct) {
         this.isShowingMainOptions = false;
-        this.currentItemIndex = this.utilSvc.orderItems.length - 1;
+        this.currentItemIndex = this.utilSvc.orderItems.length - 1;        
 
         if (this.previousProduct == product) {
             this.currentOrderItem.Quantity++;
@@ -987,6 +987,12 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
 
         orderDetail.IndexData = this.currentOrderItem.IndexData;
+        
+        if (this.currentOrderItem.ItemType == ItemType.Product)
+            orderDetail.IndexDataSub = null;
+        else
+            orderDetail.IndexDataSub = this.currentOrderItem.IndexDataSub;
+
         orderDetail.OrderTime = currentDate;
         orderDetail.IndexDataOption = isSubOption ? 0 : -1
         orderDetail.Quantity = null
@@ -1103,7 +1109,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         
         let firstCharPos: number = orderDetail.ProductName.search(/\S|$/);
         orderDetail.ProductName = SPACES10.substr(0, firstCharPos - 1) + orderDetail.ProductName.replace(/\s+/g, " ");    
-        orderDetail.PrintName = orderDetail.ProductName;    
+        orderDetail.PrintName = orderDetail.ProductName;            
         //this.utilSvc.orderItems.push(orderDetail);      
         this.addItemToOrder(orderDetail);
         //this.sortOrderItems();
@@ -1124,9 +1130,9 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.utilSvc.orderItems.splice(itemIndex + 1, 0, orderItem);
         }
         */
-       if (orderItem.IndexDataSub == null)
+       if (orderItem.IndexDataSub == null && orderItem.ItemType != ItemType.Product)
        {
-            orderItem.IndexDataSub = this.currentOrderItem.IndexDataSub;
+            orderItem.IndexDataSub = this.getNextIndexDataSub(this.currentOrderItem.IndexData);
        }
         this.utilSvc.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
         this.currentItemIndex = this.utilSvc.orderItems.indexOf(orderItem);
@@ -1381,12 +1387,16 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     getNextIndexDataSub(indexData: number): number {
-        if (this.utilSvc.orderItems.filter(oi => oi.IndexData == indexData && oi.ItemType == ItemType.Option).length == 0)
+        if (this.utilSvc.orderItems.filter(oi => oi.IndexData == indexData && (oi.ItemType == ItemType.Option || oi.ItemType == ItemType.Choice)).length == 0)
             return 0;
-
+/*
         return Math.max.apply(Math, this.utilSvc.orderItems
             .filter(oi => oi.IndexData == indexData && oi.ItemType == ItemType.Option)
             .map(function (oi) { return oi.IndexDataSub + 1; }));
+*/
+        return Math.max.apply(Math, this.utilSvc.orderItems
+            .filter(oi => oi.IndexData == indexData && oi.ItemType != ItemType.Product)
+            .map(function (oi) { return oi.IndexDataSub + 1; }));            
     }
 
     getLeftMargin(itemType: ItemType): number {
@@ -1629,8 +1639,9 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.currentProduct = null;
             }
             else
-                if (orderItem.ItemType == ItemType.SubOption || orderItem.ItemType == ItemType.Option) {
-                    this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => oi !== orderItem);
+                if (orderItem.ItemType == ItemType.SubOption || orderItem.ItemType == ItemType.Option || orderItem.ItemType == ItemType.Choice) {
+                    //this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => oi !== orderItem);
+                    this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => (oi.IndexData * 100 + oi.IndexDataSub) != (orderItem.IndexData * 100 + orderItem.IndexDataSub));
                 }
                 else {
                     this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => (oi.IndexData * 100 + oi.IndexDataSub) != (orderItem.IndexData * 100 + orderItem.IndexDataSub));
