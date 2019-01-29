@@ -194,6 +194,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         //private socketIO: SocketIO       
     ) {
         page.actionBarHidden = true;
+        utilSvc.orderItems = [];
         /*
         if (isIOS) {
                 topmost().ios.controller.navigationBar.barStyle = 1;
@@ -202,7 +203,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         //this.printerSocket = new WebSocket("ws://" + this.printerPort, []);
     }
 
-    ngOnInit(): void {
+    ngOnInit(): void {        
 
         this.guests = parseInt(localStorage.getItem('guests'));
         this.table = localStorage.getItem('table');
@@ -808,7 +809,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             product.QtyAvailable = product.QtyAvailable + qty;
     }
 
-    showOpenProduct() {
+    showOpenProduct() { 
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true,
@@ -1120,6 +1121,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.utilSvc.orderItems.splice(itemIndex + 1, 0, orderItem);
         }
         */
+        orderItem.IndexDataSub = this.currentOrderItem.IndexDataSub;
         this.utilSvc.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
         this.currentItemIndex = this.utilSvc.orderItems.indexOf(orderItem);
     }
@@ -1280,6 +1282,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             }).then(isCanceling => {
                 if (isCanceling)
                     //this.router.back();
+                    this.utilSvc.orderItems = []; 
                     this.zone.run(() => this.router.navigate(['/home/area']));
             });
         }
@@ -1967,15 +1970,26 @@ export class OrderComponent implements OnInit, OnDestroy {
                     oi.Printed = 'P';
             });
 
+            this.processFilterNumber();
+
+            /*
+            let orderItems: OrderDetail[] = [];
+            
+            this.utilSvc.orderItems.forEach( oi =>
+            {
+                orderItems.push(oi);
+            }
+            );
+            */
+            //this.utilSvc.orderItems = []; 
+           
             let orderUpdate: OrderUpdate = {
                 order: orderHeader,
                 orderDetails: this.utilSvc.orderItems,
                 payments: []
-            };
-
-            this.processFilterNumber();
-
-            this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
+            };            
+            
+            this.apiSvc.updateOrder(orderUpdate).subscribe(results => {                
                 let orderFilter: number = results.UpdateOrderResult;
 
                 let printRequest: DirectPrintJobsRequest = {

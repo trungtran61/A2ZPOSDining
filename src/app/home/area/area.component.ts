@@ -44,7 +44,7 @@ export class AreaComponent implements OnInit {
     showAreas: boolean = false;
     currentArea: Area;    
     
-    ngOnInit(): void {
+    ngOnInit(): void {         
         this.DBService.getLocalAreas().then((data) => {
             if (data.length == 0) {
                 dialogs.alert("Areas not loaded").then(() => {
@@ -67,10 +67,12 @@ export class AreaComponent implements OnInit {
         //if (this.utilSvc.blinkingInterval == null)
            //clearInterval(this.utilSvc.blinkingInterval);
         //{
+            /*
             this.utilSvc.blinkingInterval = setInterval(() => 
             {
                 this.isBlinking = !this.isBlinking;
             }, 500);   
+            */
         //}
     } 
 
