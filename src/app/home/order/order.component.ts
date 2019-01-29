@@ -140,6 +140,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     fixedOptionRows: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
 
     currentOrderItem: OrderDetail = null;
+    selectedOrderItem: OrderDetail = null;
     currentFixedOption: FixedOption;
     currentUserModifier: UserModifier;
     currentOption: Option;
@@ -737,6 +738,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             //this.utilSvc.orderItems.push(orderItem);
             this.currentOrderItem = orderItem;
             this.addItemToOrder(orderItem);
+            this.selectedOrderItem = orderItem;
 
             if (product.UseForcedModifier && product.ForcedModifier) {
                 this.showForcedModifierDialog(true);
@@ -773,7 +775,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.choiceCurrentPage = 1;
                 this.getChoicePage();
                 this.isShowingOptionsButton = false;
-                //this.isShowingProducts = false;
+                this.isShowingProducts = false;
             }
         });
 
@@ -858,6 +860,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     showModifyDialog(orderItem: OrderDetail) {
+        this.selectedOrderItem = orderItem;
         this.showProducts();
         this.previousProduct = null;
 
@@ -988,7 +991,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         orderDetail.IndexData = this.currentOrderItem.IndexData;
         
-        if (this.currentOrderItem.ItemType == ItemType.Product)
+        if (this.selectedOrderItem.ItemType == ItemType.Product)
             orderDetail.IndexDataSub = null;
         else
             orderDetail.IndexDataSub = this.currentOrderItem.IndexDataSub;
@@ -1111,7 +1114,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         orderDetail.ProductName = SPACES10.substr(0, firstCharPos - 1) + orderDetail.ProductName.replace(/\s+/g, " ");    
         orderDetail.PrintName = orderDetail.ProductName;            
         //this.utilSvc.orderItems.push(orderDetail);      
-        this.addItemToOrder(orderDetail);
+        this.addItemToOrder(orderDetail);        
         //this.sortOrderItems();
 
         this.totalPrice(); 
@@ -1136,6 +1139,7 @@ export class OrderComponent implements OnInit, OnDestroy {
        }
         this.utilSvc.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
         this.currentItemIndex = this.utilSvc.orderItems.indexOf(orderItem);
+        this.currentOrderItem = orderItem;
     }
 
     round2Decimals(inNumber: number) {
