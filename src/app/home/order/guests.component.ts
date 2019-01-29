@@ -14,10 +14,7 @@ export class GuestsComponent implements OnInit {
     tableGuestsTitle: string = 'Choose the number of guests for table ';
     normalStyle: string = "color: black;background-image: linear-gradient(gold, yellow);";
     activeStyle: string = "color: black;background-image: linear-gradient(darkred, red);";
-    styles: string[] = [this.normalStyle, this.normalStyle, this.normalStyle, this.normalStyle, this.normalStyle, this.normalStyle];
-    digits: number[] = [1,2,3,4,5,6,7,8,9];
-    digitRows: number[] = [];
-    digitCols: number[] = [];
+    styles: string[] = [this.normalStyle, this.normalStyle, this.normalStyle, this.normalStyle, this.normalStyle, this.normalStyle];    
     isNormalChoice: boolean = true;   
     guestsEntered: string = '';       
  
@@ -37,7 +34,7 @@ export class GuestsComponent implements OnInit {
     }
 
     cancel() {
-        this.params.closeCallback(this.guestsEntered);       
+        this.params.closeCallback(null);       
     }
 
     addDigit(digit: string)  
@@ -61,11 +58,12 @@ export class GuestsComponent implements OnInit {
     ngOnInit(): void {        
         this.tableGuestsTitle += localStorage.getItem('table');  
         let that = this;
+        /*
         this.digits.forEach(function (digit: number) {
             that.digitRows.push(Math.floor((digit -1 ) / 3));
             that.digitCols.push((digit - 1) % 3);
         });
-       
+       */
     }
 
     constructor(private params: ModalDialogParams, private page: Page) {       

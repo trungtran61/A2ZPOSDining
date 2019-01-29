@@ -18,8 +18,8 @@ export class TableGuestsComponent implements OnInit {
     digits: number[] = [1,2,3,4,5,6,7,8,9];
     digitRows: number[] = [];
     digitCols: number[] = [];
-    isNormalChoice: boolean = true;
-    guestsEntered: string = '';    
+    isNormalChoice: boolean = true; 
+    guestsEntered: string = '';       
 
     setNormalStyle() {        
         for (let i = 0; i < this.styles.length; i++) {
@@ -57,28 +57,13 @@ export class TableGuestsComponent implements OnInit {
     }
     
     otherQty()
-    {
-        /*
-        this.digitRows = []; 
-        this.digitCols = []; 
-        let that = this;
-        this.digits.forEach(function (digit: number) {
-            that.digitRows.push(Math.floor((digit -1 ) / 3)+1);
-            that.digitCols.push((digit - 1) % 3);
-        });
-        */    
+    {        
         this.guests.nativeElement.focus();
         this.isNormalChoice = false;
     }
 
     ngOnInit(): void {
-        this.tableGuestsTitle += localStorage.getItem('table');  
-        let that = this;
-        this.digits.forEach(function (digit: number) {
-            that.digitRows.push(Math.floor((digit -1 ) / 3));
-            that.digitCols.push((digit - 1) % 3);
-        });
-       
+        this.tableGuestsTitle += localStorage.getItem('table');         
     }
 
     constructor(private router: RouterExtensions, private page: Page) {       

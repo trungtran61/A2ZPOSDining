@@ -31,6 +31,7 @@ const PRODUCT_PAGESIZE: number = 24;
 const SUBCATEGORY_PAGESIZE: number = 5;
 const OPTION_PAGESIZE: number = 18;
 const OPTIONCATEGORY_PAGESIZE: number = 3;
+const SPACES10: string = '          ';
 const SPACES5: string = '     ';
 const SPACES3: string = '   ';
 
@@ -1075,9 +1076,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             }
             else {
                 orderDetail.ProductName = strOption + optionName;
-                if (printName != null) {
-                    orderDetail.PrintName = printName != '' ? strOption + printName : orderDetail.ProductName;
-                }
+                orderDetail.PrintName = printName != '' ? strOption + printName : orderDetail.ProductName;                
             }
         }
 
@@ -1101,11 +1100,15 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.resetLastItemOrdered();
         orderDetail.Class = 'lastOrderItem';
         orderDetail.CostID = 0;
+        
+        let firstCharPos: number = orderDetail.ProductName.search(/\S|$/);
+        orderDetail.ProductName = SPACES10.substr(0, firstCharPos - 1) + orderDetail.ProductName.replace(/\s+/g, " ");    
+        orderDetail.PrintName = orderDetail.ProductName;    
         //this.utilSvc.orderItems.push(orderDetail);      
         this.addItemToOrder(orderDetail);
         //this.sortOrderItems();
 
-        this.totalPrice();
+        this.totalPrice(); 
     }
 
     addItemToOrder(orderItem: OrderDetail) {
@@ -1121,7 +1124,10 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.utilSvc.orderItems.splice(itemIndex + 1, 0, orderItem);
         }
         */
-        orderItem.IndexDataSub = this.currentOrderItem.IndexDataSub;
+       if (orderItem.IndexDataSub == null)
+       {
+            orderItem.IndexDataSub = this.currentOrderItem.IndexDataSub;
+       }
         this.utilSvc.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
         this.currentItemIndex = this.utilSvc.orderItems.indexOf(orderItem);
     }

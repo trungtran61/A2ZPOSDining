@@ -4,7 +4,7 @@
 
 <GridLayout class="m-20" rows="auto,auto,auto" columns="auto,auto,auto">
     <Image [src]='logInLogo' col='0' row='1' style='margin: 25 0 0 0; width: 400'></Image>
-    <GridLayout class="m-20" rows="60 auto auto auto auto" columns="auto auto auto" row="1" col="1">
+    <GridLayout class="m-20" rows="60 110 110 110 110" columns="110 110 110" row="1" col="1">
         <TextField hint='Enter Id' [text]="employeeId" row="0" col="0" colspan="3" class="glass form-input" secure="true"
             style='text-align: center; width: 370; height: 60; margin-bottom: 30'></TextField>
         <Button text="1" class="glass btnRound" (tap)="addDigit('1')" row="1" col="0"></Button>

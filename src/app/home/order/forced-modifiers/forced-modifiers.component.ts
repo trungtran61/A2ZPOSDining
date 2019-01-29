@@ -51,7 +51,8 @@ export class ForcedModifiersComponent implements OnInit {
 
                 if (!this.isAdding) {
                     this.choiceLayers.forEach(cl => {
-                        let orderDetail: OrderDetail = this.utilSvc.orderItems.find(oi => oi.IndexDataSub == cl.Layer && oi.ItemType == ItemType.ForcedChoice);                            
+                        //let orderDetail: OrderDetail = this.utilSvc.orderItems.find(oi => oi.IndexDataSub == cl.Layer && oi.ItemType == ItemType.ForcedChoice);                            
+                        let orderDetail: OrderDetail = that.currentChoices.find(oi => oi.IndexDataSub == cl.Layer && oi.ItemType == ItemType.ForcedChoice);                            
                         let choice: MenuChoice = {
                             Name: orderDetail.ProductName,
                             SubOptions: []
