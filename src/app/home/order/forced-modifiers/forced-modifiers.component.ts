@@ -171,6 +171,7 @@ export class ForcedModifiersComponent implements OnInit {
         od.OrderTime = currentDate;
         od.IndexDataOption = choice.Key;
         od.Quantity = null;
+        od.IndexData = this.orderProduct.IndexData;     
         od.IndexDataSub = choice.Layer;        
         od.ItemType = ItemType.ForcedChoice;
         od.ProductName = '   ' + choice.Name;
