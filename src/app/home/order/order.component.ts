@@ -32,7 +32,7 @@ const SUBCATEGORY_PAGESIZE: number = 5;
 const OPTION_PAGESIZE: number = 18;
 const OPTIONCATEGORY_PAGESIZE: number = 3;
 const SPACES10: string = '          ';
-const SPACES5: string = '     ';
+const SPACES5: string = '   ';
 const SPACES3: string = '   ';
 
 @Component({
@@ -859,16 +859,20 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.isShowingSubCategories = true;
     }
 
-    showModifyDialog(orderItem: OrderDetail) {
-        this.selectedOrderItem = orderItem;
+    showModifyDialog(orderItem: OrderDetail) {        
+        this.isShowingOptionsButton = false;
         this.showProducts();
         this.previousProduct = null;
 
         this.utilSvc.orderItems.forEach(oi => oi.Class = 'orderItem');
         if (orderItem != null)
-            this.currentOrderItem = orderItem;
+        {
+            this.currentOrderItem = orderItem;            
+        }
         else
             orderItem = this.currentOrderItem;
+        
+        this.selectedOrderItem = orderItem;
 
         orderItem.Class = 'activeOrderItem';
         this.currentItemIndex = this.utilSvc.orderItems.indexOf(orderItem);
@@ -920,7 +924,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                         break;
                     case 'changechoice':
                         //this.showForcedModifierDialogOrderItem(orderItem);
-                        this.isShowingProducts = false;
+                        //this.isShowingProducts = false;
                         this.changeChoice(orderItem);
                         break;
                 }
@@ -1039,7 +1043,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     break;
 
                 case ModifierType.HALF:
-                    strOption = '     1/2';
+                    strOption = '   1/2';
                     if (unitPrice > 0) {
                         orderDetail.UnitPrice = this.round2Decimals(unitPrice / 2);
                         orderDetail.ExtPrice = modifierIgnoreQuantity ? orderDetail.UnitPrice : orderDetail.UnitPrice * qty;
@@ -1074,6 +1078,9 @@ export class OrderComponent implements OnInit, OnDestroy {
                     }
             }
         }
+
+        if (strOption.trim().length == 0)
+            strOption = '';
 
         if (this.currentModifierType == ModifierType.NOMAKE || this.currentModifierType == ModifierType.TOGO || customStamp) {
             orderDetail.ProductName = strOption;
@@ -1112,6 +1119,12 @@ export class OrderComponent implements OnInit, OnDestroy {
         
         let firstCharPos: number = orderDetail.ProductName.search(/\S|$/);
         orderDetail.ProductName = SPACES10.substr(0, firstCharPos - 1) + orderDetail.ProductName.replace(/\s+/g, " ");    
+
+        if (this.selectedOrderItem.ItemType != ItemType.Product)
+        {
+            orderDetail.ProductName = SPACES3 + orderDetail.ProductName;
+        }
+
         orderDetail.PrintName = orderDetail.ProductName;            
         //this.utilSvc.orderItems.push(orderDetail);      
         this.addItemToOrder(orderDetail);        
@@ -1137,6 +1150,9 @@ export class OrderComponent implements OnInit, OnDestroy {
        {
             orderItem.IndexDataSub = this.getNextIndexDataSub(this.currentOrderItem.IndexData);
        }
+
+        orderItem.ExtPrice = orderItem.ExtPrice > 0 ? orderItem.ExtPrice : null;     // hide amount if zero            
+            
         this.utilSvc.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
         this.currentItemIndex = this.utilSvc.orderItems.indexOf(orderItem);
         this.currentOrderItem = orderItem;
@@ -1149,7 +1165,6 @@ export class OrderComponent implements OnInit, OnDestroy {
     processFilterNumber() {
         let i: number = 1;
         this.utilSvc.orderItems.forEach(oi => {
-            oi.ExtPrice = oi.ExtPrice > 0 ? oi.ExtPrice : null;     // hide amount if zero            
             oi.FilterNumber = i;
             i++;
         })
