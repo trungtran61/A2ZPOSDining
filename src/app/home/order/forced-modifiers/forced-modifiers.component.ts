@@ -186,8 +186,8 @@ export class ForcedModifiersComponent implements OnInit {
         }
 
         // replace current layer's choice with new choice
-        if (this.currentChoices.length > 0)
-            this.currentChoices = this.currentChoices.filter(cc => cc.IndexDataSub != choice.Layer);
+        // --->  if (!this.isAdding && this.currentChoices.length > 0)
+        // --->    this.currentChoices = this.currentChoices.filter(cc => cc.IndexDataSub != choice.Layer && cc.ItemType == ItemType.ForcedChoice );
 
         this.currentChoices.push(od);
  

@@ -1658,12 +1658,13 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.currentProduct = null;
             }
             else
-                if (orderItem.ItemType == ItemType.SubOption || orderItem.ItemType == ItemType.Option || orderItem.ItemType == ItemType.Choice) {
+                if (orderItem.ItemType == ItemType.Option || orderItem.ItemType == ItemType.Choice) {
                     //this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => oi !== orderItem);
-                    this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => (oi.IndexData * 100 + oi.IndexDataSub) != (orderItem.IndexData * 100 + orderItem.IndexDataSub));
+                    this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => ((oi.IndexData * 100 + oi.IndexDataSub) != (orderItem.IndexData * 100 + orderItem.IndexDataSub)) 
+                        || oi.ItemType != ItemType.Option);
                 }
-                else {
-                    this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => (oi.IndexData * 100 + oi.IndexDataSub) != (orderItem.IndexData * 100 + orderItem.IndexDataSub));
+                else if (orderItem.ItemType == ItemType.SubOption) {
+                    this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => oi !== orderItem);
                 }
 
             this.totalPrice();
