@@ -279,11 +279,11 @@ export class ForcedModifiersComponent implements OnInit {
 
     ngOnInit() {
         this.isAdding = this.params.context.isAdding;
-        this.orderProduct = this.utilSvc.orderItems.find(oi => oi.ItemType == ItemType.Product);
-        this.subOptions = this.utilSvc.orderItems.filter(od => od.ItemType == ItemType.SubOption);
         this.product = this.params.context.product;
         this.orderItem = this.params.context.orderItem; 
-
+        this.orderProduct = this.utilSvc.orderItems.find(oi => oi.ItemType == ItemType.Product && oi.IndexData == this.orderItem.IndexData);        
+        this.subOptions = this.utilSvc.orderItems.filter(od => od.ItemType == ItemType.SubOption && od.IndexData == this.orderItem.IndexData);
+        
         if (!this.isAdding)
         {
             //this.currentChoices = this.utilSvc.orderItems.filter(od => (od.ItemType != ItemType.Option && od.ItemType != ItemType.Product && od.IndexDataSub != null));

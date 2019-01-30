@@ -864,7 +864,13 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.showProducts();
         this.previousProduct = null;
 
-        this.utilSvc.orderItems.forEach(oi => oi.Class = 'orderItem');
+        this.utilSvc.orderItems.forEach(oi => 
+            {
+                if (oi.Printed == 'P')
+                    oi.Class = 'disabledTextColor';
+                else
+                    oi.Class = 'orderItem';     
+            });
         if (orderItem != null)
         {
             this.currentOrderItem = orderItem;            
@@ -1782,9 +1788,15 @@ export class OrderComponent implements OnInit, OnDestroy {
                 // void product if reason given          
                 if (reason != null) {
                     if (orderItem != null) {
-                        this.utilSvc.orderItems.filter(oi => oi.IndexData == orderItem.IndexData).forEach(oi => {
-                            oi.Voided = true;
-                        });
+                        //this.utilSvc.orderItems.filter(oi => oi.IndexData == orderItem.IndexData).forEach(oi => {
+                        //    oi.Voided = true;
+                        //});
+                        this.utilSvc.orderItems.forEach ( oi =>
+                            {
+                                if (oi.IndexData == orderItem.IndexData)    
+                                    oi.Voided = true;
+                            }
+                            );
                         this.orderModified = true;
                     }
                     else    //void the whole order
