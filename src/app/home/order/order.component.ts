@@ -302,7 +302,7 @@ export class OrderComponent implements OnInit {
                 this.setOptionsPosition();
             }
         });
-    } 
+    }  
 
     getOptionCategories() {
         this.DBService.getLocalOptionCategories().then((categories) => {

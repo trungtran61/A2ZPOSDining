@@ -6,62 +6,58 @@
   <StackLayout row="0" col="0">
     <!-- order header -->
     <GridLayout style="background-color: antiquewhite;" rows='40'>
-      <StackLayout orientation="horizontal">
-        <FlexBoxLayout *ngIf='ticketNumber' justifyContent="center">
-          <Label text="Ticket #" style="text-align: center; width:75;"></Label> |
-          <Label [text]="ticketNumber" style="text-align: left; margin-right: 5;width:75; color:red"></Label> |
-        </FlexBoxLayout>
-        <FlexBoxLayout *ngIf='!ticketNumber' justifyContent="center">
-          <Label text="Check #" style="text-align: center; width:75;"></Label> |
-          <Label [text]="checkNumber" style="text-align: left; margin-right: 5;width:75; color: red"></Label> |
-        </FlexBoxLayout>
+      <StackLayout orientation="horizontal" *ngIf='ticketNumber'>
+        <Label text="Ticket #" style="text-align: center; width:75;"></Label> |
+        <Label [text]="ticketNumber" style="text-align: left; margin-right: 5;width:75; color:red"></Label> |
+      </StackLayout>
+      <StackLayout orientation="horizontal" *ngIf='!ticketNumber'>
+        <Label text="Check #" style="text-align: center; width:75;"></Label> |
+        <Label [text]="checkNumber" style="text-align: left; margin-right: 5;width:75; color: red"></Label> |
       </StackLayout>
     </GridLayout>
     <GridLayout rows='40' style="background-color: antiquewhite;" columns='50 170 80' borderTopWidth='1' borderColor='gray'
       borderLeftWidth='0' borderRightWidth='0' borderBottomWidth='1'>
       <Label [text]="table" style="text-align: center; color: red" col='0' borderRightWidth='1' borderLeftWidth='0'
         borderLeftColor='antiquewhite' borderRightColor='gray' borderBottomWidth='1'></Label>|
-      <Label [text]="server" style="text-align: center; color:green" col='1' borderRightWidth='1'
-        borderLeftWidth='0' borderRightColor='gray' borderBottomWidth='1'></Label>
+      <Label [text]="server" style="text-align: center; color:green" col='1' borderRightWidth='1' borderLeftWidth='0'
+        borderRightColor='gray' borderBottomWidth='1'></Label>
       <Label text="Guests: " style="text-align: left;" col='2'></Label>
-      <Label [text]="guests" style="text-align: right;font-weight: bold; color: red" col='2'></Label>      
+      <Label [text]="guests" style="text-align: right;font-weight: bold; color: red" col='2'></Label>
     </GridLayout>
     <!-- order items  -->
     <ScrollView style="background-color: antiquewhite" height="480" orientation="vertical" (tap)="hideOptions()">
       <StackLayout *ngIf='isShowingDetails'>
-        <StackLayout *ngFor="let item of utilSvc.orderItems">
-          <FlexBoxLayout *ngIf='item.Voided == null' (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)"
-            [class]="item.Class">
-            <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:30;"></Label>
-            <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
-            <Label [text]="item.ExtPrice | currency" style="text-align: right; width:95; margin-right:5"></Label>
-            <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
-          </FlexBoxLayout>
+        <StackLayout *ngFor="let item of utilSvc.orderItems" [visibility]="item.Voided == null ? 'visible' : 'collapse'"
+          (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" [class]="item.Class" orientation="horizontal">
+          <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:30;"></Label>
+          <Label [text]="item.ProductName" style="text-align: left; width:140; margin-right: 5"></Label>
+          <Label [text]="item.ExtPrice | currency" style="text-align: right; width:95; margin-right:5"></Label>
+          <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
         </StackLayout>
       </StackLayout>
       <StackLayout *ngIf='!isShowingDetails'>
-        <StackLayout *ngFor="let item of utilSvc.orderItems">
-          <FlexBoxLayout (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" *ngIf='item.ItemType == 1 && item.Voided == null'>
-            <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:15;"></Label>
-            <Label [text]="item.ProductName" style="text-align: left; width:150; margin-right: 5"></Label>
-            <Label [text]="item.ExtPrice | currency" style="text-align: right; width:95; margin-right:5"></Label>
-            <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
-          </FlexBoxLayout>
+        <StackLayout *ngFor="let item of utilSvc.orderItems" [visibility]="item.ItemType == 1 && item.Voided == null? 'visible' : 'collapse'"
+          (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" orientation="horizontal">
+          <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:30;"></Label>
+          <Label [text]="item.ProductName" style="text-align: left; width:140; margin-right: 5"></Label>
+          <Label [text]="item.ExtPrice | currency" style="text-align: right; width:95; margin-right:5"></Label>
+          <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
         </StackLayout>
       </StackLayout>
     </ScrollView>
+
     <!-- totals -->
     <GridLayout style="background-color: rgb(46, 44, 44);color: white" rows="20 20 20 20 20" cols='200 100'>
-        <Label row='0' col='0' text="Subtotal" class="check-label" ></Label>
-        <Label row='0' col='1' [text]="subTotal | currency" class="check-amount"></Label>
-        <Label row='1' col='0' text="Discount" class="check-label"></Label>
-        <Label row='1' col='1' [text]="discount | currency" class="check-amount"></Label>
-        <Label row='2' col='0' text="Tax" class="check-label"></Label>
-        <Label row='2' col='1' [text]="tax | currency" class="check-amount"></Label>
-        <Label row='3' col='0' text="Gratuity" class="check-label"></Label>
-        <Label row='3' col='1' [text]="tips | currency" class="check-amount"></Label>
-        <Label row='4' col='0' text="Total" class="check-label"></Label>
-        <Label row='4' col='1' [text]="checkTotal | currency" class="check-amount"></Label>      
+      <Label row='0' col='0' text="Subtotal" class="check-label"></Label>
+      <Label row='0' col='1' [text]="subTotal | currency" class="check-amount"></Label>
+      <Label row='1' col='0' text="Discount" class="check-label"></Label>
+      <Label row='1' col='1' [text]="discount | currency" class="check-amount"></Label>
+      <Label row='2' col='0' text="Tax" class="check-label"></Label>
+      <Label row='2' col='1' [text]="tax | currency" class="check-amount"></Label>
+      <Label row='3' col='0' text="Gratuity" class="check-label"></Label>
+      <Label row='3' col='1' [text]="tips | currency" class="check-amount"></Label>
+      <Label row='4' col='0' text="Total" class="check-label"></Label>
+      <Label row='4' col='1' [text]="checkTotal | currency" class="check-amount"></Label>
     </GridLayout>
   </StackLayout>
   <!-- bottom navigation -->
@@ -125,15 +121,15 @@
   </GridLayout>
 
   <!-- Choices -->
-  <GridLayout columns="* * * *" rows="60 86 86 86 86 86 86 80" row="0" col="3" *ngIf='isShowingChoices || isShowingSubOptions' (swipe)='onChoiceSwipe($event)'>
+  <GridLayout columns="* * * *" rows="60 86 86 86 86 86 86 80" row="0" col="3" *ngIf='isShowingChoices || isShowingSubOptions'
+    (swipe)='onChoiceSwipe($event)'>
     <Label [text]='subCategoriesTitle' row='0' col='0' colSpan="4" style='text-align: center; color: red; font-size: 25; padding: 0'></Label>
-    <Button class="btnChoice" [visibility]="isShowingSubOptions ? 'collapse' : 'visible'" [text]="item.Name" 
-      *ngFor="let item of pageChoices" (tap)="choiceSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true' ></Button>
-    <Button class="btnSubOption" [text]="item.Name" [visibility]="isShowingSubOptions ? 'visible' : 'collapse'"
-      *ngFor="let item of subOptions" (tap)="subOptionSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true'
-      height="60" width="100"></Button>
-    <Button class="glass btnShowSubOptions" text="Sub Options" textWrap='true' (tap)="showSubOptions()" row="6" col="2"  style="margin-top:20"
-      height="60" width="100" *ngIf="isShowingSubOptionsButton"></Button>  
+    <Button class="btnChoice" [visibility]="isShowingSubOptions ? 'collapse' : 'visible'" [text]="item.Name" *ngFor="let item of pageChoices"
+      (tap)="choiceSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true'></Button>
+    <Button class="btnSubOption" [text]="item.Name" [visibility]="isShowingSubOptions ? 'visible' : 'collapse'" *ngFor="let item of subOptions"
+      (tap)="subOptionSelected(item)" [col]='item.Col' [row]='item.Row' textWrap='true' height="60" width="100"></Button>
+    <Button class="glass btnShowSubOptions" text="Sub Options" textWrap='true' (tap)="showSubOptions()" row="6" col="2"
+      style="margin-top:20" height="60" width="100" *ngIf="isShowingSubOptionsButton"></Button>
     <Button class="glass btnOK fa" text="&#xf00c; Done" textWrap='true' (tap)="doneChoices()" row="6" col="3" style="margin-top:20"
       height="60" width="100"></Button>
   </GridLayout>
@@ -183,35 +179,33 @@
   </WrapLayout>
 </GridLayout>
 
-<StackLayout *ngIf='isGettingGuests'>
-  <StackLayout [visibility]="isNormalChoice ? 'visible' : 'collapse'">
-      <label class="dialogTitle" [text]="tableGuestsTitle"></label>
-      <GridLayout style="padding-left: 670px;" rows="110 110 110 110" columns="110 110 110">
-          <Button text="1" class="glass btnRound" (tap)="setGuests(1)" row="0" col="0"></Button>
-          <Button text="2" class="glass btnRound" (tap)="setGuests(2)" row="0" col="1"></Button>
-          <Button text="3" class="glass btnRound" (tap)="setGuests(3)" row="0" col="2"></Button>
-          <Button text="4" class="glass btnRound" (tap)="setGuests(4)" row="1" col="0"></Button>
-          <Button text="5" class="glass btnRound" (tap)="setGuests(5)" row="1" col="1"></Button>
-          <Button text="6" class="glass btnRound" (tap)="setGuests(6)" row="1" col="2"></Button>
-          <Button text="7" class="glass btnRound" (tap)="setGuests(7)" row="2" col="0"></Button>
-          <Button text="8" class="glass btnRound" (tap)="setGuests(8)" row="2" col="1"></Button>
-          <Button text="9" class="glass btnRound" (tap)="setGuests(9)" row="2" col="2"></Button>
-          <Button text="0" class="glass btnRound" (tap)="setGuests(0)" row="3" col="1"></Button>   
-          <Button text="Other" class="glass" (tap)="otherQty()" row="3" col='0'></Button>
-          <Button text="Cancel" class="glass btnCancel btnRound" (tap)="cancel()" row="3" col="2"></Button>
-      </GridLayout>
-  </StackLayout>
+<StackLayout *ngIf='isGettingGuests && isNormalChoice'>
+  <label class="dialogTitle" [text]="tableGuestsTitle"></label>
+  <GridLayout style="padding-left: 670px;" rows="110 110 110 110" columns="110 110 110">
+    <Button text="1" class="glass btnRound" (tap)="setGuests(1)" row="0" col="0"></Button>
+    <Button text="2" class="glass btnRound" (tap)="setGuests(2)" row="0" col="1"></Button>
+    <Button text="3" class="glass btnRound" (tap)="setGuests(3)" row="0" col="2"></Button>
+    <Button text="4" class="glass btnRound" (tap)="setGuests(4)" row="1" col="0"></Button>
+    <Button text="5" class="glass btnRound" (tap)="setGuests(5)" row="1" col="1"></Button>
+    <Button text="6" class="glass btnRound" (tap)="setGuests(6)" row="1" col="2"></Button>
+    <Button text="7" class="glass btnRound" (tap)="setGuests(7)" row="2" col="0"></Button>
+    <Button text="8" class="glass btnRound" (tap)="setGuests(8)" row="2" col="1"></Button>
+    <Button text="9" class="glass btnRound" (tap)="setGuests(9)" row="2" col="2"></Button>
+    <Button text="0" class="glass btnRound" (tap)="setGuests(0)" row="3" col="1"></Button>
+    <Button text="Other" class="glass" (tap)="otherQty()" row="3" col='0'></Button>
+    <Button text="Cancel" class="glass btnCancel btnRound" (tap)="cancel()" row="3" col="2"></Button>
+  </GridLayout>
+</StackLayout>
 
-  <StackLayout [visibility]="isNormalChoice ? 'collapse' : 'visible'">
-      <GridLayout rows="50" columns="200 100 200" style='margin-top: 50; margin-left:10'>
-          <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='0'
-              col='0' height="60" width="120"></Button>
-          <TextField #guests horizontalAlignment="center" [text]='guestsEntered' [(ngModel)]='guestsEntered' row='0'
-              col='1' maxlength='3' class='textEntryLongActive' (returnPress)="saveEnteredGuests()" (keyPress)="keyPressed($event)"
-              returnKeyType='done' keyboardType="Number">
-          </TextField>
-          <Button class='glass btnOK' text='Accept' (tap)='saveEnteredGuests()' horizontalAlignment="right" row='0'
-              col='2' height="60" width="120"></Button>
-      </GridLayout>
-  </StackLayout>
+<StackLayout *ngIf='isGettingGuests && !isNormalChoice'>
+  <GridLayout rows="50" columns="200 100 200" style='margin-top: 50; margin-left:10'>
+    <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='0' col='0'
+      height="60" width="120"></Button>
+    <TextField #guests horizontalAlignment="center" [text]='guestsEntered' [(ngModel)]='guestsEntered' row='0' col='1'
+      maxlength='3' class='textEntryLongActive' (returnPress)="saveEnteredGuests()" (keyPress)="keyPressed($event)"
+      returnKeyType='done' keyboardType="Number">
+    </TextField>
+    <Button class='glass btnOK' text='Accept' (tap)='saveEnteredGuests()' horizontalAlignment="right" row='0' col='2'
+      height="60" width="120"></Button>
+  </GridLayout>
 </StackLayout>
