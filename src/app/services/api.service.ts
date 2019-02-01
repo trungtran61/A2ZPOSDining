@@ -15,12 +15,14 @@ export class APIService {
     }
 
     public reloadCountdowns() {
+        let startTime = new Date().getTime();
         let that = this;
         let headers = this.createRequestHeader();
         let promise = new Promise(function (resolve, reject) {
             that.http.get(that.apiUrl + 'GetProductCountdowns', { headers: headers })
                 .subscribe(
                     data => {
+                        //console.log('elapsed ms: ' +  (new Date().getTime() - startTime));
                         let countdowns = <Countdown[]>data;
                         resolve(countdowns);
                     },

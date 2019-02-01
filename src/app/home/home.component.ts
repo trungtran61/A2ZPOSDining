@@ -136,8 +136,9 @@ export class HomeComponent implements OnInit {
             dialogs.alert("Please enter Employee Id.");
             return;
         }
-
+        
         this.DBService.login(this.employeeId).subscribe(res => {
+            //console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));  
             this.DBService.loggedInUser.Module = 1;
             this.DBService.loggedInUser.ClockInType = 1;
             switch (res.AccessType) {
@@ -155,8 +156,10 @@ export class HomeComponent implements OnInit {
                         else {
 
                             this.DBService.loggedInUser.FirstName = data.FirstName;
-                            //this.utilSvc.startTimer();                            
+                            //this.utilSvc.startTimer();    
+                            this.utilSvc.startTime = new Date().getTime();       
                             this.zone.run(() => this.router.navigate(['/home/area']));
+                            //this.router.navigate(['/home/area']);
                         }
                     });
                     //localStorage.setItem("loggedInUser", JSON.stringify(this.loggedInUser));
@@ -215,16 +218,13 @@ export class HomeComponent implements OnInit {
     }
 
     managerFunctions() {
-        //this.router.navigate(['/home/order'])
-        //this.router.navigate(['/home/orderitems'])
-        //this.DBService.loadSystemSettings(db);
-        //this.DBService.loadEmployees(db);
-        //this.DBService.getLocalSystemSettings();
-        //this.DBService.getAllEmployees();
-        //this.apiSvc.getFullOrder(188183).subscribe(orderResponse => {
-        //    console.log(orderResponse);            
-        //});
-
+        /*
+        this.utilSvc.startTime = new Date().getTime();      
+        this.DBService.login(this.employeeId).subscribe(res => {
+            console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));  
+            this.DBService.logoff();
+        });
+        */
         this.loadLocalDataBase(null);
     }
 

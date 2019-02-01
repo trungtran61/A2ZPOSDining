@@ -907,7 +907,6 @@ export class SQLiteService {
         let sql: string = "SELECT AreaID, Name, Position, ImageURL FROM Areas;"
         return SQLiteService.database.all(sql)
             .then(function (rows) {
-                console.log("SELECT * FROM Areas;");
                 let areas: Area[] = [];
                 for (var row in rows) {
                     areas.push({

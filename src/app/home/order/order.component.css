@@ -5,12 +5,12 @@
 
 .check-label
 {
-    width: 300px;  margin-left: 5;
+    font-weight: bold;text-align: left;
 }
 
 .check-amount
 {
-    text-align: right;    width: 200px;      margin-right: 5;
+    font-weight: bold;text-align: right;
 }
 
 .bgImage

@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 import { TextField } from "tns-core-modules/ui/text-field/text-field";
 import { ModalDialogParams } from "nativescript-angular/modal-dialog";
-import { Page } from "tns-core-modules/ui/page/page";
+import { RouterExtensions } from "nativescript-angular/router";
 
 @Component({
     selector: "guests",
@@ -29,7 +29,7 @@ export class GuestsComponent implements OnInit {
     }     
  
     saveEnteredGuests()
-    {
+    {        
         this.params.closeCallback(this.guestsEntered);
     }
 
@@ -66,7 +66,7 @@ export class GuestsComponent implements OnInit {
        */
     }
 
-    constructor(private params: ModalDialogParams, private page: Page) {       
+    constructor(private params: ModalDialogParams, private router: RouterExtensions) {       
         //page.actionBarHidden = true;    
     }
 

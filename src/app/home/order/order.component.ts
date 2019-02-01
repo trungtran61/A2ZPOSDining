@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewContainerRef, OnDestroy, NgZone } from "@angular/core";
+import { Component, OnInit, ViewContainerRef, NgZone } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 
@@ -42,7 +42,7 @@ const SPACES3: string = '   ';
     styleUrls: ['./order.component.css']
 })
 
-export class OrderComponent implements OnInit, OnDestroy {
+export class OrderComponent implements OnInit {
     private printerSocket: any;
 
     currentCategoryID: number = 0;
@@ -183,6 +183,11 @@ export class OrderComponent implements OnInit, OnDestroy {
     isShowingSubOptions: boolean = false;
     isShowingSubOptionsButton: boolean = false;
     currentItemIndex: number = 0;
+    
+    isGettingGuests: boolean = true;
+    isNormalChoice: boolean = true;
+    tableGuestsTitle: string = 'Choose the number of guests for table ';
+    guestsEntered: string = '';       
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -195,8 +200,9 @@ export class OrderComponent implements OnInit, OnDestroy {
         private zone: NgZone,
         //private socketIO: SocketIO       
     ) {
+        //this.utilSvc.startTime = new Date().getTime();          
         page.actionBarHidden = true;
-        utilSvc.orderItems = [];
+        utilSvc.orderItems = [];        
         /*
         if (isIOS) {
                 topmost().ios.controller.navigationBar.barStyle = 1;
@@ -204,16 +210,15 @@ export class OrderComponent implements OnInit, OnDestroy {
         */
         //this.printerSocket = new WebSocket("ws://" + this.printerPort, []);
     }
-
+   
     ngOnInit(): void {        
-
-        this.guests = parseInt(localStorage.getItem('guests'));
+            
+        this.tableGuestsTitle += localStorage.getItem('table');                 
+        this.guests = parseInt(localStorage.getItem('guests'));        
         this.table = localStorage.getItem('table');
         this.server = this.DBService.loggedInUser.FirstName;
-        this.employeeID = this.DBService.loggedInUser.PriKey;
-        /*
-        this.checkTitle = this.checkNumber + ' ' + this.server + ' ' + this.table + ' ' + this.guests;             
-        */
+        this.employeeID = this.DBService.loggedInUser.PriKey;        
+
         this.apiSvc.reloadCountdowns().then(result => {
             this.countdowns = <Countdown[]>result;
 
@@ -225,6 +230,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                     let action: string = params['action'];
 
                     if (action == 'openTable') {
+                        this.isGettingGuests = false;
                         let table: TableDetail = JSON.parse(localStorage.getItem('currentTable'));
                         this.currentOrderFilter = table.OrderFilter;
                         this.getFullOrder(table.OrderFilter);
@@ -232,17 +238,18 @@ export class OrderComponent implements OnInit, OnDestroy {
                         //this.textColorClass = 'disabledTextColor';
                     }
                 }
-                else {
+                else {       
+                    this.isGettingGuests = true;             
                     this.createNewOrder();
                 }
-            });
-
-            this.getProductOptions('');
-            this.getOptionCategories();
-            this.apiSvc.postToPrint('hero');
-            this.allOptionFilterClass = 'glass';
+            });           
         }
         );
+        
+        this.getProductOptions('');
+        this.getOptionCategories();
+        this.allOptionFilterClass = 'glass';  
+                       
     }
 
     isShowingProductOptions() {
@@ -295,7 +302,7 @@ export class OrderComponent implements OnInit, OnDestroy {
                 this.setOptionsPosition();
             }
         });
-    }
+    } 
 
     getOptionCategories() {
         this.DBService.getLocalOptionCategories().then((categories) => {
@@ -351,7 +358,10 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     getFullOrder(orderFilter: number) {
         this.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };
+        let startTime: number = new Date().getTime();
+        
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
+            console.log('elapsed ms: ' +  (new Date().getTime() - startTime));  
             this.orderResponse = orderResponse;
             //this.origOrderItems = orderResponse.OrderDetail;
             //this.utilSvc.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
@@ -1324,8 +1334,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             });
         }
         else {
-            //this.router.back();            
-            this.zone.run(() => this.router.navigate(['/home/area']));
+            this.router.navigate(['/home/area']);
+            //this.zone.run(() => this.router.navigate(['/home/area']));
         }
     }
 
@@ -2292,8 +2302,41 @@ export class OrderComponent implements OnInit, OnDestroy {
 
         return checkMenuTimer;
     }
+    
+    // number of guests   
 
-    public ngOnDestroy() {
-        const SocketIO = require("nativescript-socket.io")
+    setGuests(numberOfGuests: string) {
+        this.isGettingGuests = false;
+        this.guests = Number(numberOfGuests);
+        localStorage.setItem('guests', this.guests.toString());
+    }     
+ 
+    saveEnteredGuests()
+    {    
+        this.isGettingGuests = false; 
+        this.guests = Number(this.guestsEntered);   
+        localStorage.setItem('guests', this.guestsEntered);
+    }
+
+    cancel() {
+        this.router.back();       
+    }
+
+    addDigit(digit: string)  
+    {
+        if (parseInt(digit) || (digit == '0' && parseInt(this.guestsEntered)))
+            this.guestsEntered = this.guestsEntered + digit;          
+    }
+
+    backSpace()    
+    {
+        if (this.guestsEntered.length > 0)
+            this.guestsEntered = this.guestsEntered.substring(0, this.guestsEntered.length - 1); 
+    }
+    
+    otherQty()
+    {       
+        //this.guests.nativeElement.focus();
+        this.isNormalChoice = false;
     }
 }

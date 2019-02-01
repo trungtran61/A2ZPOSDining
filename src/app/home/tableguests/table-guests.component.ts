@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { Page } from "tns-core-modules/ui/page/page";
-import { TextField } from "tns-core-modules/ui/text-field/text-field";
+import { UtilityService } from "~/app/services/utility.service";
 
 @Component({
     selector: "TableGuests",
@@ -29,6 +29,7 @@ export class TableGuestsComponent implements OnInit {
 
     setGuests(numberOfGuests: number) {
         localStorage.setItem('guests', numberOfGuests.toString());
+        this.utilSvc.startTime = new Date().getTime();
         this.router.navigate(['/home/order']);       
     }
 
@@ -39,9 +40,8 @@ export class TableGuestsComponent implements OnInit {
     }
 
     goBack() {
-        this.router.navigate(['/home/area'])
-       
-        //this.router.back();
+        //this.router.navigate(['/home/area'])       
+        this.router.back();
     }
 
     addDigit(digit: string)
@@ -62,12 +62,14 @@ export class TableGuestsComponent implements OnInit {
         this.isNormalChoice = false;
     }
 
-    ngOnInit(): void {
-        this.tableGuestsTitle += localStorage.getItem('table');         
+    ngOnInit(): void {       
+        //console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));
+        this.tableGuestsTitle += localStorage.getItem('table');      
+        console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));            
     }
 
-    constructor(private router: RouterExtensions, private page: Page) {       
-        //page.actionBarHidden = true;  
+    constructor(private router: RouterExtensions, private page: Page, private utilSvc: UtilityService) {       
+        //page.actionBarHidden = true;                
     }
 
 }

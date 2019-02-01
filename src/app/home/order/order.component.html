@@ -2,7 +2,7 @@
   <ActionItem [text]="checkTitle" ios.position="left"></ActionItem>
   <ActionItem [text]="currentSubCategory" style="font-weight: bold" ios.position="right" android.position="popup"></ActionItem>
 </ActionBar>
-<GridLayout rows="670 85" columns="300 150 20 *">
+<GridLayout rows="670 85" columns="300 150 20 *" *ngIf='!isGettingGuests'>
   <StackLayout row="0" col="0">
     <!-- order header -->
     <GridLayout style="background-color: antiquewhite;" rows='40'>
@@ -17,19 +17,17 @@
         </FlexBoxLayout>
       </StackLayout>
     </GridLayout>
-    <GridLayout rows='40' style="background-color: antiquewhite;" columns='* * *' borderTopWidth='1' borderColor='gray'
+    <GridLayout rows='40' style="background-color: antiquewhite;" columns='50 170 80' borderTopWidth='1' borderColor='gray'
       borderLeftWidth='0' borderRightWidth='0' borderBottomWidth='1'>
-      <Label [text]="table" style="text-align: left; width:30;color: red" col='0' borderRightWidth='1' borderLeftWidth='0'
+      <Label [text]="table" style="text-align: center; color: red" col='0' borderRightWidth='1' borderLeftWidth='0'
         borderLeftColor='antiquewhite' borderRightColor='gray' borderBottomWidth='1'></Label>|
-      <Label [text]="server" style="text-align: left; width:140;color:green" col='1' borderRightWidth='1'
+      <Label [text]="server" style="text-align: center; color:green" col='1' borderRightWidth='1'
         borderLeftWidth='0' borderRightColor='gray' borderBottomWidth='1'></Label>
-      <StackLayout col='2' orientation="horizontal">
-        <Label text="Guests: " style="text-align: left;margin-left: 3"></Label>
-        <Label [text]="guests" style="font-weight: bold; color: red"></Label>
-      </StackLayout>
+      <Label text="Guests: " style="text-align: left;" col='2'></Label>
+      <Label [text]="guests" style="text-align: right;font-weight: bold; color: red" col='2'></Label>      
     </GridLayout>
     <!-- order items  -->
-    <ScrollView style="background-color: antiquewhite" height="500" orientation="vertical" (tap)="hideOptions()">
+    <ScrollView style="background-color: antiquewhite" height="480" orientation="vertical" (tap)="hideOptions()">
       <StackLayout *ngIf='isShowingDetails'>
         <StackLayout *ngFor="let item of utilSvc.orderItems">
           <FlexBoxLayout *ngIf='item.Voided == null' (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)"
@@ -53,28 +51,18 @@
       </StackLayout>
     </ScrollView>
     <!-- totals -->
-    <StackLayout style="background-color: rgb(46, 44, 44);color: white">
-      <StackLayout class="m-b-5" orientation="horizontal">
-        <Label text="Subtotal" class="check-label"></Label>
-        <Label [text]="subTotal | currency" class="check-amount"></Label>
-      </StackLayout>
-      <StackLayout class="m-b-5" orientation="horizontal">
-        <Label text="Discount" class="check-label"></Label>
-        <Label [text]="discount | currency" class="check-amount"></Label>
-      </StackLayout>
-      <StackLayout class="m-b-5" orientation="horizontal">
-        <Label text="Tax" class="check-label"></Label>
-        <Label [text]="tax | currency" class="check-amount"></Label>
-      </StackLayout>
-      <StackLayout class="m-b-5" orientation="horizontal" *ngIf='tips > 0'>
-        <Label text="Gratuity" class="check-label"></Label>
-        <Label [text]="tips | currency" class="check-amount"></Label>
-      </StackLayout>
-      <StackLayout class="m-b-0" orientation="horizontal">
-        <Label text="Total" class="check-label"></Label>
-        <Label [text]="checkTotal | currency" class="check-amount"></Label>
-      </StackLayout>
-    </StackLayout>
+    <GridLayout style="background-color: rgb(46, 44, 44);color: white" rows="20 20 20 20 20" cols='200 100'>
+        <Label row='0' col='0' text="Subtotal" class="check-label" ></Label>
+        <Label row='0' col='1' [text]="subTotal | currency" class="check-amount"></Label>
+        <Label row='1' col='0' text="Discount" class="check-label"></Label>
+        <Label row='1' col='1' [text]="discount | currency" class="check-amount"></Label>
+        <Label row='2' col='0' text="Tax" class="check-label"></Label>
+        <Label row='2' col='1' [text]="tax | currency" class="check-amount"></Label>
+        <Label row='3' col='0' text="Gratuity" class="check-label"></Label>
+        <Label row='3' col='1' [text]="tips | currency" class="check-amount"></Label>
+        <Label row='4' col='0' text="Total" class="check-label"></Label>
+        <Label row='4' col='1' [text]="checkTotal | currency" class="check-amount"></Label>      
+    </GridLayout>
   </StackLayout>
   <!-- bottom navigation -->
   <GridLayout row="1" col="0" colSpan="4" style="margin-bottom:10" columns='110 110 110 110 110 110 110 *' *ngIf='isShowingBottomNav'>
@@ -194,3 +182,36 @@
       (tap)="userModifierSelected(item)"></Button>
   </WrapLayout>
 </GridLayout>
+
+<StackLayout *ngIf='isGettingGuests'>
+  <StackLayout [visibility]="isNormalChoice ? 'visible' : 'collapse'">
+      <label class="dialogTitle" [text]="tableGuestsTitle"></label>
+      <GridLayout style="padding-left: 670px;" rows="110 110 110 110" columns="110 110 110">
+          <Button text="1" class="glass btnRound" (tap)="setGuests(1)" row="0" col="0"></Button>
+          <Button text="2" class="glass btnRound" (tap)="setGuests(2)" row="0" col="1"></Button>
+          <Button text="3" class="glass btnRound" (tap)="setGuests(3)" row="0" col="2"></Button>
+          <Button text="4" class="glass btnRound" (tap)="setGuests(4)" row="1" col="0"></Button>
+          <Button text="5" class="glass btnRound" (tap)="setGuests(5)" row="1" col="1"></Button>
+          <Button text="6" class="glass btnRound" (tap)="setGuests(6)" row="1" col="2"></Button>
+          <Button text="7" class="glass btnRound" (tap)="setGuests(7)" row="2" col="0"></Button>
+          <Button text="8" class="glass btnRound" (tap)="setGuests(8)" row="2" col="1"></Button>
+          <Button text="9" class="glass btnRound" (tap)="setGuests(9)" row="2" col="2"></Button>
+          <Button text="0" class="glass btnRound" (tap)="setGuests(0)" row="3" col="1"></Button>   
+          <Button text="Other" class="glass" (tap)="otherQty()" row="3" col='0'></Button>
+          <Button text="Cancel" class="glass btnCancel btnRound" (tap)="cancel()" row="3" col="2"></Button>
+      </GridLayout>
+  </StackLayout>
+
+  <StackLayout [visibility]="isNormalChoice ? 'collapse' : 'visible'">
+      <GridLayout rows="50" columns="200 100 200" style='margin-top: 50; margin-left:10'>
+          <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='0'
+              col='0' height="60" width="120"></Button>
+          <TextField #guests horizontalAlignment="center" [text]='guestsEntered' [(ngModel)]='guestsEntered' row='0'
+              col='1' maxlength='3' class='textEntryLongActive' (returnPress)="saveEnteredGuests()" (keyPress)="keyPressed($event)"
+              returnKeyType='done' keyboardType="Number">
+          </TextField>
+          <Button class='glass btnOK' text='Accept' (tap)='saveEnteredGuests()' horizontalAlignment="right" row='0'
+              col='2' height="60" width="120"></Button>
+      </GridLayout>
+  </StackLayout>
+</StackLayout>

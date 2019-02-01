@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from "@angular/core";
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnChanges, ViewContainerRef, NgZone } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { NavigationExtras } from "@angular/router";
 
@@ -11,6 +11,9 @@ import { Page } from "tns-core-modules/ui/page/page";
 import { UtilityService } from "~/app/services/utility.service";
 import { APIService } from "~/app/services/api.service";
 import { min } from "rxjs/operators";
+import { ModalDialogOptions, ModalDialogService } from "nativescript-angular";
+import { GuestsComponent } from "../order/guests.component";
+import { NullInjector } from "@angular/core/src/di/injector";
 
 require("nativescript-localstorage");
 
@@ -24,8 +27,9 @@ const ONE_MINUTE: number = 1000 * 60; // in milliseconds
     styleUrls: ['./area.component.css']
 })
 
-export class AreaComponent implements OnInit {
+export class AreaComponent implements OnInit, OnChanges {
     isBlinking: boolean = true;
+    isNormalChoice: boolean = false;
     blinkingInterval: number;
     areas: Area[] = [];
     //tables: Observable<TableDetail[]>;   
@@ -43,8 +47,14 @@ export class AreaComponent implements OnInit {
     showGuests: boolean = false;
     showAreas: boolean = false;
     currentArea: Area;    
+    guests: number = 0;
     
-    ngOnInit(): void {         
+    ngOnChanges(): void {      
+        
+    }
+
+    ngOnInit(): void {      
+            
         this.DBService.getLocalAreas().then((data) => {
             if (data.length == 0) {
                 dialogs.alert("Areas not loaded").then(() => {
@@ -81,11 +91,13 @@ export class AreaComponent implements OnInit {
         
         this.areaStyle = "padding-left: 30;background-image: url('" + this.httpProtocol + "://" + area.ImageURL + 
             "'); background-repeat: no-repeat;background-size: 970px; background-position: 30px 0px;";        
-
+        
+        let startTime = new Date().getTime();
         this.apiSvc.getTablesDetails(area.AreaID,
             this.DBService.loggedInUser.PriKey,
             this.DBService.loggedInUser.AccessType,
-            this.DBService.systemSettings.ServerViewAll).subscribe(res => {                
+            this.DBService.systemSettings.ServerViewAll).subscribe(res => {       
+                //console.log('elapsed ms: ' +  (new Date().getTime() - startTime));         
                 res.forEach(table => {
                     let tableClass: string = 'tableOpen';
                     if (table.Status.indexOf('Disabled') > -1) {
@@ -115,7 +127,7 @@ export class AreaComponent implements OnInit {
                         table.Style = 'border-radius: 5';
                     }
                 });
-                this.tables = res;                
+                this.tables = res;                                
             });
 
     }
@@ -198,15 +210,16 @@ export class AreaComponent implements OnInit {
     }
 
     onTableClick(table: TableDetail) {        
-
         this.resetOccupiedTablesClass();
 
         table.Class += ' currentTable';
 
         // table is open, go get number of guests
         if (table.Status.indexOf('Open') > -1) {
-            localStorage.setItem('table', table.Name);
-            this.router.navigate(['/home/tableguests/' + table.Name]);
+            localStorage.setItem('table', table.Name);           
+            //this.router.navigate(['/home/tableguests/' + table.Name]);
+            this.getNumberOfGuests();
+            return;
         }
 
         localStorage.setItem('currentTable', JSON.stringify(table));
@@ -235,7 +248,7 @@ export class AreaComponent implements OnInit {
     }
 
     setNumberOfGuests(table: TableDetail) {
-        localStorage.setItem('table', table.Name);
+        localStorage.setItem('table', table.Name);        
         this.router.navigate(['/home/tableguests/' + table.Name]);
     }
 
@@ -254,7 +267,8 @@ export class AreaComponent implements OnInit {
     logOut() {
         //localStorage.removeItem('areaID');
         this.DBService.logoff().subscribe(res => {
-            this.router.navigate(['/home/']);
+            //this.router.navigate(['/home/']);
+            this.router.back();
         });
     }
 
@@ -264,6 +278,7 @@ export class AreaComponent implements OnInit {
                 "action": "openTable"
             }
         };
+        this.utilSvc.startTime = new Date().getTime(); 
         this.router.navigate(["home/order"], navigationExtras);
     }
 
@@ -299,6 +314,29 @@ export class AreaComponent implements OnInit {
     viewCheckDetail() {
 
     }
+
+    getNumberOfGuests() {
+        localStorage.setItem('guests', null); 
+        this.utilSvc.startTime = new Date().getTime();  
+        //console.log(this.utilSvc.startTime);
+        this.router.navigate(['/home/order/']);        
+        /*
+        const modalOptions: ModalDialogOptions = {
+            viewContainerRef: this.viewContainerRef,
+            fullscreen: false,
+            //context: { options: options, currentOptions: currentOptions}
+        };
+
+        this.modalService.showModal(GuestsComponent, modalOptions)        
+            .then(
+            (numberOfGuests: string) => {
+                if (numberOfGuests != null) {
+                    localStorage.setItem('guests', numberOfGuests);                    
+                    this.router.navigate(['/home/order'], {clearHistory: true});
+                }
+            });            
+    */  
+    }
     /*
         pageTap()
         {
@@ -307,8 +345,11 @@ export class AreaComponent implements OnInit {
     */
     constructor(
         private router: RouterExtensions, private DBService: SQLiteService,
-        private page: Page, private utilSvc: UtilityService, private apiSvc: APIService
-    ) {
+        private page: Page, private utilSvc: UtilityService, private apiSvc: APIService,
+        private modalService: ModalDialogService,
+        private viewContainerRef: ViewContainerRef,
+        private zone: NgZone
+    ) {        
         page.actionBarHidden = true;
     }
 }
