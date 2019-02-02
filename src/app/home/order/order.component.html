@@ -5,15 +5,11 @@
 <GridLayout rows="670 85" columns="300 150 20 *" *ngIf='!isGettingGuests'>
   <StackLayout row="0" col="0">
     <!-- order header -->
-    <GridLayout style="background-color: antiquewhite;" rows='40'>
-      <StackLayout orientation="horizontal" *ngIf='ticketNumber'>
-        <Label text="Ticket #" style="text-align: center; width:75;"></Label> |
-        <Label [text]="ticketNumber" style="text-align: left; margin-right: 5;width:75; color:red"></Label> |
-      </StackLayout>
-      <StackLayout orientation="horizontal" *ngIf='!ticketNumber'>
-        <Label text="Check #" style="text-align: center; width:75;"></Label> |
-        <Label [text]="checkNumber" style="text-align: left; margin-right: 5;width:75; color: red"></Label> |
-      </StackLayout>
+    <GridLayout style="background-color: antiquewhite;" rows='40' cols='100'>
+      <Label text="Ticket #" style="text-align: center;" *ngIf='ticketNumber' col='0'></Label>
+      <Label [text]="ticketNumber" style="text-align: left; margin-right: 5; color:red" *ngIf='ticketNumber'></Label>
+      <Label text="Check #" style="text-align: center;" *ngIf='!ticketNumber' col='0'></Label>
+      <Label [text]="checkNumber" style="text-align: right; margin-right: 100; color: red" *ngIf='!ticketNumber'></Label>
     </GridLayout>
     <GridLayout rows='40' style="background-color: antiquewhite;" columns='50 170 80' borderTopWidth='1' borderColor='gray'
       borderLeftWidth='0' borderRightWidth='0' borderBottomWidth='1'>
@@ -27,7 +23,7 @@
     <!-- order items  -->
     <ScrollView style="background-color: antiquewhite" height="480" orientation="vertical" (tap)="hideOptions()">
       <StackLayout *ngIf='isShowingDetails'>
-        <StackLayout *ngFor="let item of utilSvc.orderItems" [visibility]="item.Voided == null ? 'visible' : 'collapse'"
+        <StackLayout *ngFor="let item of utilSvc.orderItems" [visibility]="isShowingDetails && item.Voided == null ? 'visible' : 'collapse'"
           (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" [class]="item.Class" orientation="horizontal">
           <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:30;"></Label>
           <Label [text]="item.ProductName" style="text-align: left; width:140; margin-right: 5"></Label>
@@ -46,7 +42,7 @@
       </StackLayout>
     </ScrollView>
 
-    <!-- totals -->  
+    <!-- totals -->
     <GridLayout style="background-color: rgb(46, 44, 44);color: white" rows="20 20 20 20 20" cols='200 100'>
       <Label row='0' col='0' text="Subtotal" class="check-label"></Label>
       <Label row='0' col='1' [text]="subTotal | currency" class="check-amount"></Label>
@@ -148,13 +144,14 @@
         style='margin: -40 0 0 75; color: gold; font-weight: bold'></Label>
     </GridLayout>
     <!-- fixed modifiers -->
-    <StackLayout row='1' col='3' rowSpan="4">
-      <button text="Product Options" textWrap="true" [class]='productOptionsClass' (tap)='isShowingProductOptions()'></button>
-      <StackLayout *ngFor="let item of fixedOptions let i=index">
-        <Button [class]="item.Class" textWrap="true" [text]='item.Name' (tap)='fixedOptionSelected(item)'></Button>
-      </StackLayout>
-      <Button class="glass" text="DONE" (tap)="doneOption()" style='background-image:linear-gradient(green, black);text-align: center; height: 118px;border-radius: 20'></Button>
-    </StackLayout>
+    <GridLayout row='1' col='3' rowSpan="4" rows='auto'>
+      <button text="Product Options" textWrap="true" [class]='productOptionsClass' (tap)='isShowingProductOptions()'
+        row='0' marginTop="0" verticalAlignment="top"></button>
+      <Button [class]="item.Class" textWrap="true" [text]='item.Name' (tap)='fixedOptionSelected(item)' *ngFor="let item of fixedOptions let i=index"
+        [row]="i+1" [marginTop]="(i+1) * 63" verticalAlignment="top"></Button>
+      <Button class="glass" text="DONE" (tap)="doneOption()" style='background-image:linear-gradient(green, black);text-align: center; height: 118px;border-radius: 20' 
+        row='0' [marginTop]="(fixedOptions.length + 1) * 63" verticalAlignment="top"></Button>
+    </GridLayout>
     <!-- options -->
     <GridLayout row='1' col='0' colSpan="3" rowSpan="7" rows='86 86 86 86 86 86 90' columns='auto auto auto auto'
       (swipe)='onOptionSwipe($event)'>
@@ -179,31 +176,31 @@
   </WrapLayout>
 </GridLayout>
 
-  <GridLayout style="padding-left: 670px;" rows="40 110 110 110 110" columns="110 110 110" *ngIf='isGettingGuests && isNormalChoice'>
-    <label class="dialogTitle" [text]="tableGuestsTitle" row='0' col='0' colSpan="3" style='text-align: center'></label>
-  
-    <Button text="1" class="glass btnRound" (tap)="setGuests(1)" row="1" col="0"></Button>
-    <Button text="2" class="glass btnRound" (tap)="setGuests(2)" row="1" col="1"></Button>
-    <Button text="3" class="glass btnRound" (tap)="setGuests(3)" row="1" col="2"></Button>
-    <Button text="4" class="glass btnRound" (tap)="setGuests(4)" row="2" col="0"></Button>
-    <Button text="5" class="glass btnRound" (tap)="setGuests(5)" row="2" col="1"></Button>
-    <Button text="6" class="glass btnRound" (tap)="setGuests(6)" row="2" col="2"></Button>
-    <Button text="7" class="glass btnRound" (tap)="setGuests(7)" row="3" col="0"></Button>
-    <Button text="8" class="glass btnRound" (tap)="setGuests(8)" row="3" col="1"></Button>
-    <Button text="9" class="glass btnRound" (tap)="setGuests(9)" row="3" col="2"></Button>
-    <Button text="0" class="glass btnRound" (tap)="setGuests(0)" row="4" col="1"></Button>
-    <Button text="Other" class="glass" (tap)="otherQty()" row="4" col='0'></Button>
-    <Button text="Cancel" class="glass btnCancel btnRound" (tap)="cancel()" row="4" col="2"></Button>
-    
-  </GridLayout>
+<GridLayout style="padding-left: 670px;" rows="40 110 110 110 110" columns="110 110 110" *ngIf='isGettingGuests && isNormalChoice'>
+  <label class="dialogTitle" [text]="tableGuestsTitle" row='0' col='0' colSpan="3" style='text-align: center'></label>
 
-  <GridLayout rows="50" columns="200 100 200" style='margin-top: 50; margin-left:10' *ngIf='isGettingGuests && !isNormalChoice'>
-    <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='0' col='0'
-      height="60" width="120"></Button>
-    <TextField #guests horizontalAlignment="center" [text]='guestsEntered' [(ngModel)]='guestsEntered' row='0' col='1'
-      maxlength='3' class='textEntryLongActive' (returnPress)="saveEnteredGuests()" (keyPress)="keyPressed($event)"
-      returnKeyType='done' keyboardType="Number">
-    </TextField>
-    <Button class='glass btnOK' text='Accept' (tap)='saveEnteredGuests()' horizontalAlignment="right" row='0' col='2'
-      height="60" width="120"></Button>      
-  </GridLayout> 
+  <Button text="1" class="glass btnRound" (tap)="setGuests(1)" row="1" col="0"></Button>
+  <Button text="2" class="glass btnRound" (tap)="setGuests(2)" row="1" col="1"></Button>
+  <Button text="3" class="glass btnRound" (tap)="setGuests(3)" row="1" col="2"></Button>
+  <Button text="4" class="glass btnRound" (tap)="setGuests(4)" row="2" col="0"></Button>
+  <Button text="5" class="glass btnRound" (tap)="setGuests(5)" row="2" col="1"></Button>
+  <Button text="6" class="glass btnRound" (tap)="setGuests(6)" row="2" col="2"></Button>
+  <Button text="7" class="glass btnRound" (tap)="setGuests(7)" row="3" col="0"></Button>
+  <Button text="8" class="glass btnRound" (tap)="setGuests(8)" row="3" col="1"></Button>
+  <Button text="9" class="glass btnRound" (tap)="setGuests(9)" row="3" col="2"></Button>
+  <Button text="0" class="glass btnRound" (tap)="setGuests(0)" row="4" col="1"></Button>
+  <Button text="Other" class="glass" (tap)="otherQty()" row="4" col='0'></Button>
+  <Button text="Cancel" class="glass btnCancel btnRound" (tap)="cancel()" row="4" col="2"></Button>
+
+</GridLayout>
+
+<GridLayout rows="50" columns="200 100 200" style='margin-top: 50; margin-left:10' *ngIf='isGettingGuests && !isNormalChoice'>
+  <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='0' col='0'
+    height="60" width="120"></Button>
+  <TextField #guests horizontalAlignment="center" [text]='guestsEntered' [(ngModel)]='guestsEntered' row='0' col='1'
+    maxlength='3' class='textEntryLongActive' (returnPress)="saveEnteredGuests()" (keyPress)="keyPressed($event)"
+    returnKeyType='done' keyboardType="Number">
+  </TextField>
+  <Button class='glass btnOK' text='Accept' (tap)='saveEnteredGuests()' horizontalAlignment="right" row='0' col='2'
+    height="60" width="120"></Button>
+</GridLayout>
