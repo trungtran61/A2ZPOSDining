@@ -212,7 +212,7 @@ export class OrderComponent implements OnInit {
     }
    
     ngOnInit(): void {        
-            
+        console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));      
         this.tableGuestsTitle += localStorage.getItem('table');                 
         this.guests = parseInt(localStorage.getItem('guests'));        
         this.table = localStorage.getItem('table');
@@ -361,7 +361,7 @@ export class OrderComponent implements OnInit {
         let startTime: number = new Date().getTime();
         
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
-            console.log('elapsed ms: ' +  (new Date().getTime() - startTime));  
+            //console.log('elapsed ms: ' +  (new Date().getTime() - startTime));  
             this.orderResponse = orderResponse;
             //this.origOrderItems = orderResponse.OrderDetail;
             //this.utilSvc.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);

@@ -46,7 +46,7 @@
       </StackLayout>
     </ScrollView>
 
-    <!-- totals -->
+    <!-- totals -->  
     <GridLayout style="background-color: rgb(46, 44, 44);color: white" rows="20 20 20 20 20" cols='200 100'>
       <Label row='0' col='0' text="Subtotal" class="check-label"></Label>
       <Label row='0' col='1' [text]="subTotal | currency" class="check-amount"></Label>
@@ -179,26 +179,25 @@
   </WrapLayout>
 </GridLayout>
 
-<StackLayout *ngIf='isGettingGuests && isNormalChoice'>
-  <label class="dialogTitle" [text]="tableGuestsTitle"></label>
-  <GridLayout style="padding-left: 670px;" rows="110 110 110 110" columns="110 110 110">
-    <Button text="1" class="glass btnRound" (tap)="setGuests(1)" row="0" col="0"></Button>
-    <Button text="2" class="glass btnRound" (tap)="setGuests(2)" row="0" col="1"></Button>
-    <Button text="3" class="glass btnRound" (tap)="setGuests(3)" row="0" col="2"></Button>
-    <Button text="4" class="glass btnRound" (tap)="setGuests(4)" row="1" col="0"></Button>
-    <Button text="5" class="glass btnRound" (tap)="setGuests(5)" row="1" col="1"></Button>
-    <Button text="6" class="glass btnRound" (tap)="setGuests(6)" row="1" col="2"></Button>
-    <Button text="7" class="glass btnRound" (tap)="setGuests(7)" row="2" col="0"></Button>
-    <Button text="8" class="glass btnRound" (tap)="setGuests(8)" row="2" col="1"></Button>
-    <Button text="9" class="glass btnRound" (tap)="setGuests(9)" row="2" col="2"></Button>
-    <Button text="0" class="glass btnRound" (tap)="setGuests(0)" row="3" col="1"></Button>
-    <Button text="Other" class="glass" (tap)="otherQty()" row="3" col='0'></Button>
-    <Button text="Cancel" class="glass btnCancel btnRound" (tap)="cancel()" row="3" col="2"></Button>
+  <GridLayout style="padding-left: 670px;" rows="40 110 110 110 110" columns="110 110 110" *ngIf='isGettingGuests && isNormalChoice'>
+    <label class="dialogTitle" [text]="tableGuestsTitle" row='0' col='0' colSpan="3" style='text-align: center'></label>
+  
+    <Button text="1" class="glass btnRound" (tap)="setGuests(1)" row="1" col="0"></Button>
+    <Button text="2" class="glass btnRound" (tap)="setGuests(2)" row="1" col="1"></Button>
+    <Button text="3" class="glass btnRound" (tap)="setGuests(3)" row="1" col="2"></Button>
+    <Button text="4" class="glass btnRound" (tap)="setGuests(4)" row="2" col="0"></Button>
+    <Button text="5" class="glass btnRound" (tap)="setGuests(5)" row="2" col="1"></Button>
+    <Button text="6" class="glass btnRound" (tap)="setGuests(6)" row="2" col="2"></Button>
+    <Button text="7" class="glass btnRound" (tap)="setGuests(7)" row="3" col="0"></Button>
+    <Button text="8" class="glass btnRound" (tap)="setGuests(8)" row="3" col="1"></Button>
+    <Button text="9" class="glass btnRound" (tap)="setGuests(9)" row="3" col="2"></Button>
+    <Button text="0" class="glass btnRound" (tap)="setGuests(0)" row="4" col="1"></Button>
+    <Button text="Other" class="glass" (tap)="otherQty()" row="4" col='0'></Button>
+    <Button text="Cancel" class="glass btnCancel btnRound" (tap)="cancel()" row="4" col="2"></Button>
+    
   </GridLayout>
-</StackLayout>
 
-<StackLayout *ngIf='isGettingGuests && !isNormalChoice'>
-  <GridLayout rows="50" columns="200 100 200" style='margin-top: 50; margin-left:10'>
+  <GridLayout rows="50" columns="200 100 200" style='margin-top: 50; margin-left:10' *ngIf='isGettingGuests && !isNormalChoice'>
     <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='0' col='0'
       height="60" width="120"></Button>
     <TextField #guests horizontalAlignment="center" [text]='guestsEntered' [(ngModel)]='guestsEntered' row='0' col='1'
@@ -206,6 +205,5 @@
       returnKeyType='done' keyboardType="Number">
     </TextField>
     <Button class='glass btnOK' text='Accept' (tap)='saveEnteredGuests()' horizontalAlignment="right" row='0' col='2'
-      height="60" width="120"></Button>
-  </GridLayout>
-</StackLayout>
+      height="60" width="120"></Button>      
+  </GridLayout> 
