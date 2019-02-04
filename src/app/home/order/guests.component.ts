@@ -24,6 +24,10 @@ export class GuestsComponent implements OnInit {
         }       
     }
 
+    keyPressed() {
+       
+    }  
+
     setGuests(numberOfGuests: string) {
         this.params.closeCallback(numberOfGuests);      
     }     

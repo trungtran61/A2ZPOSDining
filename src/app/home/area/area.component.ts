@@ -54,7 +54,7 @@ export class AreaComponent implements OnInit, OnChanges {
     }
 
     ngOnInit(): void {      
-            
+        //console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));          
         this.DBService.getLocalAreas().then((data) => {
             if (data.length == 0) {
                 dialogs.alert("Areas not loaded").then(() => {
@@ -98,7 +98,7 @@ export class AreaComponent implements OnInit, OnChanges {
             this.DBService.loggedInUser.AccessType,
             this.DBService.systemSettings.ServerViewAll).subscribe(res => {       
                 //console.log('elapsed ms: ' +  (new Date().getTime() - startTime));         
-                res.forEach(table => {
+                this.tables = res.map(table => {
                     let tableClass: string = 'tableOpen';
                     if (table.Status.indexOf('Disabled') > -1) {
                         tableClass = 'tableDisabled';
@@ -126,8 +126,8 @@ export class AreaComponent implements OnInit, OnChanges {
                     {
                         table.Style = 'border-radius: 5';
                     }
-                });
-                this.tables = res;                                
+                    return table;  
+                });                                            
             });
 
     }
@@ -155,15 +155,21 @@ export class AreaComponent implements OnInit, OnChanges {
     }
 
     viewStatus() {
+        this.utilSvc.startTime = new Date().getTime();
         this.viewInfo(false, true, false);
+        console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));  
     }
 
     viewStaff() {
+        this.utilSvc.startTime = new Date().getTime();
         this.viewInfo(true, false, false);
+        console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));  
     }
 
     viewGuests() {
+        this.utilSvc.startTime = new Date().getTime();
         this.viewInfo(false, false, true);
+        console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));   
     }
 
     getArea(increment: number)
@@ -267,8 +273,8 @@ export class AreaComponent implements OnInit, OnChanges {
     logOut() {
         //localStorage.removeItem('areaID');
         this.DBService.logoff().subscribe(res => {
-            //this.router.navigate(['/home/']);
-            this.router.back();
+            this.router.navigate(['/home/']);
+            //this.router.back();
         });
     }
 

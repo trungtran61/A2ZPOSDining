@@ -93,8 +93,8 @@ export class HomeComponent implements OnInit {
          setInterval(() => 
          {
              that.checkPrint();            
-         }, 30000);       
-        
+         }, 60000);               
+
        /*
          // this is for the date/time display at top right corner
         setInterval(() => {
@@ -240,11 +240,9 @@ export class HomeComponent implements OnInit {
         this.apiSvc.checkPrintStatus(this.DBService.systemSettings.DeviceName).subscribe(printStatus => {
             let printStatuses: PrintStatusDetail[] = printStatus;
             if (printStatuses.length > 0) {
-                let message: string = 'Error occurred while printing:\n';
-                printStatuses.forEach( ps => 
-                    {
-                        message += ps.SystemName + ', ' + ps.PrinterName + ': ' + PrintStatus[ps.Status] + '\n';
-                    });
+                //let message: string = 'Error occurred while printing:\n';
+                let message = printStatuses.reduce((message, ps) =>                     
+                        message + ps.SystemName + ', ' + ps.PrinterName + ': ' + PrintStatus[ps.Status] + '\n', 'Error occurred while printing:\n');                    
                 alert(message);
             }
         });

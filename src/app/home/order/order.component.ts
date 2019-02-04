@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewContainerRef, NgZone } from "@angular/core";
+import { Component, OnInit, ViewContainerRef, NgZone, AfterViewInit } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 
@@ -23,7 +23,6 @@ import { ModifyOrderItemComponent } from "./modify-order-item.component";
 import { ActivatedRoute } from "@angular/router";
 import { ReasonComponent } from "./reason.component";
 import { SearchComponent } from "./search.component";
-import { NullAstVisitor } from "@angular/compiler";
 import { GuestsComponent } from "./guests.component";
 
 const CHOICE_PAGESIZE: number = 20;
@@ -242,15 +241,14 @@ export class OrderComponent implements OnInit {
                     this.isGettingGuests = true;             
                     this.createNewOrder();
                 }
-            });           
+            });            
         }
         );
         
         this.getProductOptions('');
         this.getOptionCategories();
-        this.allOptionFilterClass = 'glass';  
-                       
-    }
+        this.allOptionFilterClass = 'glass';          
+    } 
 
     isShowingProductOptions() {
         this.isShowingSubCategories = false;
@@ -357,11 +355,10 @@ export class OrderComponent implements OnInit {
     }
 
     getFullOrder(orderFilter: number) {
-        this.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };
-        let startTime: number = new Date().getTime();
+        this.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };       
         
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
-            //console.log('elapsed ms: ' +  (new Date().getTime() - startTime));  
+            //let startTime: number = new Date().getTime();            
             this.orderResponse = orderResponse;
             //this.origOrderItems = orderResponse.OrderDetail;
             //this.utilSvc.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
@@ -373,6 +370,7 @@ export class OrderComponent implements OnInit {
             this.guests = this.orderResponse.Order.NumberGuests;
             this.utilSvc.orderItems.forEach(oi => oi.Class = 'disabledTextColor');
             this.totalPrice();
+            //console.log('elapsed ms: ' +  (new Date().getTime() - startTime));  
         });
     }
 
