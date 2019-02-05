@@ -1,0 +1,31 @@
+<StackLayout class='page'>
+    <GridLayout rows='60 * 100' class='pageHeader' [visibility]="isOtherMessage ? 'collapse' : 'visible'">
+        <label text='Choose a Message' row='0'></label>
+        <GridLayout columns="* * *" rows="110 110 110 110 110" row='1' style='border-width: 1; border-color: gray; border-radius: 10; padding: 10; margin: 5'>
+            <Button [class]='message.Class' [text]='message.Extra' (tap)='setActiveMessage(message)' [row]='message.Row'
+                [col]='message.Col' *ngFor='let message of messages'></Button>
+        </GridLayout>
+
+        <GridLayout rows="20 auto auto" columns="10 * 10" row='2'>
+            <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='1'
+                col='1' height="60" width="120"></Button>
+            <Button class='glass' text='Other' (tap)='showOtherMessage()' horizontalAlignment="center" row='1' col='1'
+                height="60" width="120"></Button>
+            <Button class='glass btnOK' text='Accept' (tap)='acceptMessage(message)' horizontalAlignment="right" row='1'
+                col='1' height="60" width="120"></Button>
+        </GridLayout>
+    </GridLayout>
+
+    <GridLayout rows="100 100 100" columns="200 auto" [visibility]="isOtherMessage ? 'visible' : 'collapse'">
+        <label text='Enter Message' row='0' col='1' horizontalAlignment="center" class="title"></label>
+        <TextField #vcMessage horizontalAlignment="center" hint="Enter Message" [text]='otherMessage' row='1' col='1'
+            [(ngModel)]='otherMessage' required #otherMessageModel='ngModel' autocorrect="true" class='textEntryLongActive'
+            (returnPress)="acceptMessage(otherMessage)" (keyPress)="keyPressed($event)" returnKeyType='done'>
+        </TextField>
+        <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='2'
+            col='1' height="60" width="120"></Button>
+        <Button class='glass btnOK' text='Accept' (tap)='acceptMessage(otherMessage)' horizontalAlignment="right" row='2'
+            col='1' height="60" width="120"></Button>
+    </GridLayout>
+
+</StackLayout>

@@ -1,0 +1,99 @@
+<ActionBar android:title="Title">
+  <ActionItem [text]="checkTitle" ios.position="left"></ActionItem>
+  <ActionItem [text]="currentSubCategory" style="font-weight: bold" ios.position="right" android.position="popup"></ActionItem>
+</ActionBar>
+<GridLayout rows="670 85" columns="300 150 20 *" *ngIf="!isShowingKitchenMessages">
+  <StackLayout row="0" col="0">
+    <!-- order header -->
+    <GridLayout style="background-color: antiquewhite;" rows='40' cols='100'>
+      <Label text="Ticket #" style="text-align: center;" *ngIf='ticketNumber' col='0'></Label>
+      <Label [text]="ticketNumber" style="text-align: left; margin-right: 5; color:red" *ngIf='ticketNumber'></Label>
+      <Label text="Check #" style="text-align: center;" *ngIf='!ticketNumber' col='0'></Label>
+      <Label [text]="checkNumber" style="text-align: right; margin-right: 100; color: red" *ngIf='!ticketNumber'></Label>
+    </GridLayout>
+    <GridLayout rows='40' style="background-color: antiquewhite;" columns='50 170 80' borderTopWidth='1' borderColor='gray'
+      borderLeftWidth='0' borderRightWidth='0' borderBottomWidth='1'>
+      <Label [text]="table" style="text-align: center; color: red" col='0' borderRightWidth='1' borderLeftWidth='0'
+        borderLeftColor='antiquewhite' borderRightColor='gray' borderBottomWidth='1'></Label>|
+      <Label [text]="server" style="text-align: center; color:green" col='1' borderRightWidth='1' borderLeftWidth='0'
+        borderRightColor='gray' borderBottomWidth='1'></Label>
+      <Label text="Guests: " style="text-align: left;" col='2'></Label>
+      <Label [text]="guests" style="text-align: right;font-weight: bold; color: red" col='2'></Label>
+    </GridLayout>
+    <!-- order items  -->
+    <ScrollView style="background-color: antiquewhite" height="480" orientation="vertical" >
+        <StackLayout *ngFor="let item of utilSvc.orderItems" 
+          (tap)="showModifyDialog(item)" (swipe)="onOrderItemSwipe($event, item)" [class]="item.Class" orientation="horizontal">
+          <Label [text]="item.Quantity" style="text-align: right; margin-right: 10;width:30;"></Label>
+          <Label [text]="item.ProductName" style="text-align: left; width:140; margin-right: 5"></Label>
+          <Label [text]="item.ExtPrice | currency" style="text-align: right; width:95; margin-right:5"></Label>
+          <Label [text]="item.SeatNumber" style="text-align: right; width:15;color: chocolate"></Label>
+        </StackLayout>      
+    </ScrollView>
+
+    <!-- totals -->
+    <GridLayout style="background-color: rgb(46, 44, 44);color: white" rows="20 20 20 20 20" cols='200 100'>
+      <Label row='0' col='0' text="Subtotal" class="check-label"></Label>
+      <Label row='0' col='1' [text]="subTotal | currency" class="check-amount"></Label>
+      <Label row='1' col='0' text="Discount" class="check-label"></Label>
+      <Label row='1' col='1' [text]="discount | currency" class="check-amount"></Label>
+      <Label row='2' col='0' text="Tax" class="check-label"></Label>
+      <Label row='2' col='1' [text]="tax | currency" class="check-amount"></Label>
+      <Label row='3' col='0' text="Gratuity" class="check-label"></Label>
+      <Label row='3' col='1' [text]="tips | currency" class="check-amount"></Label>
+      <Label row='4' col='0' text="Total" class="check-label"></Label>
+      <Label row='4' col='1' [text]="checkTotal | currency" class="check-amount"></Label>
+    </GridLayout>
+  </StackLayout>
+  <!-- bottom navigation -->
+  <GridLayout row="1" col="0" colSpan="4" style="margin-bottom:10" columns='800'>
+    <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancelHold()" col='0'></Button>
+    <Button class="glass btnBottom fa" col='7' textWrap="true" text="&#xf02f; Save No Print"></Button>
+  </GridLayout>
+
+  <!-- hold categories -->
+  <GridLayout row="0" col="1" rows="105 105 105 105">
+    <Button class="glass fa" text='&#xf06d; ALL' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(0)"></Button>
+    <Button class="glass fa" text='&#xf06d; Appetizers' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(1)"></Button>
+    <Button class="glass fa" text='&#xf06d; Entrees' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(2)"></Button>
+    <Button class="glass fa" text='&#xf06d; Drinks' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(3)"></Button>
+  </GridLayout>
+  <GridLayout row="0" col="2" rows="100 50 200 100 100 100">
+    <Button class="glass" text='Add / Edit Message' textWrap="true" row='0' (tap)="showMessageDialog()" horizontalAlignment="right"></Button>
+    <label text='Message to Kitchen' row='2' class="title" horizontalAlignment="center"></label>
+    <label [text]='kitchenMessage' row='3' style='border-color: gray; border-radius: 15; border-width: 2' horizontalAlignment="left"></label>
+    <Button class="glass" text='Clear Message' textWrap="true" row='4' (tap)="clearMessage()" horizontalAlignment="left"></Button>
+    <Button class="glass" text='Print Message Only' textWrap="true" row='4' (tap)="PrintMessageOnly()" horizontalAlignment="right"></Button>
+    <Button class="glass" text='Send Hold Items' textWrap="true" row='5' (tap)="sendHoldItems()" horizontalAlignment="right"></Button>
+  </GridLayout>
+</GridLayout>
+
+<GridLayout rows='60 * 100' class='pageHeader' *ngIf="kitchenMessage != ''">
+  <label text='Choose a Message' row='0' class="title"></label>
+  <GridLayout columns="* * *" rows="110 110 110 110 110" row='1' style='border-width: 1; border-color: gray; border-radius: 10; padding: 10; margin: 5'>
+    <Button [class]='kitchenMessage.Class' [text]='kitchenMessage.Extra' (tap)='setActiveMessage(kitchenMessage)' [row]='kitchenMessage.Row' [col]='kitchenMessage.Col'
+      *ngFor='let kitchenMessage of kitchenMessages'></Button>
+  </GridLayout>
+
+  <GridLayout rows="20 auto auto" columns="10 * 10" row='2'>
+    <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='1' col='1'
+      height="60" width="120"></Button>
+    <Button class='glass' text='Other' (tap)='showOtherReason()' horizontalAlignment="center" row='1' col='1' height="60"
+      width="120"></Button>
+    <Button class='glass btnOK' text='Accept' (tap)='acceptReason(reason)' horizontalAlignment="right" row='1' col='1'
+      height="60" width="120"></Button>
+  </GridLayout>
+</GridLayout>
+
+<GridLayout rows="50 100 100" columns="*" *ngIf="isCustomKitchenMessage">
+  <label text='Enter Message' row='0' class="title"></label>
+  <TextField #vcReason horizontalAlignment="center" hint="Enter Message" [text]='otherKitchenMessage' row='1'
+    [(ngModel)]='otherMessage' required #otherReasonModel='ngModel' autocorrect="true" class='textEntryLongActive'
+    (returnPress)="acceptMessage()" (keyPress)="keyPressed($event)" returnKeyType='done'>
+  </TextField>
+
+  <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='2' col='0'
+    height="60" width="120"></Button>
+  <Button class='glass btnOK' text='Accept' (tap)='acceptMessage()' horizontalAlignment="right" row='2' col='0' height="60"
+    width="120"></Button>
+</GridLayout>

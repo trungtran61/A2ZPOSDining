@@ -7,7 +7,7 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import {
     CategoryCode, Product, MenuCategory, MenuSubCategory, MenuProduct, MenuChoice, OpenProductItem,
-    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail, MenuSubOption, MenuTimerType, OverrideType, OptionCategory, Option, HoldCategory
+    MenuTimer, MenuOption, Choice, Modifier, TaxRate, UserModifier, Memo, ForcedModifier, TableDetail, MenuSubOption, MenuTimerType, OverrideType, OptionCategory, Option
 } from "~/app/models/products";
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { ModalDialogService, ModalDialogOptions, ListViewComponent } from "nativescript-angular";
@@ -70,14 +70,7 @@ export class OrderComponent implements OnInit {
     optionCategoryCurrentPage: number = 0;
     totalOptionCategoryPages: number = 0;
     allOptionCategorySelected: boolean = true;
-
-    holdCategories: HoldCategory[] = [
-        { Name: String.fromCharCode(0xf06d) + ' ALL', Class: 'glass holdOn fa', Position: 1 },
-        { Name: String.fromCharCode(0xf06d) + ' Appetizers', Class: 'glass holdOn fa', Position: 2 },
-        { Name: String.fromCharCode(0xf06d) + ' Entrees', Class: 'glass holdOn fa', Position: 3 },
-        { Name: String.fromCharCode(0xf06d) + ' Drinks', Class: 'glass holdOn fa', Position: 4 }
-    ];
-
+    
     menuOptions: MenuOption[];
     pageOptions: MenuOption[];
     totalOptionPages: number = 0;
@@ -121,7 +114,6 @@ export class OrderComponent implements OnInit {
     isShowingExtraFunctions: boolean = false;
     isShowingProductInfo: boolean = false;
     isShowingBottomNav: boolean = true;
-    showHoldCategories: boolean = false;
     productInfoClass: string = 'glass fa';
     viewDetailsCode: string = String.fromCharCode(0xf06e) + ' View Details'
     hideDetailsCode: string = String.fromCharCode(0xf070) + ' Hide Details'
@@ -1777,12 +1769,7 @@ export class OrderComponent implements OnInit {
             }
         });
     }
-
-    hold() {
-        this.isShowingSubCategories = false;
-        this.showHoldCategories = true;
-    }
-
+    
     showReasonDialog(orderItem: OrderDetail) {
         // get the product Order
         //let _orderItem: OrderDetail = this.utilSvc.orderItems.find( oi => oi.ItemType == ItemType.Product && oi.IndexData == orderItem.IndexData)

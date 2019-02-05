@@ -204,7 +204,8 @@ export class HomeComponent implements OnInit {
             this.DBService.loadOptions(db),
             this.DBService.loadTaxRates(db),
             this.DBService.loadUserModifiers(db),
-            this.DBService.loadReasons(db)
+            this.DBService.loadReasons(db),
+            this.DBService.loadKitchenMessages(db),
         ])
             .subscribe(results => {
                 console.log(results);

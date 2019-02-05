@@ -8,6 +8,13 @@ export interface Countdown {
     QuantityChange?: number;
 }
 
+export enum PrintGroup {
+    All = 0,    
+    Appetizers = 1,
+    Entrees = 2,
+    Drinks = 3
+}
+
 export enum FunctionType {
     DineIn = 1,    
     BarQuickSale = 2,
@@ -304,6 +311,14 @@ export interface OrderResponse {
 export interface Reason {
     PriKey?: number;
     Reason?: string;
+    Row?: number;
+    Col?: number;
+    Class?: string;
+}
+
+export interface KitchenMessage {
+    PriKey?: number;
+    Extra?: string;
     Row?: number;
     Col?: number;
     Class?: string;

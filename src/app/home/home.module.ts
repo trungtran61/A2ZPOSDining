@@ -21,7 +21,9 @@ import { MyChecksComponent } from "./my-checks/my-checks.component";
 import { ReasonComponent } from "./order/reason.component";
 import { CloseCheckComponent } from "./order/close-check/close-check.component";
 import { SearchComponent } from "./order/search.component";
-import { GuestsComponent } from "./order/guests.component";
+//import { GuestsComponent } from "./order/guests.component";
+import { KitchenMessageComponent } from "./order/kitchen-message.component";
+import { HoldComponent } from "./order/hold.component";
 
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 TNSFontIconService.debug = true;
@@ -52,7 +54,9 @@ TNSFontIconService.debug = true;
         MyChecksComponent,
         ReasonComponent,
         CloseCheckComponent,
-        GuestsComponent            
+        //GuestsComponent,
+        HoldComponent,
+        KitchenMessageComponent            
     ],
     schemas: [
         NO_ERRORS_SCHEMA
@@ -65,7 +69,8 @@ TNSFontIconService.debug = true;
         MemoComponent,
         ReasonComponent,
         SearchComponent,
-        GuestsComponent
+        //GuestsComponent,
+        KitchenMessageComponent
     ]  
 })
 export class HomeModule { }

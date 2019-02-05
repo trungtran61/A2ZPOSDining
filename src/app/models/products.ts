@@ -15,12 +15,6 @@ export interface MenuCategory {
     ButtonForeColorHex: string;
 }
 
-export interface HoldCategory {
-    Name: string;
-    Position: number;
-    Class: string;
-}
-
 export interface MenuSubCategory {
     CategoryID: number;
     SubCategoryID: number;

@@ -1,6 +1,6 @@
 <StackLayout class='page'>
-    <GridLayout rows='60 * 100' class='pageHeader' [visibility]="isOtherReason ? 'collapse' : 'visible'" >
-        <label text='Choose a Reason' row='0' class="title"></label>
+    <GridLayout rows='60 * 100' class='pageHeader' [visibility]="isOtherReason ? 'collapse' : 'visible'">
+        <label text='Choose a Reason' row='0'></label>
         <GridLayout columns="* * *" rows="110 110 110 110 110" row='1' style='border-width: 1; border-color: gray; border-radius: 10; padding: 10; margin: 5'>
             <Button [class]='reason.Class' [text]='reason.Reason' (tap)='setActiveReason(reason)' [row]='reason.Row'
                 [col]='reason.Col' *ngFor='let reason of reasons'></Button>
@@ -16,22 +16,16 @@
         </GridLayout>
     </GridLayout>
 
-    <StackLayout rows="120 auto" [visibility]="isOtherReason ? 'visible' : 'collapse'">
-        <GridLayout rows="100 auto auto" columns="*">
-            <TextField #vcReason horizontalAlignment="center" hint="Enter Reason" [text]='otherReason' row='1'
-                [(ngModel)]='otherReason' required #otherReasonModel='ngModel' autocorrect="true" class='textEntryLongActive'
-                (returnPress)="acceptReason(otherReason)" (keyPress)="keyPressed($event)" returnKeyType='done' >
-            </TextField>
-            <Label class="validation" horizontalAlignment="center" row='2' [visibility]="otherReasonModel.valid ? 'collapse' : 'visible'"
-                text="Reason is required"></Label>
-        </GridLayout>
+    <GridLayout rows="100 100 100" columns="200 auto" [visibility]="isOtherReason ? 'visible' : 'collapse'">
+        <label text='Enter Reason' row='0' col='1' horizontalAlignment="center" class="title"></label>
+        <TextField #vcReason horizontalAlignment="center" hint="Enter Reason" [text]='otherReason' row='1' col='1'
+            [(ngModel)]='otherReason' required #otherReasonModel='ngModel' autocorrect="true" class='textEntryLongActive'
+            (returnPress)="acceptReason(otherReason)" (keyPress)="keyPressed($event)" returnKeyType='done'>
+        </TextField>
+        <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='2'
+            col='1' height="60" width="120"></Button>
+        <Button class='glass btnOK' text='Accept' (tap)='acceptReason(otherReason)' horizontalAlignment="right" row='2'
+            col='1' height="60" width="120"></Button>
+    </GridLayout>
 
-        <GridLayout rows="20 auto auto" columns="10 * 10">
-            <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='1'
-                col='1' height="60" width="120"></Button>
-            <Button class='glass btnOK' text='Accept' (tap)='acceptReason(otherReason)' horizontalAlignment="right" row='1'
-                col='1' height="60" width="120"></Button>
-        </GridLayout>
-
-    </StackLayout>
 </StackLayout>
