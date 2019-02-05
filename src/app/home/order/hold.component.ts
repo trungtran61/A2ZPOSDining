@@ -53,7 +53,9 @@ export class HoldComponent implements OnInit {
         page.actionBarHidden = true;
         this.holdItems = this.utilSvc.orderItems.map(oi =>  
                ({
-                   ProductName: oi.ProductName, Quantity: oi.Quantity, SeatNumber: oi.SeatNumber, Status: oi.Printed != null ? 'PRINTED' : 'HOLD'
+                   ProductName: oi.ProductName, Quantity: oi.Quantity, 
+                   SeatNumber: oi.SeatNumber, Status: oi.Printed != null ? 'PRINTED' : 'HOLD',
+                   StatusClass: oi.Printed != null ? 'printedStatus' : 'holdStatus',
                 })             
         );
         this.isShowingSendHold = this.holdItems.some (hi => hi.Status == 'HOLD');        

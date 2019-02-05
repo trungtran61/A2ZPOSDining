@@ -329,4 +329,5 @@ export interface HoldItem {
     Status?: string;
     Quantity?: number;
     Seat?: number;
+    StatusClass?: string;
 }

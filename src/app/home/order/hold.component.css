@@ -2,3 +2,13 @@
 {
     color: black; background-image:linear-gradient(gold, white 40%, gold 90%);
 }
+
+.holdStatus
+{
+    color: red;
+}
+
+.printedStatus
+{
+    color: black;
+}
