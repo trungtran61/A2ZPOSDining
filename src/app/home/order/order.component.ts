@@ -2328,6 +2328,16 @@ export class OrderComponent implements OnInit {
 
     hold()
     {
+        this.utilSvc.subTotal = this.subTotal;
+        this.utilSvc.tax = this.tax;
+        this.utilSvc.checkTotal = this.checkTotal;
+        this.utilSvc.tips = this.tips;
+        this.utilSvc.checkNumber = this.checkNumber;
+        this.utilSvc.table = this.table;
+        this.utilSvc.server = this.server;
+        this.utilSvc.ticketNumber = this.ticketNumber;
+        this.utilSvc.guests = this.guests;
+
         this.router.navigate(['/home/hold']);
     }
 }

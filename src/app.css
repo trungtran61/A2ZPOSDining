@@ -223,3 +223,13 @@ page
 {	
 	font-size: 30; font-weight: bold; color: white;
 }
+
+.check-label
+{
+    font-weight: bold;text-align: left;
+}
+
+.check-amount
+{
+    font-weight: bold;text-align: right;
+}

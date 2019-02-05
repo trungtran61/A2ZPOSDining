@@ -3,16 +3,6 @@
     background-color: antiquewhite;
 }
 
-.check-label
-{
-    font-weight: bold;text-align: left;
-}
-
-.check-amount
-{
-    font-weight: bold;text-align: right;
-}
-
 .bgImage
 {
 background: url('https://www.nativescript.org/images/default-source/Blogs/ns-logo_share_600x315.png');

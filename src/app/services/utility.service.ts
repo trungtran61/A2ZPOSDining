@@ -14,14 +14,24 @@ const TIMEZONE_OFFSET: number = new Date().getTimezoneOffset() * 60 * 1000; // o
 export class UtilityService {
     timeoutInSecs: number = 15;
     idleTimer: number;
-    startTime : number = 0;
-    public currentDateTime: Date;    
+    startTime: number = 0;
+    public currentDateTime: Date;
     public socket: any;
     public blinkingInterval: number = null;
     private readStream: NSInputStream;
     private writeStream: NSOutputStream;
-    public taxRates: TaxRate[]=[];
+    public taxRates: TaxRate[] = [];
     orderItems: OrderDetail[] = [];
+    subTotal: number = 0;
+    tax: number = 0;
+    checkTotal: number = 0;
+    tips: number = 0;
+    discount: number = 0;
+    table: string;
+    server: string;
+    checkNumber: number;
+    ticketNumber: number;
+    guests: number;    
 
     public constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -51,11 +61,10 @@ export class UtilityService {
         this.idleTimer = 0;
     }
 
-    getCurrentTime(): string
-    {        
+    getCurrentTime(): string {
         //offSet = new Date().getTimezoneOffset() * 60 * 1000;
         let timeStamp: string = (Date.now() - TIMEZONE_OFFSET).toString();
-        return "\/Date(" + timeStamp + ")\/";  
+        return "\/Date(" + timeStamp + ")\/";
     }
     /*
   ColorLuminance("#69c", 0);		// returns "#6699cc"
@@ -147,10 +156,10 @@ export class UtilityService {
         return taxTotal;
     }
 
-    roundTo2Decimal(value: number) {        
+    roundTo2Decimal(value: number) {
         return Number((value + .000001).toFixed(2));
         //return Number(Number((value + .000001).toExponential(2)).toFixed(2));
-      }
+    }
     /*
         convertToBoolean(textBoolean: string)
         {
@@ -159,7 +168,7 @@ export class UtilityService {
     */
     getJSONDate(jsonDate: string): Date {
 
-        let longDate: number = parseInt(jsonDate.substr(6));         
+        let longDate: number = parseInt(jsonDate.substr(6));
         return new Date(longDate + TIMEZONE_OFFSET)
     }
 
@@ -174,8 +183,7 @@ export class UtilityService {
         }
     }
 
-    public getTaxRates()
-    {
+    public getTaxRates() {
         let that = this;
         this.DBService.getLocalTaxRates().then(taxRates => {
             if (taxRates.length == 0) {
@@ -188,18 +196,17 @@ export class UtilityService {
         });
     }
 
-    private getEffectiveTaxRate(taxRateID: number): number
-    {
+    private getEffectiveTaxRate(taxRateID: number): number {
         if (taxRateID == null)
             return 0;
 
-        if (this.taxRates !== null)    
+        if (this.taxRates !== null)
             return this.taxRates.find(tr => tr.TaxID == taxRateID).EffectiveRate;
         else
-            return .08;    
+            return .08;
     }
 
-    openPrinterSocket() {        
+    openPrinterSocket() {
         let readStream = new interop.Reference<NSInputStream>();
         let writeStream = new interop.Reference<NSOutputStream>(); //new interop.Reference(CFWriteStreamCreateWithBuffer(null,'',1000));        
         CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, "192.168.0.125", 9100, readStream, writeStream);
@@ -227,8 +234,7 @@ export class UtilityService {
         this.writeStream.writeMaxLength(textData + '\r\n', 255);
     }
 
-    closePrinterSocket()
-    {
+    closePrinterSocket() {
         this.writeStream.close();
     }
 }

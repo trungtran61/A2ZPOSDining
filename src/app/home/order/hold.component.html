@@ -6,19 +6,19 @@
   <StackLayout row="0" col="0">
     <!-- order header -->
     <GridLayout style="background-color: antiquewhite;" rows='40' cols='100'>
-      <Label text="Ticket #" style="text-align: center;" *ngIf='ticketNumber' col='0'></Label>
-      <Label [text]="ticketNumber" style="text-align: left; margin-right: 5; color:red" *ngIf='ticketNumber'></Label>
-      <Label text="Check #" style="text-align: center;" *ngIf='!ticketNumber' col='0'></Label>
-      <Label [text]="checkNumber" style="text-align: right; margin-right: 100; color: red" *ngIf='!ticketNumber'></Label>
+      <Label text="Ticket #" style="text-align: center;" *ngIf='utilSvc.ticketNumber' col='0'></Label>
+      <Label [text]="utilSvc.ticketNumber" style="text-align: left; margin-right: 5; color:red" *ngIf='utilSvc.ticketNumber'></Label>
+      <Label text="Check #" style="text-align: center;" *ngIf='!utilSvc.ticketNumber' col='0'></Label>
+      <Label [text]="utilSvc.checkNumber" style="text-align: right; margin-right: 100; color: red" *ngIf='!utilSvc.ticketNumber'></Label>
     </GridLayout>
     <GridLayout rows='40' style="background-color: antiquewhite;" columns='50 170 80' borderTopWidth='1' borderColor='gray'
       borderLeftWidth='0' borderRightWidth='0' borderBottomWidth='1'>
-      <Label [text]="table" style="text-align: center; color: red" col='0' borderRightWidth='1' borderLeftWidth='0'
+      <Label [text]="utilSvc.table" style="text-align: center; color: red" col='0' borderRightWidth='1' borderLeftWidth='0'
         borderLeftColor='antiquewhite' borderRightColor='gray' borderBottomWidth='1'></Label>|
-      <Label [text]="server" style="text-align: center; color:green" col='1' borderRightWidth='1' borderLeftWidth='0'
+      <Label [text]="utilSvc.server" style="text-align: center; color:green" col='1' borderRightWidth='1' borderLeftWidth='0'
         borderRightColor='gray' borderBottomWidth='1'></Label>
       <Label text="Guests: " style="text-align: left;" col='2'></Label>
-      <Label [text]="guests" style="text-align: right;font-weight: bold; color: red" col='2'></Label>
+      <Label [text]="utilSvc.guests" style="text-align: right;font-weight: bold; color: red" col='2'></Label>
     </GridLayout>
     <!-- order items  -->
     <ScrollView style="background-color: antiquewhite" height="480" orientation="vertical">
@@ -36,17 +36,17 @@
     </ScrollView>
 
     <!-- totals -->
-    <GridLayout style="background-color: rgb(46, 44, 44);color: white" rows="20 20 20 20 20" cols='200 100'>
-      <Label row='0' col='0' text="Subtotal" class="check-label"></Label>
-      <Label row='0' col='1' [text]="subTotal | currency" class="check-amount"></Label>
-      <Label row='1' col='0' text="Discount" class="check-label"></Label>
-      <Label row='1' col='1' [text]="discount | currency" class="check-amount"></Label>
-      <Label row='2' col='0' text="Tax" class="check-label"></Label>
-      <Label row='2' col='1' [text]="tax | currency" class="check-amount"></Label>
-      <Label row='3' col='0' text="Gratuity" class="check-label"></Label>
-      <Label row='3' col='1' [text]="tips | currency" class="check-amount"></Label>
-      <Label row='4' col='0' text="Total" class="check-label"></Label>
-      <Label row='4' col='1' [text]="checkTotal | currency" class="check-amount"></Label>
+    <GridLayout style="background-color: rgb(46, 44, 44);color: white" rows="20 20 20 20 20">
+      <Label row='0' horizontalAlignment="left" text="Subtotal" class="check-label"></Label>
+      <Label row='0' horizontalAlignment="right" [text]="utilSvc.subTotal | currency" class="check-amount"></Label>
+      <Label row='1' horizontalAlignment="left" text="Discount" class="check-label"></Label>
+      <Label row='1' horizontalAlignment="right" [text]="utilSvc.discount | currency" class="check-amount"></Label>
+      <Label row='2' horizontalAlignment="left" text="Tax" class="check-label"></Label>
+      <Label row='2' horizontalAlignment="right" [text]="utilSvc.tax | currency" class="check-amount"></Label>
+      <Label row='3' horizontalAlignment="left" text="Gratuity" class="check-label"></Label>
+      <Label row='3' horizontalAlignment="right" [text]="utilSvc.tips | currency" class="check-amount"></Label>
+      <Label row='4' horizontalAlignment="left" text="Total" class="check-label"></Label>
+      <Label row='4' horizontalAlignment="right" [text]="utilSvc.checkTotal | currency" class="check-amount"></Label>
     </GridLayout>
   </StackLayout>
   <!-- bottom navigation -->
