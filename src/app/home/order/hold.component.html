@@ -46,24 +46,29 @@
     </GridLayout>
   </StackLayout>
   <!-- bottom navigation -->
-  <GridLayout row="1" col="0" colSpan="4" style="margin-bottom:10" columns='800'>
+  <GridLayout row="1" col="0" colSpan="4" style="margin-bottom:10">
     <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancel()" horizontalAlignment="left"></Button>
-    <Button class="glass btnBottom" textWrap="true" text="Save No Print"  horizontalAlignment="right" width="200"></Button>
+    <Button class="glass btnBottom fa" text="&#xf021; Start Over" width="100" textWrap="true" (tap)="cancel()" horizontalAlignment="center"></Button>
+    <Button class="glass btnRound " textWrap="true" text="Save No Print"  horizontalAlignment="right" width="100" style='padding: 5; margin-right: 10'></Button>
   </GridLayout>
 
   <!-- hold categories -->
-  <GridLayout row="0" col="1" rows="105 105 105 105">
+  <GridLayout row="0" col="1" rows="105 105 105 105" style="margin-top:100">
     <Button row='0' class="glass fa" text='&#xf06d; ALL' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(0)"></Button>
     <Button row='1' class="glass fa" text='&#xf06d; Appetizers' textWrap="true" row='1' style='text-align: center' (tap)="selectItems(1)"></Button>
     <Button row='2' class="glass fa" text='&#xf06d; Entrees' textWrap="true" row='2' style='text-align: center' (tap)="selectItems(2)"></Button>
     <Button row='3' class="glass fa" text='&#xf06d; Drinks' textWrap="true" row='3' style='text-align: center' (tap)="selectItems(3)"></Button>
   </GridLayout>
-  <GridLayout row="0" col="2" rows="100 50 200 100 100 100">
-    <Button class="glass" text='Add / Edit Message' textWrap="true" row='0' (tap)="showMessageDialog()" horizontalAlignment="right"></Button>
-    <label text='Message to Kitchen' row='2' class="title" horizontalAlignment="center"></label>
-    <label [text]='kitchenMessage' row='3' style='border-color: gray; border-radius: 15; border-width: 2' horizontalAlignment="left"></label>
-    <Button class="glass" text='Clear Message' textWrap="true" row='4' (tap)="clearMessage()" horizontalAlignment="left"></Button>
-    <Button class="glass" text='Print Message Only' textWrap="true" row='4' (tap)="PrintMessageOnly()" horizontalAlignment="right"></Button>
-    <Button class="glass" text='Send Hold Items' textWrap="true" row='5' (tap)="sendHoldItems()" horizontalAlignment="right"></Button>
+  <GridLayout row="0" col="3" rows="100 20 60 200 100 80 80">
+    <Button class="glass" text='Add / Edit Message' width="120" textWrap="true" row='0' (tap)="showMessageDialog()" 
+      horizontalAlignment="right" style='padding: 5; margin-right: 10'></Button>
+    <label text='Message to Kitchen' row='2' class="title" horizontalAlignment="center" *ngIf='message != null'></label>
+    <label [text]='message' row='3' width="450" textWrap='true' *ngIf='message != null' verticalAlignment='top'
+      style='padding: 10; font-weight:bold; color: white;border-color: gray; border-radius: 15; border-width: 2; border-style: solid;' horizontalAlignment="center"></label>
+    <Button class="glass" text='Clear Message' *ngIf='message != null'
+      width="100" textWrap="true" row='4' (tap)="clearMessage()" horizontalAlignment="left" style='margin-top: 20'></Button>
+    <Button class="glass" text='Print Message Only' *ngIf='message != null'
+      width="160" textWrap="true" row='4' (tap)="PrintMessageOnly()" horizontalAlignment="right" style='margin-top: 20; margin-right: 10'></Button>
+    <Button class="glass" text='Send Hold Items' row='6' width="260" (tap)="sendHoldItems()" horizontalAlignment="right" style='margin-right: 10'></Button>
   </GridLayout>
 </GridLayout>

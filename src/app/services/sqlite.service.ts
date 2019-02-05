@@ -1614,7 +1614,7 @@ export class SQLiteService {
                             data => {
                                 let kitchenMessages = <KitchenMessage[]>data;
                                 kitchenMessages.forEach(function (kitchenMessage: KitchenMessage) {
-                                    SQLiteService.database.execSQL("INSERT INTO KitchenMessages (PriKey, Etra) VALUES (?,?)",
+                                    SQLiteService.database.execSQL("INSERT INTO KitchenMessages (PriKey, Extra) VALUES (?,?)",
                                         [kitchenMessage.PriKey, kitchenMessage.Extra]).then(id => {
                                             resolve("Added KitchenMessages records.")
                                         },
@@ -1637,7 +1637,7 @@ export class SQLiteService {
     }
 
     public getLocalKitchenMessages(): Promise<KitchenMessage[]> {
-        return SQLiteService.database.all("SELECT PriKey, KitchenMessage FROM KitchenMessages ORDER BY KitchenMessage")
+        return SQLiteService.database.all("SELECT PriKey, Extra FROM KitchenMessages ORDER BY Extra")
             .then(function (rows) {
                 let kitchenMessages: KitchenMessage[] = [];
                 for (var row in rows) {

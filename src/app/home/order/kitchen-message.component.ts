@@ -16,8 +16,7 @@ import { ModalDialogParams } from "nativescript-angular/modal-dialog";
 
 export class KitchenMessageComponent implements OnInit {
     @ViewChild('vcMessage') vcMessage: ElementRef; 
-    messages: KitchenMessage[] = [];
-    //orderItem: OrderDetail;
+    messages: KitchenMessage[] = [];    
     message: string;
     otherMessage: string;
     isOtherMessage: boolean = false;
