@@ -328,8 +328,7 @@ export interface HoldItem {
     ProductName?: string;
     Printed?: string;
     Quantity?: number;
-    Seat?: number;
-    Status?: string;
-    StatusClass?: string;
+    Seat?: number;   
     IndexData?: number;
+    Fired?: boolean;
 }

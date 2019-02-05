@@ -24,13 +24,19 @@
     <ScrollView style="background-color: antiquewhite" height="480" orientation="vertical">
       <GridLayout rows='auto' verticalAlignment='top' width="400">
         <ng-template ngFor let-item [ngForOf]="holdItems" let-i="index">
-          <Label verticalAlignment="top" horizontalAlignment="left" [text]="item.Quantity" [row]="i" [marginTop]="i * 25"></Label>
+          <Label verticalAlignment="top" horizontalAlignment="left" [text]="item.Quantity" [row]="i" [marginTop]="i * 25" (tap)='holdItem(item)'></Label>
           <Label verticalAlignment="top" horizontalAlignment="left" [text]="item.ProductName" style="margin-left: 30"
-            [row]="i" [marginTop]="i * 25" (tap)='holdItem(i)'></Label>
-          <Label verticalAlignment="top" horizontalAlignment="left" [text]="item.Status" style="margin-left: 210" [row]="i"
-            [marginTop]="i * 25" [class]='item.StatusClass'></Label>
+            [row]="i" [marginTop]="i * 25" (tap)='holdItem(item)'></Label>
+          <Label verticalAlignment="top" horizontalAlignment="left" text="HOLD" style="margin-left: 210" [row]="i" *ngIf='!item.Fired && item.Printed == null'
+            [marginTop]="i * 25" class='holdStatus' (tap)='holdItem(item)'></Label>
+          <Label verticalAlignment="top" horizontalAlignment="left" text="Printed" style="margin-left: 210" [row]="i" *ngIf='!item.Fired && item.Printed != null'
+            [marginTop]="i * 25" (tap)='holdItem(item)'></Label>            
+          <Label verticalAlignment="top" horizontalAlignment="left" class='fireStatus fa' text="&#xf06d; FIRE" style="margin-left: 210" [row]="i" *ngIf='item.Fired && item.Printed == null'
+            [marginTop]="i * 25" (tap)='holdItem(item)'></Label>             
+          <Label verticalAlignment="top" horizontalAlignment="left" text="RE-FIRE" style="margin-left: 210" [row]="i" *ngIf='item.Fired && item.Printed != null'
+            [marginTop]="i * 25" class='fireStatus fa' (tap)='holdItem(item)'></Label>  
           <Label verticalAlignment="top" horizontalAlignment="right" [text]="item.SeatNumber" style="color: chocolate"
-            [row]="i" [marginTop]="i * 25"></Label>
+            [row]="i" [marginTop]="i * 25" (tap)='holdItem(item)'></Label>
         </ng-template>
       </GridLayout>
     </ScrollView>

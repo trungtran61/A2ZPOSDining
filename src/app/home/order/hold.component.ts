@@ -22,31 +22,52 @@ export class HoldComponent implements OnInit {
     holdItems: HoldItem[];
     message: string;
     isShowingSendHold: boolean = false;
-
+    printGroupFired: boolean[] = [false,false,false,false];
+    
     ngOnInit(): void {
+        this.initializePage();
+    }
+
+    initializePage() {
+        this.holdItems = this.utilSvc.orderItems.map(oi =>
+            ({
+                ProductName: oi.ProductName, Quantity: oi.Quantity,
+                SeatNumber: oi.SeatNumber,
+                IndexData: oi.IndexData,
+                Printed: oi.Printed,
+                Fired: false
+            })
+        );
+
+        this.isShowingSendHold = this.holdItems.some(hi => hi.Printed == null);
 
     }
 
-    holdItem(item: HoldItem)
+    holdItem(item: HoldItem) {
+        let indexData: number = item.IndexData;
+        item.Fired = !item.Fired;
+        this.holdItems.filter(hi => hi.IndexData == indexData).forEach(hi => {
+            hi.Fired = item.Fired;            
+        });        
+    }
+
+    selectItems(printGroup: number)
     {
-        let indexData:number = item.IndexData;
-        this.utilSvc.orderItems.filter(oi => oi.IndexData == indexData).forEach(oi => oi.tag = 1);
-        this.holdItems.filter(hi => hi.IndexData == indexData && hi.Printed == null).forEach(hi => {
-            hi.Status = '&#xf06d; FIRE';           
-            hi.StatusClass = 'fa';
-        });
-        this.holdItems.filter(hi => hi.IndexData == indexData && hi.Printed != null).forEach(hi => {
-            hi.Status = 'RE-FIRE';           
-            hi.StatusClass = '';
-        })
+        this.printGroupFired[printGroup] = !this.printGroupFired[printGroup];
+
+        if (printGroup == 0) // ALL
+        {
+            this.holdItems.forEach(hi => {
+                hi.Fired = this.printGroupFired[0];            
+            });      
+        }
     }
 
     cancel() {
         this.router.back();
     }
 
-    clearMessage()
-    {
+    clearMessage() {
         this.message = null;
     }
 
@@ -62,21 +83,10 @@ export class HoldComponent implements OnInit {
             });
     }
 
-    constructor(private DBService: SQLiteService, private page: Page, private router: RouterExtensions,  
+    constructor(private DBService: SQLiteService, private page: Page, private router: RouterExtensions,
         private utilSvc: UtilityService, private viewContainerRef: ViewContainerRef, private modalService: ModalDialogService) {
         page.actionBarHidden = true;
-        
-        this.holdItems = this.utilSvc.orderItems.map(oi =>  
-               ({
-                   ProductName: oi.ProductName, Quantity: oi.Quantity, 
-                   SeatNumber: oi.SeatNumber, 
-                   Status: oi.Printed != null ? 'PRINTED' : 'HOLD',
-                   StatusClass: oi.Printed != null ? 'printedStatus' : 'holdStatus',
-                   IndexData: oi.IndexData,
-                   Printed: oi.Printed                   
-                })             
-        );
 
-        this.isShowingSendHold = this.holdItems.some (hi => hi.Printed == null);        
+
     }
 }
