@@ -27,6 +27,20 @@ export class HoldComponent implements OnInit {
 
     }
 
+    holdItem(item: HoldItem)
+    {
+        let indexData:number = item.IndexData;
+        this.utilSvc.orderItems.filter(oi => oi.IndexData == indexData).forEach(oi => oi.tag = 1);
+        this.holdItems.filter(hi => hi.IndexData == indexData && hi.Printed == null).forEach(hi => {
+            hi.Status = '&#xf06d; FIRE';           
+            hi.StatusClass = 'fa';
+        });
+        this.holdItems.filter(hi => hi.IndexData == indexData && hi.Printed != null).forEach(hi => {
+            hi.Status = 'RE-FIRE';           
+            hi.StatusClass = '';
+        })
+    }
+
     cancel() {
         this.router.back();
     }
@@ -51,13 +65,18 @@ export class HoldComponent implements OnInit {
     constructor(private DBService: SQLiteService, private page: Page, private router: RouterExtensions,  
         private utilSvc: UtilityService, private viewContainerRef: ViewContainerRef, private modalService: ModalDialogService) {
         page.actionBarHidden = true;
+        
         this.holdItems = this.utilSvc.orderItems.map(oi =>  
                ({
                    ProductName: oi.ProductName, Quantity: oi.Quantity, 
-                   SeatNumber: oi.SeatNumber, Status: oi.Printed != null ? 'PRINTED' : 'HOLD',
+                   SeatNumber: oi.SeatNumber, 
+                   Status: oi.Printed != null ? 'PRINTED' : 'HOLD',
                    StatusClass: oi.Printed != null ? 'printedStatus' : 'holdStatus',
+                   IndexData: oi.IndexData,
+                   Printed: oi.Printed                   
                 })             
         );
-        this.isShowingSendHold = this.holdItems.some (hi => hi.Status == 'HOLD');        
+
+        this.isShowingSendHold = this.holdItems.some (hi => hi.Printed == null);        
     }
 }

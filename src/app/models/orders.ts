@@ -326,8 +326,10 @@ export interface KitchenMessage {
 
 export interface HoldItem {
     ProductName?: string;
-    Status?: string;
+    Printed?: string;
     Quantity?: number;
     Seat?: number;
+    Status?: string;
     StatusClass?: string;
+    IndexData?: number;
 }

@@ -26,7 +26,7 @@
         <ng-template ngFor let-item [ngForOf]="holdItems" let-i="index">
           <Label verticalAlignment="top" horizontalAlignment="left" [text]="item.Quantity" [row]="i" [marginTop]="i * 25"></Label>
           <Label verticalAlignment="top" horizontalAlignment="left" [text]="item.ProductName" style="margin-left: 30"
-            [row]="i" [marginTop]="i * 25"></Label>
+            [row]="i" [marginTop]="i * 25" (tap)='holdItem(i)'></Label>
           <Label verticalAlignment="top" horizontalAlignment="left" [text]="item.Status" style="margin-left: 210" [row]="i"
             [marginTop]="i * 25" [class]='item.StatusClass'></Label>
           <Label verticalAlignment="top" horizontalAlignment="right" [text]="item.SeatNumber" style="color: chocolate"
