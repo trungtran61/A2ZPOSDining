@@ -4,8 +4,9 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 
 import { SQLiteService } from "~/app/services/sqlite.service";
 import { Page } from "tns-core-modules/ui/page/page";
-import { KitchenMessage } from "~/app/models/orders"; 
-import { ModalDialogParams } from "nativescript-angular/modal-dialog";
+import { RouterExtensions } from "nativescript-angular/router";
+import { UtilityService } from "~/app/services/utility.service";
+import { OrderDetail } from "~/app/models/orders";
 
 @Component({
     selector: "hold",
@@ -15,18 +16,19 @@ import { ModalDialogParams } from "nativescript-angular/modal-dialog";
 })
 
 export class HoldComponent implements OnInit {
-        
+
+    orderItems: OrderDetail[];
+
     ngOnInit(): void {
-       
+
     }
 
-        cancel()
-    {
-        this.params.closeCallback(null);
-    }   
+    cancel() {
+        this.router.back();
+    }
 
-    constructor ( private DBService: SQLiteService, private page: Page, private params: ModalDialogParams ) 
-    {
+    constructor(private DBService: SQLiteService, private page: Page, private router: RouterExtensions,  private utilSvc: UtilityService) {
         page.actionBarHidden = true;
+        this.orderItems = this.utilSvc.orderItems;
     }
 }

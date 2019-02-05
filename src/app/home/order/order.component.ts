@@ -23,7 +23,7 @@ import { ModifyOrderItemComponent } from "./modify-order-item.component";
 import { ActivatedRoute } from "@angular/router";
 import { ReasonComponent } from "./reason.component";
 import { SearchComponent } from "./search.component";
-import { GuestsComponent } from "./guests.component";
+//import { GuestsComponent } from "./guests.component";
 
 const CHOICE_PAGESIZE: number = 20;
 const PRODUCT_PAGESIZE: number = 24;
@@ -671,6 +671,7 @@ export class OrderComponent implements OnInit {
             this.productInfoClass = 'glass fa';
     }
 
+    /*
     changeGuestsNumber() {
         //this.router.navigate(['/home/tableguests/' + this.table]);
         const modalOptions: ModalDialogOptions = {
@@ -687,7 +688,7 @@ export class OrderComponent implements OnInit {
                 }
             });
     }
-
+*/
     changeChoice(orderItem: OrderDetail) {
         this.currentOrderItem = orderItem;
         this.showForcedModifierDialog(false);
@@ -2323,5 +2324,10 @@ export class OrderComponent implements OnInit {
     {       
         //this.guests.nativeElement.focus();
         this.isNormalChoice = false;
+    }
+
+    hold()
+    {
+        this.router.navigate(['/home/hold']);
     }
 }

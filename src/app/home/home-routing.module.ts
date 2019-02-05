@@ -9,6 +9,7 @@ import { PizzaComponent } from "./order/pizza/pizza.component";
 import { AreaComponent } from "./area/area.component";
 import { MyChecksComponent } from "./my-checks/my-checks.component";
 import { CloseCheckComponent } from "./order/close-check/close-check.component";
+import { HoldComponent } from "./order/hold.component";
 
 const routes: Routes = [
     { path: "", component: HomeComponent },
@@ -17,7 +18,8 @@ const routes: Routes = [
     { path: "order", component: OrderComponent },
     { path: "closeCheck", component: CloseCheckComponent },
     { path: "mychecks", component: MyChecksComponent },
-    { path: "pizza", component: PizzaComponent }
+    { path: "pizza", component: PizzaComponent },
+    { path: "hold", component: HoldComponent },
 ];
 
 @NgModule({

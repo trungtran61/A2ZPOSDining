@@ -47,16 +47,16 @@
   </StackLayout>
   <!-- bottom navigation -->
   <GridLayout row="1" col="0" colSpan="4" style="margin-bottom:10" columns='800'>
-    <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancelHold()" col='0'></Button>
-    <Button class="glass btnBottom fa" col='7' textWrap="true" text="&#xf02f; Save No Print"></Button>
+    <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancel()" horizontalAlignment="left"></Button>
+    <Button class="glass btnBottom" textWrap="true" text="Save No Print"  horizontalAlignment="right" width="200"></Button>
   </GridLayout>
 
   <!-- hold categories -->
   <GridLayout row="0" col="1" rows="105 105 105 105">
-    <Button class="glass fa" text='&#xf06d; ALL' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(0)"></Button>
-    <Button class="glass fa" text='&#xf06d; Appetizers' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(1)"></Button>
-    <Button class="glass fa" text='&#xf06d; Entrees' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(2)"></Button>
-    <Button class="glass fa" text='&#xf06d; Drinks' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(3)"></Button>
+    <Button row='0' class="glass fa" text='&#xf06d; ALL' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(0)"></Button>
+    <Button row='1' class="glass fa" text='&#xf06d; Appetizers' textWrap="true" row='1' style='text-align: center' (tap)="selectItems(1)"></Button>
+    <Button row='2' class="glass fa" text='&#xf06d; Entrees' textWrap="true" row='2' style='text-align: center' (tap)="selectItems(2)"></Button>
+    <Button row='3' class="glass fa" text='&#xf06d; Drinks' textWrap="true" row='3' style='text-align: center' (tap)="selectItems(3)"></Button>
   </GridLayout>
   <GridLayout row="0" col="2" rows="100 50 200 100 100 100">
     <Button class="glass" text='Add / Edit Message' textWrap="true" row='0' (tap)="showMessageDialog()" horizontalAlignment="right"></Button>
@@ -66,34 +66,4 @@
     <Button class="glass" text='Print Message Only' textWrap="true" row='4' (tap)="PrintMessageOnly()" horizontalAlignment="right"></Button>
     <Button class="glass" text='Send Hold Items' textWrap="true" row='5' (tap)="sendHoldItems()" horizontalAlignment="right"></Button>
   </GridLayout>
-</GridLayout>
-
-<GridLayout rows='60 * 100' class='pageHeader' *ngIf="kitchenMessage != ''">
-  <label text='Choose a Message' row='0' class="title"></label>
-  <GridLayout columns="* * *" rows="110 110 110 110 110" row='1' style='border-width: 1; border-color: gray; border-radius: 10; padding: 10; margin: 5'>
-    <Button [class]='kitchenMessage.Class' [text]='kitchenMessage.Extra' (tap)='setActiveMessage(kitchenMessage)' [row]='kitchenMessage.Row' [col]='kitchenMessage.Col'
-      *ngFor='let kitchenMessage of kitchenMessages'></Button>
-  </GridLayout>
-
-  <GridLayout rows="20 auto auto" columns="10 * 10" row='2'>
-    <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='1' col='1'
-      height="60" width="120"></Button>
-    <Button class='glass' text='Other' (tap)='showOtherReason()' horizontalAlignment="center" row='1' col='1' height="60"
-      width="120"></Button>
-    <Button class='glass btnOK' text='Accept' (tap)='acceptReason(reason)' horizontalAlignment="right" row='1' col='1'
-      height="60" width="120"></Button>
-  </GridLayout>
-</GridLayout>
-
-<GridLayout rows="50 100 100" columns="*" *ngIf="isCustomKitchenMessage">
-  <label text='Enter Message' row='0' class="title"></label>
-  <TextField #vcReason horizontalAlignment="center" hint="Enter Message" [text]='otherKitchenMessage' row='1'
-    [(ngModel)]='otherMessage' required #otherReasonModel='ngModel' autocorrect="true" class='textEntryLongActive'
-    (returnPress)="acceptMessage()" (keyPress)="keyPressed($event)" returnKeyType='done'>
-  </TextField>
-
-  <Button class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='cancel()' horizontalAlignment="left" row='2' col='0'
-    height="60" width="120"></Button>
-  <Button class='glass btnOK' text='Accept' (tap)='acceptMessage()' horizontalAlignment="right" row='2' col='0' height="60"
-    width="120"></Button>
 </GridLayout>
