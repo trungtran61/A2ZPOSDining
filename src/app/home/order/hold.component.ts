@@ -6,7 +6,7 @@ import { SQLiteService } from "~/app/services/sqlite.service";
 import { Page } from "tns-core-modules/ui/page/page";
 import { RouterExtensions } from "nativescript-angular/router";
 import { UtilityService } from "~/app/services/utility.service";
-import { OrderDetail } from "~/app/models/orders";
+import { OrderDetail, HoldItem } from "~/app/models/orders";
 import { ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
 import { KitchenMessageComponent } from "./kitchen-message.component";
 
@@ -19,8 +19,9 @@ import { KitchenMessageComponent } from "./kitchen-message.component";
 
 export class HoldComponent implements OnInit {
 
-    orderItems: OrderDetail[];
+    holdItems: HoldItem[];
     message: string;
+    isShowingSendHold: boolean = false;
 
     ngOnInit(): void {
 
@@ -50,6 +51,11 @@ export class HoldComponent implements OnInit {
     constructor(private DBService: SQLiteService, private page: Page, private router: RouterExtensions,  
         private utilSvc: UtilityService, private viewContainerRef: ViewContainerRef, private modalService: ModalDialogService) {
         page.actionBarHidden = true;
-        this.orderItems = this.utilSvc.orderItems;
+        this.holdItems = this.utilSvc.orderItems.map(oi =>  
+               ({
+                   ProductName: oi.ProductName, Quantity: oi.Quantity, SeatNumber: oi.SeatNumber, Status: oi.Printed != null ? 'PRINTED' : 'HOLD'
+                })             
+        );
+        this.isShowingSendHold = this.holdItems.some (hi => hi.Status == 'HOLD');        
     }
 }

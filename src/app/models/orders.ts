@@ -323,3 +323,10 @@ export interface KitchenMessage {
     Col?: number;
     Class?: string;
 }
+
+export interface HoldItem {
+    ProductName?: string;
+    Status?: string;
+    Quantity?: number;
+    Seat?: number;
+}
