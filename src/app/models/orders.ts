@@ -300,6 +300,7 @@ export interface OrderDetail {
     ApplyCharge?: boolean;
     CostID?: number;
     Layer?: number;
+    PrintGroup?: number;
 }
 
 export interface OrderResponse {
@@ -331,4 +332,5 @@ export interface HoldItem {
     Seat?: number;   
     IndexData?: number;
     Fired?: boolean;
+    PrintGroup?: number;
 }

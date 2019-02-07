@@ -729,6 +729,7 @@ export class OrderComponent implements OnInit {
             orderItem.ReportProductMix = false;
             orderItem.ClientName = this.DBService.systemSettings.DeviceName;
             orderItem.CostID = product.CostID;
+            orderItem.PrintGroup = product.PrintGroup;
             this.changeQtyAvailable(product.ProductFilter, this.qtyEntered * -1);
 
             if (this.utilSvc.orderItems.length > 0 && this.utilSvc.orderItems[this.utilSvc.orderItems.length - 1].OrderFilter == null)

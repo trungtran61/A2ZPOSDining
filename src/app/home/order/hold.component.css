@@ -17,3 +17,8 @@
 {
     color: orange;
 }
+
+.fa{
+    display: inline-block;
+    text-decoration: none;
+}

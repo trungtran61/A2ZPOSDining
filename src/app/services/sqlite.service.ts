@@ -1231,9 +1231,10 @@ export class SQLiteService {
 
     public getLocalProduct(productFilter: number): Promise<Product> {
         return SQLiteService.database.get("SELECT ProductName, ProductFilter,UnitPrice,PrintCode,Taxable,CategoryCode," +
-        "ProductGroup,PrintCode1,CouponCode,GeneralCode,Description,AutoOption," +
+        "ProductGroup,PrintCode1,CouponCode,GeneralCode,p.Description,AutoOption," +
         "PrintName,ForcedModifier,UseForcedModifier,ShowAutoOption,UseUnitPrice2,UnitPrice2,Toppings," +
-        "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity, Product, CostID FROM Products WHERE ProductFilter =?", [productFilter])
+        "Pizza,ProductType,TaxRate,PromptQuantity,ModifierIgnoreQuantity,FractionalQuantity, Product, CostID, cc.PrintGroup" + 
+        " FROM Products p JOIN CategoryCodes cc ON p.CategoryCode=cc.PriKey " + " WHERE ProductFilter =?", [productFilter])
             .then(function (row) {
                 let product: Product =
                 {
@@ -1263,7 +1264,8 @@ export class SQLiteService {
                     ModifierIgnoreQuantity: row[23],
                     FractionalQuantity: row[24],
                     Product: row[25],
-                    CostID: row[26]
+                    CostID: row[26],
+                    PrintGroup: row[27]
                 };
 
                 return (product);

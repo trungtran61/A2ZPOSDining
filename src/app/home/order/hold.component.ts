@@ -35,6 +35,7 @@ export class HoldComponent implements OnInit {
                 SeatNumber: oi.SeatNumber,
                 IndexData: oi.IndexData,
                 Printed: oi.Printed,
+                PrintGroup: oi.PrintGroup,
                 Fired: false
             })
         );
@@ -60,6 +61,12 @@ export class HoldComponent implements OnInit {
             this.holdItems.forEach(hi => {
                 hi.Fired = this.printGroupFired[0];            
             });      
+        }
+        else
+        {
+            this.holdItems.filter(hi => hi.PrintGroup == printGroup).forEach( hi =>  {
+                hi.Fired = this.printGroupFired[printGroup];            
+            });     
         }
     }
 

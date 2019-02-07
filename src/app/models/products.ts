@@ -96,6 +96,7 @@ export interface Product {
     ModifierIgnoreQuantity?: boolean;
     FractionalQuantity?: boolean;
     CostID?: number;
+    PrintGroup?: number;
 }
 
 export interface ProductCategory {
