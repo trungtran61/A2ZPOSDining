@@ -31,7 +31,7 @@
             [marginTop]="i * 25" class='holdStatus' (tap)='holdItem(item)'></Label>
           <Label verticalAlignment="top" horizontalAlignment="left" text="Printed" style="margin-left: 210" [row]="i" *ngIf='!item.Fired && item.Printed != null'
             [marginTop]="i * 25" (tap)='holdItem(item)'></Label>            
-          <Label verticalAlignment="top" horizontalAlignment="left" class='fireStatus fa' text="&#xf06d; FIRE" style="margin-left: 210" [row]="i" *ngIf='item.Fired && item.Printed == null'
+          <Label verticalAlignment="top" horizontalAlignment="left" class='fireStatus fa' text="&#xf06d;&#xf06d;&#xf06d;&#xf06d;" style="margin-left: 210" [row]="i" *ngIf='item.Fired && item.Printed == null'
             [marginTop]="i * 25" (tap)='holdItem(item)'></Label>             
           <Label verticalAlignment="top" horizontalAlignment="left" text="RE-FIRE" style="margin-left: 210" [row]="i" *ngIf='item.Fired && item.Printed != null'
             [marginTop]="i * 25" class='fireStatus fa' (tap)='holdItem(item)'></Label>  
