@@ -28,12 +28,13 @@ export class AppComponent implements OnInit, OnDestroy {
         //     if (systemSettings == null) {
         //         console.log("SystemSettings not loaded.")
         //     }
-        // });  
+        // }); 
+        /* 
         const iqKeyboard = IQKeyboardManager.sharedManager();
         iqKeyboard.overrideKeyboardAppearance = true;
         iqKeyboard.keyboardAppearance = UIKeyboardAppearance.Dark;
         iqKeyboard.shouldResignOnTouchOutside = true;
-
+        */
         //this.socketIO.connect();
     }
 

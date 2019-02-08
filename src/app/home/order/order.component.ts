@@ -81,7 +81,7 @@ export class OrderComponent implements OnInit {
     orderHeader: OrderHeader = null;
     orderResponse: OrderResponse = null;
     //orderItems: OrderDetail[] = [];
-    //origOrderItems: OrderDetail[] = [];
+    orderProducts: OrderDetail[] = [];
     //orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
     currentSeatNumber: number = 1;
     checkTotal: number = 0;
@@ -1164,6 +1164,8 @@ export class OrderComponent implements OnInit {
         this.utilSvc.orderItems.splice(this.currentItemIndex + 1, 0, orderItem);
         this.currentItemIndex = this.utilSvc.orderItems.indexOf(orderItem);
         this.currentOrderItem = orderItem;
+
+        this.orderProducts = this.utilSvc.orderItems.filter(oi => oi.ItemType == ItemType.Product);
     }
 
     round2Decimals(inNumber: number) {
