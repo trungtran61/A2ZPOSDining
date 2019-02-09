@@ -147,4 +147,16 @@ export class APIService {
         this.http.post<string>('192.168.0.125:9100', text, httpOptions);             
           
     }
+
+    downloadAreaImage(url: string)
+    {
+        url = 'http://a2zpos.azurewebsites.net/images/Area_12.jpg';
+        const httpModule = require("http");
+        const fileSystemModule = require("tns-core-modules/file-system");
+        const filePath = fileSystemModule.path.join(fileSystemModule.knownFolders.currentApp().path, "test.png");
+        httpModule.getFile(url, filePath).then((resultFile) => {
+            // The returned result will be File object
+        }, (e) => {
+        });
+    }
 }

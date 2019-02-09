@@ -58,9 +58,12 @@
   <!-- bottom navigation -->
   <GridLayout row="1" col="0" colSpan="4" style="margin-bottom:10">
     <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancel()" horizontalAlignment="left"></Button>
-    <Button class="glass btnBottom fa" text="&#xf021; Start Over" width="100" textWrap="true" (tap)="cancel()"
+    <Button class="glass btnBottom fa" text="&#xf021; Start Over" width="100" textWrap="true" (tap)="initializePage()" *ngIf='isShowingSendFire'
       horizontalAlignment="center"></Button>
-    <Button class="glass btnRound " textWrap="true" text="Save No Print" horizontalAlignment="right" width="100" style='padding: 5; margin-right: 10'></Button>
+    <Button class="glass btnRound" textWrap="true" text="Save No Print" *ngIf='!isShowingSendFire'
+      horizontalAlignment="right" width="100" style='padding: 5; margin-right: 10'></Button>
+    <Button class="glass btnRound fa" textWrap="true" text="&#xf06d; Send Fire" *ngIf='isShowingSendFire'
+      horizontalAlignment="right" width="100" style='padding: 5; margin-right: 10; color: orange'></Button>
   </GridLayout>
 
   <!-- hold categories -->

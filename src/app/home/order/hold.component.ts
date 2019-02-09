@@ -22,6 +22,7 @@ export class HoldComponent implements OnInit {
     holdItems: HoldItem[];
     message: string;
     isShowingSendHold: boolean = false;
+    isShowingSendFire: boolean = false;
     printGroupFired: boolean[] = [false,false,false,false];
     
     ngOnInit(): void {
@@ -41,9 +42,10 @@ export class HoldComponent implements OnInit {
         );
 
         this.isShowingSendHold = this.holdItems.some(hi => hi.Printed == null);
-
+        this.isShowingSendFire = false;
+        this.printGroupFired = [false,false,false,false];
     }
-
+   
     holdItem(item: HoldItem) {
         let indexData: number = item.IndexData;
         item.Fired = !item.Fired;
@@ -68,6 +70,8 @@ export class HoldComponent implements OnInit {
                 hi.Fired = this.printGroupFired[printGroup];            
             });     
         }
+
+        this.isShowingSendFire = this.holdItems.some(hi => hi.Fired);
     }
 
     cancel() {

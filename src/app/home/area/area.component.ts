@@ -89,9 +89,12 @@ export class AreaComponent implements OnInit, OnChanges {
     getTablesInfo() {
         let area: Area = this.currentArea;
         
-        this.areaStyle = "padding-left: 30;background-image: url('" + this.httpProtocol + "://" + area.ImageURL + 
-            "'); background-repeat: no-repeat;background-size: 970px; background-position: 30px 0px;";        
+        //this.areaStyle = "padding-left: 30;background-image: url('" + this.httpProtocol + "://" + area.ImageURL + 
+        //    "'); background-repeat: no-repeat;background-size: 970px; background-position: 30px 0px;";   
         
+           // this.areaStyle = "padding-left: 30;background-image: url('res://images/TableLayout/Area_12'); background-repeat: no-repeat;background-size: 970px; background-position: 30px 0px;";         
+            
+
         let startTime = new Date().getTime();
         this.apiSvc.getTablesDetails(area.AreaID,
             this.DBService.loggedInUser.PriKey,
@@ -272,6 +275,7 @@ export class AreaComponent implements OnInit, OnChanges {
 
     logOut() {
         //localStorage.removeItem('areaID');
+        this.apiSvc.downloadAreaImage('');
         this.DBService.logoff().subscribe(res => {
             this.router.navigate(['/home/']);
             //this.router.back();
