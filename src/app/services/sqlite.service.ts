@@ -8,7 +8,7 @@ import { forkJoin } from "rxjs";
 import { catchError } from 'rxjs/operators';
 import { SystemSettings, Logos } from "~/app/models/settings";
 import { APIService } from "./api.service";
-import { Countdown, Reason, OrderDetail, KitchenMessage } from "~/app/models/orders";
+import { Countdown, Reason, OrderDetail, KitchenMessage, Printer } from "~/app/models/orders";
 import { UtilityService } from "./utility.service";
 import * as utils from "utils/utils";
 
@@ -1600,6 +1600,7 @@ export class SQLiteService {
             });
     }
    
+
     public loadKitchenMessages(db) {
 
         let that = this;

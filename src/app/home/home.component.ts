@@ -206,6 +206,7 @@ export class HomeComponent implements OnInit {
             this.DBService.loadUserModifiers(db),
             this.DBService.loadReasons(db),
             this.DBService.loadKitchenMessages(db),
+            this.apiSvc.loadPrinters()
         ])
             .subscribe(results => {
                 console.log(results);

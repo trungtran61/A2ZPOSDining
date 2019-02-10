@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpEvent } from "@angular/common/http";
-import { Countdown, OrderResponse, OrderHeader, OrderUpdate, DirectPrintJobsRequest } from "~/app/models/orders";
+import { Countdown, OrderResponse, OrderHeader, OrderUpdate, DirectPrintJobsRequest, Printer } from "~/app/models/orders";
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { AccessType } from "../models/employees";
@@ -34,7 +34,7 @@ export class APIService {
 
         return promise;
     }
-    
+
     public createRequestHeader() {
         let headers = new HttpHeaders({
             "AuthKey": "my-key",
@@ -46,8 +46,8 @@ export class APIService {
     }
 
     public createHttpOptions() {
-        return ({ headers : this.createRequestHeader()});
-    }    
+        return ({ headers: this.createRequestHeader() });
+    }
 
     getOrder(orderFilter: number, ph1: boolean, ph2: boolean): OrderHeader {
         let order: OrderHeader;
@@ -57,7 +57,7 @@ export class APIService {
     getFullOrder(orderFilter: number): Observable<any> {
         let headers = this.createRequestHeader();
         return this.http.get(this.apiUrl + 'GetFullOrder?OrderFilter=' + orderFilter,
-           { headers: headers });
+            { headers: headers });
 
         /*
         return this.http.get(this.apiUrl + 'GetFullOrder?OrderFilter=' + orderFilter,
@@ -87,17 +87,15 @@ export class APIService {
             { headers: headers }).pipe(map(res => res));
     }
 
-    getGroupedChecks(employeeID: number, accessType: AccessType, closed: boolean): Observable<any>
-    {
+    getGroupedChecks(employeeID: number, accessType: AccessType, closed: boolean): Observable<any> {
         //http://a2zpos.azurewebsites.net/DBService.svc/GetGroupedChecks?employeeID=105&module=1&closed=false&multiicheck=false&name=
         let headers = this.createRequestHeader();
-        return this.http.get(this.apiUrl + 'GetGroupedChecks?employeeID=' + employeeID + 
+        return this.http.get(this.apiUrl + 'GetGroupedChecks?employeeID=' + employeeID +
             '&module=1&closed=' + closed + '&multicheck=false&name=',
             { headers: headers }).pipe(map(res => res));
     }
 
-    directPrint(printRequest: DirectPrintJobsRequest): Observable<any>
-    {
+    directPrint(printRequest: DirectPrintJobsRequest): Observable<any> {
         let options = this.createHttpOptions();
         let JSONrequest: string = JSON.stringify(printRequest);
 
@@ -105,8 +103,7 @@ export class APIService {
             JSONrequest, options);
     }
 
-    checkPrintStatus(systemID: string): Observable<any>
-    {
+    checkPrintStatus(systemID: string): Observable<any> {
         let headers = this.createRequestHeader();
         let url: string = this.apiUrl + 'CheckPrintStatus?systemID=' + encodeURIComponent(systemID);
         //let url: string = this.apiUrl + 'CheckPrintStatus';
@@ -114,42 +111,62 @@ export class APIService {
             { headers: headers }).pipe(map(res => res));
     }
 
-    updateOrder(order: OrderUpdate): Observable<any>
-    {
+    updateOrder(order: OrderUpdate): Observable<any> {
         let options = this.createHttpOptions();
         return this.http.post<OrderUpdate>(this.apiUrl + 'UpdateOrder',
             JSON.stringify(order), options); //.pipe(catchError(this.handleError('updateOrder', order)));
     }
 
+    public loadPrinters() {
+        let systemName: string = 'iPad Air 2';
+        let that = this;
+        let headers = this.createRequestHeader();
+        let promise = new Promise(function (resolve, reject) {
+            that.http.get(that.apiUrl + 'GetClientPrinterList?SystemName=' + systemName, { headers: headers })
+                .subscribe(
+                    data => {
+                        let printers = <Printer[]>data;
+                        localStorage['Printers'] = data.toString();
+                    },
+                    err => {
+                        reject("Error occurred while retrieving Printers from API.");
+                    }
+                );
+        });
+        return promise;
+    }
+
+    public getPrinters(): Promise<Printer[]> {
+        return localStorage['Printers'].split(',');
+    }
+
     private handleError(apiCall: string, error: HttpErrorResponse) {
         if (error.error instanceof ErrorEvent) {
-          // A client-side or network error occurred. Handle it accordingly.
-          console.error('An error occurred:', error.error.message);
+            // A client-side or network error occurred. Handle it accordingly.
+            console.error('An error occurred:', error.error.message);
         } else {
-          // The backend returned an unsuccessful response code.
-          // The response body may contain clues as to what went wrong,
-          console.error(
-            'Backend returned code ${error.status}, ' +
-            'body was: ${error.error}');
+            // The backend returned an unsuccessful response code.
+            // The response body may contain clues as to what went wrong,
+            console.error(
+                'Backend returned code ${error.status}, ' +
+                'body was: ${error.error}');
         }
         // return an observable with a user-facing error message
         alert('Error occurred, please contact technical support or try again later.');
-      };
-      
-    postToPrint(text: string)
-    {
+    };
+
+    postToPrint(text: string) {
         let httpOptions = {
             headers: new HttpHeaders({
-              'Content-Type':  'text/plain',
-              'Authorization': 'my-auth-token'
+                'Content-Type': 'text/plain',
+                'Authorization': 'my-auth-token'
             })
-          };
-        this.http.post<string>('192.168.0.125:9100', text, httpOptions);             
-          
+        };
+        this.http.post<string>('192.168.0.125:9100', text, httpOptions);
+
     }
 
-    downloadAreaImage(url: string)
-    {
+    downloadAreaImage(url: string) {
         url = 'http://a2zpos.azurewebsites.net/images/Area_12.jpg';
         const httpModule = require("http");
         const fileSystemModule = require("tns-core-modules/file-system");
