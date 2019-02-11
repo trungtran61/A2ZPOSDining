@@ -117,24 +117,13 @@ export class APIService {
             JSON.stringify(order), options); //.pipe(catchError(this.handleError('updateOrder', order)));
     }
 
-    public loadPrinters(systemID: string) {       
-        let that = this;
+    loadPrinters(systemID: string):Observable<any> {       
         let headers = this.createRequestHeader();
-        let promise = new Promise(function (resolve, reject) {
-            that.http.get(that.apiUrl + 'GetClientPrinterList?SystemID=' + systemID, { headers: headers })
-                .subscribe(
-                    data => {
-                        localStorage['Printers'] = JSON.stringify(data);
-                    },
-                    err => {
-                        reject("Error occurred while retrieving Printers from API.");
-                    }
-                );
-        });
-        return promise;
+        return this.http.get(this.apiUrl + 'GetClientPrinterList?SystemID=' + encodeURIComponent(systemID),  { headers: headers }).pipe(map(res => res));    
     }
 
-    public getPrinters(): Printer[] {
+    getPrinters(): Printer[] {
+        console.log(localStorage.getItem('Printers'));
         return JSON.parse(localStorage.getItem('Printers'));
     }
 

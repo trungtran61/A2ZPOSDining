@@ -88,7 +88,7 @@ export class HoldComponent implements OnInit {
     {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
-            fullscreen: true
+            fullscreen: false
         };
 
         this.modalService.showModal(SelectPrinterComponent, modalOptions).then(

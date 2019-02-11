@@ -200,7 +200,7 @@ export class UtilityService {
         if (taxRateID == null)
             return 0;
 
-        if (this.taxRates !== null)
+        if (this.taxRates !== null && this.taxRates.length > 0)
             return this.taxRates.find(tr => tr.TaxID == taxRateID).EffectiveRate;
         else
             return .08;

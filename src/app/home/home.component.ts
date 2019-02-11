@@ -218,7 +218,9 @@ export class HomeComponent implements OnInit {
                     // Do stuff whith your error
                 });
         
-        this.apiSvc.loadPrinters(this.DBService.systemSettings.DeviceName);        
+        this.apiSvc.loadPrinters(this.DBService.systemSettings.DeviceName).subscribe(printers => {            
+            localStorage.setItem('Printers', JSON.stringify(printers));
+        });        
     }
 
     managerFunctions() {
