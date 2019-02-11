@@ -1,0 +1,14 @@
+<StackLayout class='page'>
+    <Label text='Choose Printer' row='0'></Label>
+    <WrapLayout style='border: silver; border-width: 2px; width: 600px'>
+        <Image src='res://images/TableLayout/PrintKitchen' (tap)='printerSelected(printer)' height="100"
+            *ngFor='let printer of printers'></Image>
+    </WrapLayout>
+    <GridLayout>
+        <Button horizontalAlignment="left" class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='close()'></Button>
+        <Label  horizontalAlignment="center" *ngIf='printerSelected != null' [text]='selectedPrinter.Name' style='color: blue; font-weight: bold; font-size: 20; margin-top: -10' ></Label>
+        <Label  horizontalAlignment="center" *ngIf='printerSelected != null' [text]='selectedPrinter.Name' style='color: white; font-weight: bold; font-size: 30; margin-top: 15' ></Label>
+        <Button horizontalAlignment="right" *ngIf='printerSelected == null'  class='glass btnOK fa' text="&#xf00c;" style='color: grey; height: 40' ></Button>
+        <Button horizontalAlignment="right" *ngIf='printerSelected != null' class='glass btnOK fa' text="&#xf00c;" style='color: green; height: 40' (tap)='accept()'></Button>
+    </GridLayout>
+</StackLayout>

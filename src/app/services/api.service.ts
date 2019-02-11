@@ -117,16 +117,14 @@ export class APIService {
             JSON.stringify(order), options); //.pipe(catchError(this.handleError('updateOrder', order)));
     }
 
-    public loadPrinters() {
-        let systemName: string = 'iPad Air 2';
+    public loadPrinters(systemID: string) {       
         let that = this;
         let headers = this.createRequestHeader();
         let promise = new Promise(function (resolve, reject) {
-            that.http.get(that.apiUrl + 'GetClientPrinterList?SystemName=' + systemName, { headers: headers })
+            that.http.get(that.apiUrl + 'GetClientPrinterList?SystemID=' + systemID, { headers: headers })
                 .subscribe(
                     data => {
-                        let printers = <Printer[]>data;
-                        localStorage['Printers'] = data.toString();
+                        localStorage['Printers'] = JSON.stringify(data);
                     },
                     err => {
                         reject("Error occurred while retrieving Printers from API.");
@@ -136,8 +134,8 @@ export class APIService {
         return promise;
     }
 
-    public getPrinters(): Promise<Printer[]> {
-        return localStorage['Printers'].split(',');
+    public getPrinters(): Printer[] {
+        return JSON.parse(localStorage.getItem('Printers'));
     }
 
     private handleError(apiCall: string, error: HttpErrorResponse) {

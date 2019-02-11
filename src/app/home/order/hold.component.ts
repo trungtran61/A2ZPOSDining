@@ -6,9 +6,10 @@ import { SQLiteService } from "~/app/services/sqlite.service";
 import { Page } from "tns-core-modules/ui/page/page";
 import { RouterExtensions } from "nativescript-angular/router";
 import { UtilityService } from "~/app/services/utility.service";
-import { OrderDetail, HoldItem } from "~/app/models/orders";
+import { OrderDetail, HoldItem, Printer } from "~/app/models/orders";
 import { ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
 import { KitchenMessageComponent } from "./kitchen-message.component";
+import { SelectPrinterComponent } from "./select-printer.component";
 
 @Component({
     selector: "hold",
@@ -22,8 +23,9 @@ export class HoldComponent implements OnInit {
     holdItems: HoldItem[];
     message: string;
     isShowingSendHold: boolean = false;
-    isShowingSendFire: boolean = false;
+    isShowingSendFire: boolean = false;    
     printGroupFired: boolean[] = [false,false,false,false];
+    selectedPrinter: Printer;
     
     ngOnInit(): void {
         this.initializePage();
@@ -82,6 +84,22 @@ export class HoldComponent implements OnInit {
         this.message = null;
     }
 
+    printMessageOnly()
+    {
+        const modalOptions: ModalDialogOptions = {
+            viewContainerRef: this.viewContainerRef,
+            fullscreen: true
+        };
+
+        this.modalService.showModal(SelectPrinterComponent, modalOptions).then(
+            (printer: Printer) => {
+                if (printer != null)
+                {
+                this.selectedPrinter = printer;
+                }
+            });
+    }
+
     showMessageDialog() {
         const modalOptions: ModalDialogOptions = {
             viewContainerRef: this.viewContainerRef,
@@ -97,7 +115,5 @@ export class HoldComponent implements OnInit {
     constructor(private DBService: SQLiteService, private page: Page, private router: RouterExtensions,
         private utilSvc: UtilityService, private viewContainerRef: ViewContainerRef, private modalService: ModalDialogService) {
         page.actionBarHidden = true;
-
-
     }
 }

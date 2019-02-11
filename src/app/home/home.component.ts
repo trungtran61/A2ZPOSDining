@@ -206,7 +206,7 @@ export class HomeComponent implements OnInit {
             this.DBService.loadUserModifiers(db),
             this.DBService.loadReasons(db),
             this.DBService.loadKitchenMessages(db),
-            this.apiSvc.loadPrinters()
+            
         ])
             .subscribe(results => {
                 console.log(results);
@@ -217,6 +217,8 @@ export class HomeComponent implements OnInit {
                     dialogs.alert(err);
                     // Do stuff whith your error
                 });
+        
+        this.apiSvc.loadPrinters(this.DBService.systemSettings.DeviceName);        
     }
 
     managerFunctions() {

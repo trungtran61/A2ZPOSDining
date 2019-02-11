@@ -24,6 +24,7 @@ import { SearchComponent } from "./order/search.component";
 //import { GuestsComponent } from "./order/guests.component";
 import { KitchenMessageComponent } from "./order/kitchen-message.component";
 import { HoldComponent } from "./order/hold.component";
+import { SelectPrinterComponent } from "./order/select-printer.component";
 
 //import { SplashComponent } from "~/app/home/splash/splash.component";
 TNSFontIconService.debug = true;
@@ -56,7 +57,8 @@ TNSFontIconService.debug = true;
         CloseCheckComponent,
         //GuestsComponent,
         HoldComponent,
-        KitchenMessageComponent            
+        KitchenMessageComponent,
+        SelectPrinterComponent            
     ],
     schemas: [
         NO_ERRORS_SCHEMA
@@ -70,7 +72,8 @@ TNSFontIconService.debug = true;
         ReasonComponent,
         SearchComponent,
         //GuestsComponent,
-        KitchenMessageComponent
+        KitchenMessageComponent,
+        SelectPrinterComponent
     ]  
 })
 export class HomeModule { }

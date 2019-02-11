@@ -82,9 +82,12 @@
       horizontalAlignment="center"></label>
     <Button class="glass" text='Clear Message' *ngIf='message != null' width="100" textWrap="true" row='4' (tap)="clearMessage()"
       horizontalAlignment="left" style='margin-top: 20'></Button>
-    <Button class="glass" text='Print Message Only' *ngIf='message != null' width="160" textWrap="true" row='4' (tap)="PrintMessageOnly()"
+    <Button class="glass" text='Print Message Only' *ngIf='message != null' width="160" textWrap="true" row='4' (tap)="printMessageOnly()"
       horizontalAlignment="right" style='margin-top: 20; margin-right: 10'></Button>
     <Button class="glass" text='Send Hold Items' row='6' width="260" *ngIf='isShowingSendHold' (tap)="sendHoldItems()"
       horizontalAlignment="right" style='margin-right: 10'></Button>
   </GridLayout>
+
+  <!-- Printers -->
+  
 </GridLayout>

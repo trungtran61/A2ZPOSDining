@@ -319,6 +319,7 @@ export interface Reason {
 
 export interface Printer {
     Name?: string;
+    PrinterID?: number;
 }
 
 export interface KitchenMessage {
