@@ -1,8 +1,10 @@
 <StackLayout class='page' width='580' style='padding: 10'>
     <Label text='Choose Printer' row='0' style='color: white; font-weight: bold; font-size: 20; text-align: center; margin-bottom: 10' ></Label>
     <WrapLayout style='border-color: silver; border-width: 2; border-radius: 10; padding: 10' >
-        <Image src='res://images/TableLayout/PrintKitchen' (tap)='printerSelected(printer)' height="100" style='margin: 5'
-            *ngFor='let printer of printers'></Image>
+        <StackLayout *ngFor='let printer of printers' width="160">
+            <Image src='res://images/TableLayout/PrintKitchen' (tap)='printerSelected(printer)' height="100" style='margin: 5'></Image>
+            <Label [text]='printer.Name' style='color: white; font-weight: bold; font-size: 16; margin-bottom: 10; text-align: center' ></Label>
+        </StackLayout>        
     </WrapLayout>
     <GridLayout>
         <Button horizontalAlignment="left" class='glass btnCancel fa' text="&#xf0e2; Cancel" (tap)='close()'  width="90" height='60'></Button>
