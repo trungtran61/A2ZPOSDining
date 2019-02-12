@@ -78,7 +78,7 @@ export class OrderComponent implements OnInit {
     userModifiers: UserModifier[]; // bottom row user defined options
 
     categoryCodes: CategoryCode[] = [];
-    orderHeader: OrderHeader = null;
+    //orderHeader: OrderHeader = null;
     orderResponse: OrderResponse = null;
     //orderItems: OrderDetail[] = [];
     orderProducts: OrderDetail[] = [];
@@ -343,11 +343,11 @@ export class OrderComponent implements OnInit {
     }
 
     createNewOrder() {
-        this.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };
+        this.utilSvc.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };
     }
 
     getFullOrder(orderFilter: number) {
-        this.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };       
+        this.utilSvc.orderHeader = { TaxExempt: this.DBService.systemSettings.TaxExempt, Gratuity: 0, Discount: 0 };       
         
         this.apiSvc.getFullOrder(orderFilter).subscribe(orderResponse => {
             //let startTime: number = new Date().getTime();            
@@ -1744,7 +1744,7 @@ export class OrderComponent implements OnInit {
             if (oi.ExtPrice != null)
                 this.subTotal += oi.ExtPrice;
 
-            this.tax = this.utilSvc.getTaxTotal(this.orderHeader, this.utilSvc.orderItems);
+            this.tax = this.utilSvc.getTaxTotal(this.utilSvc.orderHeader, this.utilSvc.orderItems);
             this.checkTotal = this.subTotal + this.tax;
 
             if (this.guests >= this.MAX_GUESTS) {
@@ -1764,7 +1764,7 @@ export class OrderComponent implements OnInit {
             if (oi.ExtPrice != null)
                 subTotal += oi.ExtPrice;
 
-            this.taxAll = this.utilSvc.getTaxTotal(this.orderHeader, this.utilSvc.orderItems);
+            this.taxAll = this.utilSvc.getTaxTotal(this.utilSvc.orderHeader, this.utilSvc.orderItems);
             this.checkTotalAll = subTotal + this.taxAll;
 
             if (this.guests >= this.MAX_GUESTS) {

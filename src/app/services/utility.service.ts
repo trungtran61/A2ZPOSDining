@@ -22,6 +22,7 @@ export class UtilityService {
     private writeStream: NSOutputStream;
     public taxRates: TaxRate[] = [];
     orderItems: OrderDetail[] = [];
+    orderHeader: OrderHeader = null;
     subTotal: number = 0;
     tax: number = 0;
     checkTotal: number = 0;

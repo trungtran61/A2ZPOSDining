@@ -1420,12 +1420,12 @@ export class SQLiteService {
                     that.http.get(that.apiUrl + 'GetTaxRates', { headers: headers })
                         .subscribe(
                             data => {
-                                let reasons = <TaxRate[]>data;
-                                reasons.forEach(function (reason: TaxRate) {
+                                let taxRates = <TaxRate[]>data;
+                                taxRates.forEach(function (taxRate: TaxRate) {
                                     SQLiteService.database.execSQL(
                                         "INSERT INTO TaxRates (TaxID,Name,RateType,EffectiveRate,Disabled,DateEntered) VALUES (?,?,?,?,?,?)",
-                                        [reason.TaxID, reason.Name, reason.RateType, reason.EffectiveRate,
-                                        reason.Disabled, that.converTimestampToDate(reason.DateEntered)]).then(id => {
+                                        [taxRate.TaxID, taxRate.Name, taxRate.RateType, taxRate.EffectiveRate,
+                                            taxRate.Disabled, that.converTimestampToDate(taxRate.DateEntered)]).then(id => {
                                             resolve("Added TaxRates records.")
                                         },
                                             err => {

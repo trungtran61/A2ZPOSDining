@@ -2,7 +2,7 @@
     <Label text='Choose Printer' row='0' style='color: white; font-weight: bold; font-size: 20; text-align: center; margin-bottom: 10' ></Label>
     <WrapLayout style='border-color: silver; border-width: 2; border-radius: 10; padding: 10' >
         <StackLayout *ngFor='let printer of printers' width="160">
-            <Image src='res://images/TableLayout/PrintKitchen' (tap)='printerSelected(printer)' height="100" style='margin: 5'></Image>
+            <Image src='res://images/printer' (tap)='printerSelected(printer)' height="100" style='margin: 5'></Image>
             <Label [text]='printer.Name' style='color: white; font-weight: bold; font-size: 16; margin-bottom: 10; text-align: center' ></Label>
         </StackLayout>        
     </WrapLayout>

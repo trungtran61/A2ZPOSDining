@@ -48,12 +48,15 @@ export class KitchenMessageComponent implements OnInit {
 
     setActiveMessage(message: KitchenMessage)
     {
-        this.message = message.Extra;
-
+        if (this.message == null)
+            this.message = message.Extra;
+        else
+            this.message += ', ' + message.Extra;
+        /*
         this.messages.forEach( message => {
             message.Class = 'glass'            
         });
-
+        */
         message.Class = 'glass activeMessage';
     }
 
