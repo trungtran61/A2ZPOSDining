@@ -62,7 +62,7 @@
       horizontalAlignment="center"></Button>
     <Button class="glass btnRound" textWrap="true" text="Save No Print" *ngIf='!isShowingSendFire'
       horizontalAlignment="right" width="100" style='padding: 5; margin-right: 10'></Button>
-    <Button class="glass btnRound fa" textWrap="true" text="&#xf06d; Send Fire" *ngIf='isShowingSendFire'
+    <Button class="glass btnRound fa" textWrap="true" text="&#xf06d; Send Fire" *ngIf='isShowingSendFire' (tap)="sendFireItems()"
       horizontalAlignment="right" width="100" style='padding: 5; margin-right: 10; color: orange'></Button>
   </GridLayout>
 

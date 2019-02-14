@@ -6,10 +6,11 @@ import { SQLiteService } from "~/app/services/sqlite.service";
 import { Page } from "tns-core-modules/ui/page/page";
 import { RouterExtensions } from "nativescript-angular/router";
 import { UtilityService } from "~/app/services/utility.service";
-import { OrderDetail, HoldItem, Printer, OrderHeader } from "~/app/models/orders";
+import { OrderDetail, HoldItem, Printer, OrderHeader, OrderUpdate, DirectPrintJobsRequest, PrintType, PrintKitchenMessageRequest, PrintCommandType } from "~/app/models/orders";
 import { ModalDialogOptions, ModalDialogService } from "nativescript-angular/modal-dialog";
 import { KitchenMessageComponent } from "./kitchen-message.component";
 import { SelectPrinterComponent } from "./select-printer.component";
+import { APIService } from "~/app/services/api.service";
 
 @Component({
     selector: "hold",
@@ -40,7 +41,8 @@ export class HoldComponent implements OnInit {
                 IndexData: oi.IndexData,
                 Printed: oi.Printed,
                 PrintGroup: oi.PrintGroup,
-                Fired: false
+                Fired: false,
+                tag: null
             })
         );
 
@@ -54,6 +56,7 @@ export class HoldComponent implements OnInit {
         item.Fired = !item.Fired;
         this.holdItems.filter(hi => hi.IndexData == indexData).forEach(hi => {
             hi.Fired = item.Fired;
+            hi.tag = hi.Fired ? 1 : null;
         });
     }
 
@@ -64,11 +67,13 @@ export class HoldComponent implements OnInit {
         {
             this.holdItems.forEach(hi => {
                 hi.Fired = this.printGroupFired[0];
+                hi.tag = hi.Fired ? 1 : null;
             });
         }
         else {
             this.holdItems.filter(hi => hi.PrintGroup == printGroup).forEach(hi => {
                 hi.Fired = this.printGroupFired[printGroup];
+                hi.tag = hi.Fired ? 1 : null;
             });
         }
 
@@ -93,8 +98,118 @@ export class HoldComponent implements OnInit {
             (printer: Printer) => {
                 if (printer != null) {
                     this.selectedPrinter = printer;
+                    this.saveOrder(PrintCommandType.PrintMessageOnly);
                 }
             });
+    }
+
+    sendHoldItems()
+    {
+        this.saveOrder(PrintCommandType.PrintHoldItems);
+    }
+
+    sendFireItems()
+    {
+        this.saveOrder(PrintCommandType.PrintFireItems);
+    }
+
+    saveOrder(printCommandType: PrintCommandType) {
+
+        if (this.utilSvc.orderFilter == null) {
+            let orderHeader: OrderHeader = this.utilSvc.getOrderHeader();
+            
+            this.holdItems.forEach(hi => {
+                this.utilSvc.orderItems.filter(oi => oi.IndexData == hi.IndexData).forEach(oi => {
+                    oi.tag = hi.tag;
+                });
+            });
+
+            this.utilSvc.orderItems.forEach(oi => {
+                if (oi.Voided == null)
+                    oi.Printed = 'P';
+            });
+
+            this.utilSvc.processFilterNumber();
+
+            let orderUpdate: OrderUpdate = {
+                order: orderHeader,
+                orderDetails: this.utilSvc.orderItems,
+                payments: []
+            };
+
+            this.apiSvc.updateOrder(orderUpdate).subscribe(results => {
+                let orderFilter: number = results.UpdateOrderResult;
+
+                switch (printCommandType) {
+                    case PrintCommandType.PrintHoldItems:
+                        {
+                            let printRequest: DirectPrintJobsRequest = {
+                                orderFilter: orderFilter,
+                                printType: PrintType.NotPrinted,
+                                modified: false,
+                                systemID: this.DBService.systemSettings.DeviceName
+                            }
+            
+                            this.apiSvc.directPrint(printRequest).subscribe(printResult => {
+                                if (!printResult) {
+                                    dialogs.alert({
+                                        title: "Error",
+                                        message: "Error occurred sending to print API.",
+                                        okButtonText: "Close"
+                                    })
+                                }
+                            });
+                            break;
+                        }
+                    case PrintCommandType.PrintFireItems:
+                        {
+                            let printRequest: DirectPrintJobsRequest = {
+                                orderFilter: orderFilter,
+                                printType: PrintType.Selected,
+                                modified: false,
+                                systemID: this.DBService.systemSettings.DeviceName
+                            }
+            
+                            this.apiSvc.directPrint(printRequest).subscribe(printResult => {
+                                if (!printResult) {
+                                    dialogs.alert({
+                                        title: "Error",
+                                        message: "Error occurred sending to print API.",
+                                        okButtonText: "Close"
+                                    })
+                                }
+                            });
+                            break;
+                        }
+                    case PrintCommandType.PrintMessageOnly:
+                        {
+                            let printRequest: PrintKitchenMessageRequest = {
+                                orderFilter: orderFilter,                                
+                                systemID: this.DBService.systemSettings.DeviceName,
+                                printerID: this.selectedPrinter.PrinterID
+                            }
+
+                            this.apiSvc.printKitchenMessage(printRequest).subscribe(printResult => {
+                                if (!printResult) {
+                                    dialogs.alert({
+                                        title: "Error",
+                                        message: "Error occurred calling printKitchenMessage API.",
+                                        okButtonText: "Close"
+                                    })
+                                }
+                            });
+                            break;
+                        }
+                }
+               },
+                err => {
+                    dialogs.alert({
+                        title: "Error",
+                        message: err.message,
+                        okButtonText: "Close"
+                    })
+                });
+        }
     }
 
     showMessageDialog() {
@@ -110,7 +225,7 @@ export class HoldComponent implements OnInit {
             });
     }
 
-    constructor(private DBService: SQLiteService, private page: Page, private router: RouterExtensions,
+    constructor(private DBService: SQLiteService, private page: Page, private router: RouterExtensions, private apiSvc: APIService,
         private utilSvc: UtilityService, private viewContainerRef: ViewContainerRef, private modalService: ModalDialogService) {
         page.actionBarHidden = true;
     }

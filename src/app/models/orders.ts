@@ -82,6 +82,12 @@ export enum PrintStatus {
     NotFound = 5
 }
 
+export enum PrintCommandType {
+    PrintHoldItems = 1,
+    PrintFireItems = 2,
+    PrintMessageOnly = 3
+}
+
 export interface PrintStatusDetail {
     SystemName: string;
     PrinterName: string;
@@ -133,6 +139,12 @@ export interface DirectPrintJobsRequest {
     printType?: PrintType;
     modified?: boolean;    
     systemID?: string;
+}
+
+export interface PrintKitchenMessageRequest {
+    orderFilter?: number;     
+    systemID?: string;
+    printerID?: number;  
 }
 
 export interface OrderHeader {
@@ -338,4 +350,5 @@ export interface HoldItem {
     IndexData?: number;
     Fired?: boolean;
     PrintGroup?: number;
+    tag?: number;
 }

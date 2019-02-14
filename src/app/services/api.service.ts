@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpEvent } from "@angular/common/http";
-import { Countdown, OrderResponse, OrderHeader, OrderUpdate, DirectPrintJobsRequest, Printer } from "~/app/models/orders";
+import { Countdown, OrderResponse, OrderHeader, OrderUpdate, DirectPrintJobsRequest, Printer, PrintGroup, PrintKitchenMessageRequest } from "~/app/models/orders";
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { AccessType } from "../models/employees";
@@ -100,6 +100,15 @@ export class APIService {
         let JSONrequest: string = JSON.stringify(printRequest);
 
         return this.http.post<any>(this.apiUrl + 'DirectPrintJobs',
+            JSONrequest, options);
+    }
+
+    printKitchenMessage(printRequest: PrintKitchenMessageRequest)
+    {
+        let options = this.createHttpOptions();       
+        let JSONrequest: string = JSON.stringify(printRequest);
+
+        return this.http.post<any>(this.apiUrl + 'PrintKitchenMessage',
             JSONrequest, options);
     }
 

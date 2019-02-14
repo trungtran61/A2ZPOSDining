@@ -2,7 +2,7 @@ import { Injectable, NgZone } from "@angular/core";
 import { interval, Observable } from 'rxjs'
 import { RouterExtensions } from "nativescript-angular";
 import { SQLiteService } from "./sqlite.service";
-import { OrderDetail, OrderHeader } from "../models/orders";
+import { OrderDetail, OrderHeader, OrderType } from "../models/orders";
 //import { EventData } from "tns-core-modules/data/observable";
 import { topmost } from "tns-core-modules/ui/frame";
 import { isIOS } from "tns-core-modules/platform";
@@ -33,6 +33,12 @@ export class UtilityService {
     checkNumber: number;
     ticketNumber: number;
     guests: number;    
+    orderFilter: number = null;    
+    area: number;    
+    orderType: number = OrderType.DineIn;
+    checkTotalAll: number = 0;
+    taxAll: number = 0;
+    reason: string;
 
     public constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -205,6 +211,78 @@ export class UtilityService {
             return this.taxRates.find(tr => tr.TaxID == taxRateID).EffectiveRate;
         else
             return .08;
+    }
+
+    processFilterNumber() {
+        let i: number = 1;
+        this.orderItems.forEach(oi => {
+            oi.FilterNumber = i;
+            i++;
+        })       
+    }    
+
+    getOrderHeader(): OrderHeader
+    {
+        let currentDate: string = this.getCurrentTime();
+
+        let orderHeader: OrderHeader =
+         {
+            OrderFilter: this.orderFilter,
+            Name: this.table,
+            OrderID: 0,
+            TableNumber: this.table,
+            CheckNumber: 1,
+            Total: this.checkTotalAll,
+            Discount: 0,
+            EmployeeID: this.DBService.loggedInUser.PriKey,
+            TotalCash: 0,
+            TotalCheck: 0,
+            CurrentDate: currentDate,
+            CurrentTime: currentDate,
+            VoidedBy: this.DBService.loggedInUser.PriKey,
+            NumberGuests: this.guests,
+            Tax: this.taxAll,
+            TimeOrder: currentDate,
+            Area: this.area,
+            TransType: this.orderType,
+            CompAmount: 0,
+            DiscountAmountOriginal: 0.0000,
+            DiscountAmountRecall: 0.0000,
+            CouponTypeOriginal: 0,
+            CouponTypeRecall: 0,
+            DiscountIDOriginal: 0,
+            DiscountIDRecall: 0,
+            Gratuity: 0.0000,
+            CollectorID: 0,
+            OriginalAmount: 0.0000,
+            VoidServerID: this.DBService.loggedInUser.PriKey,
+            DiscountServerID: 0,
+            DiscountServerIDRecall: 0,
+            ReopenedTicket: false,
+            SendToRegister: false,
+            Deposit: 0.0000,
+            DeliverID: 0,
+            MessageReceived: false,
+            Transmedia: 0.0000,
+            ReTender: false,
+            GratuityManual: false,
+            ChangeAmount: 0.0000,
+            TenderType: 0,
+            Transferred: false,
+            ClosedRecorded: false,
+            VoidRecorded: false,
+            ClientName: this.DBService.systemSettings.DeviceName,
+            OrderCreationTime: currentDate,
+            TaxExempt: false,
+            OLOOrderID: 0,
+            OLOMessageSent: false,
+            VoidReason: this.reason,
+            Void: 'Void',
+            VoidTime: currentDate,
+            Credit: 0
+        }
+
+        return orderHeader;
     }
 
     openPrinterSocket() {

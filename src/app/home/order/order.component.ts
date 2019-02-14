@@ -84,17 +84,17 @@ export class OrderComponent implements OnInit {
     orderProducts: OrderDetail[] = [];
     //orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
     currentSeatNumber: number = 1;
-    checkTotal: number = 0;
-    checkTotalAll: number = 0;
-    subTotal: number = 0;
-    tax: number = 0;
-    taxAll: number = 0;
-    discount: number = 0;
-    tips: number = 0;
-    guests: number = 0;
-    table: string = '';
-    server: string = '';
-    checkNumber: number = 1;
+    //checkTotal: number = 0;
+    //checkTotalAll: number = 0;
+    //subTotal: number = 0;
+    //tax: number = 0;
+    //taxAll: number = 0;
+    //discount: number = 0;
+    //tips: number = 0;
+    //guests: number = 0;
+    //table: string = '';
+    //server: string = '';
+    //checkNumber: number = 1;
     checkTitle: string = '';
     currentSubCategory: MenuSubCategory;
     currentSubCategoryName: string = '';
@@ -104,7 +104,7 @@ export class OrderComponent implements OnInit {
     currentProduct: MenuProduct;
     selectedProduct: Product;
     previousProduct: MenuProduct;
-    ticketNumber: number = 0;
+    //ticketNumber: number = 0;
 
     isShowingMainCategories: boolean = true;
     isShowingSubCategories: boolean = false;
@@ -147,7 +147,7 @@ export class OrderComponent implements OnInit {
     TIPS_PCT: number = .15;
 
     qtyEntered: number = 1;
-    orderType: number = OrderType.DineIn;
+    //orderType: number = OrderType.DineIn;
 
     isExistingOrder: boolean = false;
     orderModified: boolean = false;
@@ -160,9 +160,8 @@ export class OrderComponent implements OnInit {
 
     isShowingOptionsButton: boolean = false;
 
-    currentOrderFilter: number = null;
-    employeeID: number = 0;
-    area: number = 0;
+    //employeeID: number = 0;
+    //area: number = 0;
 
     choices: MenuChoice[] = [];
     pageChoices: MenuChoice[] = [];
@@ -205,10 +204,11 @@ export class OrderComponent implements OnInit {
     ngOnInit(): void {        
         console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));      
         this.tableGuestsTitle += localStorage.getItem('table');                 
-        this.guests = parseInt(localStorage.getItem('guests'));        
-        this.table = localStorage.getItem('table');
-        this.server = this.DBService.loggedInUser.FirstName;
-        this.employeeID = this.DBService.loggedInUser.PriKey;        
+        this.utilSvc.guests = parseInt(localStorage.getItem('guests'));        
+        this.utilSvc.table = localStorage.getItem('table');
+        this.utilSvc.server = this.DBService.loggedInUser.FirstName;
+        this.utilSvc.orderFilter = null;
+        //this.employeeID = this.DBService.loggedInUser.PriKey;        
 
         this.apiSvc.reloadCountdowns().then(result => {
             this.countdowns = <Countdown[]>result;
@@ -223,7 +223,7 @@ export class OrderComponent implements OnInit {
                     if (action == 'openTable') {
                         this.isGettingGuests = false;
                         let table: TableDetail = JSON.parse(localStorage.getItem('currentTable'));
-                        this.currentOrderFilter = table.OrderFilter;
+                        this.utilSvc.orderFilter = table.OrderFilter;
                         this.getFullOrder(table.OrderFilter);
                         this.isExistingOrder = true;
                         //this.textColorClass = 'disabledTextColor';
@@ -355,11 +355,11 @@ export class OrderComponent implements OnInit {
             //this.origOrderItems = orderResponse.OrderDetail;
             //this.utilSvc.orderItems = this.origOrderItems.filter(oi => oi.Voided == null);
             this.utilSvc.orderItems = orderResponse.OrderDetail;
-            this.ticketNumber = this.orderResponse.Order.OrderID;
-            this.checkNumber = this.orderResponse.Order.CheckNumber;
-            this.table = this.orderResponse.Order.TableNumber;
-            this.DBService.getLocalEmployee(this.orderResponse.Order.EmployeeID).then(employee => this.server = employee.FirstName);
-            this.guests = this.orderResponse.Order.NumberGuests;
+            this.utilSvc.ticketNumber = this.orderResponse.Order.OrderID;
+            this.utilSvc.checkNumber = this.orderResponse.Order.CheckNumber;
+            this.utilSvc.table = this.orderResponse.Order.TableNumber;
+            this.DBService.getLocalEmployee(this.orderResponse.Order.EmployeeID).then(employee => this.utilSvc.server = employee.FirstName);
+            this.utilSvc.guests = this.orderResponse.Order.NumberGuests;
             this.utilSvc.orderItems.forEach(oi => oi.Class = 'disabledTextColor');
             this.totalPrice();
             //console.log('elapsed ms: ' +  (new Date().getTime() - startTime));  
@@ -712,8 +712,8 @@ export class OrderComponent implements OnInit {
             orderItem.IndexData = this.getNextIndexData();
             orderItem.FilterNumber = this.getNextFilterNumber();
             // null orderFilter indicates a new item
-            //if (this.currentOrderFilter != null) 
-            //    orderItem.OrderFilter = this.currentOrderFilter;
+            //if (this.utilSvc.orderFilter != null) 
+            //    orderItem.OrderFilter = this.utilSvc.orderFilter;
             orderItem.Quantity = this.qtyEntered;
             orderItem.ExtPrice = this.qtyEntered * product.UnitPrice;
             orderItem.EmployeeID = this.DBService.loggedInUser.PriKey;
@@ -918,7 +918,7 @@ export class OrderComponent implements OnInit {
                         orderProduct.SeatNumber = choice.SelectedNumber;
                         break;
                     case 'delete':
-                        if (orderItem.ItemType != ItemType.ForcedChoice || this.currentOrderFilter != null)
+                        if (orderItem.ItemType != ItemType.ForcedChoice || this.utilSvc.orderFilter != null)
                             this.deleteOrderItem(orderItem);
                         break;
                     case 'repeat':
@@ -1119,8 +1119,8 @@ export class OrderComponent implements OnInit {
             orderDetail.ExtPrice = amount * qty;
         }
 
-        //if (this.currentOrderFilter != null)
-        //    orderDetail.OrderFilter = this.currentOrderFilter;
+        //if (this.utilSvc.orderFilter != null)
+        //    orderDetail.OrderFilter = this.utilSvc.orderFilter;
         this.resetLastItemOrdered();
         orderDetail.Class = 'lastOrderItem';
         orderDetail.CostID = 0;
@@ -1170,18 +1170,7 @@ export class OrderComponent implements OnInit {
 
     round2Decimals(inNumber: number) {
         return Math.round(inNumber * 100) / 100
-    }
-
-    processFilterNumber() {
-        let i: number = 1;
-        this.utilSvc.orderItems.forEach(oi => {
-            oi.FilterNumber = i;
-            i++;
-        })
-
-        //if (this.utilSvc.orderItems.length > 0)
-        //    this.utilSvc.orderItems[this.utilSvc.orderItems.length - 1].Class = 'lastOrderItem'
-    }
+    }    
 
     onOptionSwipe(args) {
         if (this.totalOptionPages <= 1)
@@ -1735,41 +1724,40 @@ export class OrderComponent implements OnInit {
     }
 
     totalPrice() {
-        this.subTotal = 0;
-        this.tax = 0;
-        this.tips = 0;
-        this.checkTotal = 0;
+        this.utilSvc.subTotal = 0;
+        this.utilSvc.tax = 0;
+        this.utilSvc.tips = 0;
+        this.utilSvc.checkTotal = 0;
 
         this.utilSvc.orderItems.filter(oi => oi.Voided == null).forEach(oi => {
             if (oi.ExtPrice != null)
-                this.subTotal += oi.ExtPrice;
+                this.utilSvc.subTotal += oi.ExtPrice;
 
-            this.tax = this.utilSvc.getTaxTotal(this.utilSvc.orderHeader, this.utilSvc.orderItems);
-            this.checkTotal = this.subTotal + this.tax;
+            this.utilSvc.tax = this.utilSvc.getTaxTotal(this.utilSvc.orderHeader, this.utilSvc.orderItems);
+            this.utilSvc.checkTotal = this.utilSvc.subTotal + this.utilSvc.tax;
 
-            if (this.guests >= this.MAX_GUESTS) {
-                this.tips = this.subTotal * this.TIPS_PCT;
-                this.checkTotal += this.tips;
+            if (this.utilSvc.guests >= this.MAX_GUESTS) {
+                this.utilSvc.tips = this.utilSvc.subTotal * this.TIPS_PCT;
+                this.utilSvc.checkTotal += this.utilSvc.tips;
             }
         });
     }
 
     getCheckTotal() {
         let subTotal = 0;
-        this.taxAll = 0;
-        let tips: number = 0;
-        this.checkTotalAll = 0;
+        this.utilSvc.taxAll = 0;
+        this.utilSvc.checkTotalAll = 0;
 
         this.utilSvc.orderItems.forEach(oi => {
             if (oi.ExtPrice != null)
                 subTotal += oi.ExtPrice;
 
-            this.taxAll = this.utilSvc.getTaxTotal(this.utilSvc.orderHeader, this.utilSvc.orderItems);
-            this.checkTotalAll = subTotal + this.taxAll;
+            this.utilSvc.taxAll = this.utilSvc.getTaxTotal(this.utilSvc.orderHeader, this.utilSvc.orderItems);
+            this.utilSvc.checkTotalAll = subTotal + this.utilSvc.taxAll;
 
-            if (this.guests >= this.MAX_GUESTS) {
-                tips = subTotal * this.TIPS_PCT;
-                this.checkTotalAll += tips;
+            if (this.utilSvc.guests >= this.MAX_GUESTS) {
+                this.utilSvc.tips = subTotal * this.TIPS_PCT;
+                this.utilSvc.checkTotalAll += this.utilSvc.tips;
             }
         });
     }
@@ -1808,79 +1796,12 @@ export class OrderComponent implements OnInit {
     }
 
     voidOrder(reason: string) {
-
+        this.utilSvc.reason = reason;
         let currentDate: string = this.utilSvc.getCurrentTime();
         this.getCheckTotal();
 
-        let orderHeader: OrderHeader = {
-            OrderFilter: this.currentOrderFilter,
-            Name: this.table,
-            OrderID: 0,
-            TableNumber: this.table,
-            CheckNumber: 1,
-            Total: this.checkTotalAll,
-            Discount: 0,
-            EmployeeID: this.employeeID,
-            TotalCash: 0,
-            TotalCheck: 0,
-            CurrentDate: currentDate,
-            CurrentTime: currentDate,
-            VoidedBy: this.DBService.loggedInUser.PriKey,
-            NumberGuests: this.guests,
-            Tax: this.taxAll,
-            TimeOrder: currentDate,
-            Area: this.area,
-            TransType: this.orderType,
-            CompAmount: 0,
-            DiscountAmountOriginal: 0.0000,
-            DiscountAmountRecall: 0.0000,
-            CouponTypeOriginal: 0,
-            CouponTypeRecall: 0,
-            DiscountIDOriginal: 0,
-            DiscountIDRecall: 0,
-            Gratuity: 0.0000,
-            CollectorID: 0,
-            OriginalAmount: 0.0000,
-            VoidServerID: this.DBService.loggedInUser.PriKey,
-            DiscountServerID: 0,
-            DiscountServerIDRecall: 0,
-            ReopenedTicket: false,
-            SendToRegister: false,
-            Deposit: 0.0000,
-            DeliverID: 0,
-            MessageReceived: false,
-            Transmedia: 0.0000,
-            ReTender: false,
-            GratuityManual: false,
-            ChangeAmount: 0.0000,
-            TenderType: 0,
-            Transferred: false,
-            ClosedRecorded: false,
-            VoidRecorded: false,
-            ClientName: this.DBService.systemSettings.DeviceName,
-            OrderCreationTime: currentDate,
-            TaxExempt: false,
-            OLOOrderID: 0,
-            OLOMessageSent: false,
-            VoidReason: reason,
-            Void: 'Void',
-            VoidTime: currentDate,
-            Credit: 0
-        }
-
-        /*
-        let that = this;
-        this.utilSvc.orderItems.forEach(oi => {
-            oi.Refund = false;
-            oi.Paid = false;
-            oi.Comped = false;
-            oi.CostID = 0;
-            if (oi.ProductType == ItemType.Product)
-                that.DBService.getLocalProduct(oi.ProductFilter).then(product => {
-                    oi.CostID = product.CostID;
-                });                        
-        });
-        */
+        let orderHeader: OrderHeader = this.utilSvc.getOrderHeader();        
+       
         let orderUpdate: OrderUpdate = {
             order: orderHeader,
             orderDetails: this.utilSvc.orderItems,
@@ -1933,7 +1854,7 @@ export class OrderComponent implements OnInit {
     }
 
     validateOrder(startNewOrder: boolean) {
-        if (this.utilSvc.orderItems.filter(oi => oi.Voided == null).length == 0 && this.currentOrderFilter != null) {
+        if (this.utilSvc.orderItems.filter(oi => oi.Voided == null).length == 0 && this.utilSvc.orderFilter != null) {
             let options = {
                 title: "Confirm Void",
                 message: "There are no items so the Order must be voided. Do you want to continue?",
@@ -1954,83 +1875,19 @@ export class OrderComponent implements OnInit {
 
     sendCheck(startNewOrder: boolean) {
 
-        if (this.utilSvc.orderItems.length == 0 && this.currentOrderFilter != null) {
+        if (this.utilSvc.orderItems.length == 0 && this.utilSvc.orderFilter != null) {
 
         }
         else {
-            let currentDate: string = this.utilSvc.getCurrentTime();
-
-            let orderHeader: OrderHeader = {
-                OrderFilter: this.currentOrderFilter == null ? 0 : this.currentOrderFilter,
-                Name: this.table,
-                OrderID: 0,
-                TableNumber: this.table,
-                CheckNumber: 1,
-                Total: this.checkTotal,
-                Discount: 0,
-                EmployeeID: this.employeeID,
-                TotalCash: 0,
-                TotalCheck: 0,
-                CurrentDate: currentDate,
-                CurrentTime: currentDate,
-                VoidedBy: 0,
-                NumberGuests: this.guests,
-                Tax: this.tax,
-                TimeOrder: currentDate,
-                Area: this.area,
-                TransType: this.orderType,
-                CompAmount: 0,
-                DiscountAmountOriginal: 0.0000,
-                DiscountAmountRecall: 0.0000,
-                CouponTypeOriginal: 0,
-                CouponTypeRecall: 0,
-                DiscountIDOriginal: 0,
-                DiscountIDRecall: 0,
-                Gratuity: 0.0000,
-                CollectorID: 0,
-                OriginalAmount: 0.0000,
-                VoidServerID: 0,
-                DiscountServerID: 0,
-                DiscountServerIDRecall: 0,
-                ReopenedTicket: false,
-                SendToRegister: false,
-                Deposit: 0.0000,
-                DeliverID: 0,
-                MessageReceived: false,
-                Transmedia: 0.0000,
-                ReTender: false,
-                GratuityManual: false,
-                ChangeAmount: 0.0000,
-                TenderType: 0,
-                Transferred: false,
-                ClosedRecorded: false,
-                VoidRecorded: false,
-                ClientName: this.DBService.systemSettings.DeviceName,
-                OrderCreationTime: currentDate,
-                TaxExempt: false,
-                OLOOrderID: 0,
-                OLOMessageSent: false,
-                Credit: 0
-            }
+            let orderHeader: OrderHeader = this.utilSvc.getOrderHeader();  
 
             this.utilSvc.orderItems.forEach(oi => {
                 if (oi.Voided == null)
                     oi.Printed = 'P';
             });
 
-            this.processFilterNumber();
-
-            /*
-            let orderItems: OrderDetail[] = [];
-            
-            this.utilSvc.orderItems.forEach( oi =>
-            {
-                orderItems.push(oi);
-            }
-            );
-            */
-            //this.utilSvc.orderItems = []; 
-           
+            this.utilSvc.processFilterNumber();
+          
             let orderUpdate: OrderUpdate = {
                 order: orderHeader,
                 orderDetails: this.utilSvc.orderItems,
@@ -2057,7 +1914,7 @@ export class OrderComponent implements OnInit {
                     }
                 });
                 if (startNewOrder) {
-                    this.router.navigate(['/home/tableguests/' + this.table]);
+                    this.router.navigate(['/home/tableguests/' + this.utilSvc.table]);
                 }
                 else {
                     this.router.navigate(['/home/area/']);
@@ -2242,7 +2099,7 @@ export class OrderComponent implements OnInit {
                             return true;
                     case MenuTimerType.Default:
                         that.lockedCategoryId = timer.DefaultCategory;
-                        switch (that.orderType) {
+                        switch (that.utilSvc.orderType) {
                             case OrderType.DineIn:
                                 if (!timer.TableService)
                                     checkMenuTimer = false;
@@ -2296,14 +2153,14 @@ export class OrderComponent implements OnInit {
 
     setGuests(numberOfGuests: string) {
         this.isGettingGuests = false;
-        this.guests = Number(numberOfGuests);
-        localStorage.setItem('guests', this.guests.toString());
+        this.utilSvc.guests = Number(numberOfGuests);
+        localStorage.setItem('guests', this.utilSvc.guests.toString());
     }     
  
     saveEnteredGuests()
     {    
         this.isGettingGuests = false; 
-        this.guests = Number(this.guestsEntered);   
+        this.utilSvc.guests = Number(this.guestsEntered);   
         localStorage.setItem('guests', this.guestsEntered);
     }
 
@@ -2331,16 +2188,6 @@ export class OrderComponent implements OnInit {
 
     hold()
     {
-        this.utilSvc.subTotal = this.subTotal;
-        this.utilSvc.tax = this.tax;
-        this.utilSvc.checkTotal = this.checkTotal;
-        this.utilSvc.tips = this.tips;
-        this.utilSvc.checkNumber = this.checkNumber;
-        this.utilSvc.table = this.table;
-        this.utilSvc.server = this.server;
-        this.utilSvc.ticketNumber = this.ticketNumber;
-        this.utilSvc.guests = this.guests;
-
         this.router.navigate(['/home/hold']);
     }
 }
