@@ -103,13 +103,11 @@ export class HoldComponent implements OnInit {
             });
     }
 
-    sendHoldItems()
-    {
+    sendHoldItems() {
         this.saveOrder(PrintCommandType.PrintHoldItems);
     }
 
-    sendFireItems()
-    {
+    sendFireItems() {
         this.saveOrder(PrintCommandType.PrintFireItems);
     }
 
@@ -117,7 +115,7 @@ export class HoldComponent implements OnInit {
 
         if (this.utilSvc.orderFilter == null) {
             let orderHeader: OrderHeader = this.utilSvc.getOrderHeader();
-            
+
             this.holdItems.forEach(hi => {
                 this.utilSvc.orderItems.filter(oi => oi.IndexData == hi.IndexData).forEach(oi => {
                     oi.tag = hi.tag;
@@ -149,7 +147,7 @@ export class HoldComponent implements OnInit {
                                 modified: false,
                                 systemID: this.DBService.systemSettings.DeviceName
                             }
-            
+
                             this.apiSvc.directPrint(printRequest).subscribe(printResult => {
                                 if (!printResult) {
                                     dialogs.alert({
@@ -169,7 +167,7 @@ export class HoldComponent implements OnInit {
                                 modified: false,
                                 systemID: this.DBService.systemSettings.DeviceName
                             }
-            
+
                             this.apiSvc.directPrint(printRequest).subscribe(printResult => {
                                 if (!printResult) {
                                     dialogs.alert({
@@ -184,7 +182,7 @@ export class HoldComponent implements OnInit {
                     case PrintCommandType.PrintMessageOnly:
                         {
                             let printRequest: PrintKitchenMessageRequest = {
-                                orderFilter: orderFilter,                                
+                                orderFilter: orderFilter,
                                 systemID: this.DBService.systemSettings.DeviceName,
                                 printerID: this.selectedPrinter.PrinterID
                             }
@@ -201,7 +199,8 @@ export class HoldComponent implements OnInit {
                             break;
                         }
                 }
-               },
+                this.router.back();
+            },
                 err => {
                     dialogs.alert({
                         title: "Error",

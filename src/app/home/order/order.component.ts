@@ -671,6 +671,9 @@ export class OrderComponent implements OnInit {
             this.productInfoClass = 'glass fa';
     }
 
+    changeGuestsNumber() {
+        this.isGettingGuests = true;
+    }
     /*
     changeGuestsNumber() {
         //this.router.navigate(['/home/tableguests/' + this.table]);
@@ -2153,6 +2156,8 @@ export class OrderComponent implements OnInit {
 
     setGuests(numberOfGuests: string) {
         this.isGettingGuests = false;
+        this.isShowingBottomNav = true;
+        this.isShowingExtraFunctions = false;
         this.utilSvc.guests = Number(numberOfGuests);
         localStorage.setItem('guests', this.utilSvc.guests.toString());
     }     
@@ -2160,6 +2165,8 @@ export class OrderComponent implements OnInit {
     saveEnteredGuests()
     {    
         this.isGettingGuests = false; 
+        this.isShowingExtraFunctions = false;
+        this.isShowingBottomNav = true;
         this.utilSvc.guests = Number(this.guestsEntered);   
         localStorage.setItem('guests', this.guestsEntered);
     }
