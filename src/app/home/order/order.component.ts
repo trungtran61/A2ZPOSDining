@@ -179,7 +179,7 @@ export class OrderComponent implements OnInit {
     tableGuestsTitle: string = 'Choose the number of guests for table ';
     guestsEntered: string = '';       
 
-    isOrdering: boolean = false;
+    isOrdering: boolean = true;
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -209,8 +209,7 @@ export class OrderComponent implements OnInit {
         this.tableGuestsTitle += this.utilSvc.table;                 
         //this.guests = parseInt(localStorage.getItem('guests'));        
         this.utilSvc.server = this.DBService.loggedInUser.FirstName;
-        this.utilSvc.orderFilter = null;
-        this.isOrdering = true;
+        this.utilSvc.orderFilter = null;        
         //this.employeeID = this.DBService.loggedInUser.PriKey;        
 
         this.apiSvc.reloadCountdowns().then(result => {
@@ -233,15 +232,12 @@ export class OrderComponent implements OnInit {
                     }
                 }
                 else {       
-                    this.isGettingGuests = true;      
-                    this.isOrdering = false;                           
                     this.createNewOrder();
                 }
             });            
         }
         );
         
-        this.isOrdering = !this.isGettingGuests;        
         this.getProductOptions('');
         this.getOptionCategories();
         this.allOptionFilterClass = 'glass';          
@@ -678,6 +674,7 @@ export class OrderComponent implements OnInit {
 
     changeGuestsNumber() {
         this.isGettingGuests = true;
+        this.isOrdering = false;
     }
     /*
     changeGuestsNumber() {

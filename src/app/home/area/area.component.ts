@@ -28,8 +28,10 @@ const ONE_MINUTE: number = 1000 * 60; // in milliseconds
 })
 
 export class AreaComponent implements OnInit, OnChanges {
+    isAreaLayout: boolean = true;
+    isGettingGuests: boolean = false;
     isBlinking: boolean = true;
-    isNormalChoice: boolean = false;
+    isNormalChoice: boolean = true;
     blinkingInterval: number;
     areas: Area[] = [];
     //tables: Observable<TableDetail[]>;   
@@ -48,7 +50,9 @@ export class AreaComponent implements OnInit, OnChanges {
     showAreas: boolean = false;
     currentArea: Area;    
     guests: number = 0;
-    
+    tableGuestsTitle: string = 'Choose the number of guests for table ';
+    guestsEntered: string = '';       
+
     ngOnChanges(): void {      
         
     }
@@ -230,7 +234,7 @@ export class AreaComponent implements OnInit, OnChanges {
         if (table.Status.indexOf('Open') > -1) {
             //localStorage.setItem('table', table.Name);                       
             //this.router.navigate(['/home/tableguests/' + table.Name]);
-            this.getNumberOfGuests();
+            this.getNumberOfGuests();            
             return;
         }
 
@@ -330,25 +334,48 @@ export class AreaComponent implements OnInit, OnChanges {
     getNumberOfGuests() {
         localStorage.setItem('guests', null); 
         this.utilSvc.startTime = new Date().getTime();  
-        //console.log(this.utilSvc.startTime);
-        this.router.navigate(['/home/order/']);        
-        /*
-        const modalOptions: ModalDialogOptions = {
-            viewContainerRef: this.viewContainerRef,
-            fullscreen: false,
-            //context: { options: options, currentOptions: currentOptions}
-        };
-
-        this.modalService.showModal(GuestsComponent, modalOptions)        
-            .then(
-            (numberOfGuests: string) => {
-                if (numberOfGuests != null) {
-                    localStorage.setItem('guests', numberOfGuests);                    
-                    this.router.navigate(['/home/order'], {clearHistory: true});
-                }
-            });            
-    */  
+       
+        this.isAreaLayout = false;
+        this.isGettingGuests = true;
+        this.isNormalChoice = true;        
     }
+
+     // number of guests   
+
+     setGuests(numberOfGuests: string) {
+        this.utilSvc.guests = Number(numberOfGuests);
+        //localStorage.setItem('guests', this.utilSvc.guests.toString());
+        this.router.navigate(["home/order"]);
+    }     
+ 
+    saveEnteredGuests()
+    {    
+        this.setGuests(this.guestsEntered);        
+    }
+
+    cancelGuests() {
+        this.isGettingGuests = false;       
+        this.isAreaLayout = true;
+    }
+
+    addDigit(digit: string)  
+    {
+        if (parseInt(digit) || (digit == '0' && parseInt(this.guestsEntered)))
+            this.guestsEntered = this.guestsEntered + digit;          
+    }
+
+    backSpace()    
+    {
+        if (this.guestsEntered.length > 0)
+            this.guestsEntered = this.guestsEntered.substring(0, this.guestsEntered.length - 1); 
+    }
+    
+    otherGuests()
+    {       
+        this.isNormalChoice = false;
+    }
+    // number of guests
+    
     /*
         pageTap()
         {
