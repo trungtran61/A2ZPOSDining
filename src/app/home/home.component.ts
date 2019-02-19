@@ -101,6 +101,11 @@ export class HomeComponent implements OnInit {
             this.utilSvc.currentDateTime = new Date();
         }, 1000);
         */
+       this.apiSvc.loadPrinters(utils.ios.getter(UIDevice, UIDevice.currentDevice).name.toUpperCase()).subscribe(printers => {            
+            localStorage.setItem('Printers', JSON.stringify(printers));
+            console.log('Printers');
+            console.log(localStorage.getItem('Printers'));
+        });       
     }    
 
     showLogos() {
@@ -216,11 +221,8 @@ export class HomeComponent implements OnInit {
                     this.isLoading = false;
                     dialogs.alert(err);
                     // Do stuff whith your error
-                });
+                });        
         
-        this.apiSvc.loadPrinters(this.DBService.systemSettings.DeviceName).subscribe(printers => {            
-            localStorage.setItem('Printers', JSON.stringify(printers));
-        });        
     }
 
     managerFunctions() {

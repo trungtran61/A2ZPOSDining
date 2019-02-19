@@ -63,7 +63,7 @@ export class TableGuestsComponent implements OnInit {
     }
 
     ngOnInit(): void {       
-        this.tableGuestsTitle += localStorage.getItem('table');      
+        this.tableGuestsTitle += this.utilSvc.table;
         //console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));            
     }
 

@@ -82,6 +82,7 @@ export class HoldComponent implements OnInit {
 
     cancel() {
         this.router.back();
+        //this.router.navigate(["home/order"]);
     }
 
     clearMessage() {
@@ -113,8 +114,8 @@ export class HoldComponent implements OnInit {
 
     saveOrder(printCommandType: PrintCommandType) {
 
-        if (this.utilSvc.orderFilter == null) {
-            let orderHeader: OrderHeader = this.utilSvc.getOrderHeader();
+        //if (this.utilSvc.orderFilter == null) {
+            let orderHeader: OrderHeader = this.utilSvc.getOrderHeader(false);
 
             this.holdItems.forEach(hi => {
                 this.utilSvc.orderItems.filter(oi => oi.IndexData == hi.IndexData).forEach(oi => {
@@ -208,7 +209,7 @@ export class HoldComponent implements OnInit {
                         okButtonText: "Close"
                     })
                 });
-        }
+        //}
     }
 
     showMessageDialog() {

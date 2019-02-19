@@ -65,11 +65,12 @@ export class AreaComponent implements OnInit, OnChanges {
                 this.areas = data;
                 
                 let areaID: number = Number(localStorage.getItem("areaID"));
-                if (areaID != 0)                
-                    this.currentArea = this.areas.find(area => area.AreaID == areaID);
+                if (areaID != 0)                                
+                    this.currentArea = this.areas.find(area => area.AreaID == areaID);                                    
                 else
                     this.currentArea = this.areas[0];                
                 
+                this.utilSvc.area = this.currentArea.AreaID;
                 this.getTablesInfo();
             }
         });
@@ -195,6 +196,7 @@ export class AreaComponent implements OnInit, OnChanges {
         this.showAreas = false;
         localStorage.setItem('areaID', area.AreaID.toString());
         this.currentArea = area;
+        this.utilSvc.area = this.currentArea.AreaID;
         this.getTablesInfo();
     }
 
@@ -222,10 +224,11 @@ export class AreaComponent implements OnInit, OnChanges {
         this.resetOccupiedTablesClass();
 
         table.Class += ' currentTable';
+        this.utilSvc.table = table.Name;
 
         // table is open, go get number of guests
         if (table.Status.indexOf('Open') > -1) {
-            localStorage.setItem('table', table.Name);           
+            //localStorage.setItem('table', table.Name);                       
             //this.router.navigate(['/home/tableguests/' + table.Name]);
             this.getNumberOfGuests();
             return;
@@ -236,7 +239,7 @@ export class AreaComponent implements OnInit, OnChanges {
         // table is active (occupied and enabled)
         if (table.Status.indexOf('Enabled') > -1) {
             // table actions menu is displayed and same table selected
-            if (this.displayTableActions && localStorage.getItem('table') == table.Name) {
+            if (this.displayTableActions && this.utilSvc.table == table.Name) {
                 this.displayTableActions = false;
                 this.displayTableActionsClass = 'sliderHide';
                 return;
@@ -244,8 +247,7 @@ export class AreaComponent implements OnInit, OnChanges {
 
             // different table selected
             this.displayTableActions = true;
-            this.displayTableActionsClass = 'slideLeft';
-            localStorage.setItem('table', table.Name);
+            this.displayTableActionsClass = 'slideLeft';           
             return;
         }
 

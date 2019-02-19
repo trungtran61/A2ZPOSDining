@@ -2,7 +2,7 @@
   <ActionItem [text]="checkTitle" ios.position="left"></ActionItem>
   <ActionItem [text]="currentSubCategory" style="font-weight: bold" ios.position="right" android.position="popup"></ActionItem>
 </ActionBar>
-<GridLayout rows="670 85" columns="300 150 20 *" *ngIf='!isGettingGuests'>
+<GridLayout rows="670 85" columns="300 150 20 *" *ngIf='isOrdering'>
   <StackLayout row="0" col="0">
     <!-- order header -->
     <GridLayout style="background-color: antiquewhite;" rows='40' cols='100'>
@@ -212,4 +212,95 @@
   </TextField>
   <Button class='glass btnOK' text='Accept' (tap)='saveEnteredGuests()' horizontalAlignment="right" row='0' col='2'
     height="60" width="120"></Button>
+</GridLayout>
+
+<!-- Hold -->
+<GridLayout rows="670 85" columns="300 150 20 *" *ngIf="isHolding">
+  <StackLayout row="0" col="0">
+    <!-- order header -->
+    <GridLayout style="background-color: antiquewhite;" rows='40' cols='100'>
+      <Label text="Ticket #" style="text-align: center;" *ngIf='utilSvc.ticketNumber' col='0'></Label>
+      <Label [text]="utilSvc.ticketNumber" style="text-align: left; margin-right: 5; color:red" *ngIf='utilSvc.ticketNumber'></Label>
+      <Label text="Check #" style="text-align: center;" *ngIf='!utilSvc.ticketNumber' col='0'></Label>
+      <Label [text]="utilSvc.checkNumber" style="text-align: right; margin-right: 100; color: red" *ngIf='!utilSvc.ticketNumber'></Label>
+    </GridLayout>
+    <GridLayout rows='40' style="background-color: antiquewhite;" columns='50 170 80' borderTopWidth='1' borderColor='gray'
+      borderLeftWidth='0' borderRightWidth='0' borderBottomWidth='1'>
+      <Label [text]="utilSvc.table" style="text-align: center; color: red" col='0' borderRightWidth='1' borderLeftWidth='0'
+        borderLeftColor='antiquewhite' borderRightColor='gray' borderBottomWidth='1'></Label>|
+      <Label [text]="utilSvc.server" style="text-align: center; color:green" col='1' borderRightWidth='1' borderLeftWidth='0'
+        borderRightColor='gray' borderBottomWidth='1'></Label>
+      <Label text="Guests: " style="text-align: left;" col='2'></Label>
+      <Label [text]="utilSvc.guests" style="text-align: right;font-weight: bold; color: red" col='2'></Label>
+    </GridLayout>
+    <!-- order items  -->
+    <ScrollView style="background-color: antiquewhite" height="480" orientation="vertical">
+      <GridLayout rows='auto' verticalAlignment='top' width="400">
+        <ng-template ngFor let-item [ngForOf]="holdItems" let-i="index">
+          <Label verticalAlignment="top" horizontalAlignment="left" [text]="item.Quantity" [row]="i" [marginTop]="i * 25" (tap)='holdItem(item)'></Label>
+          <Label verticalAlignment="top" horizontalAlignment="left" [text]="item.ProductName" style="margin-left: 30"
+            [row]="i" [marginTop]="i * 25" (tap)='holdItem(item)'></Label>
+          <Label verticalAlignment="top" horizontalAlignment="left" text="HOLD" style="margin-left: 210" [row]="i" *ngIf='!item.Fired && item.Printed == null'
+            [marginTop]="i * 25" class='holdStatus' (tap)='holdItem(item)'></Label>
+          <Label verticalAlignment="top" horizontalAlignment="left" text="Printed" style="margin-left: 210" [row]="i" *ngIf='!item.Fired && item.Printed != null'
+            [marginTop]="i * 25" (tap)='holdItem(item)'></Label>            
+          <Label verticalAlignment="top" horizontalAlignment="left" class='fireStatus fa' text="&#xf06d;&#xf06d;&#xf06d;&#xf06d;" style="margin-left: 210" [row]="i" *ngIf='item.Fired && item.Printed == null'
+            [marginTop]="i * 25" (tap)='holdItem(item)'></Label>             
+          <Label verticalAlignment="top" horizontalAlignment="left" text="RE-FIRE" style="margin-left: 210" [row]="i" *ngIf='item.Fired && item.Printed != null'
+            [marginTop]="i * 25" class='fireStatus fa' (tap)='holdItem(item)'></Label>  
+          <Label verticalAlignment="top" horizontalAlignment="right" [text]="item.SeatNumber" style="color: chocolate"
+            [row]="i" [marginTop]="i * 25" (tap)='holdItem(item)'></Label>
+        </ng-template>
+      </GridLayout>
+    </ScrollView>
+
+    <!-- totals -->
+    <GridLayout style="background-color: rgb(46, 44, 44);color: white" rows="20 20 20 20 20">
+      <Label row='0' horizontalAlignment="left" text="Subtotal" class="check-label"></Label>
+      <Label row='0' horizontalAlignment="right" [text]="utilSvc.subTotal | currency" class="check-amount"></Label>
+      <Label row='1' horizontalAlignment="left" text="Discount" class="check-label"></Label>
+      <Label row='1' horizontalAlignment="right" [text]="utilSvc.discount | currency" class="check-amount"></Label>
+      <Label row='2' horizontalAlignment="left" text="Tax" class="check-label"></Label>
+      <Label row='2' horizontalAlignment="right" [text]="utilSvc.tax | currency" class="check-amount"></Label>
+      <Label row='3' horizontalAlignment="left" text="Gratuity" class="check-label"></Label>
+      <Label row='3' horizontalAlignment="right" [text]="utilSvc.tips | currency" class="check-amount"></Label>
+      <Label row='4' horizontalAlignment="left" text="Total" class="check-label"></Label>
+      <Label row='4' horizontalAlignment="right" [text]="utilSvc.checkTotal | currency" class="check-amount"></Label>
+    </GridLayout>
+  </StackLayout>
+  <!-- bottom navigation -->
+  <GridLayout row="1" col="0" colSpan="4" style="margin-bottom:10">
+    <Button class="glass btnBottom btnCancel fa" text="&#xf0e2; Cancel" (tap)="cancel()" horizontalAlignment="left"></Button>
+    <Button class="glass btnBottom fa" text="&#xf021; Start Over" width="100" textWrap="true" (tap)="initializePage()" *ngIf='isShowingSendFire'
+      horizontalAlignment="center"></Button>
+    <Button class="glass btnRound" textWrap="true" text="Save No Print" *ngIf='!isShowingSendFire'
+      horizontalAlignment="right" width="100" style='padding: 5; margin-right: 10'></Button>
+    <Button class="glass btnRound fa" textWrap="true" text="&#xf06d; Send Fire" *ngIf='isShowingSendFire' (tap)="sendFireItems()"
+      horizontalAlignment="right" width="100" style='padding: 5; margin-right: 10; color: orange'></Button>
+  </GridLayout>
+
+  <!-- hold categories -->
+  <GridLayout row="0" col="1" rows="105 105 105 105" style="margin-top:100">
+    <Button row='0' class="glass fa" text='&#xf06d; ALL' textWrap="true" row='0' style='text-align: center' (tap)="selectItems(0)"></Button>
+    <Button row='1' class="glass fa" text='&#xf06d; Appetizers' textWrap="true" row='1' style='text-align: center'
+      (tap)="selectItems(1)"></Button>
+    <Button row='2' class="glass fa" text='&#xf06d; Entrees' textWrap="true" row='2' style='text-align: center' (tap)="selectItems(2)"></Button>
+    <Button row='3' class="glass fa" text='&#xf06d; Drinks' textWrap="true" row='3' style='text-align: center' (tap)="selectItems(3)"></Button>
+  </GridLayout>
+  <GridLayout row="0" col="3" rows="100 20 60 200 100 80 80">
+    <Button class="glass" text='Add / Edit Message' width="120" textWrap="true" row='0' (tap)="showMessageDialog()"
+      horizontalAlignment="right" style='padding: 5; margin-right: 10'></Button>
+    <label text='Message to Kitchen' row='2' class="title" horizontalAlignment="center" *ngIf='message != null'></label>
+    <label [text]='message' row='3' width="450" textWrap='true' *ngIf='message != null' verticalAlignment='top' style='padding: 10; font-weight:bold; color: white;border-color: gray; border-radius: 15; border-width: 2; border-style: solid;'
+      horizontalAlignment="center"></label>
+    <Button class="glass" text='Clear Message' *ngIf='message != null' width="100" textWrap="true" row='4' (tap)="clearMessage()"
+      horizontalAlignment="left" style='margin-top: 20'></Button>
+    <Button class="glass" text='Print Message Only' *ngIf='message != null' width="160" textWrap="true" row='4' (tap)="printMessageOnly()"
+      horizontalAlignment="right" style='margin-top: 20; margin-right: 10'></Button>
+    <Button class="glass" text='Send Hold Items' row='6' width="260" *ngIf='isShowingSendHold' (tap)="sendHoldItems()"
+      horizontalAlignment="right" style='margin-right: 10'></Button>
+  </GridLayout>
+
+  <!-- Printers -->
+  
 </GridLayout>

@@ -27,7 +27,7 @@ export class SQLiteService {
 
     public static isInstantiated: boolean;
 
-    public constructor(private http: HttpClient, private ApiSvc: APIService) {
+    public constructor(private http: HttpClient) {
         /*
         require("nativescript-localstorage");
         let loggedInUser: string = localStorage.getItem("loggedInUser");
@@ -1328,7 +1328,7 @@ export class SQLiteService {
                 else {
                     console.log("System Settings initialized.")
                     this.systemSettings = systemSettings;
-                    this.systemSettings.DeviceName = utils.ios.getter(UIDevice, UIDevice.currentDevice).name.toUpperCase();
+                    this.systemSettings.DeviceName = utils.ios.getter(UIDevice, UIDevice.currentDevice).name.toUpperCase();                    
                 }
             });
         }

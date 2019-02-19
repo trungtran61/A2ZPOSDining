@@ -174,10 +174,12 @@ export class OrderComponent implements OnInit {
     isShowingSubOptionsButton: boolean = false;
     currentItemIndex: number = 0;
     
-    isGettingGuests: boolean = true;
+    isGettingGuests: boolean = false;
     isNormalChoice: boolean = true;
     tableGuestsTitle: string = 'Choose the number of guests for table ';
     guestsEntered: string = '';       
+
+    isOrdering: boolean = false;
 
     constructor(private router: RouterExtensions,
         private DBService: SQLiteService,
@@ -202,12 +204,13 @@ export class OrderComponent implements OnInit {
     }
    
     ngOnInit(): void {        
-        console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));      
-        this.tableGuestsTitle += localStorage.getItem('table');                 
-        this.utilSvc.guests = parseInt(localStorage.getItem('guests'));        
-        this.utilSvc.table = localStorage.getItem('table');
+        console.log(this.utilSvc.guests);      
+        this.isGettingGuests = false;        
+        this.tableGuestsTitle += this.utilSvc.table;                 
+        //this.guests = parseInt(localStorage.getItem('guests'));        
         this.utilSvc.server = this.DBService.loggedInUser.FirstName;
         this.utilSvc.orderFilter = null;
+        this.isOrdering = true;
         //this.employeeID = this.DBService.loggedInUser.PriKey;        
 
         this.apiSvc.reloadCountdowns().then(result => {
@@ -230,13 +233,15 @@ export class OrderComponent implements OnInit {
                     }
                 }
                 else {       
-                    this.isGettingGuests = true;             
+                    this.isGettingGuests = true;      
+                    this.isOrdering = false;                           
                     this.createNewOrder();
                 }
             });            
         }
         );
         
+        this.isOrdering = !this.isGettingGuests;        
         this.getProductOptions('');
         this.getOptionCategories();
         this.allOptionFilterClass = 'glass';          
@@ -1799,11 +1804,10 @@ export class OrderComponent implements OnInit {
     }
 
     voidOrder(reason: string) {
-        this.utilSvc.reason = reason;
-        let currentDate: string = this.utilSvc.getCurrentTime();
+        this.utilSvc.reason = reason;        
         this.getCheckTotal();
 
-        let orderHeader: OrderHeader = this.utilSvc.getOrderHeader();        
+        let orderHeader: OrderHeader = this.utilSvc.getOrderHeader(true);        
        
         let orderUpdate: OrderUpdate = {
             order: orderHeader,
@@ -1882,8 +1886,8 @@ export class OrderComponent implements OnInit {
 
         }
         else {
-            let orderHeader: OrderHeader = this.utilSvc.getOrderHeader();  
-
+            let orderHeader: OrderHeader = this.utilSvc.getOrderHeader(false);             
+            
             this.utilSvc.orderItems.forEach(oi => {
                 if (oi.Voided == null)
                     oi.Printed = 'P';
@@ -2156,6 +2160,7 @@ export class OrderComponent implements OnInit {
 
     setGuests(numberOfGuests: string) {
         this.isGettingGuests = false;
+        this.isOrdering = true;
         this.isShowingBottomNav = true;
         this.isShowingExtraFunctions = false;
         this.utilSvc.guests = Number(numberOfGuests);
@@ -2164,11 +2169,7 @@ export class OrderComponent implements OnInit {
  
     saveEnteredGuests()
     {    
-        this.isGettingGuests = false; 
-        this.isShowingExtraFunctions = false;
-        this.isShowingBottomNav = true;
-        this.utilSvc.guests = Number(this.guestsEntered);   
-        localStorage.setItem('guests', this.guestsEntered);
+        this.setGuests(this.guestsEntered);        
     }
 
     cancel() {

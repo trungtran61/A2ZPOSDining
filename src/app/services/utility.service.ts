@@ -221,13 +221,13 @@ export class UtilityService {
         })       
     }    
 
-    getOrderHeader(): OrderHeader
+    getOrderHeader(voided: boolean): OrderHeader
     {
         let currentDate: string = this.getCurrentTime();
 
         let orderHeader: OrderHeader =
          {
-            OrderFilter: this.orderFilter,
+            OrderFilter: this.orderFilter == null ? 0 : this.orderFilter,
             Name: this.table,
             OrderID: 0,
             TableNumber: this.table,
@@ -276,9 +276,9 @@ export class UtilityService {
             TaxExempt: false,
             OLOOrderID: 0,
             OLOMessageSent: false,
-            VoidReason: this.reason,
-            Void: 'Void',
-            VoidTime: currentDate,
+            VoidReason: voided ? this.reason : null,
+            Void: voided ? 'Void' : null,
+            VoidTime: voided ? currentDate : null,
             Credit: 0
         }
 
