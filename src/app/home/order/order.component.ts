@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewContainerRef, NgZone, AfterViewInit } from "@angular/core";
+import { Component, OnInit, ViewContainerRef, NgZone, ViewChild, ElementRef } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { SwipeDirection } from "ui/gestures";
 
@@ -42,6 +42,7 @@ const SPACES3: string = '   ';
 })
 
 export class OrderComponent implements OnInit {
+    @ViewChild('orderScroller') private orderScroller: ElementRef;
     private printerSocket: any;
 
     currentCategoryID: number = 0;
@@ -858,17 +859,15 @@ export class OrderComponent implements OnInit {
             });
     }
 
-    showProducts() {
-        this.isShowingOptionsButton = true;
-        this.isShowingBottomNav = true;
-        this.isShowingProducts = true;
-        this.isShowingProducts = true;
-        this.isShowingSubCategories = true;
+    showProducts(show: boolean) {
+        this.isShowingOptionsButton = show;
+        this.isShowingBottomNav = show;
+        this.isShowingProducts = show;
+        this.isShowingSubCategories = show;
     }
 
     showModifyDialog(orderItem: OrderDetail) {        
-        this.isShowingOptionsButton = false;
-        this.showProducts();
+        this.isShowingOptionsButton = false;        
         this.previousProduct = null;
 
         this.utilSvc.orderItems.forEach(oi => 
@@ -1748,6 +1747,11 @@ export class OrderComponent implements OnInit {
         });
 
         this.orderItems = this.utilSvc.orderItems.filter(oi => oi.Voided == null);
+
+        // scroll to bottom
+        setTimeout(() => {
+            this.orderScroller.nativeElement.scrollToVerticalOffset(this.orderScroller.nativeElement.scrollableHeight, false)
+        }, 50);
     }
 
     getCheckTotal() {
@@ -1776,6 +1780,8 @@ export class OrderComponent implements OnInit {
             viewContainerRef: this.viewContainerRef,
             fullscreen: true
         };
+        
+        let currentTime = this.utilSvc.getCurrentTime();
 
         this.modalService.showModal(ReasonComponent, modalOptions).then(
             (reason: string) => {
@@ -1792,7 +1798,7 @@ export class OrderComponent implements OnInit {
                                     oi.Voided = true;                                    
                                     oi.DeleteReason = reason;
                                     oi.DeleteServerID = this.DBService.loggedInUser.EmployeeID;
-                                    oi.DeleteTime = this.utilSvc.getCurrentTime();;
+                                    oi.DeleteTime = currentTime;
                                 }    
                             }
                             );
