@@ -200,7 +200,7 @@ export class HoldComponent implements OnInit {
                             break;
                         }
                 }
-                this.router.back();
+                this.router.navigate(['/home/area']);
             },
                 err => {
                     dialogs.alert({

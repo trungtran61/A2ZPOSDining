@@ -80,9 +80,9 @@ export class OrderComponent implements OnInit {
     categoryCodes: CategoryCode[] = [];
     //orderHeader: OrderHeader = null;
     orderResponse: OrderResponse = null;
-    //orderItems: OrderDetail[] = [];
+    orderItems: OrderDetail[] = [];
     orderProducts: OrderDetail[] = [];
-    //orderItems: string[] = ['item 1', 'item 1', 'item 1', 'item 1',];
+    
     currentSeatNumber: number = 1;
     //checkTotal: number = 0;
     //checkTotalAll: number = 0;
@@ -1746,6 +1746,8 @@ export class OrderComponent implements OnInit {
                 this.utilSvc.checkTotal += this.utilSvc.tips;
             }
         });
+
+        this.orderItems = this.utilSvc.orderItems.filter(oi => oi.Voided == null);
     }
 
     getCheckTotal() {
@@ -1786,7 +1788,12 @@ export class OrderComponent implements OnInit {
                         this.utilSvc.orderItems.forEach ( oi =>
                             {
                                 if (oi.IndexData == orderItem.IndexData)    
-                                    oi.Voided = true;
+                                {
+                                    oi.Voided = true;                                    
+                                    oi.DeleteReason = reason;
+                                    oi.DeleteServerID = this.DBService.loggedInUser.EmployeeID;
+                                    oi.DeleteTime = this.utilSvc.getCurrentTime();;
+                                }    
                             }
                             );
                         this.orderModified = true;
@@ -1802,7 +1809,7 @@ export class OrderComponent implements OnInit {
 
     voidOrder(reason: string) {
         this.utilSvc.reason = reason;        
-        this.getCheckTotal();
+        this.getCheckTotal();        
 
         let orderHeader: OrderHeader = this.utilSvc.getOrderHeader(true);        
        
@@ -1916,13 +1923,7 @@ export class OrderComponent implements OnInit {
                             okButtonText: "Close"
                         })
                     }
-                });
-                if (startNewOrder) {
-                    this.router.navigate(['/home/tableguests/' + this.utilSvc.table]);
-                }
-                else {
-                    this.router.navigate(['/home/area/']);
-                }
+                });                
             },
                 err => {
                     dialogs.alert({
@@ -1931,6 +1932,15 @@ export class OrderComponent implements OnInit {
                         okButtonText: "Close"
                     })
                 });
+           
+            if (startNewOrder) {
+                //this.router.navigate(['/home/tableguests/' + this.utilSvc.table]);
+                this.utilSvc.orderItems = [];
+                this.isOrdering = true;                
+            }
+            else {
+                this.router.navigate(['/home/area/']);
+            }
         }
     }
 

@@ -24,8 +24,8 @@
      <!-- order items  -->
      <ScrollView style="background-color: antiquewhite" height="480" orientation="vertical">
       <GridLayout rows='auto' verticalAlignment='top' width="400" *ngIf='isShowingDetails'>
-        <ng-template ngFor let-item [ngForOf]="utilSvc.orderItems" let-i="index">
-          <Label [class]="item.Class" verticalAlignment="top" horizontalAlignment="left" [text]="item.Quantity" 
+        <ng-template ngFor let-item [ngForOf]="orderItems" let-i="index">
+          <Label [class]="item.Class" verticalAlignment="top" horizontalAlignment="left" [text]="item.Quantity"  
             [row]="i" [marginTop]="i * 20" width="400"></Label>
           <Label [class]="item.Class" verticalAlignment="top" horizontalAlignment="left" [text]="item.ProductName" style="margin-left: 30" 
             [row]="i" [marginTop]="i * 20" ></Label>         
