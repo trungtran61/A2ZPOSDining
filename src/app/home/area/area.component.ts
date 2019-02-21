@@ -263,7 +263,8 @@ export class AreaComponent implements OnInit, OnChanges {
     }
 
     setNumberOfGuests(table: TableDetail) {
-        localStorage.setItem('table', table.Name);        
+        localStorage.setItem('table', table.Name);  
+        this.utilSvc.startTime = new Date().getTime();
         this.router.navigate(['/home/tableguests/' + table.Name]);
     }
 
@@ -344,6 +345,7 @@ export class AreaComponent implements OnInit, OnChanges {
 
      setGuests(numberOfGuests: string) {
         this.utilSvc.guests = Number(numberOfGuests);
+        this.utilSvc.startTime = new Date().getTime();
         //localStorage.setItem('guests', this.utilSvc.guests.toString());
         this.router.navigate(["home/order"]);
     }     

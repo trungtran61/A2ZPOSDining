@@ -127,6 +127,7 @@ export class APIService {
     }
 
     loadPrinters(systemID: string):Observable<any> {       
+        systemID = 'IPAD AIR 2'
         let headers = this.createRequestHeader();
         return this.http.get(this.apiUrl + 'GetClientPrinterList?SystemID=' + encodeURIComponent(systemID),  { headers: headers }).pipe(map(res => res));    
     }

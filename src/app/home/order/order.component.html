@@ -15,7 +15,7 @@
       borderLeftWidth='0' borderRightWidth='0' borderBottomWidth='1'>
       <Label [text]="utilSvc.table" style="text-align: center; color: red" col='0' borderRightWidth='1' borderLeftWidth='0'
         borderLeftColor='antiquewhite' borderRightColor='gray' borderBottomWidth='1'></Label>|
-      <Label [text]="utilSvc.server" style="text-align: center; color:green" col='1' borderRightWidth='1' borderLeftWidth='0'
+      <Label [text]="DBService.loggedInUser.FirstName" style="text-align: center; color:green" col='1' borderRightWidth='1' borderLeftWidth='0'
         borderRightColor='gray' borderBottomWidth='1'></Label>
       <Label text="Guests: " style="text-align: left;" col='2'></Label>
       <Label [text]="utilSvc.guests" style="text-align: right;font-weight: bold; color: red" col='2'></Label>

@@ -205,7 +205,7 @@ export class OrderComponent implements OnInit {
     }
    
     ngOnInit(): void {        
-        console.log(this.utilSvc.guests);      
+        console.log('elapsed ms: ' +  (new Date().getTime() - this.utilSvc.startTime));  
         this.isGettingGuests = false;        
         this.tableGuestsTitle += this.utilSvc.table;                 
         //this.guests = parseInt(localStorage.getItem('guests'));        
@@ -867,6 +867,7 @@ export class OrderComponent implements OnInit {
     }
 
     showModifyDialog(orderItem: OrderDetail) {        
+        this.resetFixedOptionClasses();
         this.isShowingOptionsButton = false;        
         this.previousProduct = null;
 
@@ -1214,6 +1215,7 @@ export class OrderComponent implements OnInit {
     }
 
     resetFixedOptionClasses() {
+        this.currentFixedOption = null;
         this.fixedOptions.forEach(function (fixedOption: FixedOption) {
             fixedOption.Class = 'glass btnOption';
         });
@@ -1662,9 +1664,13 @@ export class OrderComponent implements OnInit {
             }
             else
                 if (orderItem.ItemType == ItemType.Option || orderItem.ItemType == ItemType.Choice) {
-                    //this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => oi !== orderItem);
-                    this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => ((oi.IndexData * 100 + oi.IndexDataSub) != (orderItem.IndexData * 100 + orderItem.IndexDataSub)) 
-                        || oi.ItemType != ItemType.Option);
+                    this.utilSvc.orderItems.filter(oi => oi.IndexData == orderItem.IndexData && oi.IndexDataSub == orderItem.IndexDataSub).forEach( oi =>
+                        {
+                            oi.Voided = 'deleted'; 
+                        })
+                    //this.utilSvc.orderItems.splice(this.utilSvc.orderItems.indexOf(orderItem),1);
+                    this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => oi.Voided != 'deleted');
+                    //    || oi.ItemType != ItemType.Option);
                 }
                 else if (orderItem.ItemType == ItemType.SubOption) {
                     this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => oi !== orderItem);
@@ -1751,7 +1757,7 @@ export class OrderComponent implements OnInit {
         // scroll to bottom
         setTimeout(() => {
             this.orderScroller.nativeElement.scrollToVerticalOffset(this.orderScroller.nativeElement.scrollableHeight, false)
-        }, 50);
+        }, 200);
     }
 
     getCheckTotal() {
