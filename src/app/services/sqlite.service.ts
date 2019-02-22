@@ -656,7 +656,7 @@ export class SQLiteService {
     }
 
     public getLocalChoiceLayers(productCode: number) {
-        return SQLiteService.database.all("SELECT DISTINCT ChoiceName, Layer FROM MenuChoices WHERE ProductCode=?", [productCode])
+        return SQLiteService.database.all("SELECT DISTINCT ChoiceName, Layer FROM MenuChoices WHERE ProductCode=? ORDER BY Layer", [productCode])
             .then(function (rows) {
                 let choices: ChoiceLayer[] = [];
                 for (var row in rows) {

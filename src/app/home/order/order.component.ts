@@ -1171,6 +1171,7 @@ export class OrderComponent implements OnInit {
         this.currentOrderItem = orderItem;
 
         this.orderProducts = this.utilSvc.orderItems.filter(oi => oi.ItemType == ItemType.Product);
+        this.totalPrice(); 
     }
 
     round2Decimals(inNumber: number) {
