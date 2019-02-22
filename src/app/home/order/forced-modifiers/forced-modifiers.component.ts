@@ -258,9 +258,10 @@ export class ForcedModifiersComponent implements OnInit {
 
     close() {
         // if changing choices, re-sort choices by layer
-        this.currentChoices.sort((a, b) => a.IndexDataSub > b.IndexDataSub
-                ? 1 : a.IndexDataSub < b.IndexDataSub  ? -1 : 0);
-        
+        //this.currentChoices.sort((a, b) => a.IndexDataSub > b.IndexDataSub
+        //        ? 1 : a.IndexDataSub < b.IndexDataSub  ? -1 : 0);
+        //this.currentChoices.forEach(cc => cc.IndexData = 1)
+
         this.params.closeCallback(this.currentChoices);
     }
 
@@ -287,7 +288,7 @@ export class ForcedModifiersComponent implements OnInit {
         if (!this.isAdding)
         {
             //this.currentChoices = this.utilSvc.orderItems.filter(od => (od.ItemType != ItemType.Option && od.ItemType != ItemType.Product && od.IndexDataSub != null));
-            this.currentChoices = this.utilSvc.orderItems.filter(od => od.ItemType != ItemType.Product);
+            this.currentChoices = this.utilSvc.orderItems.filter(od => od.ItemType != ItemType.Product && od.IndexData == this.orderItem.IndexData);
         }
 
         this.getChoiceLayers();

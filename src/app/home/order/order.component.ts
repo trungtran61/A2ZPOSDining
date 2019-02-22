@@ -463,7 +463,7 @@ export class OrderComponent implements OnInit {
 
         let isCategoryLocked = this.checkCategoryTimer(category.CategoryID);
 
-        if (isCategoryLocked) {
+        if (isCategoryLocked) {  
             alert(category.Name + " not available during this time period.");
             return;
         }
@@ -638,8 +638,10 @@ export class OrderComponent implements OnInit {
                 if (selectedItems != null) {
                     // if changing choices, remove current choices before adding new ones
                     if (!isAdding)
+                    {
                         this.utilSvc.orderItems = this.utilSvc.orderItems.filter(oi => ((oi.IndexData == this.currentOrderItem.IndexData && oi.ItemType == ItemType.Product) ||
-                            oi.IndexData != this.currentOrderItem.IndexData));
+                            oi.IndexData != this.currentOrderItem.IndexData));                        
+                    }                            
 
                     selectedItems.forEach(function (od: OrderDetail) {
                         od.SeatNumber = that.currentSeatNumber.toString();
@@ -649,7 +651,7 @@ export class OrderComponent implements OnInit {
                         that.addItemToOrder(od);
                     });
                     this.currentItemIndex = this.utilSvc.orderItems.length - 1;
-                    //this.sortOrderItems();
+                    this.sortOrderItems();
 
                     this.totalPrice();
                     //this.setLastItemOrdered();
